@@ -19,6 +19,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
@@ -49,6 +50,7 @@ const Navigation = () => {
 
   const handleAuthClick = async () => {
     if (user) {
+      setMobileMenuOpen(false);
       await signOut();
       navigate("/");
     } else {
@@ -146,6 +148,9 @@ const Navigation = () => {
                   <SheetContent side="right" className="w-[300px] bg-background">
                     <SheetHeader>
                       <SheetTitle>Menu</SheetTitle>
+                      <SheetDescription>
+                        Navigate through the site
+                      </SheetDescription>
                     </SheetHeader>
                     <div className="flex flex-col gap-4 mt-6">
                       <NavLink 
@@ -211,9 +216,8 @@ const Navigation = () => {
                           </Button>
                         )}
                         <Button 
-                          onClick={() => {
-                            handleAuthClick();
-                            setMobileMenuOpen(false);
+                          onClick={async () => {
+                            await handleAuthClick();
                           }}
                           variant="ghost"
                           className="w-full justify-start"
@@ -252,6 +256,9 @@ const Navigation = () => {
                   <SheetContent side="right" className="w-[300px] bg-background">
                     <SheetHeader>
                       <SheetTitle>Menu</SheetTitle>
+                      <SheetDescription>
+                        Navigate through the site
+                      </SheetDescription>
                     </SheetHeader>
                     <div className="flex flex-col gap-4 mt-6">
                       <NavLink 
