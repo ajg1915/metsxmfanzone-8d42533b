@@ -237,15 +237,18 @@ export default function LiveStreamManagement() {
               </div>
 
               <div>
-                <Label htmlFor="stream_url">Stream URL *</Label>
+                <Label htmlFor="stream_url">Stream URL (M3U8) *</Label>
                 <Input
                   id="stream_url"
                   type="url"
                   value={formData.stream_url}
                   onChange={(e) => setFormData({ ...formData, stream_url: e.target.value })}
-                  placeholder="https://youtube.com/live/..."
+                  placeholder="https://example.com/stream/playlist.m3u8"
                   required
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Enter the HLS stream URL ending in .m3u8
+                </p>
               </div>
 
               <div>
