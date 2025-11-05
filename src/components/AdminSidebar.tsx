@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const adminItems = [
-  { title: "Dashboard", url: "/admin", icon: Home },
+  { title: "Home", url: "/admin", icon: Home },
   { title: "Blog Management", url: "/admin/blog", icon: FileText },
   { title: "Video Management", url: "/admin/videos", icon: Video },
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
