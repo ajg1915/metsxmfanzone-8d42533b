@@ -41,6 +41,7 @@ export default function VideoManagement() {
   const [uploading, setUploading] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -87,21 +88,28 @@ export default function VideoManagement() {
 
       // Upload video file if provided
       if (videoFile) {
+        setUploadProgress(10);
         const fileExt = videoFile.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = `${fileName}`;
 
-        const { error: uploadError, data } = await supabase.storage
+        setUploadProgress(30);
+        const { error: uploadError } = await supabase.storage
           .from('videos')
-          .upload(filePath, videoFile);
+          .upload(filePath, videoFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
         if (uploadError) throw uploadError;
 
+        setUploadProgress(70);
         const { data: { publicUrl } } = supabase.storage
           .from('videos')
           .getPublicUrl(filePath);
 
         videoUrl = publicUrl;
+        setUploadProgress(90);
       }
 
       // Upload thumbnail file if provided
@@ -167,6 +175,7 @@ export default function VideoManagement() {
       });
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -215,6 +224,7 @@ export default function VideoManagement() {
     setEditingVideo(null);
     setVideoFile(null);
     setThumbnailFile(null);
+    setUploadProgress(0);
     setFormData({
       title: "",
       description: "",
@@ -280,15 +290,48 @@ export default function VideoManagement() {
                     id="video_file"
                     type="file"
                     accept="video/mp4"
-                    onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.type !== 'video/mp4') {
+                          toast({
+                            title: "Error",
+                            description: "Please upload an MP4 file",
+                            variant: "destructive",
+                          });
+                          e.target.value = '';
+                          return;
+                        }
+                        setVideoFile(file);
+                      }
+                    }}
                     disabled={uploading}
+                    required={!editingVideo && !formData.video_url}
                   />
                   <Upload className="w-4 h-4 text-muted-foreground" />
                 </div>
+                {videoFile && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Selected: {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
+                  </p>
+                )}
                 {editingVideo && formData.video_url && !videoFile && (
                   <p className="text-sm text-muted-foreground mt-1">
-                    Current video uploaded. Select a new file to replace it.
+                    Current video will be kept if no new file is uploaded
                   </p>
+                )}
+                {uploading && uploadProgress > 0 && (
+                  <div className="mt-2">
+                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Uploading... {uploadProgress}%
+                    </p>
+                  </div>
                 )}
               </div>
 
