@@ -30,10 +30,9 @@ const Navigation = () => {
     checkAdmin();
   }, [user]);
 
-  const handleAuthClick = async () => {
+  const handleAuthClick = () => {
     if (user) {
-      await signOut();
-      navigate("/");
+      signOut();
     } else {
       navigate("/auth");
     }

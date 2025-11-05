@@ -28,17 +28,7 @@ export const useAuth = () => {
   }, []);
 
   const signOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Sign out error:", error.message);
-      }
-      // Clear local state immediately
-      setSession(null);
-      setUser(null);
-    } catch (error) {
-      console.error("Sign out failed:", error);
-    }
+    await supabase.auth.signOut();
   };
 
   return {

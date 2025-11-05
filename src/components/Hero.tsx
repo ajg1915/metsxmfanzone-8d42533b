@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Info } from "lucide-react";
-import heroImage from "@/assets/hero-metsxm.png";
+import { Play, Info } from "lucide-react";
+import heroImage from "@/assets/hero-stadium.jpg";
 
 const Hero = () => {
   return (
@@ -22,6 +22,10 @@ const Hero = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-6 sm:mb-8 px-4">
+          <Button size="lg" className="gap-2 w-full sm:w-auto">
+            <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+            Join Community
+          </Button>
           <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto">
             <Info className="w-4 h-4 sm:w-5 sm:h-5" />
             More Info
