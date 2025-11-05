@@ -40,10 +40,10 @@ const Navigation = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           <div className="flex items-center gap-2">
-            <div className="text-lg font-bold">
+            <div className="text-base sm:text-lg font-bold">
               <span className="text-foreground">MetsXMFanZone</span>
               <span className="text-primary">.com</span>
             </div>

@@ -93,16 +93,16 @@ const LiveStreamsSection = () => {
   }
 
   return (
-    <section className="py-16 bg-secondary/20">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Live & Upcoming Streams</h2>
-          <Button variant="outline" onClick={() => navigate("/live")}>
+    <section className="py-8 sm:py-12 md:py-16 bg-secondary/20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold">Live & Upcoming Streams</h2>
+          <Button variant="outline" onClick={() => navigate("/live")} className="w-full sm:w-auto">
             View All Streams
           </Button>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {streams.map((stream) => (
             <Card 
               key={stream.id}

@@ -61,16 +61,16 @@ const SpringTraining = () => {
   ];
 
   return (
-    <section className="py-16 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
+    <section className="py-8 sm:py-12 md:py-16 bg-background">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-2">
             2026 Spring Training
           </h2>
-          <p className="text-foreground">Upcoming games and exclusive coverage</p>
+          <p className="text-sm sm:text-base text-foreground">Upcoming games and exclusive coverage</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {games.map((game) => (
             <Card key={game.id} className="border-2 border-primary bg-card overflow-hidden hover:shadow-xl transition-shadow">
               <div className={`h-48 ${game.colors} relative flex items-center justify-center`}>
