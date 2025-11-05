@@ -1,41 +1,69 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Radio, Tv, Users } from "lucide-react";
+import { Play, Radio, Users } from "lucide-react";
+
+interface LiveStream {
+  id: string;
+  title: string;
+  description: string;
+  stream_url: string;
+  thumbnail_url: string;
+  status: 'live' | 'scheduled' | 'ended';
+  scheduled_start: string;
+  viewers_count: number;
+}
 
 const Live = () => {
-  const liveStreams = [
-    {
-      title: "Mets Game Day Live",
-      description: "Pre-game analysis and live game coverage",
-      status: "LIVE NOW",
-      viewers: "2.3K",
-      icon: Radio,
-    },
-    {
-      title: "Just Live Baseball",
-      description: "24/7 baseball coverage and highlights",
-      status: "LIVE NOW",
-      viewers: "1.8K",
-      icon: Tv,
-    },
-    {
-      title: "SNY Network Stream",
-      description: "Official Mets network coverage",
-      status: "LIVE NOW",
-      viewers: "4.1K",
-      icon: Tv,
-    },
-    {
-      title: "Fan Zone Podcast",
-      description: "Live fan discussions and call-ins",
-      status: "STARTING SOON",
-      viewers: "856",
-      icon: Users,
-    },
-  ];
+  const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStreams();
+
+    // Set up realtime subscription
+    const channel = supabase
+      .channel('live-page-streams')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'live_streams'
+        },
+        () => {
+          console.log('Live streams updated, refetching...');
+          fetchStreams();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchStreams = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("live_streams")
+        .select("*")
+        .eq("published", true)
+        .in("status", ["live", "scheduled"])
+        .order("scheduled_start", { ascending: true });
+
+      if (error) throw error;
+      setLiveStreams(data as LiveStream[] || []);
+    } catch (error) {
+      console.error("Error fetching streams:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,16 +80,41 @@ const Live = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
-              {liveStreams.map((stream, index) => {
-                const Icon = stream.icon;
-                return (
-                  <Card key={index} className="border-2 border-primary bg-card hover:shadow-xl transition-all">
+            {loading ? (
+              <div className="text-center py-12">Loading live streams...</div>
+            ) : liveStreams.length === 0 ? (
+              <Card className="max-w-2xl mx-auto mb-12">
+                <CardContent className="py-12 text-center text-muted-foreground">
+                  No live or upcoming streams at the moment. Check back soon!
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
+                {liveStreams.map((stream) => (
+                  <Card 
+                    key={stream.id} 
+                    className="border-2 border-primary bg-card hover:shadow-xl transition-all cursor-pointer"
+                    onClick={() => window.open(stream.stream_url, '_blank')}
+                  >
+                    {stream.thumbnail_url && (
+                      <div className="aspect-video overflow-hidden">
+                        <img 
+                          src={stream.thumbnail_url} 
+                          alt={stream.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                     <CardHeader>
                       <div className="flex items-start justify-between mb-2">
-                        <Icon className="w-8 h-8 text-primary" />
-                        <Badge className={stream.status === "LIVE NOW" ? "bg-red-600 text-white" : "bg-primary text-primary-foreground"}>
-                          {stream.status}
+                        <Radio className="w-8 h-8 text-primary" />
+                        <Badge className={stream.status === "live" ? "bg-red-600 text-white" : "bg-blue-600 text-white"}>
+                          {stream.status === "live" ? (
+                            <>
+                              <Radio className="w-3 h-3 mr-1 animate-pulse" />
+                              LIVE NOW
+                            </>
+                          ) : 'STARTING SOON'}
                         </Badge>
                       </div>
                       <CardTitle className="text-xl text-primary">{stream.title}</CardTitle>
@@ -73,7 +126,7 @@ const Live = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground flex items-center gap-1">
                           <Users className="w-4 h-4" />
-                          {stream.viewers} watching
+                          {stream.viewers_count > 0 ? `${stream.viewers_count} watching` : 'Starting soon'}
                         </span>
                         <Button className="gap-2">
                           <Play className="w-4 h-4" />
@@ -82,9 +135,9 @@ const Live = () => {
                       </div>
                     </CardContent>
                   </Card>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
 
             <div className="text-center">
               <Card className="border-2 border-primary bg-card max-w-2xl mx-auto">

@@ -70,6 +70,60 @@ export type Database = {
           },
         ]
       }
+      live_streams: {
+        Row: {
+          actual_end: string | null
+          actual_start: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          published: boolean
+          scheduled_end: string | null
+          scheduled_start: string | null
+          status: string
+          stream_url: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          viewers_count: number | null
+        }
+        Insert: {
+          actual_end?: string | null
+          actual_start?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          published?: boolean
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          status: string
+          stream_url: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          viewers_count?: number | null
+        }
+        Update: {
+          actual_end?: string | null
+          actual_start?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          published?: boolean
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          status?: string
+          stream_url?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          viewers_count?: number | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           content: string
