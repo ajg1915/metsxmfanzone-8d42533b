@@ -10,6 +10,7 @@ import Highlights from "./pages/Highlights";
 import Replays from "./pages/Replays";
 import Plans from "./pages/Plans";
 import Auth from "./pages/Auth";
+import AdminSetup from "./pages/AdminSetup";
 import { AdminLayout } from "./components/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import ContentManagement from "./pages/admin/ContentManagement";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/replays" element={<Replays />} />
           <Route path="/plans" element={<Plans />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/admin-setup" element={<AdminSetup />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="content" element={<ContentManagement />} />
