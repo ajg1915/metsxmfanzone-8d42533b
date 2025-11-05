@@ -41,15 +41,15 @@ const Navigation = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-12">
           <div className="flex items-center gap-2">
-            <div className="text-2xl font-bold">
+            <div className="text-lg font-bold">
               <span className="text-foreground">MetsXMFanZone</span>
               <span className="text-primary">.com</span>
             </div>
           </div>
           
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4 text-sm">
             <NavLink 
               to="/" 
               className="text-foreground hover:text-primary transition-colors"
@@ -61,14 +61,14 @@ const Navigation = () => {
               to="/live" 
               className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
-              <Play className="w-4 h-4" />
+              <Play className="w-3 h-3" />
               Live
             </NavLink>
             <NavLink 
               to="/community" 
               className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
-              <Users className="w-4 h-4" />
+              <Users className="w-3 h-3" />
               Community
             </NavLink>
             <NavLink 
@@ -81,7 +81,7 @@ const Navigation = () => {
               to="/replays" 
               className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
-              <VideoIcon className="w-4 h-4" />
+              <VideoIcon className="w-3 h-3" />
               Replays
             </NavLink>
             <NavLink 
@@ -98,17 +98,17 @@ const Navigation = () => {
                 onClick={() => navigate("/admin")} 
                 variant="outline" 
                 size="sm"
-                className="hidden md:flex"
+                className="hidden md:flex text-xs"
               >
-                <Shield className="w-4 h-4 mr-2" />
+                <Shield className="w-3 h-3 mr-1" />
                 Admin
               </Button>
             )}
-            <Button size="lg" className="hidden md:flex" onClick={handleAuthClick}>
+            <Button size="sm" className="hidden md:flex text-xs" onClick={handleAuthClick}>
               {user ? "Sign Out" : "Sign Up"}
             </Button>
             <Button variant="ghost" size="icon" className="md:hidden" onClick={handleAuthClick}>
-              {user ? "Sign Out" : <Menu className="w-6 h-6" />}
+              {user ? "Sign Out" : <Menu className="w-5 h-5" />}
             </Button>
           </div>
         </div>
