@@ -83,6 +83,8 @@ export default function LiveStreamManagement() {
     try {
       const streamData = {
         ...formData,
+        scheduled_start: formData.scheduled_start || null,
+        scheduled_end: formData.scheduled_end || null,
         actual_start: formData.status === 'live' ? new Date().toISOString() : null,
       };
 
