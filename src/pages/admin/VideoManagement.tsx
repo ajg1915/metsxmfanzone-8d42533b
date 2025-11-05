@@ -1,41 +1,51 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Video } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Trash2, Plus, Edit } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-interface VideoItem {
+interface Video {
   id: string;
   title: string;
-  description?: string;
+  description: string;
   video_url: string;
-  thumbnail_url?: string;
-  video_type: string;
+  thumbnail_url: string;
+  video_type: 'highlight' | 'replay' | 'live_stream';
   category: string;
+  duration: number;
   published: boolean;
+  published_at: string;
   created_at: string;
 }
 
 export default function VideoManagement() {
   const { toast } = useToast();
-  const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     video_url: "",
     thumbnail_url: "",
-    video_type: "highlight",
+    video_type: "highlight" as 'highlight' | 'replay' | 'live_stream',
     category: "General",
+    duration: 0,
     published: false,
   });
 
@@ -51,7 +61,7 @@ export default function VideoManagement() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setVideos(data || []);
+      setVideos(data as Video[] || []);
     } catch (error) {
       console.error("Error fetching videos:", error);
       toast({
@@ -66,46 +76,54 @@ export default function VideoManagement() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      const submitData = {
+      const videoData = {
         ...formData,
         published_at: formData.published ? new Date().toISOString() : null,
       };
 
-      const { error } = await supabase
-        .from("videos")
-        .insert([submitData]);
+      if (editingVideo) {
+        const { error } = await supabase
+          .from("videos")
+          .update(videoData)
+          .eq("id", editingVideo.id);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Video added successfully",
-      });
+        toast({
+          title: "Success",
+          description: "Video updated successfully",
+        });
+      } else {
+        const { error } = await supabase
+          .from("videos")
+          .insert([videoData]);
 
-      setDialogOpen(false);
-      setFormData({
-        title: "",
-        description: "",
-        video_url: "",
-        thumbnail_url: "",
-        video_type: "highlight",
-        category: "General",
-        published: false,
-      });
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Video created successfully",
+        });
+      }
+
+      setIsDialogOpen(false);
+      resetForm();
       fetchVideos();
     } catch (error) {
-      console.error("Error adding video:", error);
+      console.error("Error saving video:", error);
       toast({
         title: "Error",
-        description: "Failed to add video",
+        description: "Failed to save video",
         variant: "destructive",
       });
     }
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this video?")) return;
+
     try {
       const { error } = await supabase
         .from("videos")
@@ -129,40 +147,47 @@ export default function VideoManagement() {
     }
   };
 
-  const handleTogglePublish = async (id: string, currentStatus: boolean) => {
-    try {
-      const { error } = await supabase
-        .from("videos")
-        .update({ 
-          published: !currentStatus,
-          published_at: !currentStatus ? new Date().toISOString() : null
-        })
-        .eq("id", id);
+  const handleEdit = (video: Video) => {
+    setEditingVideo(video);
+    setFormData({
+      title: video.title,
+      description: video.description || "",
+      video_url: video.video_url,
+      thumbnail_url: video.thumbnail_url || "",
+      video_type: video.video_type,
+      category: video.category,
+      duration: video.duration || 0,
+      published: video.published,
+    });
+    setIsDialogOpen(true);
+  };
 
-      if (error) throw error;
+  const resetForm = () => {
+    setEditingVideo(null);
+    setFormData({
+      title: "",
+      description: "",
+      video_url: "",
+      thumbnail_url: "",
+      video_type: "highlight",
+      category: "General",
+      duration: 0,
+      published: false,
+    });
+  };
 
-      toast({
-        title: "Success",
-        description: `Video ${!currentStatus ? 'published' : 'unpublished'} successfully`,
-      });
-      fetchVideos();
-    } catch (error) {
-      console.error("Error updating video:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update video",
-        variant: "destructive",
-      });
+  const handleDialogClose = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      resetForm();
     }
   };
 
-  if (loading) return <div>Loading videos...</div>;
-
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Video Management</h1>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="w-4 h-4 mr-2" />
@@ -171,11 +196,14 @@ export default function VideoManagement() {
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add New Video</DialogTitle>
+              <DialogTitle>{editingVideo ? "Edit Video" : "Add New Video"}</DialogTitle>
+              <DialogDescription>
+                {editingVideo ? "Update video details" : "Add a new video to your collection"}
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title">Title *</Label>
                 <Input
                   id="title"
                   value={formData.title}
@@ -183,7 +211,7 @@ export default function VideoManagement() {
                   required
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="description">Description</Label>
                 <Textarea
@@ -195,13 +223,13 @@ export default function VideoManagement() {
               </div>
 
               <div>
-                <Label htmlFor="video_url">Video URL</Label>
+                <Label htmlFor="video_url">Video URL *</Label>
                 <Input
                   id="video_url"
                   type="url"
                   value={formData.video_url}
                   onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                  placeholder="https://youtube.com/watch?v=..."
+                  placeholder="https://youtube.com/..."
                   required
                 />
               </div>
@@ -217,29 +245,43 @@ export default function VideoManagement() {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="video_type">Video Type</Label>
-                <Select
-                  value={formData.video_type}
-                  onValueChange={(value) => setFormData({ ...formData, video_type: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="highlight">Highlight</SelectItem>
-                    <SelectItem value="replay">Replay</SelectItem>
-                    <SelectItem value="live_stream">Live Stream</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="video_type">Video Type *</Label>
+                  <Select
+                    value={formData.video_type}
+                    onValueChange={(value: 'highlight' | 'replay' | 'live_stream') =>
+                      setFormData({ ...formData, video_type: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="highlight">Highlight</SelectItem>
+                      <SelectItem value="replay">Replay</SelectItem>
+                      <SelectItem value="live_stream">Live Stream</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="category">Category</Label>
+                  <Input
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  />
+                </div>
               </div>
 
               <div>
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="duration">Duration (seconds)</Label>
                 <Input
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  id="duration"
+                  type="number"
+                  value={formData.duration}
+                  onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
                 />
               </div>
 
@@ -249,71 +291,65 @@ export default function VideoManagement() {
                   checked={formData.published}
                   onCheckedChange={(checked) => setFormData({ ...formData, published: checked })}
                 />
-                <Label htmlFor="published">Publish immediately</Label>
+                <Label htmlFor="published">Published</Label>
               </div>
 
-              <Button type="submit" className="w-full">Add Video</Button>
+              <div className="flex gap-2 justify-end">
+                <Button type="button" variant="outline" onClick={() => handleDialogClose(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {editingVideo ? "Update" : "Create"}
+                </Button>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      {videos.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-8">Loading videos...</div>
+      ) : videos.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            No videos yet. Add your first video!
+            No videos yet. Click "Add Video" to create your first video.
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {videos.map((video) => (
             <Card key={video.id}>
-              <div className="aspect-video overflow-hidden rounded-t-lg bg-muted">
-                {video.thumbnail_url ? (
-                  <img 
-                    src={video.thumbnail_url} 
-                    alt={video.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Video className="w-16 h-16 text-muted-foreground" />
-                  </div>
-                )}
-              </div>
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <CardTitle className="line-clamp-2">{video.title}</CardTitle>
-                    <div className="flex gap-2">
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                        {video.video_type}
-                      </span>
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        video.published 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}>
-                        {video.published ? 'Published' : 'Draft'}
-                      </span>
+                <div className="aspect-video overflow-hidden rounded-lg mb-2 bg-muted">
+                  {video.thumbnail_url ? (
+                    <img
+                      src={video.thumbnail_url}
+                      alt={video.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                      No thumbnail
                     </div>
-                  </div>
+                  )}
                 </div>
+                <CardTitle className="line-clamp-2">{video.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                {video.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                    {video.description}
-                  </p>
-                )}
+                <div className="space-y-2 text-sm text-muted-foreground mb-4">
+                  <p>Type: {video.video_type}</p>
+                  <p>Category: {video.category}</p>
+                  <p>Status: {video.published ? "Published" : "Draft"}</p>
+                </div>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleTogglePublish(video.id, video.published)}
+                    onClick={() => handleEdit(video)}
                     className="flex-1"
                   >
-                    {video.published ? 'Unpublish' : 'Publish'}
+                    <Edit className="w-4 h-4 mr-1" />
+                    Edit
                   </Button>
                   <Button
                     variant="destructive"

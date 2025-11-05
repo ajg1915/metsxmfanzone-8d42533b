@@ -8,9 +8,9 @@ import { Heart, Share2, Play } from "lucide-react";
 interface Video {
   id: string;
   title: string;
-  description?: string;
+  description: string;
   video_url: string;
-  thumbnail_url?: string;
+  thumbnail_url: string;
   views: number;
 }
 
@@ -27,7 +27,7 @@ const GameHighlights = () => {
     try {
       const { data, error } = await supabase
         .from("videos")
-        .select("id, title, description, video_url, thumbnail_url, views")
+        .select("*")
         .eq("video_type", "highlight")
         .eq("published", true)
         .order("published_at", { ascending: false })
@@ -73,6 +73,7 @@ const GameHighlights = () => {
             <Card 
               key={video.id} 
               className="border-2 border-primary bg-card overflow-hidden group hover:shadow-xl transition-all cursor-pointer"
+              onClick={() => window.open(video.video_url, '_blank')}
             >
               <div className="aspect-video overflow-hidden relative">
                 {video.thumbnail_url ? (
@@ -86,8 +87,8 @@ const GameHighlights = () => {
                     <Play className="w-16 h-16 text-primary" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Play className="w-16 h-16 text-white" />
+                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Play className="w-12 h-12 text-white" />
                 </div>
               </div>
               <CardContent className="pt-4">
@@ -101,11 +102,27 @@ const GameHighlights = () => {
                 )}
               </CardContent>
               <CardFooter className="flex gap-4 pt-0">
-                <Button variant="ghost" size="sm" className="gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Handle like functionality
+                  }}
+                >
                   <Heart className="w-4 h-4" />
                   Like
                 </Button>
-                <Button variant="ghost" size="sm" className="gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Handle share functionality
+                  }}
+                >
                   <Share2 className="w-4 h-4" />
                   Share
                 </Button>
