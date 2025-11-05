@@ -64,32 +64,63 @@ const Highlights = () => {
   }, [videos, searchQuery, selectedCategory]);
 
   useEffect(() => {
-    if (selectedVideo && videoRef.current && isPlayerOpen && !playerRef.current) {
-      playerRef.current = videojs(videoRef.current, {
-        controls: true,
-        autoplay: true,
-        preload: 'auto',
-        fluid: true,
-        responsive: true,
-        html5: {
-          vhs: {
-            overrideNative: true
+    if (selectedVideo && videoRef.current && isPlayerOpen) {
+      // Dispose any existing player first
+      if (playerRef.current) {
+        playerRef.current.dispose();
+        playerRef.current = null;
+      }
+
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        if (videoRef.current) {
+          try {
+            playerRef.current = videojs(videoRef.current, {
+              controls: true,
+              autoplay: true,
+              preload: 'auto',
+              fluid: true,
+              responsive: true,
+              sources: [{
+                src: selectedVideo.video_url,
+                type: 'video/mp4'
+              }]
+            });
+
+            playerRef.current.ready(() => {
+              console.log('Video player ready');
+            });
+
+            playerRef.current.on('error', (error: any) => {
+              console.error('Video player error:', error);
+              toast({
+                title: "Video Error",
+                description: "Failed to load video. Please try again.",
+                variant: "destructive",
+              });
+            });
+
+            // Increment view count
+            incrementViews(selectedVideo.id);
+          } catch (error) {
+            console.error('Failed to initialize video player:', error);
+            toast({
+              title: "Player Error",
+              description: "Failed to initialize video player.",
+              variant: "destructive",
+            });
           }
         }
-      });
-
-      playerRef.current.src({
-        src: selectedVideo.video_url,
-        type: 'video/mp4'
-      });
-
-      // Increment view count
-      incrementViews(selectedVideo.id);
+      }, 100);
     }
 
     return () => {
       if (playerRef.current) {
-        playerRef.current.dispose();
+        try {
+          playerRef.current.dispose();
+        } catch (e) {
+          console.error('Error disposing player:', e);
+        }
         playerRef.current = null;
       }
     };

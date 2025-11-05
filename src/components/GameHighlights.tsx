@@ -42,6 +42,10 @@ const GameHighlights = () => {
     }
   };
 
+  const handleVideoClick = (video: Video) => {
+    navigate(`/highlights?video=${video.id}`);
+  };
+
   if (loading) {
     return (
       <section className="py-16 bg-background">
@@ -73,7 +77,7 @@ const GameHighlights = () => {
             <Card 
               key={video.id} 
               className="border-2 border-primary bg-card overflow-hidden group hover:shadow-xl transition-all cursor-pointer"
-              onClick={() => navigate(`/highlights?video=${video.id}`)}
+              onClick={() => handleVideoClick(video)}
             >
               <div className="aspect-video overflow-hidden relative">
                 {video.thumbnail_url ? (
