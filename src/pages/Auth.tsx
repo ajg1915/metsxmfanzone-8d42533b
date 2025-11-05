@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,13 +20,24 @@ const loginSchema = z.object({
 });
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode");
+  const [isLogin, setIsLogin] = useState(mode === "login" || mode !== "signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Update isLogin based on mode parameter
+    if (mode === "login") {
+      setIsLogin(true);
+    } else if (mode === "signup") {
+      setIsLogin(false);
+    }
+  }, [mode]);
 
   useEffect(() => {
     // Check if user is already logged in

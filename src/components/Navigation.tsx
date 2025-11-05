@@ -98,9 +98,29 @@ const Navigation = () => {
                 Admin
               </Button>
             )}
-            <Button size="sm" className="hidden md:flex text-xs" onClick={handleAuthClick}>
-              {user ? "Sign Out" : "Sign Up"}
-            </Button>
+            {user ? (
+              <Button size="sm" className="hidden md:flex text-xs" onClick={handleAuthClick}>
+                Sign Out
+              </Button>
+            ) : (
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="hidden md:flex text-xs"
+                  onClick={() => navigate("/auth?mode=login")}
+                >
+                  Login
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="hidden md:flex text-xs"
+                  onClick={() => navigate("/auth?mode=signup")}
+                >
+                  Sign Up
+                </Button>
+              </>
+            )}
             <Button variant="ghost" size="icon" className="md:hidden" onClick={handleAuthClick}>
               {user ? "Sign Out" : <Menu className="w-5 h-5" />}
             </Button>
