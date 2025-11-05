@@ -1,0 +1,179 @@
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Check } from "lucide-react";
+
+const Plans = () => {
+  const plans = [
+    {
+      name: "Free",
+      price: "$0",
+      period: "forever",
+      description: "Perfect for casual fans",
+      features: [
+        "Limited highlights access",
+        "Community forum access",
+        "Game schedules",
+        "News updates",
+      ],
+      notIncluded: [
+        "Live streaming",
+        "Full game replays",
+        "Exclusive content",
+        "Ad-free experience",
+      ],
+      cta: "Sign Up Free",
+      popular: false,
+    },
+    {
+      name: "Premium",
+      price: "$12.99",
+      period: "per month",
+      description: "Most popular for true fans",
+      features: [
+        "All live streams",
+        "Full game replays",
+        "All highlights",
+        "Community forum access",
+        "Ad-free experience",
+        "Exclusive content",
+        "HD streaming",
+        "Multi-device access",
+      ],
+      notIncluded: [],
+      cta: "Start 7-Day Free Trial",
+      popular: true,
+    },
+    {
+      name: "Annual",
+      price: "$129.99",
+      period: "per year",
+      description: "Best value - Save 2 months",
+      features: [
+        "Everything in Premium",
+        "Save $26/year",
+        "Priority support",
+        "Early access to content",
+        "Exclusive merchandise discounts",
+        "VIP community badge",
+      ],
+      notIncluded: [],
+      cta: "Start Annual Plan",
+      popular: false,
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <main className="pt-16">
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+                Choose Your Plan
+              </h1>
+              <p className="text-lg text-foreground max-w-2xl mx-auto">
+                Get unlimited access to live games, replays, highlights, and exclusive Mets content
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+              {plans.map((plan, index) => (
+                <Card 
+                  key={index} 
+                  className={`border-2 ${plan.popular ? 'border-primary shadow-2xl scale-105' : 'border-primary'} bg-card relative overflow-hidden transition-all hover:shadow-xl`}
+                >
+                  {plan.popular && (
+                    <div className="absolute top-0 right-0">
+                      <Badge className="bg-primary text-primary-foreground rounded-none rounded-bl-lg px-4 py-2">
+                        MOST POPULAR
+                      </Badge>
+                    </div>
+                  )}
+                  <CardHeader className="text-center pt-8">
+                    <CardTitle className="text-2xl text-primary mb-2">{plan.name}</CardTitle>
+                    <div className="mb-4">
+                      <span className="text-4xl font-bold text-foreground">{plan.price}</span>
+                      <span className="text-muted-foreground ml-2">/ {plan.period}</span>
+                    </div>
+                    <CardDescription className="text-foreground">
+                      {plan.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      variant={plan.popular ? "default" : "outline"}
+                    >
+                      {plan.cta}
+                    </Button>
+                    
+                    <div className="space-y-3">
+                      {plan.features.map((feature, featureIndex) => (
+                        <div key={featureIndex} className="flex items-start gap-3">
+                          <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-foreground">{feature}</span>
+                        </div>
+                      ))}
+                      {plan.notIncluded.map((feature, featureIndex) => (
+                        <div key={featureIndex} className="flex items-start gap-3 opacity-50">
+                          <div className="w-5 h-5 flex-shrink-0 mt-0.5"></div>
+                          <span className="text-sm text-muted-foreground line-through">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="mt-16 text-center">
+              <h2 className="text-2xl font-bold text-primary mb-8">Frequently Asked Questions</h2>
+              <div className="max-w-3xl mx-auto space-y-4">
+                <Card className="border-2 border-primary bg-card text-left">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-primary">Can I cancel anytime?</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-foreground">
+                      Yes! You can cancel your subscription at any time. Your access will continue until the end of your billing period.
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-2 border-primary bg-card text-left">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-primary">What's included in the free trial?</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-foreground">
+                      The 7-day free trial gives you full access to all Premium features. No credit card required to start.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2 border-primary bg-card text-left">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-primary">Can I watch on multiple devices?</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-foreground">
+                      Yes! Premium and Annual plans allow streaming on up to 3 devices simultaneously.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default Plans;
