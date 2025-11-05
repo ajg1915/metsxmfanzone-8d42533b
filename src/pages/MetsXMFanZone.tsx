@@ -11,12 +11,10 @@ const MetsXMFanZone = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
-      
+
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-            MetsXMFanZone TV
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">MetsXMFanZone TV</h1>
           <p className="text-muted-foreground mb-8">
             Your exclusive destination for Mets content, fan discussions, and live coverage
           </p>
@@ -59,10 +57,10 @@ const MetsXMFanZone = () => {
             </Card>
           </div>
 
-          <StreamPlayer 
+          <StreamPlayer
             pageName="metsxmfanzone"
             pageTitle="MetsXMFanZone Live Stream"
-            pageDescription="Watch exclusive Mets coverage and fan zone content"
+            pageDescription="Ulimate Destination Where the Fans Go"
           />
 
           <div className="grid gap-6 md:grid-cols-2">
