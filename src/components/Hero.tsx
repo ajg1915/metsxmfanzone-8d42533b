@@ -21,17 +21,6 @@ const Hero = () => {
           and game reactions the all new Live Home for Mets Fans
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center mb-4 sm:mb-6 px-4">
-          <Button size="default" className="gap-2 w-full sm:w-auto">
-            <Play className="w-4 h-4" />
-            Join Community
-          </Button>
-          <Button size="default" variant="outline" className="gap-2 w-full sm:w-auto">
-            <Info className="w-4 h-4" />
-            More Info
-          </Button>
-        </div>
-
         <div className="flex items-center justify-center px-4">
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 border-2 border-primary rounded-md bg-background/50 backdrop-blur-sm max-w-full">
             <span className="text-xs text-foreground text-center">
