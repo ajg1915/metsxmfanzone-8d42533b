@@ -7,7 +7,6 @@ import Index from "./pages/Index";
 import Live from "./pages/Live";
 import Community from "./pages/Community";
 import Highlights from "./pages/Highlights";
-import Replays from "./pages/Replays";
 import Plans from "./pages/Plans";
 import Auth from "./pages/Auth";
 import AdminSetup from "./pages/AdminSetup";
@@ -40,7 +39,6 @@ const App = () => (
           <Route path="/live" element={<Live />} />
           <Route path="/community" element={<Community />} />
           <Route path="/highlights" element={<Highlights />} />
-          <Route path="/replays" element={<Replays />} />
           <Route path="/plans" element={<Plans />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/blog" element={<Blog />} />

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Play, Users, Trophy, VideoIcon, Menu, Shield } from "lucide-react";
+import { Play, Users, Menu, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -70,13 +70,6 @@ const Navigation = () => {
             >
               <Users className="w-3 h-3" />
               Community
-            </NavLink>
-            <NavLink 
-              to="/replays" 
-              className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
-            >
-              <VideoIcon className="w-3 h-3" />
-              Replays
             </NavLink>
             <NavLink 
               to="/blog" 
