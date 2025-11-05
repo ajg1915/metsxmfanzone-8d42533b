@@ -19,9 +19,9 @@ interface Post {
   image_url: string | null;
   created_at: string;
   profiles: {
-    full_name: string;
-    email: string;
-  };
+    full_name: string | null;
+    email: string | null;
+  } | null;
 }
 
 const Community = () => {
@@ -49,7 +49,7 @@ const Community = () => {
       .from("posts")
       .select(`
         *,
-        profiles!posts_user_id_fkey (
+        profiles (
           full_name,
           email
         )
@@ -59,7 +59,7 @@ const Community = () => {
     if (error) {
       console.error("Error fetching posts:", error);
     } else {
-      setPosts(data || []);
+      setPosts(data as any || []);
     }
   };
 
