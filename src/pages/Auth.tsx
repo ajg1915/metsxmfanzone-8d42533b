@@ -109,7 +109,7 @@ const Auth = () => {
           title: "Success!",
           description: "Account created successfully. You're now logged in!",
         });
-        navigate("/");
+        navigate("/plans");
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
