@@ -34,6 +34,7 @@ import Terms from "./pages/Terms";
 import Podcast from "./pages/Podcast";
 import BusinessPartner from "./pages/BusinessPartner";
 import Dashboard from "./pages/Dashboard";
+import Feedback from "./pages/Feedback";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
           <Route path="/blog/rss" element={<BlogRSS />} />
           <Route path="/help-center" element={<HelpCenter />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/feedback" element={<Feedback />} />
           <Route path="/faqs" element={<FAQs />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />

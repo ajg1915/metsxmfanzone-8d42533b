@@ -6,6 +6,7 @@ import LiveStreamsSection from "@/components/LiveStreamsSection";
 import SpringTraining from "@/components/SpringTraining";
 import BlogSection from "@/components/BlogSection";
 import NewsletterSection from "@/components/NewsletterSection";
+import FeedbackSection from "@/components/FeedbackSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -19,6 +20,7 @@ const Index = () => {
         <LiveStreamsSection />
         <SpringTraining />
         <BlogSection />
+        <FeedbackSection />
         <NewsletterSection />
       </main>
       <Footer />
