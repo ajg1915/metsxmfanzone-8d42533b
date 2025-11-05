@@ -4,7 +4,7 @@ import heroImage from "@/assets/hero-mets.png";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-[400px] sm:min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[350px] sm:min-h-[400px] md:min-h-[450px] flex items-center justify-center overflow-hidden">
       <div 
         className="absolute inset-0 bg-cover bg-center z-0"
         style={{ backgroundImage: `url(${heroImage})` }}
@@ -12,35 +12,35 @@ const Hero = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/80 to-background"></div>
       </div>
       
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-12 sm:py-16 md:py-20">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary mb-4 sm:mb-6 animate-fade-in">
-          Join the Community
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-8 sm:py-12 md:py-16">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-3 sm:mb-4 animate-fade-in">
+          Welcome to MetsXMFanZone Community
         </h1>
-        <p className="text-base sm:text-lg md:text-xl text-foreground mb-6 sm:mb-8 max-w-3xl mx-auto px-4">
+        <p className="text-sm sm:text-base md:text-lg text-foreground mb-4 sm:mb-6 max-w-2xl mx-auto px-4">
           Connect with thousands of passionate Mets fans. Share your thoughts, predictions, 
           and game reactions the all new Live Home for Mets Fans
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-6 sm:mb-8 px-4">
-          <Button size="lg" className="gap-2 w-full sm:w-auto">
-            <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center items-center mb-4 sm:mb-6 px-4">
+          <Button size="default" className="gap-2 w-full sm:w-auto">
+            <Play className="w-4 h-4" />
             Join Community
           </Button>
-          <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto">
-            <Info className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Button size="default" variant="outline" className="gap-2 w-full sm:w-auto">
+            <Info className="w-4 h-4" />
             More Info
           </Button>
         </div>
 
         <div className="flex items-center justify-center px-4">
-          <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-3 border-2 border-primary rounded-md bg-background/50 backdrop-blur-sm max-w-full">
-            <span className="text-xs sm:text-sm text-foreground text-center">
+          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 border-2 border-primary rounded-md bg-background/50 backdrop-blur-sm max-w-full">
+            <span className="text-xs text-foreground text-center">
               ⚡ Start your <span className="text-primary font-semibold">7-day FREE trial</span> for unlimited access. Then $12.99/month
             </span>
           </div>
         </div>
 
-        <div className="flex gap-2 justify-center mt-6">
+        <div className="flex gap-2 justify-center mt-4">
           <div className="w-2 h-2 rounded-full bg-primary"></div>
           <div className="w-2 h-2 rounded-full bg-muted"></div>
           <div className="w-2 h-2 rounded-full bg-muted"></div>
