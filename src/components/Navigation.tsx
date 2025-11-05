@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Play, Users, Menu, Shield } from "lucide-react";
+import { Play, Users, Menu, Shield, User, LogOut, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
@@ -95,21 +104,43 @@ const Navigation = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            {isAdmin && (
-              <Button 
-                onClick={() => navigate("/admin")} 
-                variant="outline" 
-                size="sm"
-                className="hidden md:flex text-xs"
-              >
-                <Shield className="w-3 h-3 mr-1" />
-                Admin
-              </Button>
-            )}
             {user ? (
-              <Button size="sm" className="hidden md:flex text-xs" onClick={handleAuthClick}>
-                Sign Out
-              </Button>
+              <>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="hidden md:flex gap-2 text-xs">
+                      <Avatar className="h-6 w-6">
+                        <AvatarFallback className="text-xs">
+                          {user.email?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="max-w-[150px] truncate">{user.email}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </DropdownMenuItem>
+                    {isAdmin && (
+                      <DropdownMenuItem onClick={() => navigate("/admin")}>
+                        <Shield className="w-4 h-4 mr-2" />
+                        Admin Portal
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleAuthClick}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="w-5 h-5" />
+                </Button>
+              </>
             ) : (
               <>
                 <Button 
@@ -127,11 +158,11 @@ const Navigation = () => {
                 >
                   Sign Up
                 </Button>
+                <Button variant="ghost" size="icon" className="md:hidden" onClick={() => navigate("/auth")}>
+                  <Menu className="w-5 h-5" />
+                </Button>
               </>
             )}
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={handleAuthClick}>
-              {user ? "Sign Out" : <Menu className="w-5 h-5" />}
-            </Button>
           </div>
         </div>
       </div>
