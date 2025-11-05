@@ -17,9 +17,13 @@ import ContentManagement from "./pages/admin/ContentManagement";
 import PostsManagement from "./pages/admin/PostsManagement";
 import UserRoles from "./pages/admin/UserRoles";
 import AdminSettings from "./pages/admin/AdminSettings";
+import BlogManagement from "./pages/admin/BlogManagement";
 import MetsXMFanZone from "./pages/MetsXMFanZone";
 import MLBNetwork from "./pages/MLBNetwork";
 import NotFound from "./pages/NotFound";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import BlogRSS from "./pages/BlogRSS";
 
 const queryClient = new QueryClient();
 
@@ -37,9 +41,13 @@ const App = () => (
           <Route path="/replays" element={<Replays />} />
           <Route path="/plans" element={<Plans />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/blog/rss" element={<BlogRSS />} />
           <Route path="/legal/admin-setup" element={<AdminSetup />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="blog" element={<BlogManagement />} />
             <Route path="content" element={<ContentManagement />} />
             <Route path="posts" element={<PostsManagement />} />
             <Route path="roles" element={<UserRoles />} />

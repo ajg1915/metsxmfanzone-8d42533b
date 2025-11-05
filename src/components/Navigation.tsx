@@ -79,6 +79,12 @@ const Navigation = () => {
               Replays
             </NavLink>
             <NavLink 
+              to="/blog" 
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Blog
+            </NavLink>
+            <NavLink 
               to="/plans" 
               className="text-foreground hover:text-primary transition-colors"
             >

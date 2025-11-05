@@ -15,6 +15,7 @@ import {
 
 const adminItems = [
   { title: "Dashboard", url: "/admin", icon: Home },
+  { title: "Blog Management", url: "/admin/blog", icon: FileText },
   { title: "Content Management", url: "/admin/content", icon: Upload },
   { title: "Posts Management", url: "/admin/posts", icon: FileText },
   { title: "User Roles", url: "/admin/roles", icon: Shield },
