@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Play, Users, Menu, Shield, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Play, Users, Menu, Shield, User, LogOut, LayoutDashboard, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,11 +14,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -88,12 +96,6 @@ const Navigation = () => {
               Blog
             </NavLink>
             <NavLink 
-              to="/feedback" 
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Feedback
-            </NavLink>
-            <NavLink 
               to="/plans" 
               className="text-foreground hover:text-primary transition-colors"
             >
@@ -135,9 +137,94 @@ const Navigation = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="w-5 h-5" />
-                </Button>
+                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="md:hidden">
+                      <Menu className="w-5 h-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-[300px] bg-background">
+                    <SheetHeader>
+                      <SheetTitle>Menu</SheetTitle>
+                    </SheetHeader>
+                    <div className="flex flex-col gap-4 mt-6">
+                      <NavLink 
+                        to="/" 
+                        className="text-foreground hover:text-primary transition-colors py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Home
+                      </NavLink>
+                      <NavLink 
+                        to="/live" 
+                        className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Play className="w-4 h-4" />
+                        Live
+                      </NavLink>
+                      <NavLink 
+                        to="/community" 
+                        className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Users className="w-4 h-4" />
+                        Community
+                      </NavLink>
+                      <NavLink 
+                        to="/blog" 
+                        className="text-foreground hover:text-primary transition-colors py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Blog
+                      </NavLink>
+                      <NavLink 
+                        to="/plans" 
+                        className="text-foreground hover:text-primary transition-colors py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Plans
+                      </NavLink>
+                      <div className="border-t border-border pt-4 mt-2">
+                        <Button 
+                          onClick={() => {
+                            navigate("/dashboard");
+                            setMobileMenuOpen(false);
+                          }}
+                          variant="ghost"
+                          className="w-full justify-start"
+                        >
+                          <LayoutDashboard className="w-4 h-4 mr-2" />
+                          Dashboard
+                        </Button>
+                        {isAdmin && (
+                          <Button 
+                            onClick={() => {
+                              navigate("/admin");
+                              setMobileMenuOpen(false);
+                            }}
+                            variant="ghost"
+                            className="w-full justify-start"
+                          >
+                            <Shield className="w-4 h-4 mr-2" />
+                            Admin Portal
+                          </Button>
+                        )}
+                        <Button 
+                          onClick={() => {
+                            handleAuthClick();
+                            setMobileMenuOpen(false);
+                          }}
+                          variant="ghost"
+                          className="w-full justify-start"
+                        >
+                          <LogOut className="w-4 h-4 mr-2" />
+                          Sign Out
+                        </Button>
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </>
             ) : (
               <>
@@ -156,9 +243,78 @@ const Navigation = () => {
                 >
                   Sign Up
                 </Button>
-                <Button variant="ghost" size="icon" className="md:hidden" onClick={() => navigate("/auth")}>
-                  <Menu className="w-5 h-5" />
-                </Button>
+                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="md:hidden">
+                      <Menu className="w-5 h-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-[300px] bg-background">
+                    <SheetHeader>
+                      <SheetTitle>Menu</SheetTitle>
+                    </SheetHeader>
+                    <div className="flex flex-col gap-4 mt-6">
+                      <NavLink 
+                        to="/" 
+                        className="text-foreground hover:text-primary transition-colors py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Home
+                      </NavLink>
+                      <NavLink 
+                        to="/live" 
+                        className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Play className="w-4 h-4" />
+                        Live
+                      </NavLink>
+                      <NavLink 
+                        to="/community" 
+                        className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Users className="w-4 h-4" />
+                        Community
+                      </NavLink>
+                      <NavLink 
+                        to="/blog" 
+                        className="text-foreground hover:text-primary transition-colors py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Blog
+                      </NavLink>
+                      <NavLink 
+                        to="/plans" 
+                        className="text-foreground hover:text-primary transition-colors py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Plans
+                      </NavLink>
+                      <div className="border-t border-border pt-4 mt-2">
+                        <Button 
+                          onClick={() => {
+                            navigate("/auth?mode=login");
+                            setMobileMenuOpen(false);
+                          }}
+                          variant="ghost"
+                          className="w-full justify-start"
+                        >
+                          Login
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            navigate("/auth?mode=signup");
+                            setMobileMenuOpen(false);
+                          }}
+                          className="w-full justify-start"
+                        >
+                          Sign Up
+                        </Button>
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </>
             )}
           </div>
