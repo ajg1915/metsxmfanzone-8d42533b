@@ -15,6 +15,7 @@ interface LiveStream {
   status: 'live' | 'scheduled' | 'ended';
   scheduled_start: string;
   viewers_count: number;
+  assigned_pages: string[];
 }
 
 const LiveStreamsSection = () => {
@@ -54,7 +55,6 @@ const LiveStreamsSection = () => {
         .select("*")
         .eq("published", true)
         .in("status", ["live", "scheduled"])
-        .contains("assigned_pages", ["live"])
         .order("scheduled_start", { ascending: true })
         .limit(3);
 
@@ -65,6 +65,17 @@ const LiveStreamsSection = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getStreamPageUrl = (stream: LiveStream) => {
+    // Get the first assigned page and navigate to it
+    if (stream.assigned_pages && stream.assigned_pages.length > 0) {
+      const firstPage = stream.assigned_pages[0];
+      if (firstPage === 'live') return '/live';
+      if (firstPage === 'metsxmfanzone') return '/metsxmfanzone-tv';
+      if (firstPage === 'mlb-network') return '/mlb-network';
+    }
+    return '/live'; // default fallback
   };
 
   if (loading) {
@@ -96,7 +107,7 @@ const LiveStreamsSection = () => {
             <Card 
               key={stream.id}
               className="border-2 border-primary bg-card overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
-              onClick={() => window.open(stream.stream_url, '_blank')}
+              onClick={() => navigate(getStreamPageUrl(stream))}
             >
               {stream.thumbnail_url && (
                 <div className="aspect-video overflow-hidden relative">
