@@ -1,11 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Play, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import heroImage from "@/assets/hero-metsxm.png";
-import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
-  const navigate = useNavigate();
-
   return (
     <section className="relative min-h-[400px] sm:min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden">
       <div 
@@ -25,10 +22,6 @@ const Hero = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mb-6 sm:mb-8 px-4">
-          <Button size="lg" className="gap-2 w-full sm:w-auto" onClick={() => navigate('/auth')}>
-            <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-            Join Community
-          </Button>
           <Button size="lg" variant="outline" className="gap-2 w-full sm:w-auto">
             <Info className="w-4 h-4 sm:w-5 sm:h-5" />
             More Info
