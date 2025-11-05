@@ -28,7 +28,7 @@ interface LiveStream {
   status: 'live' | 'scheduled' | 'ended';
   scheduled_start: string;
   scheduled_end: string;
-  category: string;
+  assigned_pages: string[];
   viewers_count: number;
   published: boolean;
   created_at: string;
@@ -48,7 +48,7 @@ export default function LiveStreamManagement() {
     status: "scheduled" as 'live' | 'scheduled' | 'ended',
     scheduled_start: "",
     scheduled_end: "",
-    category: "General",
+    assigned_pages: [] as string[],
     published: false,
   });
 
@@ -162,7 +162,7 @@ export default function LiveStreamManagement() {
       status: stream.status,
       scheduled_start: stream.scheduled_start ? new Date(stream.scheduled_start).toISOString().slice(0, 16) : "",
       scheduled_end: stream.scheduled_end ? new Date(stream.scheduled_end).toISOString().slice(0, 16) : "",
-      category: stream.category,
+      assigned_pages: stream.assigned_pages || [],
       published: stream.published,
     });
     setIsDialogOpen(true);
@@ -178,7 +178,7 @@ export default function LiveStreamManagement() {
       status: "scheduled",
       scheduled_start: "",
       scheduled_end: "",
-      category: "General",
+      assigned_pages: [],
       published: false,
     });
   };
@@ -285,12 +285,28 @@ export default function LiveStreamManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Input
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  />
+                  <Label htmlFor="assigned_pages">Assign to Pages *</Label>
+                  <div className="space-y-2 mt-2">
+                    {['live', 'metsxmfanzone', 'mlb-network'].map((page) => (
+                      <div key={page} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={page}
+                          checked={formData.assigned_pages.includes(page)}
+                          onChange={(e) => {
+                            const newPages = e.target.checked
+                              ? [...formData.assigned_pages, page]
+                              : formData.assigned_pages.filter(p => p !== page);
+                            setFormData({ ...formData, assigned_pages: newPages });
+                          }}
+                          className="rounded border-gray-300"
+                        />
+                        <Label htmlFor={page} className="cursor-pointer font-normal">
+                          {page === 'live' ? 'Live Page' : page === 'metsxmfanzone' ? 'MetsXMFanZone TV' : 'MLB Network'}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -373,7 +389,12 @@ export default function LiveStreamManagement() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 text-sm text-muted-foreground mb-4">
-                  <p>Category: {stream.category}</p>
+                  <p>Assigned to: {stream.assigned_pages?.length > 0 ? stream.assigned_pages.map(p => {
+                    if (p === 'live') return 'Live Page';
+                    if (p === 'metsxmfanzone') return 'MetsXMFanZone TV';
+                    if (p === 'mlb-network') return 'MLB Network';
+                    return p;
+                  }).join(', ') : 'None'}</p>
                   {stream.scheduled_start && (
                     <p>Starts: {new Date(stream.scheduled_start).toLocaleString()}</p>
                   )}

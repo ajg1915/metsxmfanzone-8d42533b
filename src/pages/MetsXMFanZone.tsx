@@ -1,5 +1,8 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { StreamPlayer } from "@/components/StreamPlayer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, Users, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,29 +59,11 @@ const MetsXMFanZone = () => {
             </Card>
           </div>
 
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="text-2xl">Live Stream</CardTitle>
-              <CardDescription>
-                Watch exclusive Mets coverage and fan zone content
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <Play className="w-16 h-16 text-primary mx-auto mb-4" />
-                  <p className="text-lg font-semibold mb-2">MetsXMFanZone Live Stream</p>
-                  <p className="text-muted-foreground mb-4">
-                    Stream will appear here when live
-                  </p>
-                  <Button size="lg">
-                    <Play className="w-5 h-5 mr-2" />
-                    Start Watching
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StreamPlayer 
+            pageName="metsxmfanzone"
+            pageTitle="MetsXMFanZone Live Stream"
+            pageDescription="Watch exclusive Mets coverage and fan zone content"
+          />
 
           <div className="grid gap-6 md:grid-cols-2">
             <Card>

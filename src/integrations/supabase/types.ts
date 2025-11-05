@@ -74,7 +74,7 @@ export type Database = {
         Row: {
           actual_end: string | null
           actual_start: string | null
-          category: string | null
+          assigned_pages: string[] | null
           created_at: string
           description: string | null
           id: string
@@ -91,7 +91,7 @@ export type Database = {
         Insert: {
           actual_end?: string | null
           actual_start?: string | null
-          category?: string | null
+          assigned_pages?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
@@ -108,7 +108,7 @@ export type Database = {
         Update: {
           actual_end?: string | null
           actual_start?: string | null
-          category?: string | null
+          assigned_pages?: string[] | null
           created_at?: string
           description?: string | null
           id?: string

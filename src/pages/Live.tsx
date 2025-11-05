@@ -54,6 +54,7 @@ const Live = () => {
         .select("*")
         .eq("published", true)
         .in("status", ["live", "scheduled"])
+        .contains("assigned_pages", ["live"])
         .order("scheduled_start", { ascending: true });
 
       if (error) throw error;
