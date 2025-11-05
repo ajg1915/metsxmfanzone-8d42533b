@@ -11,7 +11,7 @@ const SpringTraining = () => {
       date: "Sat, Feb 28, 1:05 PM",
       location: "Clover Park, Port St. Lucie, FL",
       description: "Spring training opener against the Yankees",
-      colors: "bg-gradient-to-br from-blue-600 to-orange-500"
+      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
     },
     {
       id: 2,
@@ -20,7 +20,7 @@ const SpringTraining = () => {
       date: "Mon, Mar 2, 1:05 PM",
       location: "Clover Park, Port St. Lucie, FL",
       description: "Spring training matchup",
-      colors: "bg-gradient-to-br from-orange-600 to-blue-600"
+      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
     },
     {
       id: 3,
@@ -29,7 +29,7 @@ const SpringTraining = () => {
       date: "Thu, Mar 5, 1:05 PM",
       location: "Roger Dean Stadium, Jupiter, FL",
       description: "Away spring training game",
-      colors: "bg-gradient-to-br from-yellow-500 to-red-600"
+      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
     },
     {
       id: 4,
@@ -38,7 +38,7 @@ const SpringTraining = () => {
       date: "Sun, Mar 8, 1:05 PM",
       location: "Clover Park, Port St. Lucie, FL",
       description: "Spring training home game",
-      colors: "bg-gradient-to-br from-red-600 to-blue-600"
+      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
     },
     {
       id: 5,
@@ -47,7 +47,7 @@ const SpringTraining = () => {
       date: "Wed, Mar 11, 1:05 PM",
       location: "JetBlue Park, Fort Myers, FL",
       description: "Away spring training game",
-      colors: "bg-gradient-to-br from-red-700 to-blue-600"
+      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
     },
     {
       id: 6,
@@ -56,7 +56,7 @@ const SpringTraining = () => {
       date: "Sat, Mar 14, 1:05 PM",
       location: "Clover Park, Port St. Lucie, FL",
       description: "Spring training divisional matchup",
-      colors: "bg-gradient-to-br from-orange-600 to-red-600"
+      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
     }
   ];
 
