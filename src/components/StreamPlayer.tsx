@@ -2,9 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play } from "lucide-react";
-
-// @ts-ignore - Clappr doesn't have TypeScript definitions
-import Clappr from "clappr";
+import videojs from "video.js";
+import "video.js/dist/video-js.css";
 
 interface LiveStream {
   id: string;
@@ -24,8 +23,8 @@ interface StreamPlayerProps {
 export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPlayerProps) {
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [loading, setLoading] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchStream();
@@ -49,42 +48,55 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
 
     return () => {
       supabase.removeChannel(channel);
-      // Destroy player on cleanup
+      // Dispose player on cleanup
       if (playerRef.current) {
-        playerRef.current.destroy();
+        playerRef.current.dispose();
         playerRef.current = null;
       }
     };
   }, [pageName]);
 
-  // Initialize Clappr player when stream changes
+  // Initialize Video.js player when stream changes
   useEffect(() => {
-    if (stream && containerRef.current) {
-      // Destroy existing player if any
-      if (playerRef.current) {
-        playerRef.current.destroy();
-      }
-
-      // Create new Clappr player
-      playerRef.current = new Clappr.Player({
-        source: stream.stream_url,
-        parent: containerRef.current,
-        width: '100%',
-        height: '100%',
-        autoPlay: true,
-        mute: false,
-        playback: {
-          playInline: true,
-          recycleVideo: Clappr.Browser.isMobile,
+    if (stream && videoRef.current && !playerRef.current) {
+      console.log('Initializing Video.js player for:', stream.stream_url);
+      
+      playerRef.current = videojs(videoRef.current, {
+        controls: true,
+        autoplay: true,
+        preload: 'auto',
+        fluid: true,
+        liveui: true,
+        html5: {
+          vhs: {
+            overrideNative: true
+          },
+          nativeVideoTracks: false,
+          nativeAudioTracks: false,
+          nativeTextTracks: false
         },
+        sources: [{
+          src: stream.stream_url,
+          type: 'application/x-mpegURL'
+        }]
       });
 
-      console.log('Clappr player initialized for:', stream.stream_url);
+      playerRef.current.ready(() => {
+        console.log('Video.js player is ready');
+      });
+
+      playerRef.current.on('error', (e: any) => {
+        console.error('Video.js error:', e);
+        const error = playerRef.current.error();
+        if (error) {
+          console.error('Error details:', error.message, error.code);
+        }
+      });
     }
 
     return () => {
       if (playerRef.current) {
-        playerRef.current.destroy();
+        playerRef.current.dispose();
         playerRef.current = null;
       }
     };
@@ -130,11 +142,13 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       <CardContent>
         {stream ? (
           <div className="space-y-4">
-            <div 
-              ref={containerRef}
-              className="aspect-video bg-black rounded-lg overflow-hidden"
-              style={{ width: '100%', height: 'auto' }}
-            />
+            <div className="aspect-video bg-black rounded-lg overflow-hidden">
+              <video
+                ref={videoRef}
+                className="video-js vjs-big-play-centered vjs-theme-fantasy"
+                style={{ width: '100%', height: '100%' }}
+              />
+            </div>
             <div>
               <h3 className="text-lg font-semibold">{stream.title}</h3>
               {stream.description && (
