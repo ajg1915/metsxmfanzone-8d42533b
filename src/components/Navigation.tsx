@@ -78,6 +78,14 @@ const Navigation = () => {
             >
               Blog
             </NavLink>
+            {user && (
+              <NavLink 
+                to="/dashboard" 
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Dashboard
+              </NavLink>
+            )}
             <NavLink 
               to="/plans" 
               className="text-foreground hover:text-primary transition-colors"

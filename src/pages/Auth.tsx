@@ -109,7 +109,7 @@ const Auth = () => {
           title: "Success!",
           description: "Account created successfully. You're now logged in!",
         });
-        navigate("/plans");
+        navigate("/dashboard");
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -164,7 +164,7 @@ const Auth = () => {
           title: "Welcome back!",
           description: "You've successfully logged in.",
         });
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (error) {
       if (error instanceof z.ZodError) {

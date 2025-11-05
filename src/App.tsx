@@ -33,6 +33,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Podcast from "./pages/Podcast";
 import BusinessPartner from "./pages/BusinessPartner";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/plans" element={<Plans />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/blog/rss" element={<BlogRSS />} />
