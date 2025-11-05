@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -28,6 +29,7 @@ interface Video {
 
 const Highlights = () => {
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [videos, setVideos] = useState<Video[]>([]);
   const [filteredVideos, setFilteredVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,6 +45,19 @@ const Highlights = () => {
   useEffect(() => {
     fetchVideos();
   }, []);
+
+  // Auto-play video if videoId is in URL params
+  useEffect(() => {
+    const videoId = searchParams.get('video');
+    if (videoId && videos.length > 0) {
+      const video = videos.find(v => v.id === videoId);
+      if (video) {
+        handleVideoClick(video);
+        // Remove the video param from URL after opening
+        setSearchParams({});
+      }
+    }
+  }, [searchParams, videos]);
 
   useEffect(() => {
     filterVideos();

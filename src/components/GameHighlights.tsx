@@ -73,7 +73,7 @@ const GameHighlights = () => {
             <Card 
               key={video.id} 
               className="border-2 border-primary bg-card overflow-hidden group hover:shadow-xl transition-all cursor-pointer"
-              onClick={() => window.open(video.video_url, '_blank')}
+              onClick={() => navigate(`/highlights?video=${video.id}`)}
             >
               <div className="aspect-video overflow-hidden relative">
                 {video.thumbnail_url ? (
