@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit } from "lucide-react";
+import { Trash2, Plus, Edit, Upload } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +38,9 @@ export default function VideoManagement() {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -76,10 +79,54 @@ export default function VideoManagement() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUploading(true);
 
     try {
+      let videoUrl = formData.video_url;
+      let thumbnailUrl = formData.thumbnail_url;
+
+      // Upload video file if provided
+      if (videoFile) {
+        const fileExt = videoFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError, data } = await supabase.storage
+          .from('videos')
+          .upload(filePath, videoFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('videos')
+          .getPublicUrl(filePath);
+
+        videoUrl = publicUrl;
+      }
+
+      // Upload thumbnail file if provided
+      if (thumbnailFile) {
+        const fileExt = thumbnailFile.name.split('.').pop();
+        const fileName = `thumbnail-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('videos')
+          .upload(filePath, thumbnailFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('videos')
+          .getPublicUrl(filePath);
+
+        thumbnailUrl = publicUrl;
+      }
+
       const videoData = {
         ...formData,
+        video_url: videoUrl,
+        thumbnail_url: thumbnailUrl,
         published_at: formData.published ? new Date().toISOString() : null,
       };
 
@@ -118,6 +165,8 @@ export default function VideoManagement() {
         description: "Failed to save video",
         variant: "destructive",
       });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -164,6 +213,8 @@ export default function VideoManagement() {
 
   const resetForm = () => {
     setEditingVideo(null);
+    setVideoFile(null);
+    setThumbnailFile(null);
     setFormData({
       title: "",
       description: "",
@@ -223,26 +274,41 @@ export default function VideoManagement() {
               </div>
 
               <div>
-                <Label htmlFor="video_url">Video URL *</Label>
-                <Input
-                  id="video_url"
-                  type="url"
-                  value={formData.video_url}
-                  onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                  placeholder="https://youtube.com/..."
-                  required
-                />
+                <Label htmlFor="video_file">Upload Video (MP4) *</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="video_file"
+                    type="file"
+                    accept="video/mp4"
+                    onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                    disabled={uploading}
+                  />
+                  <Upload className="w-4 h-4 text-muted-foreground" />
+                </div>
+                {editingVideo && formData.video_url && !videoFile && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Current video uploaded. Select a new file to replace it.
+                  </p>
+                )}
               </div>
 
               <div>
-                <Label htmlFor="thumbnail_url">Thumbnail URL</Label>
-                <Input
-                  id="thumbnail_url"
-                  type="url"
-                  value={formData.thumbnail_url}
-                  onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
-                  placeholder="https://..."
-                />
+                <Label htmlFor="thumbnail_file">Upload Thumbnail (Optional)</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="thumbnail_file"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
+                    disabled={uploading}
+                  />
+                  <Upload className="w-4 h-4 text-muted-foreground" />
+                </div>
+                {editingVideo && formData.thumbnail_url && !thumbnailFile && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Current thumbnail uploaded. Select a new file to replace it.
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -295,11 +361,11 @@ export default function VideoManagement() {
               </div>
 
               <div className="flex gap-2 justify-end">
-                <Button type="button" variant="outline" onClick={() => handleDialogClose(false)}>
+                <Button type="button" variant="outline" onClick={() => handleDialogClose(false)} disabled={uploading}>
                   Cancel
                 </Button>
-                <Button type="submit">
-                  {editingVideo ? "Update" : "Create"}
+                <Button type="submit" disabled={uploading || (!videoFile && !editingVideo)}>
+                  {uploading ? "Uploading..." : editingVideo ? "Update" : "Create"}
                 </Button>
               </div>
             </form>
