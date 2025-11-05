@@ -135,6 +135,68 @@ export default function VideoManagement() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Comprehensive file validation before upload
+    if (videoFile) {
+      const MAX_VIDEO_SIZE = 500 * 1024 * 1024; // 500MB
+      const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/x-msvideo'];
+      
+      // Check file size
+      if (videoFile.size > MAX_VIDEO_SIZE) {
+        toast({
+          title: "Error",
+          description: "Video file size must be less than 500MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check MIME type
+      if (!ALLOWED_VIDEO_TYPES.includes(videoFile.type)) {
+        toast({
+          title: "Error",
+          description: "Please upload a valid video file (MP4, MOV, or AVI)",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Double-check extension as additional security layer
+      const extension = videoFile.name.split('.').pop()?.toLowerCase();
+      if (!['mp4', 'mov', 'avi'].includes(extension || '')) {
+        toast({
+          title: "Error",
+          description: "Invalid video file extension",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // Validate thumbnail file
+    if (thumbnailFile) {
+      const MAX_THUMBNAIL_SIZE = 5 * 1024 * 1024; // 5MB
+      const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+      
+      if (thumbnailFile.size > MAX_THUMBNAIL_SIZE) {
+        toast({
+          title: "Error",
+          description: "Thumbnail file size must be less than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!ALLOWED_IMAGE_TYPES.includes(thumbnailFile.type)) {
+        toast({
+          title: "Error",
+          description: "Please upload a valid image file (JPEG, PNG, or WebP)",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setUploading(true);
 
     try {
@@ -371,19 +433,23 @@ export default function VideoManagement() {
               </div>
 
               <div>
-                <Label htmlFor="video_file">Upload Video (MP4) *</Label>
+                <Label htmlFor="video_file">Upload Video *</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Maximum size: 500MB. Formats: MP4, MOV, AVI
+                </p>
                 <div className="flex items-center gap-2">
                   <Input
                     id="video_file"
                     type="file"
-                    accept="video/mp4"
+                    accept="video/mp4,video/quicktime,video/x-msvideo"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        if (file.type !== 'video/mp4') {
+                        const MAX_SIZE = 500 * 1024 * 1024;
+                        if (file.size > MAX_SIZE) {
                           toast({
                             title: "Error",
-                            description: "Please upload an MP4 file",
+                            description: "Video file must be less than 500MB",
                             variant: "destructive",
                           });
                           e.target.value = '';
@@ -425,14 +491,29 @@ export default function VideoManagement() {
               <div>
                 <Label htmlFor="thumbnail_file">Upload Custom Thumbnail (Optional)</Label>
                 <p className="text-xs text-muted-foreground mb-2">
-                  If not provided, a thumbnail will be auto-generated from the video
+                  If not provided, a thumbnail will be auto-generated from the video. Maximum size: 5MB. Formats: JPEG, PNG, WebP
                 </p>
                 <div className="flex items-center gap-2">
                   <Input
                     id="thumbnail_file"
                     type="file"
-                    accept="image/*"
-                    onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const MAX_SIZE = 5 * 1024 * 1024;
+                        if (file.size > MAX_SIZE) {
+                          toast({
+                            title: "Error",
+                            description: "Thumbnail must be less than 5MB",
+                            variant: "destructive",
+                          });
+                          e.target.value = '';
+                          return;
+                        }
+                        setThumbnailFile(file);
+                      }
+                    }}
                     disabled={uploading}
                   />
                   <Upload className="w-4 h-4 text-muted-foreground" />
