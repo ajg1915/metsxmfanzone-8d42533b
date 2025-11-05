@@ -119,7 +119,7 @@ const Navigation = () => {
                       <span className="max-w-[150px] truncate">{user.email}</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent align="end" className="w-56 bg-background z-50">
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => navigate("/dashboard")}>
@@ -139,96 +139,6 @@ const Navigation = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="md:hidden">
-                      <Menu className="w-5 h-5" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="w-[300px] bg-background">
-                    <SheetHeader>
-                      <SheetTitle>Menu</SheetTitle>
-                      <SheetDescription>
-                        Navigate through the site
-                      </SheetDescription>
-                    </SheetHeader>
-                    <div className="flex flex-col gap-4 mt-6">
-                      <NavLink 
-                        to="/" 
-                        className="text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Home
-                      </NavLink>
-                      <NavLink 
-                        to="/live" 
-                        className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <Play className="w-4 h-4" />
-                        Live
-                      </NavLink>
-                      <NavLink 
-                        to="/community" 
-                        className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <Users className="w-4 h-4" />
-                        Community
-                      </NavLink>
-                      <NavLink 
-                        to="/blog" 
-                        className="text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Blog
-                      </NavLink>
-                      <NavLink 
-                        to="/plans" 
-                        className="text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Plans
-                      </NavLink>
-                      <div className="border-t border-border pt-4 mt-2">
-                        <Button 
-                          onClick={() => {
-                            navigate("/dashboard");
-                            setMobileMenuOpen(false);
-                          }}
-                          variant="ghost"
-                          className="w-full justify-start"
-                        >
-                          <LayoutDashboard className="w-4 h-4 mr-2" />
-                          Dashboard
-                        </Button>
-                        {isAdmin && (
-                          <Button 
-                            onClick={() => {
-                              navigate("/admin");
-                              setMobileMenuOpen(false);
-                            }}
-                            variant="ghost"
-                            className="w-full justify-start"
-                          >
-                            <Shield className="w-4 h-4 mr-2" />
-                            Admin Portal
-                          </Button>
-                        )}
-                        <Button 
-                          onClick={async () => {
-                            await handleAuthClick();
-                          }}
-                          variant="ghost"
-                          className="w-full justify-start"
-                        >
-                          <LogOut className="w-4 h-4 mr-2" />
-                          Sign Out
-                        </Button>
-                      </div>
-                    </div>
-                  </SheetContent>
-                </Sheet>
               </>
             ) : (
               <>
@@ -247,65 +157,119 @@ const Navigation = () => {
                 >
                   Sign Up
                 </Button>
-                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="md:hidden">
-                      <Menu className="w-5 h-5" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="w-[300px] bg-background">
-                    <SheetHeader>
-                      <SheetTitle>Menu</SheetTitle>
-                      <SheetDescription>
-                        Navigate through the site
-                      </SheetDescription>
-                    </SheetHeader>
-                    <div className="flex flex-col gap-4 mt-6">
-                      <NavLink 
-                        to="/" 
-                        className="text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Home
-                      </NavLink>
-                      <NavLink 
-                        to="/live" 
-                        className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <Play className="w-4 h-4" />
-                        Live
-                      </NavLink>
-                      <NavLink 
-                        to="/community" 
-                        className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <Users className="w-4 h-4" />
-                        Community
-                      </NavLink>
-                      <NavLink 
-                        to="/blog" 
-                        className="text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Blog
-                      </NavLink>
-                      <NavLink 
-                        to="/plans" 
-                        className="text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Plans
-                      </NavLink>
-                      <div className="border-t border-border pt-4 mt-2">
+              </>
+            )}
+            
+            {/* Single mobile menu for all users */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="w-5 h-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] bg-background">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                  <SheetDescription>
+                    Navigate through the site
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="flex flex-col gap-4 mt-6">
+                  <NavLink 
+                    to="/" 
+                    className="text-foreground hover:text-primary transition-colors py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Home
+                  </NavLink>
+                  <NavLink 
+                    to="/live" 
+                    className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Play className="w-4 h-4" />
+                    Live
+                  </NavLink>
+                  <NavLink 
+                    to="/community" 
+                    className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Users className="w-4 h-4" />
+                    Community
+                  </NavLink>
+                  <NavLink 
+                    to="/blog" 
+                    className="text-foreground hover:text-primary transition-colors py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Blog
+                  </NavLink>
+                  <NavLink 
+                    to="/plans" 
+                    className="text-foreground hover:text-primary transition-colors py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Plans
+                  </NavLink>
+                  
+                  <div className="border-t border-border pt-4 mt-2">
+                    {user ? (
+                      <>
+                        <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="text-xs">
+                                {user.email?.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm truncate">{user.email}</span>
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => {
+                            navigate("/dashboard");
+                            setMobileMenuOpen(false);
+                          }}
+                          variant="ghost"
+                          className="w-full justify-start mb-2"
+                        >
+                          <LayoutDashboard className="w-4 h-4 mr-2" />
+                          Dashboard
+                        </Button>
+                        {isAdmin && (
+                          <Button 
+                            onClick={() => {
+                              navigate("/admin");
+                              setMobileMenuOpen(false);
+                            }}
+                            variant="ghost"
+                            className="w-full justify-start mb-2"
+                          >
+                            <Shield className="w-4 h-4 mr-2" />
+                            Admin Portal
+                          </Button>
+                        )}
+                        <Button 
+                          onClick={async () => {
+                            await handleAuthClick();
+                          }}
+                          variant="ghost"
+                          className="w-full justify-start"
+                        >
+                          <LogOut className="w-4 h-4 mr-2" />
+                          Sign Out
+                        </Button>
+                      </>
+                    ) : (
+                      <>
                         <Button 
                           onClick={() => {
                             navigate("/auth?mode=login");
                             setMobileMenuOpen(false);
                           }}
                           variant="ghost"
-                          className="w-full justify-start"
+                          className="w-full justify-start mb-2"
                         >
                           Login
                         </Button>
@@ -318,12 +282,12 @@ const Navigation = () => {
                         >
                           Sign Up
                         </Button>
-                      </div>
-                    </div>
-                  </SheetContent>
-                </Sheet>
-              </>
-            )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
