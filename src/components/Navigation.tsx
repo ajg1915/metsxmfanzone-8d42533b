@@ -1,12 +1,34 @@
+import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Play, Users, Trophy, VideoIcon, Menu } from "lucide-react";
+import { Play, Users, Trophy, VideoIcon, Menu, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .single();
+
+        setIsAdmin(!!data);
+      } else {
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdmin();
+  }, [user]);
 
   const handleAuthClick = () => {
     if (user) {
@@ -71,6 +93,17 @@ const Navigation = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            {isAdmin && (
+              <Button 
+                onClick={() => navigate("/admin")} 
+                variant="outline" 
+                size="sm"
+                className="hidden md:flex"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Admin
+              </Button>
+            )}
             <Button size="lg" className="hidden md:flex" onClick={handleAuthClick}>
               {user ? "Sign Out" : "Sign Up"}
             </Button>

@@ -10,6 +10,9 @@ import Highlights from "./pages/Highlights";
 import Replays from "./pages/Replays";
 import Plans from "./pages/Plans";
 import Auth from "./pages/Auth";
+import Admin from "./pages/Admin";
+import MetsXMFanZone from "./pages/MetsXMFanZone";
+import MLBNetwork from "./pages/MLBNetwork";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +31,9 @@ const App = () => (
           <Route path="/replays" element={<Replays />} />
           <Route path="/plans" element={<Plans />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
+          <Route path="/mlb-network" element={<MLBNetwork />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

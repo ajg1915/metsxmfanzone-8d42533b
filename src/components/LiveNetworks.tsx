@@ -1,8 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play } from "lucide-react";
 
 const LiveNetworks = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
@@ -19,9 +22,13 @@ const LiveNetworks = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full gap-2" size="lg">
+              <Button 
+                className="w-full gap-2" 
+                size="lg"
+                onClick={() => navigate("/mlb-network")}
+              >
                 <Play className="w-5 h-5" />
-                Watch Live Baseball
+                Watch MLB Network
               </Button>
             </CardContent>
           </Card>
@@ -34,9 +41,13 @@ const LiveNetworks = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full gap-2" size="lg">
+              <Button 
+                className="w-full gap-2" 
+                size="lg"
+                onClick={() => navigate("/metsxmfanzone-tv")}
+              >
                 <Play className="w-5 h-5" />
-                Watch MetsXMFanZone Live
+                Watch MetsXMFanZone TV
               </Button>
             </CardContent>
           </Card>
