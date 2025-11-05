@@ -42,6 +42,7 @@ export default function VideoManagement() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -52,6 +53,60 @@ export default function VideoManagement() {
     duration: 0,
     published: false,
   });
+
+  const generateThumbnailFromVideo = async (videoFile: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      video.preload = 'metadata';
+      video.muted = true;
+      video.playsInline = true;
+
+      video.onloadedmetadata = () => {
+        // Set canvas size to video dimensions
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Seek to 2 seconds or 10% of video duration
+        const seekTime = Math.min(2, video.duration * 0.1);
+        video.currentTime = seekTime;
+      };
+
+      video.onseeked = () => {
+        try {
+          // Draw video frame to canvas
+          ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          // Convert canvas to blob
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const thumbnailFile = new File(
+                [blob],
+                `thumbnail-${Date.now()}.jpg`,
+                { type: 'image/jpeg' }
+              );
+              URL.revokeObjectURL(video.src);
+              resolve(thumbnailFile);
+            } else {
+              reject(new Error('Failed to generate thumbnail'));
+            }
+          }, 'image/jpeg', 0.9);
+        } catch (error) {
+          URL.revokeObjectURL(video.src);
+          reject(error);
+        }
+      };
+
+      video.onerror = () => {
+        URL.revokeObjectURL(video.src);
+        reject(new Error('Failed to load video'));
+      };
+
+      video.src = URL.createObjectURL(videoFile);
+    });
+  };
 
   useEffect(() => {
     fetchVideos();
@@ -103,12 +158,43 @@ export default function VideoManagement() {
 
         if (uploadError) throw uploadError;
 
-        setUploadProgress(70);
+        setUploadProgress(50);
         const { data: { publicUrl } } = supabase.storage
           .from('videos')
           .getPublicUrl(filePath);
 
         videoUrl = publicUrl;
+
+        // Auto-generate thumbnail if not provided
+        if (!thumbnailFile) {
+          try {
+            setGeneratingThumbnail(true);
+            setUploadProgress(60);
+            const generatedThumbnail = await generateThumbnailFromVideo(videoFile);
+            setUploadProgress(70);
+            
+            const thumbnailFileName = `thumbnail-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+            const { error: thumbUploadError } = await supabase.storage
+              .from('videos')
+              .upload(thumbnailFileName, generatedThumbnail);
+
+            if (!thumbUploadError) {
+              const { data: { publicUrl: thumbPublicUrl } } = supabase.storage
+                .from('videos')
+                .getPublicUrl(thumbnailFileName);
+              thumbnailUrl = thumbPublicUrl;
+            }
+          } catch (error) {
+            console.error('Error generating thumbnail:', error);
+            toast({
+              title: "Warning",
+              description: "Video uploaded but thumbnail generation failed",
+              variant: "default",
+            });
+          } finally {
+            setGeneratingThumbnail(false);
+          }
+        }
         setUploadProgress(90);
       }
 
@@ -175,6 +261,7 @@ export default function VideoManagement() {
       });
     } finally {
       setUploading(false);
+      setGeneratingThumbnail(false);
       setUploadProgress(0);
     }
   };
@@ -329,14 +416,17 @@ export default function VideoManagement() {
                       />
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Uploading... {uploadProgress}%
+                      {generatingThumbnail ? 'Generating thumbnail...' : `Uploading... ${uploadProgress}%`}
                     </p>
                   </div>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="thumbnail_file">Upload Thumbnail (Optional)</Label>
+                <Label htmlFor="thumbnail_file">Upload Custom Thumbnail (Optional)</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  If not provided, a thumbnail will be auto-generated from the video
+                </p>
                 <div className="flex items-center gap-2">
                   <Input
                     id="thumbnail_file"
@@ -347,9 +437,14 @@ export default function VideoManagement() {
                   />
                   <Upload className="w-4 h-4 text-muted-foreground" />
                 </div>
+                {thumbnailFile && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Custom thumbnail selected: {thumbnailFile.name}
+                  </p>
+                )}
                 {editingVideo && formData.thumbnail_url && !thumbnailFile && (
                   <p className="text-sm text-muted-foreground mt-1">
-                    Current thumbnail uploaded. Select a new file to replace it.
+                    Current thumbnail will be kept if no new file is uploaded
                   </p>
                 )}
               </div>
