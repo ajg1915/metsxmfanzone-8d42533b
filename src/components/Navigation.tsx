@@ -72,12 +72,6 @@ const Navigation = () => {
               Community
             </NavLink>
             <NavLink 
-              to="/highlights" 
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Highlights
-            </NavLink>
-            <NavLink 
               to="/replays" 
               className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
