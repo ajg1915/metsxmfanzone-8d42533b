@@ -14,7 +14,7 @@ const Hero = () => {
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-8 sm:py-12 md:py-16">
         <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-3 sm:mb-4 animate-fade-in">
-          Welcome to MetsXMFanZone Community
+          Welcome to MetsXMFanZone
         </h1>
         <p className="text-sm sm:text-base md:text-lg text-foreground mb-4 sm:mb-6 max-w-2xl mx-auto px-4">
           Connect with thousands of passionate Mets fans. Share your thoughts, predictions, 
