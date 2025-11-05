@@ -1,10 +1,12 @@
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
+import LiveNotificationBar from "@/components/LiveNotificationBar";
 import LiveNetworks from "@/components/LiveNetworks";
 import LiveStreamsSection from "@/components/LiveStreamsSection";
 import GameHighlights from "@/components/GameHighlights";
 import SpringTraining from "@/components/SpringTraining";
 import BlogSection from "@/components/BlogSection";
+import NewsletterSection from "@/components/NewsletterSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -13,11 +15,13 @@ const Index = () => {
       <Navigation />
       <main className="pt-14 sm:pt-16">
         <Hero />
+        <LiveNotificationBar />
         <LiveNetworks />
         <LiveStreamsSection />
         <GameHighlights />
         <SpringTraining />
         <BlogSection />
+        <NewsletterSection />
       </main>
       <Footer />
     </div>
