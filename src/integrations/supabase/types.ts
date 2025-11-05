@@ -178,6 +178,42 @@ export type Database = {
         }
         Relationships: []
       }
+      podcasts: {
+        Row: {
+          audio_url: string
+          created_at: string
+          description: string | null
+          duration: number | null
+          id: string
+          published: boolean
+          published_at: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          id?: string
+          published?: boolean
+          published_at?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          id?: string
+          published?: boolean
+          published_at?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           content: string
