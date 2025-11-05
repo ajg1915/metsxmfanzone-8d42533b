@@ -2,16 +2,39 @@ import { useState, useEffect } from "react";
 import { X, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const LiveNotificationBar = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const [notification, setNotification] = useState<{
+    message: string;
+    link_url: string;
+  } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const dismissed = sessionStorage.getItem("liveNotificationDismissed");
     if (dismissed) {
       setIsVisible(false);
+      return;
     }
+
+    const fetchActiveNotification = async () => {
+      const { data, error } = await supabase
+        .from("live_notifications")
+        .select("message, link_url")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (!error && data) {
+        setNotification(data);
+        setIsVisible(true);
+      }
+    };
+
+    fetchActiveNotification();
   }, []);
 
   const handleDismiss = () => {
@@ -19,7 +42,7 @@ const LiveNotificationBar = () => {
     sessionStorage.setItem("liveNotificationDismissed", "true");
   };
 
-  if (!isVisible) return null;
+  if (!isVisible || !notification) return null;
 
   return (
     <div className="bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground py-3 px-4 relative animate-in slide-in-from-top duration-500">
@@ -27,14 +50,14 @@ const LiveNotificationBar = () => {
         <div className="flex items-center gap-3 flex-1">
           <Radio className="w-5 h-5 animate-pulse" />
           <p className="text-sm md:text-base font-medium">
-            🔴 <span className="font-bold">LIVE NOW:</span> Watch exclusive Mets coverage and analysis!
+            {notification.message}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button 
             variant="secondary" 
             size="sm"
-            onClick={() => navigate("/mlb-network")}
+            onClick={() => navigate(notification.link_url)}
             className="hidden sm:inline-flex"
           >
             Watch Now

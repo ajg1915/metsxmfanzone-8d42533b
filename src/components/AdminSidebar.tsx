@@ -1,4 +1,4 @@
-import { Home, Users, FileText, Upload, Settings, Shield, Video, Radio } from "lucide-react";
+import { Home, Users, FileText, Upload, Settings, Shield, Video, Radio, Bell } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -18,6 +18,7 @@ const adminItems = [
   { title: "Blog Management", url: "/admin/blog", icon: FileText },
   { title: "Video Management", url: "/admin/videos", icon: Video },
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
+  { title: "Live Notifications", url: "/admin/live-notifications", icon: Bell },
   { title: "Content Management", url: "/admin/content", icon: Upload },
   { title: "Posts Management", url: "/admin/posts", icon: FileText },
   { title: "User Roles", url: "/admin/roles", icon: Shield },
