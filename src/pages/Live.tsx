@@ -71,20 +71,20 @@ const Live = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="pt-16">
-        <section className="py-16 bg-gradient-to-b from-secondary/20 to-background">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+      <main className="pt-16 sm:pt-20">
+        <section className="py-8 sm:py-12 md:py-16 bg-gradient-to-b from-secondary/20 to-background">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-8 sm:mb-12">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-4">
                 Live Streams
               </h1>
-              <p className="text-lg text-foreground max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg text-foreground max-w-2xl mx-auto px-4">
                 Watch live Mets coverage, pre-game shows, post-game analysis, and exclusive fan content
               </p>
             </div>
 
             {loading ? (
-              <div className="text-center py-12">Loading live streams...</div>
+              <div className="text-center py-8 sm:py-12">Loading live streams...</div>
             ) : liveStreams.length === 0 ? (
               <Card className="max-w-2xl mx-auto mb-12">
                 <CardContent className="py-12 text-center text-muted-foreground">
@@ -92,7 +92,7 @@ const Live = () => {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-5xl mx-auto mb-8 sm:mb-12">
                 {liveStreams.map((stream) => (
                   <Card 
                     key={stream.id} 

@@ -85,8 +85,8 @@ export default function BlogPost() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
       <Navigation />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pt-20 sm:pt-24">
+        <div className="max-w-4xl mx-auto w-full">
           <Button 
             variant="ghost" 
             className="mb-6"
@@ -107,8 +107,8 @@ export default function BlogPost() {
               </div>
             )}
 
-            <header className="mb-8">
-              <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
+            <header className="mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">{post.title}</h1>
               
               <div className="flex items-center gap-4 text-muted-foreground mb-4">
                 <span className="flex items-center gap-1">

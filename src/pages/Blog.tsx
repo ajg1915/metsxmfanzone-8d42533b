@@ -68,11 +68,11 @@ export default function Blog() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
       <Navigation />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-bold">Blog</h1>
-            <Button variant="outline" onClick={() => navigate("/blog/rss")}>
+      <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pt-20 sm:pt-24">
+        <div className="max-w-6xl mx-auto w-full">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold">Blog</h1>
+            <Button variant="outline" onClick={() => navigate("/blog/rss")} className="w-full sm:w-auto">
               <Rss className="w-4 h-4 mr-2" />
               RSS Feed
             </Button>
@@ -113,7 +113,7 @@ export default function Blog() {
           </div>
 
           {loading ? (
-            <div className="text-center py-12">Loading...</div>
+            <div className="text-center py-8 sm:py-12">Loading...</div>
           ) : filteredPosts.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
