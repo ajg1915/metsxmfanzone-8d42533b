@@ -1,8 +1,21 @@
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
 import { Play, Users, Trophy, VideoIcon, Menu } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAuthClick = () => {
+    if (user) {
+      signOut();
+    } else {
+      navigate("/auth");
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
       <div className="container mx-auto px-4">
@@ -58,11 +71,11 @@ const Navigation = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button size="lg" className="hidden md:flex">
-              Sign Up
+            <Button size="lg" className="hidden md:flex" onClick={handleAuthClick}>
+              {user ? "Sign Out" : "Sign Up"}
             </Button>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="w-6 h-6" />
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={handleAuthClick}>
+              {user ? "Sign Out" : <Menu className="w-6 h-6" />}
             </Button>
           </div>
         </div>
