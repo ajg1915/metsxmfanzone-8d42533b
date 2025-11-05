@@ -109,13 +109,19 @@ const Auth = () => {
           title: "Success!",
           description: "Account created successfully. You're now logged in!",
         });
-        navigate("/");
+        navigate("/plans");
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
           title: "Validation error",
           description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Signup failed",
+          description: "An unexpected error occurred. Please try again.",
           variant: "destructive",
         });
       }
@@ -167,6 +173,12 @@ const Auth = () => {
           description: error.errors[0].message,
           variant: "destructive",
         });
+      } else {
+        toast({
+          title: "Login failed",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
       }
     } finally {
       setLoading(false);
@@ -210,6 +222,12 @@ const Auth = () => {
           description: error.errors[0].message,
           variant: "destructive",
         });
+      } else {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
       }
     } finally {
       setLoading(false);
@@ -247,6 +265,12 @@ const Auth = () => {
         toast({
           title: "Validation error",
           description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
           variant: "destructive",
         });
       }
