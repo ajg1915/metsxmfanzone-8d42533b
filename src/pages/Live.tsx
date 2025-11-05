@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -19,6 +20,7 @@ interface LiveStream {
 }
 
 const Live = () => {
+  const navigate = useNavigate();
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -95,7 +97,7 @@ const Live = () => {
                   <Card 
                     key={stream.id} 
                     className="border-2 border-primary bg-card hover:shadow-xl transition-all cursor-pointer"
-                    onClick={() => window.open(stream.stream_url, '_blank')}
+                    onClick={() => navigate('/metsxmfanzone-tv')}
                   >
                     {stream.thumbnail_url && (
                       <div className="aspect-video overflow-hidden">
