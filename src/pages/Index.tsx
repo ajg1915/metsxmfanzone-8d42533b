@@ -3,7 +3,6 @@ import Hero from "@/components/Hero";
 import LiveNotificationBar from "@/components/LiveNotificationBar";
 import LiveNetworks from "@/components/LiveNetworks";
 import LiveStreamsSection from "@/components/LiveStreamsSection";
-import VideoGallery from "@/components/VideoGallery";
 import SpringTraining from "@/components/SpringTraining";
 import BlogSection from "@/components/BlogSection";
 import NewsletterSection from "@/components/NewsletterSection";
@@ -18,7 +17,6 @@ const Index = () => {
         <LiveNotificationBar />
         <LiveNetworks />
         <LiveStreamsSection />
-        <VideoGallery />
         <SpringTraining />
         <BlogSection />
         <NewsletterSection />
