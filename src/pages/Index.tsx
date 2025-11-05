@@ -3,7 +3,7 @@ import Hero from "@/components/Hero";
 import LiveNetworks from "@/components/LiveNetworks";
 import GameHighlights from "@/components/GameHighlights";
 import SpringTraining from "@/components/SpringTraining";
-import NewsSection from "@/components/NewsSection";
+import BlogSection from "@/components/BlogSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -15,7 +15,7 @@ const Index = () => {
         <LiveNetworks />
         <GameHighlights />
         <SpringTraining />
-        <NewsSection />
+        <BlogSection />
       </main>
       <Footer />
     </div>
