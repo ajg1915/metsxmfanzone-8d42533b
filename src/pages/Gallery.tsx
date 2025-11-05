@@ -3,12 +3,12 @@ import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Heart, Share2, Play, Search, Filter, Eye, Clock } from "lucide-react";
+import { Play, Search, Filter, Eye, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
@@ -27,7 +27,7 @@ interface Video {
   created_at: string;
 }
 
-const Highlights = () => {
+const Gallery = () => {
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [videos, setVideos] = useState<Video[]>([]);
@@ -35,25 +35,25 @@ const Highlights = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedType, setSelectedType] = useState("All");
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
 
   const categories = ["All", ...new Set(videos.map(v => v.category))];
+  const types = ["All", ...new Set(videos.map(v => v.video_type))];
 
   useEffect(() => {
     fetchVideos();
   }, []);
 
-  // Auto-play video if videoId is in URL params
   useEffect(() => {
     const videoId = searchParams.get('video');
     if (videoId && videos.length > 0) {
       const video = videos.find(v => v.id === videoId);
       if (video) {
         handleVideoClick(video);
-        // Remove the video param from URL after opening
         setSearchParams({});
       }
     }
@@ -61,17 +61,15 @@ const Highlights = () => {
 
   useEffect(() => {
     filterVideos();
-  }, [videos, searchQuery, selectedCategory]);
+  }, [videos, searchQuery, selectedCategory, selectedType]);
 
   useEffect(() => {
     if (selectedVideo && videoRef.current && isPlayerOpen) {
-      // Dispose any existing player first
       if (playerRef.current) {
         playerRef.current.dispose();
         playerRef.current = null;
       }
 
-      // Small delay to ensure DOM is ready
       setTimeout(() => {
         if (videoRef.current) {
           try {
@@ -100,7 +98,6 @@ const Highlights = () => {
               });
             });
 
-            // Increment view count
             incrementViews(selectedVideo.id);
           } catch (error) {
             console.error('Failed to initialize video player:', error);
@@ -132,7 +129,6 @@ const Highlights = () => {
         .from("videos")
         .select("*")
         .eq("published", true)
-        .eq("video_type", "highlight")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -141,7 +137,7 @@ const Highlights = () => {
       console.error("Error fetching videos:", error);
       toast({
         title: "Error",
-        description: "Failed to load highlight videos",
+        description: "Failed to load videos",
         variant: "destructive",
       });
     } finally {
@@ -154,6 +150,10 @@ const Highlights = () => {
 
     if (selectedCategory !== "All") {
       filtered = filtered.filter(v => v.category === selectedCategory);
+    }
+
+    if (selectedType !== "All") {
+      filtered = filtered.filter(v => v.video_type === selectedType);
     }
 
     if (searchQuery) {
@@ -207,28 +207,12 @@ const Highlights = () => {
     setTimeout(() => setSelectedVideo(null), 300);
   };
 
-  const handleShare = (video: Video) => {
-    if (navigator.share) {
-      navigator.share({
-        title: video.title,
-        text: video.description || "",
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: "Link copied!",
-        description: "Video link copied to clipboard",
-      });
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-muted-foreground">Loading highlights...</p>
+          <p className="text-muted-foreground">Loading videos...</p>
         </div>
         <Footer />
       </div>
@@ -238,15 +222,15 @@ const Highlights = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="pt-16 sm:pt-20">
+      <main className="pt-20 sm:pt-24">
         <section className="py-8 sm:py-12 md:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-8 sm:mb-12">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-4">
-                Game Highlights
+                Video Gallery
               </h1>
               <p className="text-base sm:text-lg text-foreground max-w-2xl mx-auto px-4">
-                Watch the best moments, incredible plays, and unforgettable highlights from Mets games
+                Explore our complete collection of videos, highlights, and exclusive content
               </p>
             </div>
 
@@ -255,7 +239,7 @@ const Highlights = () => {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                   <Input 
-                    placeholder="Search highlights..." 
+                    placeholder="Search videos..." 
                     className="pl-10 border-2 border-primary bg-card"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -267,33 +251,52 @@ const Highlights = () => {
                 </Button>
               </div>
 
-              <div className="flex gap-2 flex-wrap mt-3 sm:mt-4">
-                {categories.map((category) => (
-                  <Badge 
-                    key={category}
-                    className={`cursor-pointer transition-colors ${
-                      category === selectedCategory 
-                        ? "bg-primary text-primary-foreground" 
-                        : "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground"
-                    }`}
-                    onClick={() => setSelectedCategory(category)}
-                  >
-                    {category}
-                  </Badge>
-                ))}
+              <div className="flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4">
+                <div className="flex gap-2 flex-wrap">
+                  <span className="text-sm font-semibold text-foreground">Category:</span>
+                  {categories.map((category) => (
+                    <Badge 
+                      key={category}
+                      className={`cursor-pointer transition-colors ${
+                        category === selectedCategory 
+                          ? "bg-primary text-primary-foreground" 
+                          : "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground"
+                      }`}
+                      onClick={() => setSelectedCategory(category)}
+                    >
+                      {category}
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  <span className="text-sm font-semibold text-foreground">Type:</span>
+                  {types.map((type) => (
+                    <Badge 
+                      key={type}
+                      className={`cursor-pointer transition-colors ${
+                        type === selectedType 
+                          ? "bg-primary text-primary-foreground" 
+                          : "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground"
+                      }`}
+                      onClick={() => setSelectedType(type)}
+                    >
+                      {type}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             </div>
 
             {filteredVideos.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <p className="text-muted-foreground text-base sm:text-lg px-4">
-                  {searchQuery || selectedCategory !== "All" 
-                    ? "No highlights found matching your criteria" 
-                    : "No highlights available yet"}
+                  {searchQuery || selectedCategory !== "All" || selectedType !== "All"
+                    ? "No videos found matching your criteria" 
+                    : "No videos available yet"}
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 {filteredVideos.map((video) => (
                   <Card 
                     key={video.id} 
@@ -325,51 +328,22 @@ const Highlights = () => {
                       )}
                     </div>
                     <CardContent className="pt-4">
-                      <Badge className="mb-2 bg-primary text-primary-foreground">
-                        {video.category}
-                      </Badge>
-                      <h3 className="text-lg font-semibold text-primary mb-2 line-clamp-2">
+                      <div className="flex gap-2 mb-2">
+                        <Badge className="bg-primary text-primary-foreground text-xs">
+                          {video.category}
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          {video.video_type}
+                        </Badge>
+                      </div>
+                      <h3 className="text-base font-semibold text-primary mb-2 line-clamp-2">
                         {video.title}
                       </h3>
-                      {video.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                          {video.description}
-                        </p>
-                      )}
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Eye className="w-4 h-4" />
                         <span>{formatViews(video.views || 0)} views</span>
                       </div>
                     </CardContent>
-                    <CardFooter className="flex gap-4 pt-0">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="gap-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toast({
-                            title: "Feature coming soon!",
-                            description: "Like functionality will be available soon",
-                          });
-                        }}
-                      >
-                        <Heart className="w-4 h-4" />
-                        Like
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="gap-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleShare(video);
-                        }}
-                      >
-                        <Share2 className="w-4 h-4" />
-                        Share
-                      </Button>
-                    </CardFooter>
                   </Card>
                 ))}
               </div>
@@ -397,12 +371,13 @@ const Highlights = () => {
                 <p className="text-muted-foreground">{selectedVideo.description}</p>
               </div>
             )}
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
               <div className="flex items-center gap-1">
                 <Eye className="w-4 h-4" />
                 <span>{formatViews(selectedVideo?.views || 0)} views</span>
               </div>
               <Badge>{selectedVideo?.category}</Badge>
+              <Badge variant="secondary">{selectedVideo?.video_type}</Badge>
               {selectedVideo?.duration && selectedVideo.duration > 0 && (
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
@@ -419,4 +394,4 @@ const Highlights = () => {
   );
 };
 
-export default Highlights;
+export default Gallery;
