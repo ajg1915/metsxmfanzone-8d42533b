@@ -287,7 +287,7 @@ export default function LiveStreamManagement() {
                 <div>
                   <Label htmlFor="assigned_pages">Assign to Pages *</Label>
                   <div className="space-y-2 mt-2">
-                    {['live', 'metsxmfanzone', 'mlb-network'].map((page) => (
+                    {['live', 'metsxmfanzone', 'mlb-network', 'espn-network'].map((page) => (
                       <div key={page} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
@@ -302,7 +302,7 @@ export default function LiveStreamManagement() {
                           className="rounded border-gray-300"
                         />
                         <Label htmlFor={page} className="cursor-pointer font-normal">
-                          {page === 'live' ? 'Live Page' : page === 'metsxmfanzone' ? 'MetsXMFanZone TV' : 'MLB Network'}
+                          {page === 'live' ? 'Live Page' : page === 'metsxmfanzone' ? 'MetsXMFanZone TV' : page === 'mlb-network' ? 'MLB Network' : 'ESPN Network'}
                         </Label>
                       </div>
                     ))}
