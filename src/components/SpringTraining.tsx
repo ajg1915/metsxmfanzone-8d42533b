@@ -1,6 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin } from "lucide-react";
+import yankees from "@/assets/spring-mets-yankees.jpg";
+import astros from "@/assets/spring-mets-astros.jpg";
+import cards from "@/assets/spring-mets-cards.jpg";
+import nats from "@/assets/spring-mets-nats.jpg";
+import redsox from "@/assets/spring-mets-redsox.jpg";
+import braves from "@/assets/spring-mets-braves.jpg";
 
 const SpringTraining = () => {
   const games = [
@@ -11,7 +17,7 @@ const SpringTraining = () => {
       date: "Sat, Feb 28, 1:05 PM",
       location: "Clover Park, Port St. Lucie, FL",
       description: "Spring training opener against the Yankees",
-      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
+      image: yankees
     },
     {
       id: 2,
@@ -20,7 +26,7 @@ const SpringTraining = () => {
       date: "Mon, Mar 2, 1:05 PM",
       location: "Clover Park, Port St. Lucie, FL",
       description: "Spring training matchup",
-      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
+      image: astros
     },
     {
       id: 3,
@@ -29,7 +35,7 @@ const SpringTraining = () => {
       date: "Thu, Mar 5, 1:05 PM",
       location: "Roger Dean Stadium, Jupiter, FL",
       description: "Away spring training game",
-      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
+      image: cards
     },
     {
       id: 4,
@@ -38,7 +44,7 @@ const SpringTraining = () => {
       date: "Sun, Mar 8, 1:05 PM",
       location: "Clover Park, Port St. Lucie, FL",
       description: "Spring training home game",
-      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
+      image: nats
     },
     {
       id: 5,
@@ -47,7 +53,7 @@ const SpringTraining = () => {
       date: "Wed, Mar 11, 1:05 PM",
       location: "JetBlue Park, Fort Myers, FL",
       description: "Away spring training game",
-      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
+      image: redsox
     },
     {
       id: 6,
@@ -56,7 +62,7 @@ const SpringTraining = () => {
       date: "Sat, Mar 14, 1:05 PM",
       location: "Clover Park, Port St. Lucie, FL",
       description: "Spring training divisional matchup",
-      colors: "bg-gradient-to-br from-orange-500 to-orange-600"
+      image: braves
     }
   ];
 
@@ -73,14 +79,20 @@ const SpringTraining = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {games.map((game) => (
             <Card key={game.id} className="border-2 border-primary bg-card overflow-hidden hover:shadow-xl transition-shadow">
-              <div className={`h-48 ${game.colors} relative flex items-center justify-center`}>
+              <div className="h-48 relative overflow-hidden">
+                <img 
+                  src={game.image} 
+                  alt={`${game.home} vs ${game.away}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                 <div className="absolute top-4 right-4">
                   <Badge className="bg-primary text-primary-foreground">
                     UPCOMING
                   </Badge>
                 </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-white mb-2">
+                <div className="absolute bottom-4 left-4 right-4 text-center">
+                  <div className="text-2xl sm:text-3xl font-bold text-white">
                     {game.home} vs {game.away}
                   </div>
                 </div>
