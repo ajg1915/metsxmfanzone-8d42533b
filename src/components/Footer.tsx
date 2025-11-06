@@ -29,7 +29,6 @@ const Footer = () => {
               <li><a href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</a></li>
               <li><a href="/faqs" className="text-muted-foreground hover:text-primary transition-colors">FAQs</a></li>
               <li><a href="/feedback" className="text-muted-foreground hover:text-primary transition-colors">Feedback</a></li>
-              <li><a href="https://clwghkbtkofacsjeyrtk.supabase.co/functions/v1/sitemap" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">Sitemap</a></li>
             </ul>
           </div>
 
