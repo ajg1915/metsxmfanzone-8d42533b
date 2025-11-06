@@ -23,6 +23,7 @@ import LiveStreamManagement from "./pages/admin/LiveStreamManagement";
 import LiveNotificationManagement from "./pages/admin/LiveNotificationManagement";
 import MetsXMFanZone from "./pages/MetsXMFanZone";
 import MLBNetwork from "./pages/MLBNetwork";
+import ESPNNetwork from "./pages/ESPNNetwork";
 import NotFound from "./pages/NotFound";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -80,6 +81,7 @@ const App = () => (
           </Route>
           <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
           <Route path="/mlb-network" element={<MLBNetwork />} />
+          <Route path="/espn-network" element={<ESPNNetwork />} />
           <Route path="/sitemap.xml" element={<Sitemap />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
