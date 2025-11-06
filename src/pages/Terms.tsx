@@ -1,9 +1,16 @@
+import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
 const Terms = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Terms of Service - MetsXMFanZone User Agreement</title>
+        <meta name="description" content="Review MetsXMFanZone's terms of service and user agreement. Understand your rights and responsibilities when using our platform." />
+        <meta name="keywords" content="terms of service, user agreement, terms and conditions, legal terms" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/terms" />
+      </Helmet>
       <Navigation />
       <main className="pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">

@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import {
@@ -53,6 +54,12 @@ const FAQs = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Frequently Asked Questions - MetsXMFanZone Help & Support</title>
+        <meta name="description" content="Find answers to common questions about MetsXMFanZone subscriptions, live streams, content access, and more. Get help with your account and features." />
+        <meta name="keywords" content="Mets FAQs, MetsXM help, support questions, streaming help, subscription FAQ" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/faqs" />
+      </Helmet>
       <Navigation />
       <main className="pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">

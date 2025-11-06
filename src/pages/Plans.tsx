@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,6 +68,12 @@ const Plans = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Mets Fan Subscription Plans - Premium Access | MetsXMFanZone</title>
+        <meta name="description" content="Choose your MetsXMFanZone plan. Get unlimited access to live Mets streams, game replays, exclusive content, and more. Start your free trial today." />
+        <meta name="keywords" content="Mets subscription, Mets premium, baseball streaming plans, Mets fan membership, live stream subscription" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/plans" />
+      </Helmet>
       <Navigation />
       <main className="pt-16">
         <section className="py-16">

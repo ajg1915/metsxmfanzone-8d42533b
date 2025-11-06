@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -63,6 +64,12 @@ const Podcast = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Mets Podcast - Live Shows & Exclusive Audio Content | MetsXMFanZone</title>
+        <meta name="description" content="Listen to the best Mets podcasts, live shows, game analysis, and fan discussions. Daily Mets content featuring expert commentary and interviews." />
+        <meta name="keywords" content="Mets podcast, baseball podcast, Mets live show, Mets audio, MLB podcast, Mets commentary, Mets interviews" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/podcast" />
+      </Helmet>
       <Navigation />
       <main className="pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -209,19 +210,34 @@ const Gallery = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-muted-foreground">Loading videos...</p>
+      <>
+        <Helmet>
+          <title>Mets Highlights & Game Videos - Watch HD Replays | MetsXMFanZone</title>
+          <meta name="description" content="Watch Mets game highlights, full game replays, and exclusive video content. Browse HD quality Mets videos, best plays, and memorable moments." />
+          <meta name="keywords" content="Mets highlights, Mets videos, Mets replays, baseball highlights, Mets best plays, game replays, Mets gallery" />
+          <link rel="canonical" href="https://www.metsxmfanzone.com/gallery" />
+        </Helmet>
+        <div className="min-h-screen bg-background">
+          <Navigation />
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <p className="text-muted-foreground">Loading videos...</p>
+          </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <>
+      <Helmet>
+        <title>Mets Highlights & Game Videos - Watch HD Replays | MetsXMFanZone</title>
+        <meta name="description" content="Watch Mets game highlights, full game replays, and exclusive video content. Browse HD quality Mets videos, best plays, and memorable moments." />
+        <meta name="keywords" content="Mets highlights, Mets videos, Mets replays, baseball highlights, Mets best plays, game replays, Mets gallery" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/gallery" />
+      </Helmet>
+      <div className="min-h-screen bg-background">
+        <Navigation />
       <main className="pt-20 sm:pt-24">
         <section className="py-8 sm:py-12 md:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -390,7 +406,8 @@ const Gallery = () => {
       </Dialog>
 
       <Footer />
-    </div>
+      </div>
+    </>
   );
 };
 

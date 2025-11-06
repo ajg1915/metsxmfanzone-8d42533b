@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -70,6 +71,12 @@ const Live = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Watch Mets Live Streams - Live Game Coverage & Analysis | MetsXMFanZone</title>
+        <meta name="description" content="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7." />
+        <meta name="keywords" content="Mets live stream, watch Mets live, Mets game stream, live baseball, Mets pre-game, Mets post-game, MLB live stream" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/live" />
+      </Helmet>
       <Navigation />
       <main className="pt-16 sm:pt-20">
         <section className="py-8 sm:py-12 md:py-16 bg-gradient-to-b from-secondary/20 to-background">

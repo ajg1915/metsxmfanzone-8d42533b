@@ -1,9 +1,16 @@
+import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Privacy Policy - MetsXMFanZone Data Protection & Privacy</title>
+        <meta name="description" content="Read MetsXMFanZone's privacy policy to understand how we collect, use, and protect your personal information and data." />
+        <meta name="keywords" content="privacy policy, data protection, user privacy, terms and conditions" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/privacy" />
+      </Helmet>
       <Navigation />
       <main className="pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">

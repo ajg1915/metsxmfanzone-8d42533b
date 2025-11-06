@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,12 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Contact MetsXMFanZone - Get in Touch with Our Team</title>
+        <meta name="description" content="Contact MetsXMFanZone for support, feedback, or questions. We're here to help Mets fans with subscriptions, content, and more." />
+        <meta name="keywords" content="contact Mets fan zone, MetsXM support, Mets customer service, contact us" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/contact" />
+      </Helmet>
       <Navigation />
       <main className="pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">

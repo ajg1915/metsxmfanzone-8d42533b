@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,12 @@ const Feedback = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Share Your Feedback - Help Us Improve MetsXMFanZone</title>
+        <meta name="description" content="Share your feedback and suggestions with MetsXMFanZone. Help us improve your experience and make the platform better for all Mets fans." />
+        <meta name="keywords" content="feedback, suggestions, user feedback, improve service, contact support" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/feedback" />
+      </Helmet>
       <Navigation />
       <main className="pt-20 pb-16">
         <div className="container mx-auto px-4 max-w-2xl">

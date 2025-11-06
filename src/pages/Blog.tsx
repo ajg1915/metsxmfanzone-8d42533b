@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -66,6 +67,12 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
+      <Helmet>
+        <title>Mets News, Analysis & Updates - MetsXMFanZone Blog</title>
+        <meta name="description" content="Latest New York Mets news, game analysis, player updates, and exclusive content. Stay informed with in-depth Mets coverage and commentary." />
+        <meta name="keywords" content="Mets news, Mets blog, Mets analysis, New York Mets updates, Mets commentary, baseball news, MLB news" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/blog" />
+      </Helmet>
       <Navigation />
       
       <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pt-20 sm:pt-24">

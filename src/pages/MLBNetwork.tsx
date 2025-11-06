@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -10,6 +11,12 @@ import { Button } from "@/components/ui/button";
 const MLBNetwork = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <Helmet>
+        <title>MLB Network Live - Watch Baseball Games & Analysis | MetsXMFanZone</title>
+        <meta name="description" content="Watch MLB Network live games, highlights, and expert baseball analysis. Stream 24/7 MLB coverage featuring your favorite teams." />
+        <meta name="keywords" content="MLB Network, live baseball, MLB live stream, baseball games live, MLB analysis, baseball coverage" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/mlb-network" />
+      </Helmet>
       <Navigation />
       
       <main className="flex-1 container mx-auto px-4 py-8">
