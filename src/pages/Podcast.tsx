@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Play, Mic, Radio } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SocialShareButtons from "@/components/SocialShareButtons";
 
 const Podcast = () => {
   const navigate = useNavigate();
@@ -103,6 +104,15 @@ const Podcast = () => {
                 </Card>
               ))}
             </div>
+          </section>
+
+          {/* Social Share Section */}
+          <section className="mb-12">
+            <Card>
+              <CardContent className="py-6">
+                <SocialShareButtons title="MetsXMFanZone Podcasts" />
+              </CardContent>
+            </Card>
           </section>
 
           {/* Podcast Episodes */}

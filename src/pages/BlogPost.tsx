@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Tag, ArrowLeft } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import SocialShareButtons from "@/components/SocialShareButtons";
 
 interface BlogPost {
   id: string;
@@ -144,6 +145,14 @@ export default function BlogPost() {
                 <div className="whitespace-pre-wrap">{post.content}</div>
               </CardContent>
             </Card>
+
+            <div className="mt-8">
+              <Card>
+                <CardContent className="py-6">
+                  <SocialShareButtons title={post.title} url={window.location.href} />
+                </CardContent>
+              </Card>
+            </div>
           </article>
         </div>
       </main>

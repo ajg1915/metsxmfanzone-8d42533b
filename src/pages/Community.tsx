@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as ImageIcon, Send, Trash2, Heart } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import SocialShareButtons from "@/components/SocialShareButtons";
 
 interface Post {
   id: string;
@@ -205,6 +206,12 @@ const Community = () => {
                   {uploading ? "Posting..." : "Post"}
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-6">
+            <CardContent className="py-6">
+              <SocialShareButtons title="MetsXMFanZone Community" />
             </CardContent>
           </Card>
 
