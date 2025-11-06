@@ -16,7 +16,11 @@ const Plans = () => {
   const { user } = useAuth();
 
   const handleSubscribe = async (planType: string) => {
+    console.log('handleSubscribe called with planType:', planType);
+    console.log('User:', user);
+    
     if (!user) {
+      console.log('No user found, redirecting to auth');
       toast({
         title: "Authentication Required",
         description: "Please sign in to subscribe",
@@ -27,20 +31,39 @@ const Plans = () => {
     }
 
     try {
+      console.log('Calling create-paypal-order edge function...');
+      toast({
+        title: "Processing...",
+        description: "Creating your payment session",
+      });
+
       const { data, error } = await supabase.functions.invoke('create-paypal-order', {
         body: { planType },
       });
 
-      if (error) throw error;
+      console.log('Edge function response:', { data, error });
 
-      if (data.approvalUrl) {
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
+      }
+
+      if (data?.approvalUrl) {
+        console.log('Redirecting to PayPal:', data.approvalUrl);
         window.location.href = data.approvalUrl;
+      } else {
+        console.error('No approval URL returned:', data);
+        toast({
+          title: "Error",
+          description: "Failed to get payment URL. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Error creating PayPal order:', error);
       toast({
         title: "Error",
-        description: "Failed to initiate payment. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to initiate payment. Please try again.",
         variant: "destructive",
       });
     }
