@@ -12,6 +12,29 @@ serve(async (req) => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { orderId } = await req.json();
 
     if (!orderId) {
@@ -53,11 +76,7 @@ serve(async (req) => {
       throw new Error('Payment capture failed');
     }
 
-    // Update subscription status
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
+    // Fetch subscription and verify user owns it
     const { data: subscription } = await supabase
       .from('subscriptions')
       .select('*')
@@ -66,6 +85,14 @@ serve(async (req) => {
 
     if (!subscription) {
       throw new Error('Subscription not found');
+    }
+
+    // Verify the authenticated user owns this subscription
+    if (subscription.user_id !== user.id) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized: You do not own this subscription' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Calculate end date based on plan type

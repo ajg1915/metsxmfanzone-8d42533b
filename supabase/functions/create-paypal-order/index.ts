@@ -6,6 +6,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Server-side plan pricing - never trust client
+const PLAN_PRICES: Record<string, number> = {
+  'premium': 12.99,
+  'annual': 129.99,
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -34,11 +40,20 @@ serve(async (req) => {
       );
     }
 
-    const { planType, amount } = await req.json();
+    const { planType } = await req.json();
 
-    if (!planType || !amount) {
+    if (!planType) {
       return new Response(
-        JSON.stringify({ error: 'Plan type and amount are required' }),
+        JSON.stringify({ error: 'Plan type is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate plan type and get server-side price
+    const amount = PLAN_PRICES[planType];
+    if (!amount) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid plan type' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -98,7 +113,7 @@ serve(async (req) => {
         plan_type: planType,
         status: 'pending',
         paypal_order_id: orderData.id,
-        amount: parseFloat(amount),
+        amount: amount,
         currency: 'USD',
       });
 

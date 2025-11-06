@@ -15,7 +15,7 @@ const Plans = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const handleSubscribe = async (planType: string, amount: number) => {
+  const handleSubscribe = async (planType: string) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -28,7 +28,7 @@ const Plans = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('create-paypal-order', {
-        body: { planType, amount },
+        body: { planType },
       });
 
       if (error) throw error;
@@ -158,8 +158,7 @@ const Plans = () => {
                         if (plan.name === 'Free') {
                           navigate('/auth');
                         } else {
-                          const amount = plan.name === 'Premium' ? 12.99 : 129.99;
-                          handleSubscribe(plan.name.toLowerCase(), amount);
+                          handleSubscribe(plan.name.toLowerCase());
                         }
                       }}
                     >
