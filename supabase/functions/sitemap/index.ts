@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
     const { data: posts } = await supabase
       .from('blog_posts')
       .select('slug, published_at')
-      .eq('status', 'published')
+      .eq('published', true)
       .order('published_at', { ascending: false });
 
     const baseUrl = 'https://www.metsxmfanzone.com';
