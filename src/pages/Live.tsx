@@ -18,6 +18,7 @@ interface LiveStream {
   status: 'live' | 'scheduled' | 'ended';
   scheduled_start: string;
   viewers_count: number;
+  assigned_pages: string[];
 }
 
 const Live = () => {
@@ -69,6 +70,18 @@ const Live = () => {
     }
   };
 
+  const getStreamPageUrl = (assignedPages: string[]) => {
+    // Filter out 'live' and get the first available network page
+    const networkPages = assignedPages.filter(page => page !== 'live');
+    
+    if (networkPages.includes('metsxmfanzone')) return '/metsxmfanzone-tv';
+    if (networkPages.includes('mlb-network')) return '/mlb-network';
+    if (networkPages.includes('espn-network')) return '/espn-network';
+    
+    // Default fallback
+    return '/metsxmfanzone-tv';
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -104,7 +117,7 @@ const Live = () => {
                   <Card 
                     key={stream.id} 
                     className="border-2 border-primary bg-card hover:shadow-xl transition-all cursor-pointer"
-                    onClick={() => navigate('/metsxmfanzone-tv')}
+                    onClick={() => navigate(getStreamPageUrl(stream.assigned_pages))}
                   >
                     {stream.thumbnail_url && (
                       <div className="aspect-video overflow-hidden">
