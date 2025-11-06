@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit, Trash2, FileText } from "lucide-react";
+import { Plus, Edit, Trash2, FileText, Sparkles } from "lucide-react";
 
 interface BlogPost {
   id: string;
@@ -42,6 +42,7 @@ export default function BlogManagement() {
     tags: "",
     published: false,
   });
+  const [generatingImage, setGeneratingImage] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -172,6 +173,43 @@ export default function BlogManagement() {
     }
   };
 
+  const handleGenerateImage = async () => {
+    if (!formData.title) {
+      toast({
+        title: "Error",
+        description: "Please enter a blog title first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setGeneratingImage(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-blog-image', {
+        body: { prompt: formData.title }
+      });
+
+      if (error) throw error;
+
+      if (data?.imageUrl) {
+        setFormData({ ...formData, featured_image_url: data.imageUrl });
+        toast({
+          title: "Success",
+          description: "AI image generated successfully!",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error generating image:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate image",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
+
   const resetForm = () => {
     setEditingPost(null);
     setFormData({
@@ -263,13 +301,30 @@ export default function BlogManagement() {
               </div>
 
               <div>
-                <Label htmlFor="featured_image">Featured Image URL</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="featured_image">Featured Image URL</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateImage}
+                    disabled={generatingImage || !formData.title}
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    {generatingImage ? "Generating..." : "Generate with AI"}
+                  </Button>
+                </div>
                 <Input
                   id="featured_image"
                   value={formData.featured_image_url}
                   onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
-                  placeholder="https://..."
+                  placeholder="https://... or generate with AI"
                 />
+                {formData.featured_image_url && formData.featured_image_url.startsWith('data:image') && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    AI-generated image preview will be shown when post is saved
+                  </p>
+                )}
               </div>
 
               <div>
