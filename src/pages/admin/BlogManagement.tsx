@@ -43,6 +43,7 @@ export default function BlogManagement() {
     published: false,
   });
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [generatingContent, setGeneratingContent] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -210,6 +211,47 @@ export default function BlogManagement() {
     }
   };
 
+  const handleGenerateContent = async () => {
+    if (!formData.title) {
+      toast({
+        title: "Error",
+        description: "Please enter a blog title first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setGeneratingContent(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-blog-content', {
+        body: { 
+          title: formData.title,
+          category: formData.category,
+          excerpt: formData.excerpt
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.content) {
+        setFormData({ ...formData, content: data.content });
+        toast({
+          title: "Success",
+          description: "Article content generated successfully!",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error generating content:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate content",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingContent(false);
+    }
+  };
+
   const resetForm = () => {
     setEditingPost(null);
     setFormData({
@@ -328,7 +370,19 @@ export default function BlogManagement() {
               </div>
 
               <div>
-                <Label htmlFor="content">Content</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="content">Content</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateContent}
+                    disabled={generatingContent || !formData.title}
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    {generatingContent ? "Generating..." : "Generate with AI"}
+                  </Button>
+                </div>
                 <Textarea
                   id="content"
                   value={formData.content}
