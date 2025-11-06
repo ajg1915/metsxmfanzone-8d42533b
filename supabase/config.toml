@@ -2,3 +2,9 @@ project_id = "clwghkbtkofacsjeyrtk"
 
 [functions.generate-blog-image]
 verify_jwt = true
+
+[functions.create-paypal-order]
+verify_jwt = true
+
+[functions.verify-paypal-payment]
+verify_jwt = false

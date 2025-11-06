@@ -5,8 +5,47 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const Plans = () => {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleSubscribe = async (planType: string, amount: number) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to subscribe",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke('create-paypal-order', {
+        body: { planType, amount },
+      });
+
+      if (error) throw error;
+
+      if (data.approvalUrl) {
+        window.location.href = data.approvalUrl;
+      }
+    } catch (error) {
+      console.error('Error creating PayPal order:', error);
+      toast({
+        title: "Error",
+        description: "Failed to initiate payment. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const plans = [
     {
       name: "Free",
@@ -115,6 +154,14 @@ const Plans = () => {
                       className="w-full" 
                       size="lg"
                       variant={plan.popular ? "default" : "outline"}
+                      onClick={() => {
+                        if (plan.name === 'Free') {
+                          navigate('/auth');
+                        } else {
+                          const amount = plan.name === 'Premium' ? 12.99 : 129.99;
+                          handleSubscribe(plan.name.toLowerCase(), amount);
+                        }
+                      }}
                     >
                       {plan.cta}
                     </Button>

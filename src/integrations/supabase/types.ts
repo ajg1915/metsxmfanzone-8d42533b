@@ -276,6 +276,51 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          currency: string | null
+          end_date: string | null
+          id: string
+          paypal_order_id: string | null
+          paypal_subscription_id: string | null
+          plan_type: string
+          start_date: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          currency?: string | null
+          end_date?: string | null
+          id?: string
+          paypal_order_id?: string | null
+          paypal_subscription_id?: string | null
+          plan_type: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          currency?: string | null
+          end_date?: string | null
+          id?: string
+          paypal_order_id?: string | null
+          paypal_subscription_id?: string | null
+          plan_type?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null

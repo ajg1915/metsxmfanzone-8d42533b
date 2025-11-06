@@ -38,6 +38,7 @@ import BusinessPartner from "./pages/BusinessPartner";
 import Dashboard from "./pages/Dashboard";
 import Feedback from "./pages/Feedback";
 import Sitemap from "./pages/Sitemap";
+import PayPalSuccess from "./pages/PayPalSuccess";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
           <Route path="/community" element={<Community />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/plans" element={<Plans />} />
+          <Route path="/paypal-success" element={<PayPalSuccess />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/blog" element={<Blog />} />

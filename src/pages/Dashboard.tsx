@@ -7,17 +7,50 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User, CreditCard, Calendar, ArrowUpCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [userPlan, setUserPlan] = useState<"free" | "premium" | "annual">("free");
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
+  const [subscriptionEndDate, setSubscriptionEndDate] = useState<Date | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth?mode=login");
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (!error && data) {
+          setUserPlan(data.plan_type as "free" | "premium" | "annual");
+          if (data.end_date) {
+            setSubscriptionEndDate(new Date(data.end_date));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching subscription:', error);
+      } finally {
+        setSubscriptionLoading(false);
+      }
+    };
+
+    fetchSubscription();
+  }, [user]);
 
   if (loading) {
     return (
@@ -115,7 +148,7 @@ const Dashboard = () => {
                         <Calendar className="w-4 h-4 text-muted-foreground" />
                         <span className="text-muted-foreground">Next billing: </span>
                         <span className="text-foreground">
-                          {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                          {subscriptionEndDate ? subscriptionEndDate.toLocaleDateString() : 'N/A'}
                         </span>
                       </div>
                       <Button 
