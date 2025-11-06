@@ -36,6 +36,7 @@ import Podcast from "./pages/Podcast";
 import BusinessPartner from "./pages/BusinessPartner";
 import Dashboard from "./pages/Dashboard";
 import Feedback from "./pages/Feedback";
+import Sitemap from "./pages/Sitemap";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,7 @@ const App = () => (
           </Route>
           <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
           <Route path="/mlb-network" element={<MLBNetwork />} />
+          <Route path="/sitemap.xml" element={<Sitemap />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
