@@ -68,14 +68,15 @@ const LiveStreamsSection = () => {
   };
 
   const getStreamPageUrl = (stream: LiveStream) => {
-    // Get the first assigned page and navigate to it
-    if (stream.assigned_pages && stream.assigned_pages.length > 0) {
-      const firstPage = stream.assigned_pages[0];
-      if (firstPage === 'live') return '/live';
-      if (firstPage === 'metsxmfanzone') return '/metsxmfanzone-tv';
-      if (firstPage === 'mlb-network') return '/mlb-network';
-    }
-    return '/live'; // default fallback
+    // Filter out 'live' and get the first available network page
+    const networkPages = stream.assigned_pages.filter(page => page !== 'live');
+    
+    if (networkPages.includes('metsxmfanzone')) return '/metsxmfanzone-tv';
+    if (networkPages.includes('mlb-network')) return '/mlb-network';
+    if (networkPages.includes('espn-network')) return '/espn-network';
+    
+    // Default fallback
+    return '/live';
   };
 
   if (loading) {
