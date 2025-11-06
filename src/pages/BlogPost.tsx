@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,8 +83,41 @@ export default function BlogPost() {
     );
   }
 
+  const currentUrl = window.location.href;
+  const siteUrl = window.location.origin;
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
+      <Helmet>
+        <title>{post.title} | MetsXMFanZone</title>
+        <meta name="description" content={post.excerpt} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={currentUrl} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:image" content={post.featured_image_url || `${siteUrl}/logo-512.png`} />
+        <meta property="og:site_name" content="MetsXMFanZone" />
+        <meta property="article:published_time" content={post.published_at} />
+        <meta property="article:section" content={post.category} />
+        {post.tags.map((tag) => (
+          <meta key={tag} property="article:tag" content={tag} />
+        ))}
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@metsxmfanzone" />
+        <meta name="twitter:url" content={currentUrl} />
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={post.excerpt} />
+        <meta name="twitter:image" content={post.featured_image_url || `${siteUrl}/logo-512.png`} />
+        
+        {/* Additional Meta Tags */}
+        <meta name="author" content="MetsXMFanZone" />
+        <link rel="canonical" href={currentUrl} />
+      </Helmet>
+      
       <Navigation />
       
       <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pt-20 sm:pt-24">

@@ -53,6 +53,16 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
     }
   ];
 
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      // You could add a toast notification here
+      alert('Link copied to clipboard!');
+    } catch (error) {
+      console.log('Error copying:', error);
+    }
+  };
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -64,8 +74,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
         console.log('Error sharing:', error);
       }
     } else {
-      // Fallback - copy to clipboard
-      navigator.clipboard.writeText(shareUrl);
+      copyToClipboard();
     }
   };
 
