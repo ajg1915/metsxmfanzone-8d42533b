@@ -14,4 +14,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://clwghkbtkofacsjeyrtk.supabase.co/functions/v1/sitemap
-Sitemap: https://metsxmfanzone.lovable.app/sitemap.xml
+Sitemap: https://www.metsxmfanzone.com/sitemap.xml

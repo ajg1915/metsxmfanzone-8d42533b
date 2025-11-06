@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
       .eq('status', 'published')
       .order('published_at', { ascending: false });
 
-    const baseUrl = 'https://metsxmfanzone.lovable.app';
+    const baseUrl = 'https://www.metsxmfanzone.com';
     
     // Static pages
     const staticPages = [
