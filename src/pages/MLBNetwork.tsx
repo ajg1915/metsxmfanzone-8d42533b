@@ -19,7 +19,7 @@ const MLBNetwork = () => {
       </Helmet>
       <Navigation />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8 pt-20 sm:pt-24">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
             MLB Network
