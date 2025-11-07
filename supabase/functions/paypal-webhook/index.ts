@@ -21,6 +21,98 @@ serve(async (req) => {
     const webhookEvent = JSON.parse(webhookBody);
     
     console.log('PayPal webhook received:', webhookEvent.event_type);
+
+    // Verify PayPal webhook signature for security
+    const webhookId = Deno.env.get('PAYPAL_WEBHOOK_ID')!;
+    const transmissionId = req.headers.get('paypal-transmission-id');
+    const transmissionTime = req.headers.get('paypal-transmission-time');
+    const transmissionSig = req.headers.get('paypal-transmission-sig');
+    const certUrl = req.headers.get('paypal-cert-url');
+    const authAlgo = req.headers.get('paypal-auth-algo');
+
+    if (!transmissionId || !transmissionTime || !transmissionSig || !certUrl || !authAlgo) {
+      console.error('Missing PayPal webhook verification headers');
+      return new Response(
+        JSON.stringify({ error: 'Missing verification headers' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Verify the webhook signature with PayPal
+    const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID')!;
+    const paypalSecret = Deno.env.get('PAYPAL_SECRET')!;
+    const paypalBaseUrl = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.paypal.com';
+
+    // Get PayPal access token
+    const authResponse = await fetch(`${paypalBaseUrl}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${btoa(`${paypalClientId}:${paypalSecret}`)}`,
+      },
+      body: 'grant_type=client_credentials',
+    });
+
+    if (!authResponse.ok) {
+      console.error('Failed to get PayPal access token');
+      return new Response(
+        JSON.stringify({ error: 'Authentication failed' }),
+        { 
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    const authData = await authResponse.json();
+    const accessToken = authData.access_token;
+
+    // Verify webhook signature
+    const verifyResponse = await fetch(`${paypalBaseUrl}/v1/notifications/verify-webhook-signature`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        transmission_id: transmissionId,
+        transmission_time: transmissionTime,
+        cert_url: certUrl,
+        auth_algo: authAlgo,
+        transmission_sig: transmissionSig,
+        webhook_id: webhookId,
+        webhook_event: webhookEvent,
+      }),
+    });
+
+    if (!verifyResponse.ok) {
+      console.error('Webhook verification request failed:', verifyResponse.status);
+      return new Response(
+        JSON.stringify({ error: 'Verification failed' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    const verifyData = await verifyResponse.json();
+    
+    if (verifyData.verification_status !== 'SUCCESS') {
+      console.error('Invalid webhook signature:', verifyData.verification_status);
+      return new Response(
+        JSON.stringify({ error: 'Invalid signature' }),
+        { 
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    console.log('Webhook signature verified successfully');
     console.log('Webhook data:', JSON.stringify(webhookEvent, null, 2));
 
     const eventType = webhookEvent.event_type;

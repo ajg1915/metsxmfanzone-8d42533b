@@ -10,6 +10,18 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Edit, Trash2, FileText, Sparkles } from "lucide-react";
+import { z } from "zod";
+
+const blogPostSchema = z.object({
+  title: z.string().trim().min(3, "Title must be at least 3 characters").max(200, "Title must be less than 200 characters"),
+  slug: z.string().trim().max(250, "Slug too long").regex(/^[a-z0-9-]*$/, "Slug must contain only lowercase letters, numbers, and hyphens").optional(),
+  content: z.string().trim().min(10, "Content must be at least 10 characters").max(50000, "Content must be less than 50,000 characters"),
+  excerpt: z.string().trim().max(500, "Excerpt must be less than 500 characters").optional(),
+  featured_image_url: z.string().trim().max(2000, "Image URL too long").optional(),
+  category: z.string().trim().min(1, "Category is required").max(100, "Category too long"),
+  tags: z.string().trim().max(200, "Tags must be less than 200 characters").optional(),
+  published: z.boolean(),
+});
 
 interface BlogPost {
   id: string;
@@ -83,8 +95,31 @@ export default function BlogManagement() {
     if (!user) return;
 
     try {
+      // Validate form data with Zod
+      const validationResult = blogPostSchema.safeParse(formData);
+      
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        toast({
+          title: "Validation Error",
+          description: firstError.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
       const slug = formData.slug || generateSlug(formData.title);
+      
+      // Validate individual tags
       const tagsArray = formData.tags.split(",").map(t => t.trim()).filter(t => t);
+      if (tagsArray.some(tag => tag.length > 50)) {
+        toast({
+          title: "Validation Error",
+          description: "Individual tags must be less than 50 characters",
+          variant: "destructive",
+        });
+        return;
+      }
       
       const postData = {
         ...formData,
