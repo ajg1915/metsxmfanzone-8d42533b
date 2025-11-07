@@ -10,6 +10,7 @@ import PodcastSection from "@/components/PodcastSection";
 import NewsletterSection from "@/components/NewsletterSection";
 import FeedbackSection from "@/components/FeedbackSection";
 import Footer from "@/components/Footer";
+import InstallPrompt from "@/components/InstallPrompt";
 
 const Index = () => {
   return (
@@ -33,6 +34,7 @@ const Index = () => {
         <NewsletterSection />
       </main>
       <Footer />
+      <InstallPrompt />
     </div>
   );
 };
