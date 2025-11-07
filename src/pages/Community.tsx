@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Image as ImageIcon, Send, Trash2, Heart } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SocialShareButtons from "@/components/SocialShareButtons";
+import { z } from "zod";
 
 interface Post {
   id: string;
@@ -25,6 +26,22 @@ interface Post {
     email: string | null;
   } | null;
 }
+
+const postSchema = z.object({
+  content: z.string().min(1, "Post content is required").max(5000, "Post must be less than 5000 characters").trim(),
+});
+
+const validateImage = (file: File) => {
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  
+  if (file.size > maxSize) {
+    throw new Error('Image must be less than 5MB');
+  }
+  if (!allowedTypes.includes(file.type.toLowerCase())) {
+    throw new Error('Only JPG, PNG, and WebP images are allowed');
+  }
+};
 
 const Community = () => {
   const { user, loading } = useAuth();
@@ -86,13 +103,46 @@ const Community = () => {
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedImage(e.target.files[0]);
+      const file = e.target.files[0];
+      try {
+        validateImage(file);
+        setSelectedImage(file);
+      } catch (error: any) {
+        toast({
+          title: "Invalid Image",
+          description: error.message,
+          variant: "destructive",
+        });
+        e.target.value = ''; // Reset file input
+      }
     }
   };
 
   const handleSubmitPost = async () => {
-    if (!newPost.trim() && !selectedImage) return;
     if (!user) return;
+
+    // Validate content if provided
+    if (newPost.trim()) {
+      try {
+        postSchema.parse({ content: newPost });
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          toast({
+            title: "Validation Error",
+            description: error.errors[0].message,
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+    } else if (!selectedImage) {
+      toast({
+        title: "Validation Error",
+        description: "Please add some content or an image",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setUploading(true);
 
