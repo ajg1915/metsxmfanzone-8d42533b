@@ -61,7 +61,26 @@ const Community = () => {
     if (error) {
       console.error("Error fetching posts:", error);
     } else {
-      setPosts(data as any || []);
+      // Generate signed URLs for images
+      const postsWithSignedUrls = await Promise.all(
+        (data || []).map(async (post) => {
+          if (post.image_url) {
+            const fileName = post.image_url.split('/community_images/')[1];
+            if (fileName) {
+              const { data: signedUrlData } = await supabase.storage
+                .from('community_images')
+                .createSignedUrl(fileName, 3600); // 1 hour expiry
+              
+              return {
+                ...post,
+                image_url: signedUrlData?.signedUrl || post.image_url
+              };
+            }
+          }
+          return post;
+        })
+      );
+      setPosts(postsWithSignedUrls as any || []);
     }
   };
 
@@ -90,11 +109,8 @@ const Community = () => {
 
         if (uploadError) throw uploadError;
 
-        const { data: urlData } = supabase.storage
-          .from("community_images")
-          .getPublicUrl(fileName);
-
-        imageUrl = urlData.publicUrl;
+        // Store the file path, not the URL (we'll generate signed URLs on fetch)
+        imageUrl = fileName;
       }
 
       const { error } = await supabase.from("posts").insert({
