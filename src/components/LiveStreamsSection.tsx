@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +23,8 @@ interface LiveStream {
 
 const LiveStreamsSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { isPremium } = useSubscription();
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -67,16 +72,27 @@ const LiveStreamsSection = () => {
     }
   };
 
-  const getStreamPageUrl = (stream: LiveStream) => {
-    // Filter out 'live' and get the first available network page
+  const handleStreamClick = (stream: LiveStream) => {
+    if (!user) {
+      toast.error("Please log in to watch streams");
+      navigate("/auth");
+      return;
+    }
+
+    if (!isPremium) {
+      toast.error("Upgrade to Premium to watch all live streams");
+      navigate("/plans");
+      return;
+    }
+
     const networkPages = stream.assigned_pages.filter(page => page !== 'live');
     
-    if (networkPages.includes('metsxmfanzone')) return '/metsxmfanzone-tv';
-    if (networkPages.includes('mlb-network')) return '/mlb-network';
-    if (networkPages.includes('espn-network')) return '/espn-network';
+    let url = '/live';
+    if (networkPages.includes('metsxmfanzone')) url = '/metsxmfanzone-tv';
+    else if (networkPages.includes('mlb-network')) url = '/mlb-network';
+    else if (networkPages.includes('espn-network')) url = '/espn-network';
     
-    // Default fallback
-    return '/live';
+    navigate(url);
   };
 
   if (loading) {
@@ -108,7 +124,7 @@ const LiveStreamsSection = () => {
             <Card 
               key={stream.id}
               className="border-2 border-primary bg-card overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
-              onClick={() => navigate(getStreamPageUrl(stream))}
+              onClick={() => handleStreamClick(stream)}
             >
               {stream.thumbnail_url && (
                 <div className="aspect-video overflow-hidden relative">
