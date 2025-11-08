@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Tag, ArrowLeft, Lock } from "lucide-react";
@@ -26,12 +25,11 @@ interface BlogPost {
 export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { tier, loading: subLoading } = useSubscription();
+  const { user, loading: authLoading } = useAuth();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   
-  const hasAnyPlan = tier !== "free";
+  const isLoggedIn = !!user;
 
   useEffect(() => {
     if (slug) {
@@ -57,7 +55,7 @@ export default function BlogPost() {
     }
   };
 
-  if (loading || subLoading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
         <Navigation />
@@ -180,16 +178,16 @@ export default function BlogPost() {
               )}
             </header>
 
-            {!hasAnyPlan ? (
+            {!isLoggedIn ? (
               <Card className="border-2 border-primary">
                 <CardContent className="py-12 text-center">
                   <Lock className="w-16 h-16 mx-auto mb-4 text-primary" />
-                  <h3 className="text-2xl font-bold mb-2">Subscription Required</h3>
+                  <h3 className="text-2xl font-bold mb-2">Account Required</h3>
                   <p className="text-muted-foreground mb-6">
-                    Subscribe to any plan to read full blog posts and access exclusive content
+                    Sign up for free to read full blog posts and access exclusive content
                   </p>
-                  <Button size="lg" onClick={() => navigate("/plans")}>
-                    View Plans
+                  <Button size="lg" onClick={() => navigate("/auth?mode=signup")}>
+                    Sign Up Free
                   </Button>
                 </CardContent>
               </Card>
