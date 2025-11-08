@@ -1,46 +1,53 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, Clock } from "lucide-react";
 
+interface NewsItem {
+  id: string;
+  type: "signing" | "rumor";
+  title: string;
+  player: string;
+  details: string;
+  time_ago: string;
+  image_url: string;
+}
+
 const MetsNewsTracker = () => {
-  const newsItems = [
-    {
-      id: 1,
-      type: "signing",
-      title: "Mets Sign Star Outfielder",
-      player: "Juan Soto",
-      details: "3-year deal worth $120M",
-      time: "2 hours ago",
-      image: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=400&h=400&fit=crop"
-    },
-    {
-      id: 2,
-      type: "rumor",
-      title: "Trade Talks Heating Up",
-      player: "Pete Alonso",
-      details: "Multiple teams showing interest in star first baseman",
-      time: "5 hours ago",
-      image: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=400&h=400&fit=crop"
-    },
-    {
-      id: 3,
-      type: "signing",
-      title: "Pitching Rotation Addition",
-      player: "New Ace Acquisition",
-      details: "2-year contract finalized",
-      time: "8 hours ago",
-      image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=400&fit=crop"
-    },
-    {
-      id: 4,
-      type: "rumor",
-      title: "Front Office Activity",
-      player: "Edwin Diaz Extension",
-      details: "Negotiations ongoing for contract extension",
-      time: "12 hours ago",
-      image: "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=400&fit=crop"
-    }
-  ];
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNewsItems = async () => {
+      const { data, error } = await supabase
+        .from("mets_news_tracker")
+        .select("*")
+        .eq("published", true)
+        .order("created_at", { ascending: false });
+
+      if (data) {
+        setNewsItems(data as NewsItem[]);
+      }
+      setLoading(false);
+    };
+
+    fetchNewsItems();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center">Loading news...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (newsItems.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background relative overflow-hidden">
@@ -69,7 +76,7 @@ const MetsNewsTracker = () => {
                 <div className="relative flex-shrink-0">
                   <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 group-hover:border-primary transition-colors">
                     <img 
-                      src={item.image} 
+                      src={item.image_url} 
                       alt={item.player}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
@@ -109,7 +116,7 @@ const MetsNewsTracker = () => {
                     </p>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Clock className="w-3 h-3" />
-                      {item.time}
+                      {item.time_ago}
                     </div>
                   </CardContent>
                 </div>

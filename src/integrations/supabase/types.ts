@@ -178,6 +178,45 @@ export type Database = {
         }
         Relationships: []
       }
+      mets_news_tracker: {
+        Row: {
+          created_at: string
+          details: string
+          id: string
+          image_url: string
+          player: string
+          published: boolean
+          time_ago: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          details: string
+          id?: string
+          image_url: string
+          player: string
+          published?: boolean
+          time_ago?: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string
+          id?: string
+          image_url?: string
+          player?: string
+          published?: boolean
+          time_ago?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       podcasts: {
         Row: {
           audio_url: string
@@ -273,6 +312,57 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      seo_settings: {
+        Row: {
+          canonical_url: string | null
+          created_at: string
+          description: string
+          id: string
+          keywords: string | null
+          og_description: string | null
+          og_image: string | null
+          og_title: string | null
+          page_name: string
+          page_path: string
+          robots: string | null
+          title: string
+          twitter_card: string | null
+          updated_at: string
+        }
+        Insert: {
+          canonical_url?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          keywords?: string | null
+          og_description?: string | null
+          og_image?: string | null
+          og_title?: string | null
+          page_name: string
+          page_path: string
+          robots?: string | null
+          title: string
+          twitter_card?: string | null
+          updated_at?: string
+        }
+        Update: {
+          canonical_url?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          keywords?: string | null
+          og_description?: string | null
+          og_image?: string | null
+          og_title?: string | null
+          page_name?: string
+          page_path?: string
+          robots?: string | null
+          title?: string
+          twitter_card?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
