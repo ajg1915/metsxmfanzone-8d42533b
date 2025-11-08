@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAdmin } from "@/hooks/useAdmin";
 import { Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
@@ -12,8 +13,9 @@ import { Trophy } from "lucide-react";
 const SpringTrainingLive = () => {
   const { user, loading: authLoading } = useAuth();
   const { isPremium, loading: subLoading } = useSubscription();
+  const { isAdmin, loading: adminLoading } = useAdmin();
 
-  if (authLoading || subLoading) {
+  if (authLoading || subLoading || adminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-muted-foreground">Loading...</p>
@@ -25,7 +27,7 @@ const SpringTrainingLive = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!isPremium) {
+  if (!isPremium && !isAdmin) {
     return <Navigate to="/plans" replace />;
   }
 

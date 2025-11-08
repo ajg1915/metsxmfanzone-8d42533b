@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAdmin } from "@/hooks/useAdmin";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,13 +28,14 @@ export default function Blog() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isPremium, loading: subLoading } = useSubscription();
+  const { isAdmin, loading: adminLoading } = useAdmin();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
 
-  if (authLoading || subLoading) {
+  if (authLoading || subLoading || adminLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
@@ -41,21 +43,26 @@ export default function Blog() {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!isPremium) {
+  if (!isPremium && !isAdmin) {
     return <Navigate to="/plans" replace />;
   }
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [isAdmin]);
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("blog_posts")
-        .select("*")
-        .eq("published", true)
-        .order("published_at", { ascending: false });
+        .select("*");
+
+      // Only filter by published status if not admin
+      if (!isAdmin) {
+        query = query.eq("published", true);
+      }
+
+      const { data, error } = await query.order("published_at", { ascending: false });
 
       if (error) throw error;
       

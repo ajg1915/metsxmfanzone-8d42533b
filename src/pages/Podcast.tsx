@@ -2,6 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAdmin } from "@/hooks/useAdmin";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,8 +14,9 @@ const Podcast = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isPremium, loading: subLoading } = useSubscription();
+  const { isAdmin, loading: adminLoading } = useAdmin();
 
-  if (authLoading || subLoading) {
+  if (authLoading || subLoading || adminLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
@@ -22,7 +24,7 @@ const Podcast = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!isPremium) {
+  if (!isPremium && !isAdmin) {
     return <Navigate to="/plans" replace />;
   }
 
