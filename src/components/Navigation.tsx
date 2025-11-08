@@ -63,13 +63,16 @@ const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
             <img 
               src={logo} 
               alt="MetsXMFanZone Logo" 
-              className="h-10 sm:h-12 w-auto cursor-pointer"
-              onClick={() => navigate("/")}
+              className="h-10 sm:h-12 w-auto"
             />
+            <div className="text-xs sm:text-sm font-semibold">
+              <span className="text-foreground">metsxmfanzone</span>
+              <span className="text-primary">.com</span>
+            </div>
           </div>
           
           <div className="hidden md:flex items-center gap-4 text-sm">
