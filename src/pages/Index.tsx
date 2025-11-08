@@ -11,7 +11,6 @@ import NewsletterSection from "@/components/NewsletterSection";
 import FeedbackSection from "@/components/FeedbackSection";
 import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
-import { DebugPanel } from "@/components/DebugPanel";
 
 const Index = () => {
   return (
@@ -36,7 +35,6 @@ const Index = () => {
       </main>
       <Footer />
       <InstallPrompt />
-      <DebugPanel />
     </div>
   );
 };
