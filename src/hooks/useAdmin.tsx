@@ -16,12 +16,15 @@ export const useAdmin = () => {
       }
 
       try {
+        console.log('useAdmin: Checking admin for user:', user.id);
         const { data, error } = await supabase
           .from("user_roles")
           .select("role")
           .eq("user_id", user.id)
           .eq("role", "admin")
           .maybeSingle();
+
+        console.log('useAdmin: Query result:', { data, error, isAdmin: !!data });
 
         if (error) {
           console.error("Error checking admin status:", error);

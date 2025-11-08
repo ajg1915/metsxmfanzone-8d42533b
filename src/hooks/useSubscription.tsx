@@ -18,6 +18,7 @@ export const useSubscription = () => {
       }
 
       try {
+        console.log('useSubscription: Fetching subscription for user:', user.id);
         const { data, error } = await supabase
           .from("subscriptions")
           .select("plan_type, status, end_date")
@@ -27,10 +28,14 @@ export const useSubscription = () => {
           .limit(1)
           .maybeSingle();
 
+        console.log('useSubscription: Query result:', { data, error });
+
         if (!error && data) {
           // Check if subscription is still valid
           const endDate = data.end_date ? new Date(data.end_date) : null;
           const isActive = !endDate || endDate > new Date();
+          
+          console.log('useSubscription: Subscription check:', { endDate, isActive, planType: data.plan_type });
           
           if (isActive) {
             setTier(data.plan_type as SubscriptionTier);
@@ -38,6 +43,7 @@ export const useSubscription = () => {
             setTier("free");
           }
         } else {
+          console.log('useSubscription: No active subscription found');
           setTier("free");
         }
       } catch (error) {
