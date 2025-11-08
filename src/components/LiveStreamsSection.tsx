@@ -19,6 +19,7 @@ interface LiveStream {
   scheduled_start: string;
   viewers_count: number;
   assigned_pages: string[];
+  published: boolean;
 }
 
 const LiveStreamsSection = () => {
@@ -51,14 +52,34 @@ const LiveStreamsSection = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user]);
 
   const fetchStreams = async () => {
     try {
-      const { data, error } = await supabase
+      // Check if user is admin
+      let isAdmin = false;
+      if (user) {
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .single();
+        
+        isAdmin = !!roleData;
+      }
+
+      // Build query - admins see all, users see only published
+      let query = supabase
         .from("live_streams")
-        .select("*")
-        .eq("published", true)
+        .select("*");
+
+      // Only filter by published if not admin
+      if (!isAdmin) {
+        query = query.eq("published", true);
+      }
+
+      const { data, error } = await query
         .in("status", ["live", "scheduled"])
         .order("scheduled_start", { ascending: true })
         .limit(3);
@@ -142,6 +163,13 @@ const LiveStreamsSection = () => {
                       {stream.status === 'live' ? 'LIVE NOW' : 'UPCOMING'}
                     </Badge>
                   </div>
+                  {!stream.published && (
+                    <div className="absolute top-2 left-2">
+                      <Badge variant="secondary" className="bg-yellow-600 text-white">
+                        UNPUBLISHED
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               )}
               <CardHeader>

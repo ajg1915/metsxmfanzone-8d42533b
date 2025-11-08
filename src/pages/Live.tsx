@@ -22,6 +22,7 @@ interface LiveStream {
   scheduled_start: string;
   viewers_count: number;
   assigned_pages: string[];
+  published: boolean;
 }
 
 const Live = () => {
@@ -54,14 +55,34 @@ const Live = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user]);
 
   const fetchStreams = async () => {
     try {
-      const { data, error } = await supabase
+      // Check if user is admin
+      let isAdmin = false;
+      if (user) {
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .single();
+        
+        isAdmin = !!roleData;
+      }
+
+      // Build query - admins see all, users see only published
+      let query = supabase
         .from("live_streams")
-        .select("*")
-        .eq("published", true)
+        .select("*");
+
+      // Only filter by published if not admin
+      if (!isAdmin) {
+        query = query.eq("published", true);
+      }
+
+      const { data, error } = await query
         .in("status", ["live", "scheduled"])
         .contains("assigned_pages", ["live"])
         .order("scheduled_start", { ascending: true });
@@ -147,14 +168,21 @@ const Live = () => {
                     <CardHeader>
                       <div className="flex items-start justify-between mb-2">
                         <Radio className="w-8 h-8 text-primary" />
-                        <Badge className={stream.status === "live" ? "bg-red-600 text-white" : "bg-blue-600 text-white"}>
-                          {stream.status === "live" ? (
-                            <>
-                              <Radio className="w-3 h-3 mr-1 animate-pulse" />
-                              LIVE NOW
-                            </>
-                          ) : 'STARTING SOON'}
-                        </Badge>
+                        <div className="flex gap-2">
+                          <Badge className={stream.status === "live" ? "bg-red-600 text-white" : "bg-blue-600 text-white"}>
+                            {stream.status === "live" ? (
+                              <>
+                                <Radio className="w-3 h-3 mr-1 animate-pulse" />
+                                LIVE NOW
+                              </>
+                            ) : 'STARTING SOON'}
+                          </Badge>
+                          {!stream.published && (
+                            <Badge variant="secondary" className="bg-yellow-600 text-white">
+                              UNPUBLISHED
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                       <CardTitle className="text-xl text-primary">{stream.title}</CardTitle>
                       <CardDescription className="text-foreground">
