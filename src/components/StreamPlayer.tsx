@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 
@@ -14,7 +12,6 @@ interface LiveStream {
   stream_url: string;
   thumbnail_url: string;
   status: 'live' | 'scheduled' | 'ended';
-  published: boolean;
 }
 
 interface StreamPlayerProps {
@@ -24,7 +21,6 @@ interface StreamPlayerProps {
 }
 
 export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPlayerProps) {
-  const { user } = useAuth();
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [loading, setLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -58,7 +54,7 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
         playerRef.current = null;
       }
     };
-  }, [pageName, user]);
+  }, [pageName]);
 
   // Initialize Video.js player when stream changes
   useEffect(() => {
@@ -108,30 +104,10 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
 
   const fetchStream = async () => {
     try {
-      // Check if user is admin
-      let isAdmin = false;
-      if (user) {
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .eq("role", "admin")
-          .single();
-        
-        isAdmin = !!roleData;
-      }
-
-      // Build query - admins see all, users see only published
-      let query = supabase
+      const { data, error } = await supabase
         .from("live_streams")
-        .select("*");
-
-      // Only filter by published if not admin
-      if (!isAdmin) {
-        query = query.eq("published", true);
-      }
-
-      const { data, error } = await query
+        .select("*")
+        .eq("published", true)
         .eq("status", "live")
         .contains("assigned_pages", [pageName])
         .order("scheduled_start", { ascending: false })
@@ -174,16 +150,9 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
               />
             </div>
             <div>
-              <div className="flex items-start justify-between gap-4">
-                <h3 className="text-lg font-semibold flex-1">{stream.title}</h3>
-                {!stream.published && (
-                  <Badge variant="secondary" className="bg-yellow-600 text-white">
-                    UNPUBLISHED
-                  </Badge>
-                )}
-              </div>
+              <h3 className="text-lg font-semibold">{stream.title}</h3>
               {stream.description && (
-                <p className="text-muted-foreground mt-2">{stream.description}</p>
+                <p className="text-muted-foreground">{stream.description}</p>
               )}
             </div>
           </div>

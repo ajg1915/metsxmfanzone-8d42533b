@@ -2,10 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
-import { useAdmin } from "@/hooks/useAdmin";
-import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,14 +19,10 @@ interface LiveStream {
   scheduled_start: string;
   viewers_count: number;
   assigned_pages: string[];
-  published: boolean;
 }
 
 const Live = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { isPremium } = useSubscription();
-  const { isAdmin } = useAdmin();
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,21 +49,14 @@ const Live = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, isAdmin]);
+  }, []);
 
   const fetchStreams = async () => {
     try {
-      // Build query - admins see all, users see only published
-      let query = supabase
+      const { data, error } = await supabase
         .from("live_streams")
-        .select("*");
-
-      // Only filter by published if not admin
-      if (!isAdmin) {
-        query = query.eq("published", true);
-      }
-
-      const { data, error } = await query
+        .select("*")
+        .eq("published", true)
         .in("status", ["live", "scheduled"])
         .contains("assigned_pages", ["live"])
         .order("scheduled_start", { ascending: true });
@@ -85,28 +70,16 @@ const Live = () => {
     }
   };
 
-  const handleStreamClick = (assignedPages: string[]) => {
-    if (!user) {
-      toast.error("Please log in to watch streams");
-      navigate("/auth");
-      return;
-    }
-
-    // Allow access if user is premium OR admin
-    if (!isPremium && !isAdmin) {
-      toast.error("Premium subscription required to watch streams");
-      navigate("/plans");
-      return;
-    }
-
+  const getStreamPageUrl = (assignedPages: string[]) => {
+    // Filter out 'live' and get the first available network page
     const networkPages = assignedPages.filter(page => page !== 'live');
     
-    let url = '/metsxmfanzone-tv';
-    if (networkPages.includes('metsxmfanzone')) url = '/metsxmfanzone-tv';
-    else if (networkPages.includes('mlb-network')) url = '/mlb-network';
-    else if (networkPages.includes('espn-network')) url = '/espn-network';
+    if (networkPages.includes('metsxmfanzone')) return '/metsxmfanzone-tv';
+    if (networkPages.includes('mlb-network')) return '/mlb-network';
+    if (networkPages.includes('espn-network')) return '/espn-network';
     
-    navigate(url);
+    // Default fallback
+    return '/metsxmfanzone-tv';
   };
 
   return (
@@ -144,7 +117,7 @@ const Live = () => {
                   <Card 
                     key={stream.id} 
                     className="border-2 border-primary bg-card hover:shadow-xl transition-all cursor-pointer"
-                    onClick={() => handleStreamClick(stream.assigned_pages)}
+                    onClick={() => navigate(getStreamPageUrl(stream.assigned_pages))}
                   >
                     {stream.thumbnail_url && (
                       <div className="aspect-video overflow-hidden">
@@ -158,21 +131,14 @@ const Live = () => {
                     <CardHeader>
                       <div className="flex items-start justify-between mb-2">
                         <Radio className="w-8 h-8 text-primary" />
-                        <div className="flex gap-2">
-                          <Badge className={stream.status === "live" ? "bg-red-600 text-white" : "bg-blue-600 text-white"}>
-                            {stream.status === "live" ? (
-                              <>
-                                <Radio className="w-3 h-3 mr-1 animate-pulse" />
-                                LIVE NOW
-                              </>
-                            ) : 'STARTING SOON'}
-                          </Badge>
-                          {!stream.published && (
-                            <Badge variant="secondary" className="bg-yellow-600 text-white">
-                              UNPUBLISHED
-                            </Badge>
-                          )}
-                        </div>
+                        <Badge className={stream.status === "live" ? "bg-red-600 text-white" : "bg-blue-600 text-white"}>
+                          {stream.status === "live" ? (
+                            <>
+                              <Radio className="w-3 h-3 mr-1 animate-pulse" />
+                              LIVE NOW
+                            </>
+                          ) : 'STARTING SOON'}
+                        </Badge>
                       </div>
                       <CardTitle className="text-xl text-primary">{stream.title}</CardTitle>
                       <CardDescription className="text-foreground">

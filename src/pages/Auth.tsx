@@ -61,20 +61,9 @@ const Auth = () => {
   }, [mode]);
 
   useEffect(() => {
-    // Check for password recovery token in URL hash
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const type = hashParams.get('type');
-    
-    if (type === 'recovery') {
-      setIsResettingPassword(true);
-      setIsLogin(false);
-      setIsForgotPassword(false);
-      return;
-    }
-
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && type !== 'recovery') {
+      if (session) {
         navigate("/");
       }
     });
@@ -171,25 +160,11 @@ const Auth = () => {
       }
 
       if (data.user) {
-        // Check if user is admin and redirect accordingly
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", data.user.id)
-          .eq("role", "admin")
-          .maybeSingle();
-
         toast({
           title: "Welcome back!",
           description: "You've successfully logged in.",
         });
-        
-        // Redirect admins to admin panel, others to dashboard
-        if (roleData) {
-          navigate("/admin");
-        } else {
-          navigate("/dashboard");
-        }
+        navigate("/dashboard");
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -305,26 +280,24 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-      <Card className="w-full max-w-md relative backdrop-blur-sm border-primary/20 shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-lg" />
-        <CardHeader className="space-y-1 relative">
-          <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            {isResettingPassword ? "Set New Password" : isForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Join the Community"}
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">
+            {isResettingPassword ? "Set New Password" : isForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Create Account"}
           </CardTitle>
-          <CardDescription className="text-center text-base">
+          <CardDescription className="text-center">
             {isResettingPassword
               ? "Enter your new password below"
               : isForgotPassword
               ? "Enter your email to receive a password reset link"
               : isLogin
-              ? "Sign in to access your account"
-              : "Create an account to get started"}
+              ? "Enter your credentials to access your account"
+              : "Sign up to join the Mets fan community"}
           </CardDescription>
         </CardHeader>
-        <CardContent className="relative">
-          <form onSubmit={isResettingPassword ? handleUpdatePassword : isForgotPassword ? handleForgotPassword : isLogin ? handleLogin : handleSignup} className="space-y-5">
+        <CardContent>
+          <form onSubmit={isResettingPassword ? handleUpdatePassword : isForgotPassword ? handleForgotPassword : isLogin ? handleLogin : handleSignup} className="space-y-4">
             {!isLogin && !isForgotPassword && !isResettingPassword && (
               <div className="space-y-2">
                 <Label htmlFor="fullName">Full Name</Label>
@@ -411,12 +384,12 @@ const Auth = () => {
               </>
             )}
 
-            <Button type="submit" className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300" disabled={loading}>
-              {loading ? "Loading..." : isResettingPassword ? "Update Password" : isForgotPassword ? "Send Reset Link" : isLogin ? "Sign In" : "Create Account"}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Loading..." : isResettingPassword ? "Update Password" : isForgotPassword ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm space-y-2">
+          <div className="mt-4 text-center text-sm space-y-2">
             {!isResettingPassword && (
               isForgotPassword ? (
                 <button
@@ -425,29 +398,27 @@ const Auth = () => {
                     setIsForgotPassword(false);
                     setEmail("");
                   }}
-                  className="text-primary hover:text-primary/80 transition-colors font-medium"
+                  className="text-primary hover:underline"
                   disabled={loading}
                 >
-                  ← Back to login
+                  Back to login
                 </button>
               ) : (
-                <div className="space-y-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsLogin(!isLogin);
-                      setEmail("");
-                      setPassword("");
-                      setFullName("");
-                    }}
-                    className="text-primary hover:text-primary/80 transition-colors font-medium"
-                    disabled={loading}
-                  >
-                    {isLogin
-                      ? "Don't have an account? Sign up"
-                      : "Already have an account? Sign in"}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setEmail("");
+                    setPassword("");
+                    setFullName("");
+                  }}
+                  className="text-primary hover:underline"
+                  disabled={loading}
+                >
+                  {isLogin
+                    ? "Don't have an account? Sign up"
+                    : "Already have an account? Sign in"}
+                </button>
               )
             )}
           </div>

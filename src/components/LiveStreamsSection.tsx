@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
-import { useAdmin } from "@/hooks/useAdmin";
-import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,14 +16,10 @@ interface LiveStream {
   scheduled_start: string;
   viewers_count: number;
   assigned_pages: string[];
-  published: boolean;
 }
 
 const LiveStreamsSection = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { isPremium } = useSubscription();
-  const { isAdmin } = useAdmin();
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,34 +46,14 @@ const LiveStreamsSection = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, []);
 
   const fetchStreams = async () => {
     try {
-      // Check if user is admin
-      let isAdmin = false;
-      if (user) {
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .eq("role", "admin")
-          .single();
-        
-        isAdmin = !!roleData;
-      }
-
-      // Build query - admins see all, users see only published
-      let query = supabase
+      const { data, error } = await supabase
         .from("live_streams")
-        .select("*");
-
-      // Only filter by published if not admin
-      if (!isAdmin) {
-        query = query.eq("published", true);
-      }
-
-      const { data, error } = await query
+        .select("*")
+        .eq("published", true)
         .in("status", ["live", "scheduled"])
         .order("scheduled_start", { ascending: true })
         .limit(3);
@@ -95,27 +67,16 @@ const LiveStreamsSection = () => {
     }
   };
 
-  const handleStreamClick = (stream: LiveStream) => {
-    if (!user) {
-      toast.error("Please log in to watch streams");
-      navigate("/auth");
-      return;
-    }
-
-    if (!isPremium && !isAdmin) {
-      toast.error("Upgrade to Premium to watch all live streams");
-      navigate("/plans");
-      return;
-    }
-
+  const getStreamPageUrl = (stream: LiveStream) => {
+    // Filter out 'live' and get the first available network page
     const networkPages = stream.assigned_pages.filter(page => page !== 'live');
     
-    let url = '/live';
-    if (networkPages.includes('metsxmfanzone')) url = '/metsxmfanzone-tv';
-    else if (networkPages.includes('mlb-network')) url = '/mlb-network';
-    else if (networkPages.includes('espn-network')) url = '/espn-network';
+    if (networkPages.includes('metsxmfanzone')) return '/metsxmfanzone-tv';
+    if (networkPages.includes('mlb-network')) return '/mlb-network';
+    if (networkPages.includes('espn-network')) return '/espn-network';
     
-    navigate(url);
+    // Default fallback
+    return '/live';
   };
 
   if (loading) {
@@ -147,7 +108,7 @@ const LiveStreamsSection = () => {
             <Card 
               key={stream.id}
               className="border-2 border-primary bg-card overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
-              onClick={() => handleStreamClick(stream)}
+              onClick={() => navigate(getStreamPageUrl(stream))}
             >
               {stream.thumbnail_url && (
                 <div className="aspect-video overflow-hidden relative">
@@ -165,13 +126,6 @@ const LiveStreamsSection = () => {
                       {stream.status === 'live' ? 'LIVE NOW' : 'UPCOMING'}
                     </Badge>
                   </div>
-                  {!stream.published && (
-                    <div className="absolute top-2 left-2">
-                      <Badge variant="secondary" className="bg-yellow-600 text-white">
-                        UNPUBLISHED
-                      </Badge>
-                    </div>
-                  )}
                 </div>
               )}
               <CardHeader>

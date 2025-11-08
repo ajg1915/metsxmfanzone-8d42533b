@@ -1,7 +1,3 @@
-import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
-import { useAdmin } from "@/hooks/useAdmin";
-import { Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -10,21 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Tv, Radio } from "lucide-react";
 
 const ESPNNetwork = () => {
-  const { user, loading: authLoading } = useAuth();
-  const { isPremium, loading: subLoading } = useSubscription();
-  const { isAdmin, loading: adminLoading } = useAdmin();
-
-  if (authLoading || subLoading || adminLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  if (!isPremium && !isAdmin) {
-    return <Navigate to="/plans" replace />;
-  }
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Helmet>

@@ -15,14 +15,12 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import ContentManagement from "./pages/admin/ContentManagement";
 import PostsManagement from "./pages/admin/PostsManagement";
 import UserRoles from "./pages/admin/UserRoles";
-import UserSubscriptions from "./pages/admin/UserSubscriptions";
 import AdminSettings from "./pages/admin/AdminSettings";
 import BlogManagement from "./pages/admin/BlogManagement";
 import VideoManagement from "./pages/admin/VideoManagement";
 import PodcastManagement from "./pages/admin/PodcastManagement";
 import LiveStreamManagement from "./pages/admin/LiveStreamManagement";
 import LiveNotificationManagement from "./pages/admin/LiveNotificationManagement";
-import SEOManagement from "./pages/admin/SEOManagement";
 import MetsXMFanZone from "./pages/MetsXMFanZone";
 import MLBNetwork from "./pages/MLBNetwork";
 import ESPNNetwork from "./pages/ESPNNetwork";
@@ -42,7 +40,6 @@ import Feedback from "./pages/Feedback";
 import Sitemap from "./pages/Sitemap";
 import PayPalSuccess from "./pages/PayPalSuccess";
 import SpringTrainingLive from "./pages/SpringTrainingLive";
-import SpringTraining2026 from "./pages/SpringTraining2026";
 
 const queryClient = new QueryClient();
 
@@ -80,15 +77,12 @@ const App = () => (
             <Route path="podcasts" element={<PodcastManagement />} />
             <Route path="live-streams" element={<LiveStreamManagement />} />
             <Route path="live-notifications" element={<LiveNotificationManagement />} />
-            <Route path="seo" element={<SEOManagement />} />
             <Route path="content" element={<ContentManagement />} />
             <Route path="posts" element={<PostsManagement />} />
-            <Route path="subscriptions" element={<UserSubscriptions />} />
             <Route path="roles" element={<UserRoles />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
           <Route path="/spring-training-live" element={<SpringTrainingLive />} />
-          <Route path="/spring-training-2026" element={<SpringTraining2026 />} />
           <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
           <Route path="/mlb-network" element={<MLBNetwork />} />
           <Route path="/espn-network" element={<ESPNNetwork />} />

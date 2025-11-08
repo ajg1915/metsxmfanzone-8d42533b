@@ -1,21 +1,28 @@
-import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
-import { useAdmin } from "@/hooks/useAdmin";
-import { Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SpringTraining from "@/components/SpringTraining";
 import { StreamPlayer } from "@/components/StreamPlayer";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trophy } from "lucide-react";
+import { Trophy, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const SpringTrainingLive = () => {
-  const { user, loading: authLoading } = useAuth();
-  const { isPremium, loading: subLoading } = useSubscription();
-  const { isAdmin, loading: adminLoading } = useAdmin();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
-  if (authLoading || subLoading || adminLoading) {
+  // Redirect non-logged-in users
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth?mode=login&redirect=/spring-training-live");
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-muted-foreground">Loading...</p>
@@ -24,11 +31,7 @@ const SpringTrainingLive = () => {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  if (!isPremium && !isAdmin) {
-    return <Navigate to="/plans" replace />;
+    return null;
   }
 
   return (

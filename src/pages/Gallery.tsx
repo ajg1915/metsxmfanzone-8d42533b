@@ -1,10 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams, Navigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
-import { useAdmin } from "@/hooks/useAdmin";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,9 +30,6 @@ interface Video {
 
 const Gallery = () => {
   const { toast } = useToast();
-  const { user, loading: authLoading } = useAuth();
-  const { isPremium, loading: subLoading } = useSubscription();
-  const { isAdmin, loading: adminLoading } = useAdmin();
   const [searchParams, setSearchParams] = useSearchParams();
   const [videos, setVideos] = useState<Video[]>([]);
   const [filteredVideos, setFilteredVideos] = useState<Video[]>([]);
@@ -48,24 +42,12 @@ const Gallery = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
 
-  if (authLoading || subLoading || adminLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  if (!isPremium && !isAdmin) {
-    return <Navigate to="/plans" replace />;
-  }
-
   const categories = ["All", ...new Set(videos.map(v => v.category))];
   const types = ["All", ...new Set(videos.map(v => v.video_type))];
 
   useEffect(() => {
     fetchVideos();
-  }, [isAdmin]);
+  }, []);
 
   useEffect(() => {
     const videoId = searchParams.get('video');
@@ -144,16 +126,11 @@ const Gallery = () => {
 
   const fetchVideos = async () => {
     try {
-      let query = supabase
+      const { data, error } = await supabase
         .from("videos")
-        .select("*");
-
-      // Only filter by published status if not admin
-      if (!isAdmin) {
-        query = query.eq("published", true);
-      }
-
-      const { data, error } = await query.order("created_at", { ascending: false });
+        .select("*")
+        .eq("published", true)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setVideos(data || []);

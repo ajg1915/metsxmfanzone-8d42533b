@@ -17,10 +17,7 @@ export const useSubscription = () => {
         return;
       }
 
-      setLoading(true);
-
       try {
-        console.log('useSubscription: Fetching subscription for user:', user.id);
         const { data, error } = await supabase
           .from("subscriptions")
           .select("plan_type, status, end_date")
@@ -28,32 +25,25 @@ export const useSubscription = () => {
           .eq("status", "active")
           .order("created_at", { ascending: false })
           .limit(1)
-          .maybeSingle();
-
-        console.log('useSubscription: Query result:', { data, error });
-
-        let finalTier: SubscriptionTier = "free";
+          .single();
 
         if (!error && data) {
           // Check if subscription is still valid
           const endDate = data.end_date ? new Date(data.end_date) : null;
           const isActive = !endDate || endDate > new Date();
           
-          console.log('useSubscription: Subscription check:', { endDate, isActive, planType: data.plan_type });
-          
           if (isActive) {
-            finalTier = data.plan_type as SubscriptionTier;
+            setTier(data.plan_type as SubscriptionTier);
+          } else {
+            setTier("free");
           }
         } else {
-          console.log('useSubscription: No active subscription found');
+          setTier("free");
         }
-
-        // Set both states together to avoid race condition
-        setTier(finalTier);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching subscription:", error);
         setTier("free");
+      } finally {
         setLoading(false);
       }
     };
