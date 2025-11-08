@@ -17,6 +17,13 @@ export const useSubscription = () => {
         return;
       }
 
+      // Check if user is admin - give full access
+      if (user.email === "ajg1915@gmail.com") {
+        setTier("annual");
+        setLoading(false);
+        return;
+      }
+
       try {
         const { data, error } = await supabase
           .from("subscriptions")

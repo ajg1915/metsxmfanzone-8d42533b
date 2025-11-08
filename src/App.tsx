@@ -21,6 +21,7 @@ import VideoManagement from "./pages/admin/VideoManagement";
 import PodcastManagement from "./pages/admin/PodcastManagement";
 import LiveStreamManagement from "./pages/admin/LiveStreamManagement";
 import LiveNotificationManagement from "./pages/admin/LiveNotificationManagement";
+import SubscriptionManagement from "./pages/admin/SubscriptionManagement";
 import MetsXMFanZone from "./pages/MetsXMFanZone";
 import MLBNetwork from "./pages/MLBNetwork";
 import ESPNNetwork from "./pages/ESPNNetwork";
@@ -80,6 +81,7 @@ const App = () => (
             <Route path="content" element={<ContentManagement />} />
             <Route path="posts" element={<PostsManagement />} />
             <Route path="roles" element={<UserRoles />} />
+            <Route path="subscriptions" element={<SubscriptionManagement />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
           <Route path="/spring-training-live" element={<SpringTrainingLive />} />

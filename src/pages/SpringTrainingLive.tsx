@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SpringTraining from "@/components/SpringTraining";
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 
 const SpringTrainingLive = () => {
   const { user, loading } = useAuth();
+  const { isPremium, loading: subLoading } = useSubscription();
   const navigate = useNavigate();
 
   // Redirect non-logged-in users
@@ -22,7 +24,7 @@ const SpringTrainingLive = () => {
     }
   }, [user, loading, navigate]);
 
-  if (loading) {
+  if (loading || subLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-muted-foreground">Loading...</p>
@@ -32,6 +34,29 @@ const SpringTrainingLive = () => {
 
   if (!user) {
     return null;
+  }
+
+  if (!isPremium) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navigation />
+        <main className="flex-1 container mx-auto px-4 py-8 pt-20 sm:pt-24">
+          <Card className="max-w-2xl mx-auto border-2 border-primary">
+            <CardContent className="py-12 text-center">
+              <Lock className="w-16 h-16 mx-auto mb-4 text-primary" />
+              <h2 className="text-2xl font-bold mb-2">Premium Access Required</h2>
+              <p className="text-muted-foreground mb-6">
+                Subscribe to unlock Spring Training live streams and exclusive content
+              </p>
+              <Button size="lg" onClick={() => navigate("/plans")}>
+                View Plans
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (

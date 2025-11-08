@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Tag, ArrowLeft } from "lucide-react";
+import { Calendar, Tag, ArrowLeft, Lock } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
@@ -24,8 +26,12 @@ interface BlogPost {
 export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { tier, loading: subLoading } = useSubscription();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  const hasAnyPlan = tier !== "free";
 
   useEffect(() => {
     if (slug) {
@@ -51,7 +57,7 @@ export default function BlogPost() {
     }
   };
 
-  if (loading) {
+  if (loading || subLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
         <Navigation />
@@ -174,11 +180,26 @@ export default function BlogPost() {
               )}
             </header>
 
-            <Card>
-              <CardContent className="prose prose-lg max-w-none dark:prose-invert py-8">
-                <div className="whitespace-pre-wrap">{post.content}</div>
-              </CardContent>
-            </Card>
+            {!hasAnyPlan ? (
+              <Card className="border-2 border-primary">
+                <CardContent className="py-12 text-center">
+                  <Lock className="w-16 h-16 mx-auto mb-4 text-primary" />
+                  <h3 className="text-2xl font-bold mb-2">Subscription Required</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Subscribe to any plan to read full blog posts and access exclusive content
+                  </p>
+                  <Button size="lg" onClick={() => navigate("/plans")}>
+                    View Plans
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardContent className="prose prose-lg max-w-none dark:prose-invert py-8">
+                  <div className="whitespace-pre-wrap">{post.content}</div>
+                </CardContent>
+              </Card>
+            )}
 
             <div className="mt-8">
               <Card>

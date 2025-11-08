@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Radio, Users } from "lucide-react";
+import { Play, Radio, Users, Lock } from "lucide-react";
 
 interface LiveStream {
   id: string;
@@ -23,6 +24,7 @@ interface LiveStream {
 
 const Live = () => {
   const navigate = useNavigate();
+  const { isPremium, loading: subLoading } = useSubscription();
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -103,8 +105,21 @@ const Live = () => {
               </p>
             </div>
 
-            {loading ? (
+            {loading || subLoading ? (
               <div className="text-center py-8 sm:py-12">Loading live streams...</div>
+            ) : !isPremium ? (
+              <Card className="max-w-2xl mx-auto mb-12 border-2 border-primary">
+                <CardContent className="py-12 text-center">
+                  <Lock className="w-16 h-16 mx-auto mb-4 text-primary" />
+                  <h3 className="text-2xl font-bold mb-2">Premium Access Required</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Subscribe to unlock all live streaming content and exclusive coverage
+                  </p>
+                  <Button size="lg" onClick={() => navigate("/plans")}>
+                    View Plans
+                  </Button>
+                </CardContent>
+              </Card>
             ) : liveStreams.length === 0 ? (
               <Card className="max-w-2xl mx-auto mb-12">
                 <CardContent className="py-12 text-center text-muted-foreground">
@@ -162,21 +177,23 @@ const Live = () => {
               </div>
             )}
 
-            <div className="text-center">
-              <Card className="border-2 border-primary bg-card max-w-2xl mx-auto">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-primary">Premium Access Required</CardTitle>
-                  <CardDescription className="text-foreground">
-                    Get unlimited access to all live streams, replays, and exclusive content
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button size="lg" className="w-full md:w-auto">
-                    Start 7-Day Free Trial
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            {isPremium && (
+              <div className="text-center">
+                <Card className="border-2 border-primary bg-card max-w-2xl mx-auto">
+                  <CardHeader>
+                    <CardTitle className="text-2xl text-primary">Need More Access?</CardTitle>
+                    <CardDescription className="text-foreground">
+                      Upgrade for additional features and benefits
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button size="lg" className="w-full md:w-auto" onClick={() => navigate("/plans")}>
+                      View All Plans
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         </section>
       </main>
