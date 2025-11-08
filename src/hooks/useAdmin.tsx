@@ -15,15 +15,27 @@ export const useAdmin = () => {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .maybeSingle();
 
-      setIsAdmin(!error && !!data);
-      setLoading(false);
+        if (error) {
+          console.error("Error checking admin status:", error);
+          setIsAdmin(false);
+        } else {
+          setIsAdmin(!!data);
+          console.log("Admin check result:", { isAdmin: !!data, userId: user.id });
+        }
+      } catch (err) {
+        console.error("Admin check failed:", err);
+        setIsAdmin(false);
+      } finally {
+        setLoading(false);
+      }
     };
 
     checkAdmin();
