@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAdmin } from "@/hooks/useAdmin";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Tag, ArrowLeft } from "lucide-react";
@@ -28,10 +29,11 @@ export default function BlogPost() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isPremium, loading: subLoading } = useSubscription();
+  const { isAdmin, loading: adminLoading } = useAdmin();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
-  if (authLoading || subLoading) {
+  if (authLoading || subLoading || adminLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
@@ -39,7 +41,7 @@ export default function BlogPost() {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!isPremium) {
+  if (!isPremium && !isAdmin) {
     return <Navigate to="/plans" replace />;
   }
 
@@ -47,16 +49,21 @@ export default function BlogPost() {
     if (slug) {
       fetchPost();
     }
-  }, [slug]);
+  }, [slug, isAdmin]);
 
   const fetchPost = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("blog_posts")
         .select("*")
-        .eq("slug", slug)
-        .eq("published", true)
-        .single();
+        .eq("slug", slug);
+
+      // Only filter by published status if not admin
+      if (!isAdmin) {
+        query = query.eq("published", true);
+      }
+
+      const { data, error } = await query.single();
 
       if (error) throw error;
       setPost(data);

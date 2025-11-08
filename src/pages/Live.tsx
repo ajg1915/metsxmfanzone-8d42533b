@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAdmin } from "@/hooks/useAdmin";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -29,6 +30,7 @@ const Live = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium } = useSubscription();
+  const { isAdmin } = useAdmin();
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,23 +57,10 @@ const Live = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, isAdmin]);
 
   const fetchStreams = async () => {
     try {
-      // Check if user is admin
-      let isAdmin = false;
-      if (user) {
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .eq("role", "admin")
-          .single();
-        
-        isAdmin = !!roleData;
-      }
-
       // Build query - admins see all, users see only published
       let query = supabase
         .from("live_streams")
@@ -103,7 +92,8 @@ const Live = () => {
       return;
     }
 
-    if (!isPremium) {
+    // Allow access if user is premium OR admin
+    if (!isPremium && !isAdmin) {
       toast.error("Premium subscription required to watch streams");
       navigate("/plans");
       return;
