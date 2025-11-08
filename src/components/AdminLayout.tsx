@@ -15,12 +15,15 @@ export function AdminLayout() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!authLoading && !user) {
+    // Only redirect after loading is complete
+    if (authLoading || adminLoading) return;
+    
+    if (!user) {
       navigate("/auth");
       return;
     }
 
-    if (!authLoading && !adminLoading && user && !isAdmin) {
+    if (!isAdmin) {
       toast({
         title: "Access Denied",
         description: "You don't have admin privileges",
@@ -30,6 +33,7 @@ export function AdminLayout() {
     }
   }, [user, isAdmin, authLoading, adminLoading, navigate, toast]);
 
+  // Wait for all loading to complete
   if (authLoading || adminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -38,7 +42,8 @@ export function AdminLayout() {
     );
   }
 
-  if (!isAdmin || !user) {
+  // Don't render if not authenticated or not admin
+  if (!user || !isAdmin) {
     return null;
   }
 
