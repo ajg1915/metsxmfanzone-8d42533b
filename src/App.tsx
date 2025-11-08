@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import ContentManagement from "./pages/admin/ContentManagement";
 import PostsManagement from "./pages/admin/PostsManagement";
 import UserRoles from "./pages/admin/UserRoles";
+import UserSubscriptions from "./pages/admin/UserSubscriptions";
 import AdminSettings from "./pages/admin/AdminSettings";
 import BlogManagement from "./pages/admin/BlogManagement";
 import VideoManagement from "./pages/admin/VideoManagement";
@@ -82,6 +83,7 @@ const App = () => (
             <Route path="seo" element={<SEOManagement />} />
             <Route path="content" element={<ContentManagement />} />
             <Route path="posts" element={<PostsManagement />} />
+            <Route path="subscriptions" element={<UserSubscriptions />} />
             <Route path="roles" element={<UserRoles />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>

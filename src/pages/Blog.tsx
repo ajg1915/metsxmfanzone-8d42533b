@@ -35,29 +35,15 @@ export default function Blog() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
 
-  // Debug logging
-  useEffect(() => {
-    console.log("Blog Page Access Check:", {
-      user: user?.email,
-      isPremium,
-      isAdmin,
-      authLoading,
-      subLoading,
-      adminLoading
-    });
-  }, [user, isPremium, isAdmin, authLoading, subLoading, adminLoading]);
-
   if (authLoading || subLoading || adminLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
   if (!user) {
-    console.log("Blog: Redirecting to auth - no user");
     return <Navigate to="/auth" replace />;
   }
 
   if (!isPremium && !isAdmin) {
-    console.log("Blog: Redirecting to plans - not premium and not admin");
     return <Navigate to="/plans" replace />;
   }
 
