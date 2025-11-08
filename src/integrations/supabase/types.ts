@@ -276,6 +276,57 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_settings: {
+        Row: {
+          canonical_url: string | null
+          created_at: string
+          description: string
+          id: string
+          keywords: string | null
+          og_description: string | null
+          og_image: string | null
+          og_title: string | null
+          page_name: string
+          page_path: string
+          robots: string | null
+          title: string
+          twitter_card: string | null
+          updated_at: string
+        }
+        Insert: {
+          canonical_url?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          keywords?: string | null
+          og_description?: string | null
+          og_image?: string | null
+          og_title?: string | null
+          page_name: string
+          page_path: string
+          robots?: string | null
+          title: string
+          twitter_card?: string | null
+          updated_at?: string
+        }
+        Update: {
+          canonical_url?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          keywords?: string | null
+          og_description?: string | null
+          og_image?: string | null
+          og_title?: string | null
+          page_name?: string
+          page_path?: string
+          robots?: string | null
+          title?: string
+          twitter_card?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           amount: number | null
