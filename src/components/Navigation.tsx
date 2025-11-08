@@ -70,7 +70,7 @@ const Navigation = () => {
               className="h-10 sm:h-12 w-auto"
             />
             <div className="text-xs sm:text-sm font-semibold">
-              <span className="text-foreground">metsxmfanzone</span>
+              <span className="text-foreground">MetsXMFanZone</span>
               <span className="text-primary">.com</span>
             </div>
           </div>
