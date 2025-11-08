@@ -12,7 +12,6 @@ import Auth from "./pages/Auth";
 import AdminSetup from "./pages/AdminSetup";
 import { AdminLayout } from "./components/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
-import ContentManagement from "./pages/admin/ContentManagement";
 import PostsManagement from "./pages/admin/PostsManagement";
 import UserRoles from "./pages/admin/UserRoles";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -82,7 +81,6 @@ const App = () => (
             <Route path="live-notifications" element={<LiveNotificationManagement />} />
             <Route path="mets-news" element={<MetsNewsTrackerManagement />} />
             <Route path="feedbacks" element={<FeedbackManagement />} />
-            <Route path="content" element={<ContentManagement />} />
             <Route path="posts" element={<PostsManagement />} />
             <Route path="roles" element={<UserRoles />} />
             <Route path="subscriptions" element={<SubscriptionManagement />} />

@@ -22,7 +22,6 @@ const adminItems = [
   { title: "Live Notifications", url: "/admin/live-notifications", icon: Bell },
   { title: "Mets News Tracker", url: "/admin/mets-news", icon: TrendingUp },
   { title: "Feedback Management", url: "/admin/feedbacks", icon: MessageSquare },
-  { title: "Content Management", url: "/admin/content", icon: Upload },
   { title: "Posts Management", url: "/admin/posts", icon: FileText },
   { title: "User Roles", url: "/admin/roles", icon: Shield },
   { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
