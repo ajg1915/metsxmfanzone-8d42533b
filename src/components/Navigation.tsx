@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Play, Users, Menu, Shield, User, LogOut, LayoutDashboard, X } from "lucide-react";
+import { Play, Users, Menu, Shield, User, LogOut, LayoutDashboard, X, Trophy } from "lucide-react";
+import logo from "@/assets/metsxmfanzone-logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -63,10 +64,12 @@ const Navigation = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           <div className="flex items-center gap-2">
-            <div className="text-base sm:text-lg font-bold">
-              <span className="text-foreground">MetsXMFanZone</span>
-              <span className="text-primary">.com</span>
-            </div>
+            <img 
+              src={logo} 
+              alt="MetsXMFanZone Logo" 
+              className="h-10 sm:h-12 w-auto cursor-pointer"
+              onClick={() => navigate("/")}
+            />
           </div>
           
           <div className="hidden md:flex items-center gap-4 text-sm">
@@ -81,7 +84,7 @@ const Navigation = () => {
               to="/live" 
               className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
-              <Play className="w-3 h-3" />
+              <Trophy className="w-3 h-3" />
               Live
             </NavLink>
             <NavLink 
@@ -187,7 +190,7 @@ const Navigation = () => {
                     className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Play className="w-4 h-4" />
+                    <Trophy className="w-4 h-4" />
                     Live
                   </NavLink>
                   <NavLink 

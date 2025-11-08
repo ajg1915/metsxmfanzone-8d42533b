@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Image as ImageIcon, Send, Trash2, Heart } from "lucide-react";
+import { Image as ImageIcon, Send, Trash2, Heart, Lock } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import { z } from "zod";
@@ -119,7 +119,15 @@ const Community = () => {
   };
 
   const handleSubmitPost = async () => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to post in the community",
+        variant: "destructive",
+      });
+      navigate("/auth?mode=login");
+      return;
+    }
 
     // Validate content if provided
     if (newPost.trim()) {
@@ -191,6 +199,15 @@ const Community = () => {
   };
 
   const handleDeletePost = async (postId: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to delete posts",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       const { error } = await supabase.from("posts").delete().eq("id", postId);
 
@@ -240,45 +257,59 @@ const Community = () => {
               <CardTitle>What's on your mind?</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Textarea
-                placeholder="Share your thoughts with the Mets community..."
-                value={newPost}
-                onChange={(e) => setNewPost(e.target.value)}
-                className="min-h-[100px]"
-              />
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <label htmlFor="image-upload">
-                    <Button variant="outline" size="sm" asChild>
-                      <span className="cursor-pointer">
-                        <ImageIcon className="w-4 h-4 mr-2" />
-                        Add Photo
-                      </span>
-                    </Button>
-                  </label>
-                  {selectedImage && (
-                    <span className="text-sm text-muted-foreground">
-                      {selectedImage.name}
-                    </span>
-                  )}
+              {!user ? (
+                <div className="text-center p-6 bg-muted/50 rounded-lg">
+                  <Lock className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground mb-4">
+                    Join the conversation! Log in or sign up to post in the community.
+                  </p>
+                  <Button onClick={() => navigate("/auth?mode=login")}>
+                    Log In to Post
+                  </Button>
                 </div>
-                
-                <Button
-                  onClick={handleSubmitPost}
-                  disabled={(!newPost.trim() && !selectedImage) || uploading}
-                >
-                  <Send className="w-4 h-4 mr-2" />
-                  {uploading ? "Posting..." : "Post"}
-                </Button>
-              </div>
+              ) : (
+                <>
+                  <Textarea
+                    placeholder="Share your thoughts with the Mets community..."
+                    value={newPost}
+                    onChange={(e) => setNewPost(e.target.value)}
+                    className="min-h-[100px]"
+                  />
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                        id="image-upload"
+                      />
+                      <label htmlFor="image-upload">
+                        <Button variant="outline" size="sm" asChild>
+                          <span className="cursor-pointer">
+                            <ImageIcon className="w-4 h-4 mr-2" />
+                            Add Photo
+                          </span>
+                        </Button>
+                      </label>
+                      {selectedImage && (
+                        <span className="text-sm text-muted-foreground">
+                          {selectedImage.name}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <Button
+                      onClick={handleSubmitPost}
+                      disabled={(!newPost.trim() && !selectedImage) || uploading}
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      {uploading ? "Posting..." : "Post"}
+                    </Button>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 

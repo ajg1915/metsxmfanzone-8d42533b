@@ -39,6 +39,7 @@ import Dashboard from "./pages/Dashboard";
 import Feedback from "./pages/Feedback";
 import Sitemap from "./pages/Sitemap";
 import PayPalSuccess from "./pages/PayPalSuccess";
+import SpringTrainingLive from "./pages/SpringTrainingLive";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="roles" element={<UserRoles />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
+          <Route path="/spring-training-live" element={<SpringTrainingLive />} />
           <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
           <Route path="/mlb-network" element={<MLBNetwork />} />
           <Route path="/espn-network" element={<ESPNNetwork />} />
