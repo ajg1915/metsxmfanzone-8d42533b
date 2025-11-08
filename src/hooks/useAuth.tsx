@@ -28,24 +28,23 @@ export const useAuth = () => {
   }, []);
 
   const signOut = async () => {
-    try {
-      // Sign out from Supabase first
-      const { error } = await supabase.auth.signOut();
-      
-      // Ignore "session_not_found" errors as the user is already signed out
-      if (error && !error.message.includes('session_not_found')) {
-        console.error('Sign out error:', error);
-        throw error;
+    // Clear local state immediately to prevent multiple calls
+    const wasSignedIn = !!session;
+    setSession(null);
+    setUser(null);
+    
+    // Only attempt sign out if there was a session
+    if (wasSignedIn) {
+      try {
+        const { error } = await supabase.auth.signOut();
+        
+        // Ignore session_not_found errors as the user is already signed out
+        if (error && !error.message.includes('session_not_found')) {
+          console.error('Sign out error:', error);
+        }
+      } catch (error) {
+        console.error('Unexpected sign out error:', error);
       }
-      
-      // Clear local state after successful sign out
-      setSession(null);
-      setUser(null);
-    } catch (error) {
-      // Still clear local state even if there's an error
-      setSession(null);
-      setUser(null);
-      console.error('Unexpected sign out error:', error);
     }
   };
 

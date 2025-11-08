@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { useAdmin } from "@/hooks/useAdmin";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { useToast } from "@/hooks/use-toast";
@@ -9,46 +9,28 @@ import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 
 export function AdminLayout() {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdmin();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const checkAdmin = async () => {
-      if (!loading && !user) {
-        navigate("/auth");
-        return;
-      }
+    if (!authLoading && !user) {
+      navigate("/auth");
+      return;
+    }
 
-      if (user) {
-        const { data, error } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .eq("role", "admin")
-          .single();
+    if (!authLoading && !adminLoading && user && !isAdmin) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have admin privileges",
+        variant: "destructive",
+      });
+      navigate("/");
+    }
+  }, [user, isAdmin, authLoading, adminLoading, navigate, toast]);
 
-        if (error || !data) {
-          toast({
-            title: "Access Denied",
-            description: "You don't have admin privileges",
-            variant: "destructive",
-          });
-          navigate("/");
-          return;
-        }
-
-        setIsAdmin(true);
-      }
-      setChecking(false);
-    };
-
-    checkAdmin();
-  }, [user, loading, navigate, toast]);
-
-  if (loading || checking) {
+  if (authLoading || adminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-muted-foreground">Loading...</p>
@@ -56,7 +38,7 @@ export function AdminLayout() {
     );
   }
 
-  if (!isAdmin) {
+  if (!isAdmin || !user) {
     return null;
   }
 
