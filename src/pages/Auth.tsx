@@ -61,9 +61,20 @@ const Auth = () => {
   }, [mode]);
 
   useEffect(() => {
+    // Check for password recovery token in URL hash
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get('type');
+    
+    if (type === 'recovery') {
+      setIsResettingPassword(true);
+      setIsLogin(false);
+      setIsForgotPassword(false);
+      return;
+    }
+
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+      if (session && type !== 'recovery') {
         navigate("/");
       }
     });
