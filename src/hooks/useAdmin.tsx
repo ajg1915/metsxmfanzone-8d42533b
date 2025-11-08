@@ -15,6 +15,8 @@ export const useAdmin = () => {
         return;
       }
 
+      setLoading(true);
+
       try {
         console.log('useAdmin: Checking admin for user:', user.id);
         const { data, error } = await supabase
@@ -26,16 +28,14 @@ export const useAdmin = () => {
 
         console.log('useAdmin: Query result:', { data, error, isAdmin: !!data });
 
-        if (error) {
-          console.error("Error checking admin status:", error);
-          setIsAdmin(false);
-        } else {
-          setIsAdmin(!!data);
-        }
+        const adminStatus = !error && !!data;
+        
+        // Set both states together to avoid race condition
+        setIsAdmin(adminStatus);
+        setLoading(false);
       } catch (err) {
         console.error("Admin check failed:", err);
         setIsAdmin(false);
-      } finally {
         setLoading(false);
       }
     };
