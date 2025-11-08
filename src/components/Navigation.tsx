@@ -91,6 +91,12 @@ const Navigation = () => {
               Live
             </NavLink>
             <NavLink 
+              to="/spring-training-2026" 
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Spring Training
+            </NavLink>
+            <NavLink 
               to="/community" 
               className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
@@ -195,6 +201,13 @@ const Navigation = () => {
                   >
                     <Trophy className="w-4 h-4" />
                     Live
+                  </NavLink>
+                  <NavLink 
+                    to="/spring-training-2026" 
+                    className="text-foreground hover:text-primary transition-colors py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Spring Training
                   </NavLink>
                   <NavLink 
                     to="/community" 

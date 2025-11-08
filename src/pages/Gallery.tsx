@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,6 +32,8 @@ interface Video {
 
 const Gallery = () => {
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
+  const { isPremium, loading: subLoading } = useSubscription();
   const [searchParams, setSearchParams] = useSearchParams();
   const [videos, setVideos] = useState<Video[]>([]);
   const [filteredVideos, setFilteredVideos] = useState<Video[]>([]);
@@ -41,6 +45,18 @@ const Gallery = () => {
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
+
+  if (authLoading || subLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (!isPremium) {
+    return <Navigate to="/plans" replace />;
+  }
 
   const categories = ["All", ...new Set(videos.map(v => v.category))];
   const types = ["All", ...new Set(videos.map(v => v.video_type))];
