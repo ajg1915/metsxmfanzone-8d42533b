@@ -5,6 +5,7 @@ import LiveNotificationBar from "@/components/LiveNotificationBar";
 import LiveNetworks from "@/components/LiveNetworks";
 import LiveStreamsSection from "@/components/LiveStreamsSection";
 import SpringTraining from "@/components/SpringTraining";
+import MetsNewsTracker from "@/components/MetsNewsTracker";
 import BlogSection from "@/components/BlogSection";
 import PodcastSection from "@/components/PodcastSection";
 import NewsletterSection from "@/components/NewsletterSection";
@@ -28,6 +29,7 @@ const Index = () => {
         <LiveNetworks />
         <LiveStreamsSection />
         <SpringTraining />
+        <MetsNewsTracker />
         <BlogSection />
         <PodcastSection />
         <FeedbackSection />
