@@ -103,11 +103,11 @@ const LiveStreamsSection = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
           {streams.map((stream) => (
             <Card 
               key={stream.id}
-              className="border border-primary bg-card overflow-hidden hover:shadow-lg transition-all cursor-pointer group"
+              className="border border-primary bg-card overflow-hidden hover:shadow-md transition-all cursor-pointer group"
               onClick={() => navigate(getStreamPageUrl(stream))}
             >
               {stream.thumbnail_url && (
@@ -118,35 +118,25 @@ const LiveStreamsSection = () => {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Play className="w-8 h-8 text-white" />
+                    <Play className="w-6 h-6 text-white" />
                   </div>
-                  <div className="absolute top-2 right-2">
-                    <Badge className={stream.status === 'live' ? 'bg-red-600 text-white text-xs' : 'bg-blue-600 text-white text-xs'}>
-                      {stream.status === 'live' && <Radio className="w-2.5 h-2.5 mr-1 animate-pulse" />}
+                  <div className="absolute top-1.5 right-1.5">
+                    <Badge className={stream.status === 'live' ? 'bg-red-600 text-white text-[10px] px-1.5 py-0.5' : 'bg-blue-600 text-white text-[10px] px-1.5 py-0.5'}>
+                      {stream.status === 'live' && <Radio className="w-2 h-2 mr-0.5 animate-pulse" />}
                       {stream.status === 'live' ? 'LIVE NOW' : 'UPCOMING'}
                     </Badge>
                   </div>
                 </div>
               )}
-              <CardHeader className="p-3 pb-2">
-                <CardTitle className="line-clamp-2 text-base">{stream.title}</CardTitle>
+              <CardHeader className="p-2 pb-1">
+                <CardTitle className="line-clamp-1 text-sm">{stream.title}</CardTitle>
               </CardHeader>
-              <CardContent className="p-3 pt-0">
-                {stream.description && (
-                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                    {stream.description}
-                  </p>
-                )}
+              <CardContent className="p-2 pt-0">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Users className="w-3 h-3" />
-                    {stream.viewers_count > 0 ? `${stream.viewers_count} watching` : 'Starting soon'}
+                  <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                    <Users className="w-2.5 h-2.5" />
+                    {stream.viewers_count > 0 ? stream.viewers_count : 'Starting soon'}
                   </span>
-                  {stream.scheduled_start && stream.status === 'scheduled' && (
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(stream.scheduled_start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  )}
                 </div>
               </CardContent>
             </Card>
