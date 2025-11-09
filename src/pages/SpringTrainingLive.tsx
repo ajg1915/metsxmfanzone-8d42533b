@@ -79,53 +79,11 @@ const SpringTrainingLive = () => {
             Exclusive live coverage of Mets Spring Training from Port St. Lucie, Florida
           </p>
 
-          <div className="grid gap-6 md:grid-cols-3 mb-8">
-            <Card>
-              <CardContent className="flex items-center gap-3 p-6">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <Trophy className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">2026</p>
-                  <p className="text-sm text-muted-foreground">Season</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="flex items-center gap-3 p-6">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <Trophy className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">Live</p>
-                  <p className="text-sm text-muted-foreground">Streaming</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="flex items-center gap-3 p-6">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <Trophy className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">24/7</p>
-                  <p className="text-sm text-muted-foreground">Coverage</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
           <StreamPlayer 
             pageName="spring-training"
             pageTitle="Spring Training Live Stream"
             pageDescription="Live from Clover Park in Port St. Lucie, FL"
           />
-
-          <div className="mt-12">
-            <SpringTraining />
-          </div>
         </div>
       </main>
 
