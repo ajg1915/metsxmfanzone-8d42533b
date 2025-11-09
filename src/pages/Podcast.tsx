@@ -17,7 +17,7 @@ const Podcast = () => {
       path: "/mlb-network",
     },
     {
-      title: "MetsXMFanZone TV",
+      title: "MetsXMFanZoneTV",
       description: "Exclusive Mets live content and discussions",
       path: "/metsxmfanzone-tv",
     },
@@ -66,8 +66,14 @@ const Podcast = () => {
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>Mets Podcast - Live Shows & Exclusive Audio Content | MetsXMFanZone</title>
-        <meta name="description" content="Listen to the best Mets podcasts, live shows, game analysis, and fan discussions. Daily Mets content featuring expert commentary and interviews." />
-        <meta name="keywords" content="Mets podcast, baseball podcast, Mets live show, Mets audio, MLB podcast, Mets commentary, Mets interviews" />
+        <meta
+          name="description"
+          content="Listen to the best Mets podcasts, live shows, game analysis, and fan discussions. Daily Mets content featuring expert commentary and interviews."
+        />
+        <meta
+          name="keywords"
+          content="Mets podcast, baseball podcast, Mets live show, Mets audio, MLB podcast, Mets commentary, Mets interviews"
+        />
         <link rel="canonical" href="https://www.metsxmfanzone.com/podcast" />
       </Helmet>
       <Navigation />
@@ -99,11 +105,7 @@ const Podcast = () => {
                     <CardDescription>{show.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button 
-                      className="w-full gap-2" 
-                      size="lg"
-                      onClick={() => navigate(show.path)}
-                    >
+                    <Button className="w-full gap-2" size="lg" onClick={() => navigate(show.path)}>
                       <Play className="w-5 h-5" />
                       Watch Live
                     </Button>
