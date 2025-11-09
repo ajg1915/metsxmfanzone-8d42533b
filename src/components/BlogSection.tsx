@@ -88,7 +88,7 @@ const BlogSection = () => {
               onClick={() => navigate(`/blog/${post.slug}`)}
             >
               {post.featured_image_url && (
-                <div className="aspect-video overflow-hidden">
+                <div className="aspect-[16/9] max-h-32 overflow-hidden">
                   <img 
                     src={post.featured_image_url} 
                     alt={post.title}
@@ -96,22 +96,22 @@ const BlogSection = () => {
                   />
                 </div>
               )}
-              <CardHeader className="p-3 sm:p-4">
-                <Badge className="w-fit mb-1 text-[10px] bg-primary text-primary-foreground">
+              <CardHeader className="p-2 sm:p-3">
+                <Badge className="w-fit mb-1 text-[9px] px-1.5 py-0.5 bg-primary text-primary-foreground">
                   {post.category}
                 </Badge>
-                <h3 className="text-sm sm:text-base font-bold text-primary group-hover:text-primary/80 transition-colors">
+                <h3 className="text-xs sm:text-sm font-bold text-primary group-hover:text-primary/80 transition-colors line-clamp-2">
                   {post.title}
                 </h3>
               </CardHeader>
-              <CardContent className="p-3 sm:p-4 pt-0">
+              <CardContent className="p-2 sm:p-3 pt-0">
                 {post.excerpt && (
-                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                  <p className="text-[10px] text-muted-foreground mb-1.5 line-clamp-2">
                     {post.excerpt}
                   </p>
                 )}
-                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                  <Clock className="w-3 h-3" />
+                <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                  <Clock className="w-2.5 h-2.5" />
                   {getTimeAgo(post.published_at)}
                 </div>
               </CardContent>
