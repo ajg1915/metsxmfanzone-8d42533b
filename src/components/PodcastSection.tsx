@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Music2, Facebook, Headphones, Music, Podcast } from "lucide-react";
+import { Play, Music2, Facebook, Headphones, Music, Podcast, Radio } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
 
@@ -25,6 +25,12 @@ const platforms = [
     icon: Facebook,
     url: "https://www.facebook.com/metsxmfanzone",
     color: "bg-blue-600 hover:bg-blue-700",
+  },
+  {
+    name: "iHeartRadio",
+    icon: Radio,
+    url: "https://www.iheart.com",
+    color: "bg-red-600 hover:bg-red-700",
   },
   {
     name: "Amazon Music",
@@ -84,7 +90,7 @@ const PodcastSection = () => {
         {/* Listen Live Section */}
         <div className="mb-8 sm:mb-10">
           <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">Listen Live On</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5 sm:gap-2 max-w-5xl mx-auto">
             {platforms.map((platform) => {
               const IconComponent = platform.icon;
               return (
