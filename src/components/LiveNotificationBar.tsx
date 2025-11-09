@@ -49,7 +49,7 @@ const LiveNotificationBar = () => {
     <div className="bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground py-3 px-4 relative animate-in slide-in-from-top duration-500">
       <div className="container mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1">
-          <img src={logo} alt="MetsXMFanZone" className="w-5 h-5 animate-pulse" />
+          <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 animate-pulse" />
           <p className="text-sm md:text-base font-medium">
             {notification.message}
           </p>
