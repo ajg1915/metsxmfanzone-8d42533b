@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
+import { Play, Music2, Facebook, Headphones, Music, Podcast } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
 
@@ -16,31 +16,31 @@ interface Podcast {
 const platforms = [
   {
     name: "TikTok",
-    icon: "🎵",
+    icon: Music2,
     url: "https://www.tiktok.com/@metsxmfanzone",
     color: "bg-black hover:bg-black/80",
   },
   {
     name: "Facebook",
-    icon: "📘",
+    icon: Facebook,
     url: "https://www.facebook.com/metsxmfanzone",
     color: "bg-blue-600 hover:bg-blue-700",
   },
   {
     name: "Amazon Music",
-    icon: "🎧",
+    icon: Headphones,
     url: "https://music.amazon.com",
     color: "bg-orange-500 hover:bg-orange-600",
   },
   {
     name: "Spotify",
-    icon: "🎶",
+    icon: Music,
     url: "https://open.spotify.com",
     color: "bg-green-600 hover:bg-green-700",
   },
   {
     name: "Apple Podcasts",
-    icon: "🎙️",
+    icon: Podcast,
     url: "https://podcasts.apple.com",
     color: "bg-purple-600 hover:bg-purple-700",
   },
@@ -85,22 +85,27 @@ const PodcastSection = () => {
         <div className="mb-8 sm:mb-10">
           <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">Listen Live On</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 max-w-4xl mx-auto">
-            {platforms.map((platform) => (
-              <a
-                key={platform.name}
-                href={platform.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group"
-              >
-                <Card className="hover:shadow-lg transition-all duration-300 border hover:border-primary">
-                  <CardContent className="p-3 sm:p-4 text-center">
-                    <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">{platform.icon}</div>
-                    <p className="font-semibold text-xs sm:text-sm">{platform.name}</p>
-                  </CardContent>
-                </Card>
-              </a>
-            ))}
+            {platforms.map((platform) => {
+              const IconComponent = platform.icon;
+              return (
+                <a
+                  key={platform.name}
+                  href={platform.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group"
+                >
+                  <Card className="hover:shadow-lg transition-all duration-300 border hover:border-primary">
+                    <CardContent className="p-3 sm:p-4 text-center">
+                      <div className="flex justify-center mb-1 sm:mb-2">
+                        <IconComponent className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+                      </div>
+                      <p className="font-semibold text-xs sm:text-sm">{platform.name}</p>
+                    </CardContent>
+                  </Card>
+                </a>
+              );
+            })}
           </div>
         </div>
 
