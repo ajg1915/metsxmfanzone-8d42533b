@@ -76,7 +76,7 @@ const SpringTraining = () => {
           <p className="text-xs sm:text-sm text-foreground">Upcoming games and exclusive coverage</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {games.map((game) => (
             <Card key={game.id} className="border-2 border-primary bg-card overflow-hidden hover:shadow-xl transition-shadow">
               <div className="h-48 relative overflow-hidden">
