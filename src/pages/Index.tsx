@@ -10,6 +10,7 @@ import BlogSection from "@/components/BlogSection";
 import PodcastSection from "@/components/PodcastSection";
 import NewsletterSection from "@/components/NewsletterSection";
 import FeedbackSection from "@/components/FeedbackSection";
+import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
 
@@ -32,6 +33,7 @@ const Index = () => {
         <MetsNewsTracker />
         <BlogSection />
         <PodcastSection />
+        <FAQSection />
         <FeedbackSection />
         <NewsletterSection />
       </main>
