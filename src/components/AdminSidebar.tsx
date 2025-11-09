@@ -1,5 +1,6 @@
-import { Home, Users, FileText, Upload, Settings, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare } from "lucide-react";
+import { Home, FileText, Settings, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -9,20 +10,29 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-const adminItems = [
+const mainItems = [
   { title: "Home", url: "/admin", icon: Home },
+];
+
+const mediaItems = [
   { title: "Blog Management", url: "/admin/blog", icon: FileText },
   { title: "Video Management", url: "/admin/videos", icon: Video },
   { title: "Podcast Management", url: "/admin/podcasts", icon: Mic },
+];
+
+const liveManagementItems = [
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
   { title: "Live Notifications", url: "/admin/live-notifications", icon: Bell },
   { title: "Mets News Tracker", url: "/admin/mets-news", icon: TrendingUp },
-  { title: "Feedback Management", url: "/admin/feedbacks", icon: MessageSquare },
-  { title: "Posts Management", url: "/admin/posts", icon: FileText },
+];
+
+const otherItems = [
+  { title: "Feedback", url: "/admin/feedbacks", icon: MessageSquare },
+  { title: "Posts", url: "/admin/posts", icon: FileText },
   { title: "User Roles", url: "/admin/roles", icon: Shield },
   { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
   { title: "Settings", url: "/admin/settings", icon: Settings },
@@ -32,6 +42,9 @@ export function AdminSidebar() {
   const { open } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
+  
+  const [mediaOpen, setMediaOpen] = useState(true);
+  const [liveManagementOpen, setLiveManagementOpen] = useState(true);
 
   const isActive = (path: string) => {
     if (path === "/admin") {
@@ -40,14 +53,127 @@ export function AdminSidebar() {
     return currentPath.startsWith(path);
   };
 
+  const isGroupActive = (items: typeof mediaItems) => {
+    return items.some(item => isActive(item.url));
+  };
+
   return (
     <Sidebar className={open ? "w-60" : "w-14"} collapsible="icon">
-      <SidebarContent>
+      <SidebarContent className="gap-2">
+        {/* Main Items */}
         <SidebarGroup>
-          <SidebarGroupLabel>Admin Portal</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {adminItems.map((item) => (
+              {mainItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      className={({ isActive: active }) =>
+                        active || isActive(item.url)
+                          ? "bg-primary text-primary-foreground font-medium"
+                          : "hover:bg-muted/50"
+                      }
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {open && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Media Section */}
+        <SidebarGroup>
+          <Collapsible open={mediaOpen} onOpenChange={setMediaOpen}>
+            <SidebarGroupLabel asChild>
+              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1">
+                <div className="flex items-center gap-2">
+                  <Film className="h-4 w-4" />
+                  {open && <span>Media</span>}
+                </div>
+                {open && (
+                  <ChevronDown 
+                    className={`h-4 w-4 transition-transform ${mediaOpen ? "rotate-180" : ""}`}
+                  />
+                )}
+              </CollapsibleTrigger>
+            </SidebarGroupLabel>
+            <CollapsibleContent>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {mediaItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          className={({ isActive: active }) =>
+                            active || isActive(item.url)
+                              ? "bg-primary text-primary-foreground font-medium pl-6"
+                              : "hover:bg-muted/50 pl-6"
+                          }
+                        >
+                          <item.icon className="h-4 w-4" />
+                          {open && <span className="text-sm">{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </Collapsible>
+        </SidebarGroup>
+
+        {/* Live Management Section */}
+        <SidebarGroup>
+          <Collapsible open={liveManagementOpen} onOpenChange={setLiveManagementOpen}>
+            <SidebarGroupLabel asChild>
+              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1">
+                <div className="flex items-center gap-2">
+                  <Radio className="h-4 w-4" />
+                  {open && <span>Live Management</span>}
+                </div>
+                {open && (
+                  <ChevronDown 
+                    className={`h-4 w-4 transition-transform ${liveManagementOpen ? "rotate-180" : ""}`}
+                  />
+                )}
+              </CollapsibleTrigger>
+            </SidebarGroupLabel>
+            <CollapsibleContent>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {liveManagementItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          className={({ isActive: active }) =>
+                            active || isActive(item.url)
+                              ? "bg-primary text-primary-foreground font-medium pl-6"
+                              : "hover:bg-muted/50 pl-6"
+                          }
+                        >
+                          <item.icon className="h-4 w-4" />
+                          {open && <span className="text-sm">{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </Collapsible>
+        </SidebarGroup>
+
+        {/* Other Items */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {otherItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
