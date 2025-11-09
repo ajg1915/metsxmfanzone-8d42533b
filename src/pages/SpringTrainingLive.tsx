@@ -7,6 +7,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import MetsNewsTracker from "@/components/MetsNewsTracker";
+import MetsRSSFeed from "@/components/MetsRSSFeed";
 import { StreamPlayer } from "@/components/StreamPlayer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Lock, Calendar, TrendingUp, Facebook } from "lucide-react";
@@ -191,25 +192,16 @@ const SpringTrainingLive = () => {
           </div>
         </section>
 
-        {/* SNY Mets Feed Section */}
-        <section className="py-12">
+        {/* Mets RSS Feed Section */}
+        <section className="py-12 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center gap-2 mb-6">
-                <Calendar className="w-8 h-8 text-primary" />
-                <h2 className="text-3xl font-bold">SNY Mets Feed</h2>
+                <TrendingUp className="w-8 h-8 text-primary" />
+                <h2 className="text-3xl font-bold">Mets News Feed</h2>
               </div>
               
-              <Card className="border-2 border-primary">
-                <CardContent className="p-0">
-                  <iframe
-                    src="https://sny.tv/mets-feed"
-                    className="w-full h-[600px] border-0"
-                    title="SNY Mets Feed"
-                    loading="lazy"
-                  />
-                </CardContent>
-              </Card>
+              <MetsRSSFeed />
             </div>
           </div>
         </section>
