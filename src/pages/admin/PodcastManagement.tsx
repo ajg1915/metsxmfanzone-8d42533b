@@ -37,7 +37,7 @@ export default function PodcastManagement() {
     title: "",
     description: "",
     script: "",
-    voiceId: "9BWtsMINqrJLrRacOk9x", // Aria default
+    voice: "alloy", // Alloy default
   });
 
   const [generatedAudio, setGeneratedAudio] = useState<Blob | null>(null);
@@ -197,7 +197,7 @@ export default function PodcastManagement() {
       const { data, error } = await supabase.functions.invoke('generate-podcast-audio', {
         body: {
           text: aiFormData.script,
-          voiceId: aiFormData.voiceId,
+          voice: aiFormData.voice,
         },
       });
 
@@ -258,7 +258,7 @@ export default function PodcastManagement() {
         title: "AI Podcast saved successfully",
       });
 
-      setAiFormData({ title: "", description: "", script: "", voiceId: "9BWtsMINqrJLrRacOk9x" });
+      setAiFormData({ title: "", description: "", script: "", voice: "alloy" });
       setGeneratedAudio(null);
       fetchPodcasts();
     } catch (error: any) {
@@ -381,25 +381,21 @@ export default function PodcastManagement() {
                 <div>
                   <Label htmlFor="voice">AI Voice</Label>
                   <Select
-                    value={aiFormData.voiceId}
+                    value={aiFormData.voice}
                     onValueChange={(value) =>
-                      setAiFormData({ ...aiFormData, voiceId: value })
+                      setAiFormData({ ...aiFormData, voice: value })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="9BWtsMINqrJLrRacOk9x">Aria (Female)</SelectItem>
-                      <SelectItem value="CwhRBWXzGAHq8TQ4Fs17">Roger (Male)</SelectItem>
-                      <SelectItem value="EXAVITQu4vr4xnSDxMaL">Sarah (Female)</SelectItem>
-                      <SelectItem value="FGY2WhTYpPnrIDTdsKH5">Laura (Female)</SelectItem>
-                      <SelectItem value="IKne3meq5aSn9XLyUdCD">Charlie (Male)</SelectItem>
-                      <SelectItem value="JBFqnCBsd6RMkjVDRZzb">George (Male)</SelectItem>
-                      <SelectItem value="N2lVS1w4EtoT3dr4eOWO">Callum (Male)</SelectItem>
-                      <SelectItem value="TX3LPaxmHKxFdv7VOQHJ">Liam (Male)</SelectItem>
-                      <SelectItem value="XB0fDUnXU5powFXDhCwa">Charlotte (Female)</SelectItem>
-                      <SelectItem value="Xb7hH8MSUJpSbSDYk0k2">Alice (Female)</SelectItem>
+                      <SelectItem value="alloy">Alloy (Neutral)</SelectItem>
+                      <SelectItem value="echo">Echo (Male)</SelectItem>
+                      <SelectItem value="fable">Fable (British Male)</SelectItem>
+                      <SelectItem value="onyx">Onyx (Deep Male)</SelectItem>
+                      <SelectItem value="nova">Nova (Female)</SelectItem>
+                      <SelectItem value="shimmer">Shimmer (Warm Female)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
