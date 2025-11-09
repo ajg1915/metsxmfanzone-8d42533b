@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Mail } from "lucide-react";
+import logo from "@/assets/metsxmfanzone-logo.png";
 
 const NewsletterSection = () => {
   const [email, setEmail] = useState("");
@@ -29,7 +29,7 @@ const NewsletterSection = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
-            <Mail className="w-8 h-8 text-primary" />
+            <img src={logo} alt="MetsXMFanZone" className="w-8 h-8" />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Stay in the Loop
