@@ -242,10 +242,10 @@ const Gallery = () => {
         <section className="py-8 sm:py-12 md:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-8 sm:mb-12">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
                 Video Gallery
               </h1>
-              <p className="text-base sm:text-lg text-foreground max-w-2xl mx-auto px-4">
+              <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto px-2 sm:px-4">
                 Explore our complete collection of videos, highlights, and exclusive content
               </p>
             </div>

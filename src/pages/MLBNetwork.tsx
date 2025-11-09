@@ -70,10 +70,10 @@ const MLBNetwork = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8 pt-20 sm:pt-24">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
             MLB Network
           </h1>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
             Live baseball coverage, highlights, and expert analysis from across the league
           </p>
 

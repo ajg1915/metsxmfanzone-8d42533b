@@ -88,7 +88,7 @@ const Feedback = () => {
         <div className="container mx-auto px-4 max-w-2xl">
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl font-bold">Share Your Feedback</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold">Share Your Feedback</CardTitle>
               <CardDescription>
                 Let us know what you think! Your feedback helps us improve.
               </CardDescription>

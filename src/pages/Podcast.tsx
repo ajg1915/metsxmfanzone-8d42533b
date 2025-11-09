@@ -77,10 +77,10 @@ const Podcast = () => {
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
               <Mic className="w-10 h-10 text-primary" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
               Podcasts & Live Shows
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
               Listen to exclusive Mets content, live shows, and in-depth discussions
             </p>
           </div>
@@ -89,7 +89,7 @@ const Podcast = () => {
           <section className="mb-12">
             <div className="flex items-center gap-3 mb-6">
               <Radio className="w-6 h-6 text-primary animate-pulse" />
-              <h2 className="text-3xl font-bold text-foreground">Live Now</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Live Now</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {liveShows.map((show, index) => (
@@ -124,7 +124,7 @@ const Podcast = () => {
 
           {/* Podcast Episodes */}
           <section>
-            <h2 className="text-3xl font-bold text-foreground mb-6">Recent Episodes</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Recent Episodes</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {podcastEpisodes.map((episode, index) => (
                 <Card key={index} className="hover:shadow-lg transition-shadow">

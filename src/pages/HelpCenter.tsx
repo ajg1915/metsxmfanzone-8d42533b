@@ -64,10 +64,10 @@ const HelpCenter = () => {
       <main className="pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
               Help Center
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
               Find answers to your questions and learn how to get the most out of MetsXMFanZone
             </p>
           </div>

@@ -175,9 +175,9 @@ const Navigation = () => {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] bg-background">
                 <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
-                  <SheetDescription>
-                    Navigate through the site
+                  <SheetTitle className="text-lg font-bold">MetsXMFanZone.com</SheetTitle>
+                  <SheetDescription className="text-sm">
+                    Ultimate Destination where the fans go
                   </SheetDescription>
                 </SheetHeader>
                 <div className="flex flex-col gap-4 mt-6">

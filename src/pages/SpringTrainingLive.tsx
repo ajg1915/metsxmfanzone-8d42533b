@@ -71,11 +71,11 @@ const SpringTrainingLive = () => {
 
       <main className="flex-1 container mx-auto px-4 py-8 pt-20 sm:pt-24">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-4">
-            <Trophy className="w-10 h-10 text-primary" />
-            <h1 className="text-4xl md:text-5xl font-bold text-primary">Spring Training Live</h1>
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <Trophy className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">Spring Training Live</h1>
           </div>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
             Exclusive live coverage of Mets Spring Training from Port St. Lucie, Florida
           </p>
 

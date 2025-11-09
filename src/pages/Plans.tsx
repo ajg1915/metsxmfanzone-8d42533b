@@ -141,10 +141,10 @@ const Plans = () => {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
                 Choose Your Plan
               </h1>
-              <p className="text-lg text-foreground max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto px-2">
                 Get unlimited access to live games, replays, highlights, and exclusive Mets content
               </p>
             </div>

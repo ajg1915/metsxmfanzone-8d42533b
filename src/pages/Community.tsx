@@ -248,7 +248,7 @@ const Community = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8 pt-24">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-primary mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-6 sm:mb-8">
             Community Feed
           </h1>
 

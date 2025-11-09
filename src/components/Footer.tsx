@@ -1,51 +1,69 @@
 const Footer = () => {
   return (
-    <footer className="bg-card border-t border-border py-6 sm:py-12">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 mb-4 sm:mb-8">
-          <div className="col-span-2 md:col-span-1">
-            <h3 className="font-bold text-primary mb-2 sm:mb-4 text-base sm:text-lg">MetsXMFanZone</h3>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Welcome the the<br />
-              fan ultimate destination for all exclusive Mets content.
+    <footer className="bg-gradient-to-b from-card to-muted/30 border-t border-border">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
+          {/* Brand Section */}
+          <div className="sm:col-span-2 lg:col-span-1">
+            <h3 className="font-bold text-primary mb-3 text-lg sm:text-xl">MetsXMFanZone</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-4">
+              The ultimate destination for all exclusive Mets content. Join thousands of passionate fans.
             </p>
+            <div className="flex gap-3">
+              <a href="https://www.facebook.com/metsxmfanzone" target="_blank" rel="noopener noreferrer" 
+                 className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors">
+                <span className="text-primary text-sm">📘</span>
+              </a>
+              <a href="https://www.tiktok.com/@metsxmfanzone" target="_blank" rel="noopener noreferrer"
+                 className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors">
+                <span className="text-primary text-sm">🎵</span>
+              </a>
+            </div>
           </div>
           
+          {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-foreground mb-2 sm:mb-4 text-sm sm:text-base">Resources</h4>
-            <ul className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
-              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
-              <li><a href="/live" className="text-muted-foreground hover:text-primary transition-colors">Live</a></li>
-              <li><a href="/community" className="text-muted-foreground hover:text-primary transition-colors">Community</a></li>
-              <li><a href="/highlights" className="text-muted-foreground hover:text-primary transition-colors">Highlights</a></li>
-              <li><a href="/podcast" className="text-muted-foreground hover:text-primary transition-colors">Podcasts</a></li>
+            <h4 className="font-semibold text-foreground mb-3 text-sm sm:text-base">Quick Links</h4>
+            <ul className="space-y-2 text-xs sm:text-sm">
+              <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors inline-block">Home</a></li>
+              <li><a href="/live" className="text-muted-foreground hover:text-primary transition-colors inline-block">Live Streams</a></li>
+              <li><a href="/blog" className="text-muted-foreground hover:text-primary transition-colors inline-block">Blog</a></li>
+              <li><a href="/podcast" className="text-muted-foreground hover:text-primary transition-colors inline-block">Podcasts</a></li>
+              <li><a href="/community" className="text-muted-foreground hover:text-primary transition-colors inline-block">Community</a></li>
             </ul>
           </div>
 
+          {/* Support */}
           <div>
-            <h4 className="font-semibold text-foreground mb-2 sm:mb-4 text-sm sm:text-base">Support</h4>
-            <ul className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
-              <li><a href="/help-center" className="text-muted-foreground hover:text-primary transition-colors">Help Center</a></li>
-              <li><a href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</a></li>
-              <li><a href="/faqs" className="text-muted-foreground hover:text-primary transition-colors">FAQs</a></li>
-              <li><a href="/feedback" className="text-muted-foreground hover:text-primary transition-colors">Feedback</a></li>
+            <h4 className="font-semibold text-foreground mb-3 text-sm sm:text-base">Support</h4>
+            <ul className="space-y-2 text-xs sm:text-sm">
+              <li><a href="/help-center" className="text-muted-foreground hover:text-primary transition-colors inline-block">Help Center</a></li>
+              <li><a href="/contact" className="text-muted-foreground hover:text-primary transition-colors inline-block">Contact Us</a></li>
+              <li><a href="/faqs" className="text-muted-foreground hover:text-primary transition-colors inline-block">FAQs</a></li>
+              <li><a href="/feedback" className="text-muted-foreground hover:text-primary transition-colors inline-block">Feedback</a></li>
+              <li><a href="/plans" className="text-muted-foreground hover:text-primary transition-colors inline-block">Plans & Pricing</a></li>
             </ul>
           </div>
 
+          {/* Legal */}
           <div>
-            <h4 className="font-semibold text-foreground mb-2 sm:mb-4 text-sm sm:text-base">Legal</h4>
-            <ul className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
-              <li><a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy</a></li>
-              <li><a href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms</a></li>
-              <li><a href="/business-partner" className="text-muted-foreground hover:text-primary transition-colors">Business Partner</a></li>
-              <li><a href="/auth" className="text-muted-foreground hover:text-primary transition-colors">Admin Login</a></li>
+            <h4 className="font-semibold text-foreground mb-3 text-sm sm:text-base">Legal</h4>
+            <ul className="space-y-2 text-xs sm:text-sm">
+              <li><a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors inline-block">Privacy Policy</a></li>
+              <li><a href="/terms" className="text-muted-foreground hover:text-primary transition-colors inline-block">Terms of Service</a></li>
+              <li><a href="/business-partner" className="text-muted-foreground hover:text-primary transition-colors inline-block">Business Partners</a></li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-border pt-4 sm:pt-8 text-center">
-          <p className="text-xs sm:text-sm text-muted-foreground">
+        {/* Bottom Bar */}
+        <div className="border-t border-border pt-4 sm:pt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <p className="text-[10px] sm:text-xs text-muted-foreground text-center sm:text-left">
             © 2024 MetsXMFanZone.com. All rights reserved.
+          </p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground text-center sm:text-right">
+            Made with ❤️ for Mets fans everywhere
           </p>
         </div>
       </div>

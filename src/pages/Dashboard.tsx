@@ -71,7 +71,7 @@ const Dashboard = () => {
         <section className="py-12">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary mb-2">
                 Welcome Back!
               </h1>
               <p className="text-foreground">
