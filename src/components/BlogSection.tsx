@@ -71,20 +71,20 @@ const BlogSection = () => {
   }
 
   return (
-    <section className="py-6 sm:py-10 md:py-14 bg-secondary/20">
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold">Latest News</h2>
-          <Button variant="outline" size="sm" onClick={() => navigate("/blog")} className="w-full sm:w-auto">
+    <section className="py-4 sm:py-6 bg-secondary/20">
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3 sm:mb-4">
+          <h2 className="text-base sm:text-lg font-bold">Latest News</h2>
+          <Button variant="outline" size="sm" onClick={() => navigate("/blog")} className="w-full sm:w-auto text-xs">
             View All Posts
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
           {posts.map((post) => (
             <Card 
               key={post.id} 
-              className="border-2 border-primary bg-card overflow-hidden hover:shadow-xl transition-all group cursor-pointer"
+              className="border border-primary bg-card overflow-hidden hover:shadow-lg transition-all group cursor-pointer"
               onClick={() => navigate(`/blog/${post.slug}`)}
             >
               {post.featured_image_url && (
@@ -96,21 +96,21 @@ const BlogSection = () => {
                   />
                 </div>
               )}
-              <CardHeader>
-                <Badge className="w-fit mb-2 bg-primary text-primary-foreground">
+              <CardHeader className="p-3 sm:p-4">
+                <Badge className="w-fit mb-1 text-[10px] bg-primary text-primary-foreground">
                   {post.category}
                 </Badge>
-                <h3 className="text-lg font-bold text-primary group-hover:text-primary/80 transition-colors">
+                <h3 className="text-sm sm:text-base font-bold text-primary group-hover:text-primary/80 transition-colors">
                   {post.title}
                 </h3>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 sm:p-4 pt-0">
                 {post.excerpt && (
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
                     {post.excerpt}
                   </p>
                 )}
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                   <Clock className="w-3 h-3" />
                   {getTimeAgo(post.published_at)}
                 </div>
