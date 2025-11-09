@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { X, Radio } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import logo from "@/assets/metsxmfanzone-logo.png";
 
 const LiveNotificationBar = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -48,7 +49,7 @@ const LiveNotificationBar = () => {
     <div className="bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground py-3 px-4 relative animate-in slide-in-from-top duration-500">
       <div className="container mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1">
-          <Radio className="w-5 h-5 animate-pulse" />
+          <img src={logo} alt="MetsXMFanZone" className="w-5 h-5 animate-pulse" />
           <p className="text-sm md:text-base font-medium">
             {notification.message}
           </p>
