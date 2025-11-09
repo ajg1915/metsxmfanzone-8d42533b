@@ -4,9 +4,9 @@ const Footer = () => {
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
         {/* Mobile Footer - Simple */}
         <div className="block lg:hidden">
-          <div className="flex flex-col items-center gap-2 mb-3">
+          <div className="flex flex-col items-center gap-2 mb-2">
             <h3 className="font-bold text-primary text-base">MetsXMFanZone</h3>
-            <div className="flex flex-wrap justify-center gap-x-3 gap-y-1.5 text-xs">
+            <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 text-xs">
               <a href="/help-center" className="text-muted-foreground hover:text-primary transition-colors">Help Center</a>
               <span className="text-muted-foreground">•</span>
               <a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</a>
