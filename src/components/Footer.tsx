@@ -5,7 +5,7 @@ const Footer = () => {
         {/* Mobile Footer - Simple */}
         <div className="block lg:hidden">
           <div className="flex flex-col items-center gap-2 mb-2">
-            <h3 className="font-bold text-primary text-base">MetsXMFanZone</h3>
+            <h3 className="font-bold text-primary text-base">MetsXMFanZone.com</h3>
             <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 text-xs">
               <a href="/help-center" className="text-muted-foreground hover:text-primary transition-colors">Help Center</a>
               <span className="text-muted-foreground">•</span>
@@ -28,7 +28,7 @@ const Footer = () => {
           <div className="grid grid-cols-4 gap-8 mb-8">
             {/* Brand Section */}
             <div>
-              <h3 className="font-bold text-primary mb-3 text-xl">MetsXMFanZone</h3>
+              <h3 className="font-bold text-primary mb-3 text-xl">MetsXMFanZone.com</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 The ultimate destination for all exclusive Mets content. Join thousands of passionate fans.
               </p>
