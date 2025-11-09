@@ -94,20 +94,20 @@ const LiveStreamsSection = () => {
   }
 
   return (
-    <section className="py-6 sm:py-8 md:py-10 bg-secondary/20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold">Live & Upcoming Streams</h2>
-          <Button variant="outline" size="sm" onClick={() => navigate("/live")} className="w-full sm:w-auto">
+    <section className="py-12 sm:py-16 bg-secondary/20">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <h2 className="text-3xl sm:text-4xl font-bold">Live & Upcoming Streams</h2>
+          <Button variant="outline" onClick={() => navigate("/live")}>
             View All Streams
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {streams.map((stream) => (
             <Card 
               key={stream.id}
-              className="border border-primary bg-card overflow-hidden hover:shadow-md transition-all cursor-pointer group"
+              className="border-2 border-primary bg-card overflow-hidden hover:shadow-lg transition-all cursor-pointer group"
               onClick={() => navigate(getStreamPageUrl(stream))}
             >
               {stream.thumbnail_url && (
@@ -118,23 +118,23 @@ const LiveStreamsSection = () => {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Play className="w-6 h-6 text-white" />
+                    <Play className="w-12 h-12 text-white" />
                   </div>
-                  <div className="absolute top-1.5 right-1.5">
-                    <Badge className={stream.status === 'live' ? 'bg-red-600 text-white text-[10px] px-1.5 py-0.5' : 'bg-blue-600 text-white text-[10px] px-1.5 py-0.5'}>
-                      {stream.status === 'live' && <Radio className="w-2 h-2 mr-0.5 animate-pulse" />}
+                  <div className="absolute top-2 right-2">
+                    <Badge className={stream.status === 'live' ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'}>
+                      {stream.status === 'live' && <Radio className="w-3 h-3 mr-1 animate-pulse" />}
                       {stream.status === 'live' ? 'LIVE NOW' : 'UPCOMING'}
                     </Badge>
                   </div>
                 </div>
               )}
-              <CardHeader className="p-2 pb-1">
-                <CardTitle className="line-clamp-1 text-sm">{stream.title}</CardTitle>
+              <CardHeader className="p-4">
+                <CardTitle className="line-clamp-2">{stream.title}</CardTitle>
               </CardHeader>
-              <CardContent className="p-2 pt-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                    <Users className="w-2.5 h-2.5" />
+              <CardContent className="p-4 pt-0">
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
                     {stream.viewers_count > 0 ? stream.viewers_count : 'Starting soon'}
                   </span>
                 </div>
