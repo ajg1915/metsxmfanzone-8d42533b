@@ -84,7 +84,7 @@ const PodcastSection = () => {
         {/* Listen Live Section */}
         <div className="mb-8 sm:mb-10">
           <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">Listen Live On</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2 max-w-4xl mx-auto">
             {platforms.map((platform) => {
               const IconComponent = platform.icon;
               return (
@@ -96,11 +96,11 @@ const PodcastSection = () => {
                   className="group"
                 >
                   <Card className="hover:shadow-lg transition-all duration-300 border hover:border-primary">
-                    <CardContent className="p-3 sm:p-4 text-center">
-                      <div className="flex justify-center mb-1 sm:mb-2">
-                        <IconComponent className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+                    <CardContent className="p-2 sm:p-2.5 text-center">
+                      <div className="flex justify-center mb-0.5 sm:mb-1">
+                        <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                       </div>
-                      <p className="font-semibold text-xs sm:text-sm">{platform.name}</p>
+                      <p className="font-semibold text-[10px] sm:text-xs">{platform.name}</p>
                     </CardContent>
                   </Card>
                 </a>
