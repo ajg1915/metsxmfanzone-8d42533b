@@ -34,7 +34,7 @@ const NewsSection = () => {
   return (
     <section className="py-16 bg-secondary/20">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {articles.map((article) => (
             <Card key={article.id} className="border-2 border-primary bg-card overflow-hidden hover:shadow-xl transition-all group cursor-pointer">
               <div className="aspect-video overflow-hidden">
