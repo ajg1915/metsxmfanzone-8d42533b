@@ -24,7 +24,7 @@ const Index = () => {
         <link rel="canonical" href="https://www.metsxmfanzone.com/" />
       </Helmet>
       <Navigation />
-      <main className="pt-14 sm:pt-16">
+      <main className="pt-12 sm:pt-14">
         <Hero />
         <LiveNotificationBar />
         <LiveNetworks />

@@ -66,24 +66,24 @@ const PodcastSection = () => {
   };
 
   return (
-    <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-b from-background to-muted/20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8 sm:mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Music className="w-8 h-8 text-primary" />
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
+    <section className="py-6 sm:py-10 md:py-14 bg-gradient-to-b from-background to-muted/20">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="text-center mb-6 sm:mb-10">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <Music className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
               MetsXMFanZone Podcast
             </h2>
           </div>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
             Listen to exclusive Mets content, game analysis, and fan discussions
           </p>
         </div>
 
         {/* Listen Live Section */}
-        <div className="mb-12">
-          <h3 className="text-2xl font-bold text-center mb-6">Listen Live On</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
+        <div className="mb-8 sm:mb-10">
+          <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">Listen Live On</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 max-w-4xl mx-auto">
             {platforms.map((platform) => (
               <a
                 key={platform.name}
@@ -92,10 +92,10 @@ const PodcastSection = () => {
                 rel="noopener noreferrer"
                 className="group"
               >
-                <Card className="hover:shadow-lg transition-all duration-300 border-2 hover:border-primary">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-4xl mb-2">{platform.icon}</div>
-                    <p className="font-semibold text-sm">{platform.name}</p>
+                <Card className="hover:shadow-lg transition-all duration-300 border hover:border-primary">
+                  <CardContent className="p-3 sm:p-4 text-center">
+                    <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">{platform.icon}</div>
+                    <p className="font-semibold text-xs sm:text-sm">{platform.name}</p>
                   </CardContent>
                 </Card>
               </a>
@@ -106,8 +106,8 @@ const PodcastSection = () => {
         {/* Recent Episodes */}
         {podcasts.length > 0 && (
           <div>
-            <h3 className="text-2xl font-bold text-center mb-6">Recent Episodes</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">Recent Episodes</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
               {podcasts.map((podcast) => (
                 <Card key={podcast.id} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">

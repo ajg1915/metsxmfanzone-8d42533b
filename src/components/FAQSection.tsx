@@ -34,29 +34,29 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 bg-muted/30">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">
+    <section className="py-6 sm:py-10 md:py-14 bg-muted/30">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="text-center mb-6 sm:mb-10">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 sm:mb-3">
             Frequently Asked Questions
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl mx-auto px-2">
             Got questions? We've got answers. Find everything you need to know about MetsXMFanZone.
           </p>
         </div>
 
         <div className="max-w-3xl mx-auto">
-          <Accordion type="single" collapsible className="space-y-4">
+          <Accordion type="single" collapsible className="space-y-3 sm:space-y-4">
             {faqs.map((faq, index) => (
               <AccordionItem 
                 key={index} 
                 value={`item-${index}`}
-                className="bg-background rounded-lg border border-border px-4 sm:px-6"
+                className="bg-background rounded-lg border border-border px-3 sm:px-4"
               >
-                <AccordionTrigger className="text-left text-sm sm:text-base font-semibold text-foreground hover:text-primary">
+                <AccordionTrigger className="text-left text-xs sm:text-sm font-semibold text-foreground hover:text-primary py-3">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-xs sm:text-sm text-muted-foreground">
+                <AccordionContent className="text-xs sm:text-sm text-muted-foreground pb-3">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

@@ -71,16 +71,16 @@ const BlogSection = () => {
   }
 
   return (
-    <section className="py-8 sm:py-12 md:py-16 bg-secondary/20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold">Latest News</h2>
-          <Button variant="outline" onClick={() => navigate("/blog")} className="w-full sm:w-auto">
+    <section className="py-6 sm:py-10 md:py-14 bg-secondary/20">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold">Latest News</h2>
+          <Button variant="outline" size="sm" onClick={() => navigate("/blog")} className="w-full sm:w-auto">
             View All Posts
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {posts.map((post) => (
             <Card 
               key={post.id} 
