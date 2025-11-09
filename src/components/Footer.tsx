@@ -7,19 +7,9 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="sm:col-span-2 lg:col-span-1">
             <h3 className="font-bold text-primary mb-3 text-lg sm:text-xl">MetsXMFanZone</h3>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-4">
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
               The ultimate destination for all exclusive Mets content. Join thousands of passionate fans.
             </p>
-            <div className="flex gap-3">
-              <a href="https://www.facebook.com/metsxmfanzone" target="_blank" rel="noopener noreferrer" 
-                 className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors">
-                <span className="text-primary text-sm">📘</span>
-              </a>
-              <a href="https://www.tiktok.com/@metsxmfanzone" target="_blank" rel="noopener noreferrer"
-                 className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors">
-                <span className="text-primary text-sm">🎵</span>
-              </a>
-            </div>
           </div>
           
           {/* Quick Links */}
