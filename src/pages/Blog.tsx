@@ -71,6 +71,22 @@ export default function Blog() {
         <title>Mets News, Analysis & Updates - MetsXMFanZone Blog</title>
         <meta name="description" content="Latest New York Mets news, game analysis, player updates, and exclusive content. Stay informed with in-depth Mets coverage and commentary." />
         <meta name="keywords" content="Mets news, Mets blog, Mets analysis, New York Mets updates, Mets commentary, baseball news, MLB news" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.metsxmfanzone.com/blog" />
+        <meta property="og:title" content="Mets News, Analysis & Updates - MetsXMFanZone Blog" />
+        <meta property="og:description" content="Latest New York Mets news, game analysis, player updates, and exclusive content." />
+        <meta property="og:image" content={`${window.location.origin}/logo-512.png`} />
+        <meta property="og:site_name" content="MetsXMFanZone" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@metsxmfanzone" />
+        <meta name="twitter:title" content="Mets News, Analysis & Updates - MetsXMFanZone Blog" />
+        <meta name="twitter:description" content="Latest New York Mets news, game analysis, player updates, and exclusive content." />
+        <meta name="twitter:image" content={`${window.location.origin}/logo-512.png`} />
+        
         <link rel="canonical" href="https://www.metsxmfanzone.com/blog" />
       </Helmet>
       <Navigation />

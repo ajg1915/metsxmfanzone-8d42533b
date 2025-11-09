@@ -102,9 +102,13 @@ export default function BlogPost() {
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.excerpt} />
         <meta property="og:image" content={post.featured_image_url || `${siteUrl}/logo-512.png`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={post.title} />
         <meta property="og:site_name" content="MetsXMFanZone" />
         <meta property="article:published_time" content={post.published_at} />
         <meta property="article:section" content={post.category} />
+        <meta property="article:author" content="MetsXMFanZone" />
         {post.tags.map((tag) => (
           <meta key={tag} property="article:tag" content={tag} />
         ))}
@@ -112,10 +116,12 @@ export default function BlogPost() {
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@metsxmfanzone" />
+        <meta name="twitter:creator" content="@metsxmfanzone" />
         <meta name="twitter:url" content={currentUrl} />
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.excerpt} />
         <meta name="twitter:image" content={post.featured_image_url || `${siteUrl}/logo-512.png`} />
+        <meta name="twitter:image:alt" content={post.title} />
         
         {/* Additional Meta Tags */}
         <meta name="author" content="MetsXMFanZone" />
