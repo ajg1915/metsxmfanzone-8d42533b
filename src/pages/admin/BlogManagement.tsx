@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit, Trash2, FileText, Sparkles } from "lucide-react";
+import { Plus, Edit, Trash2, FileText, Sparkles, Upload } from "lucide-react";
 import { z } from "zod";
 
 const blogPostSchema = z.object({
@@ -56,6 +56,7 @@ export default function BlogManagement() {
   });
   const [generatingImage, setGeneratingImage] = useState(false);
   const [generatingContent, setGeneratingContent] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -287,6 +288,63 @@ export default function BlogManagement() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error",
+        description: "Please upload an image file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "Image must be less than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `blog-images/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('content_uploads')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('content_uploads')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, featured_image_url: publicUrl });
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully!",
+      });
+    } catch (error: any) {
+      console.error("Error uploading image:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload image",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const resetForm = () => {
     setEditingPost(null);
     setFormData({
@@ -402,6 +460,29 @@ export default function BlogManagement() {
                     AI-generated image preview will be shown when post is saved
                   </p>
                 )}
+                
+                <div className="mt-3">
+                  <Label htmlFor="image_upload" className="text-sm text-muted-foreground">Or Upload Image</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Input
+                      id="image_upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploadingImage}
+                      className="cursor-pointer"
+                    />
+                    {uploadingImage && (
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        <Upload className="w-3 h-3 inline mr-1 animate-pulse" />
+                        Uploading...
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Max 5MB • JPG, PNG, GIF, WEBP
+                  </p>
+                </div>
               </div>
 
               <div>
