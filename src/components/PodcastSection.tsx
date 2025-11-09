@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Music } from "lucide-react";
+import { Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import logo from "@/assets/metsxmfanzone-logo.png";
 
 interface Podcast {
   id: string;
@@ -70,7 +71,7 @@ const PodcastSection = () => {
       <div className="container mx-auto px-3 sm:px-6 lg:px-8">
         <div className="text-center mb-6 sm:mb-10">
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-            <Music className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+            <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
               MetsXMFanZone Podcast
             </h2>
