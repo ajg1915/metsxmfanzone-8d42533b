@@ -91,6 +91,13 @@ const Navigation = () => {
               Live
             </NavLink>
             <NavLink 
+              to="/spring-training-live" 
+              className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <Trophy className="w-3 h-3" />
+              Spring Training
+            </NavLink>
+            <NavLink 
               to="/community" 
               className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
@@ -195,6 +202,14 @@ const Navigation = () => {
                   >
                     <Trophy className="w-4 h-4" />
                     Live
+                  </NavLink>
+                  <NavLink 
+                    to="/spring-training-live" 
+                    className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Trophy className="w-4 h-4" />
+                    Spring Training
                   </NavLink>
                   <NavLink 
                     to="/community" 
