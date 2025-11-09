@@ -1,4 +1,4 @@
-import { Home, FileText, Settings, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film } from "lucide-react";
+import { Home, FileText, Settings, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -30,7 +30,7 @@ const liveManagementItems = [
   { title: "Mets News Tracker", url: "/admin/mets-news", icon: TrendingUp },
 ];
 
-const otherItems = [
+const userItems = [
   { title: "Feedback", url: "/admin/feedbacks", icon: MessageSquare },
   { title: "Posts", url: "/admin/posts", icon: FileText },
   { title: "User Roles", url: "/admin/roles", icon: Shield },
@@ -45,16 +45,13 @@ export function AdminSidebar() {
   
   const [mediaOpen, setMediaOpen] = useState(true);
   const [liveManagementOpen, setLiveManagementOpen] = useState(true);
+  const [userOpen, setUserOpen] = useState(true);
 
   const isActive = (path: string) => {
     if (path === "/admin") {
       return currentPath === path;
     }
     return currentPath.startsWith(path);
-  };
-
-  const isGroupActive = (items: typeof mediaItems) => {
-    return items.some(item => isActive(item.url));
   };
 
   return (
@@ -169,29 +166,46 @@ export function AdminSidebar() {
           </Collapsible>
         </SidebarGroup>
 
-        {/* Other Items */}
+        {/* User Management Section */}
         <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {otherItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      className={({ isActive: active }) =>
-                        active || isActive(item.url)
-                          ? "bg-primary text-primary-foreground font-medium"
-                          : "hover:bg-muted/50"
-                      }
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {open && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
+          <Collapsible open={userOpen} onOpenChange={setUserOpen}>
+            <SidebarGroupLabel asChild>
+              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  {open && <span>User</span>}
+                </div>
+                {open && (
+                  <ChevronDown 
+                    className={`h-4 w-4 transition-transform ${userOpen ? "rotate-180" : ""}`}
+                  />
+                )}
+              </CollapsibleTrigger>
+            </SidebarGroupLabel>
+            <CollapsibleContent>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {userItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          className={({ isActive: active }) =>
+                            active || isActive(item.url)
+                              ? "bg-primary text-primary-foreground font-medium pl-6"
+                              : "hover:bg-muted/50 pl-6"
+                          }
+                        >
+                          <item.icon className="h-4 w-4" />
+                          {open && <span className="text-sm">{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </Collapsible>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
