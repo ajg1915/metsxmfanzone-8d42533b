@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,8 +28,6 @@ interface Story {
 }
 
 const StoriesManagement = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,12 +44,8 @@ const StoriesManagement = () => {
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
 
   useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
     fetchStories();
-  }, [user, navigate]);
+  }, []);
 
   const fetchStories = async () => {
     try {
