@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Image as ImageIcon, Send, Trash2, Heart, Lock } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SocialShareButtons from "@/components/SocialShareButtons";
+import StoriesSection from "@/components/StoriesSection";
 import { z } from "zod";
 
 interface Post {
@@ -245,6 +246,8 @@ const Community = () => {
         <link rel="canonical" href="https://www.metsxmfanzone.com/community" />
       </Helmet>
       <Navigation />
+      
+      <StoriesSection />
       
       <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 sm:pt-24">
         <div className="max-w-3xl mx-auto w-full">
