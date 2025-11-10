@@ -110,11 +110,11 @@ const StoriesSection = () => {
       </section>
 
       <Dialog open={!!selectedStory} onOpenChange={() => setSelectedStory(null)}>
-        <DialogContent className="max-w-2xl p-0">
-          {selectedStory && <div className="relative bg-black">
-              {selectedStory.media_type === 'video' ? <video src={selectedStory.media_url} controls autoPlay className="w-full max-h-[80vh]" /> : <img src={selectedStory.media_url} alt={selectedStory.title} className="w-full max-h-[80vh] object-contain" />}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                <h3 className="text-white text-lg font-bold">{selectedStory.title}</h3>
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl md:max-w-3xl p-0 overflow-hidden">
+          {selectedStory && <div className="relative bg-black w-full">
+              {selectedStory.media_type === 'video' ? <video src={selectedStory.media_url} controls autoPlay className="w-full h-auto max-h-[85vh] object-contain" /> : <img src={selectedStory.media_url} alt={selectedStory.title} className="w-full h-auto max-h-[85vh] object-contain" />}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 sm:p-4">
+                <h3 className="text-white text-sm sm:text-lg font-bold">{selectedStory.title}</h3>
               </div>
             </div>}
         </DialogContent>
