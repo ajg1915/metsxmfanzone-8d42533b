@@ -81,7 +81,7 @@ const StoriesSection = () => {
               return (
                 <Card 
                   key={story.id} 
-                  className="flex-shrink-0 w-24 h-32 sm:w-28 sm:h-40 cursor-pointer overflow-hidden group border-2 border-primary/20 hover:border-primary transition-all relative" 
+                  className="flex-shrink-0 w-32 h-44 sm:w-36 sm:h-52 cursor-pointer overflow-hidden group border-2 border-primary/20 hover:border-primary transition-all relative" 
                   onClick={handleClick}
                 >
                   <div className="relative w-full h-full">
