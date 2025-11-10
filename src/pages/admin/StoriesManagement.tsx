@@ -44,8 +44,6 @@ const StoriesManagement = () => {
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  const [videoFrames, setVideoFrames] = useState<string[]>([]);
-  const [selectedFrameIndex, setSelectedFrameIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetchStories();
@@ -74,153 +72,6 @@ const StoriesManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const generateVideoFrames = (file: File): Promise<string[]> => {
-    return new Promise((resolve, reject) => {
-      const video = document.createElement('video');
-      video.preload = 'metadata';
-      video.src = URL.createObjectURL(file);
-      
-      const frames: string[] = [];
-      const timestamps = [0.5, 1.5, 3, 5, 7]; // Capture frames at these seconds
-      let currentIndex = 0;
-      
-      video.onloadedmetadata = () => {
-        const maxTime = video.duration;
-        // Adjust timestamps based on actual video duration
-        const adjustedTimestamps = timestamps
-          .filter(t => t < maxTime)
-          .concat(maxTime > 10 ? [maxTime * 0.3, maxTime * 0.5, maxTime * 0.7] : []);
-        
-        const captureFrame = (time: number) => {
-          return new Promise<string>((res, rej) => {
-            video.currentTime = time;
-            video.onseeked = () => {
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              canvas.width = video.videoWidth;
-              canvas.height = video.videoHeight;
-              ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
-              canvas.toBlob((blob) => {
-                if (blob) {
-                  res(URL.createObjectURL(blob));
-                } else {
-                  rej(new Error('Failed to generate frame'));
-                }
-              }, 'image/jpeg', 0.8);
-            };
-          });
-        };
-        
-        Promise.all(adjustedTimestamps.slice(0, 6).map(captureFrame))
-          .then(frameUrls => {
-            URL.revokeObjectURL(video.src);
-            resolve(frameUrls);
-          })
-          .catch(err => {
-            URL.revokeObjectURL(video.src);
-            reject(err);
-          });
-      };
-      
-      video.onerror = () => {
-        reject(new Error('Failed to load video'));
-        URL.revokeObjectURL(video.src);
-      };
-    });
-  };
-
-  const generateVideoThumbnail = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const video = document.createElement('video');
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
-      video.preload = 'metadata';
-      video.src = URL.createObjectURL(file);
-      
-      video.onloadedmetadata = () => {
-        video.currentTime = 1; // Capture frame at 1 second
-      };
-      
-      video.onseeked = () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(URL.createObjectURL(blob));
-          } else {
-            reject(new Error('Failed to generate thumbnail'));
-          }
-          URL.revokeObjectURL(video.src);
-        }, 'image/jpeg', 0.8);
-      };
-      
-      video.onerror = () => {
-        reject(new Error('Failed to load video'));
-        URL.revokeObjectURL(video.src);
-      };
-    });
-  };
-
-  const handleMediaFileChange = async (file: File | null) => {
-    setMediaFile(file);
-    
-    if (mediaPreview) {
-      URL.revokeObjectURL(mediaPreview);
-      setMediaPreview(null);
-    }
-
-    // Clear previous video frames
-    videoFrames.forEach(frame => URL.revokeObjectURL(frame));
-    setVideoFrames([]);
-    setSelectedFrameIndex(null);
-    
-    if (file) {
-      if (file.type.startsWith('image/')) {
-        setMediaPreview(URL.createObjectURL(file));
-      } else if (file.type.startsWith('video/')) {
-        try {
-          const frames = await generateVideoFrames(file);
-          setVideoFrames(frames);
-          setSelectedFrameIndex(0); // Select first frame by default
-          setMediaPreview(frames[0]);
-        } catch (error) {
-          console.error('Error generating video frames:', error);
-        }
-      }
-    }
-  };
-
-  const handleFrameSelect = (index: number) => {
-    setSelectedFrameIndex(index);
-    setMediaPreview(videoFrames[index]);
-    // Also set this as the thumbnail preview
-    if (thumbnailPreview) {
-      URL.revokeObjectURL(thumbnailPreview);
-    }
-    setThumbnailPreview(videoFrames[index]);
-  };
-
-  const handleThumbnailFileChange = (file: File | null) => {
-    setThumbnailFile(file);
-    
-    if (thumbnailPreview) {
-      URL.revokeObjectURL(thumbnailPreview);
-      setThumbnailPreview(null);
-    }
-    
-    if (file) {
-      setThumbnailPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const convertBlobUrlToFile = async (blobUrl: string, filename: string): Promise<File> => {
-    const response = await fetch(blobUrl);
-    const blob = await response.blob();
-    return new File([blob], filename, { type: 'image/jpeg' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -253,23 +104,6 @@ const StoriesManagement = () => {
 
         if (uploadError) throw uploadError;
         mediaUrl = fileName;
-
-        // If it's a video and a frame was selected, use that as thumbnail
-        if (mediaType === "video" && selectedFrameIndex !== null && videoFrames[selectedFrameIndex]) {
-          const thumbnailBlob = await convertBlobUrlToFile(
-            videoFrames[selectedFrameIndex],
-            `thumb_${Date.now()}.jpg`
-          );
-          const thumbName = `thumb_${Date.now()}.jpg`;
-          
-          const { error: thumbError } = await supabase.storage
-            .from("stories")
-            .upload(thumbName, thumbnailBlob);
-
-          if (!thumbError) {
-            thumbnailUrl = thumbName;
-          }
-        }
       }
 
       if (thumbnailFile) {
@@ -321,20 +155,6 @@ const StoriesManagement = () => {
     } finally {
       setUploading(false);
     }
-  };
-
-  const resetForm = () => {
-    setFormData({ title: "", display_order: 0, published: false });
-    setMediaFile(null);
-    setThumbnailFile(null);
-    if (mediaPreview) URL.revokeObjectURL(mediaPreview);
-    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
-    videoFrames.forEach(frame => URL.revokeObjectURL(frame));
-    setMediaPreview(null);
-    setThumbnailPreview(null);
-    setVideoFrames([]);
-    setSelectedFrameIndex(null);
-    setEditingStory(null);
   };
 
   const handleDelete = async (id: string, mediaUrl: string) => {
@@ -394,6 +214,86 @@ const StoriesManagement = () => {
     setIsDialogOpen(true);
   };
 
+  const generateVideoThumbnail = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      video.preload = 'metadata';
+      video.src = URL.createObjectURL(file);
+      
+      video.onloadedmetadata = () => {
+        video.currentTime = 1; // Capture frame at 1 second
+      };
+      
+      video.onseeked = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(URL.createObjectURL(blob));
+          } else {
+            reject(new Error('Failed to generate thumbnail'));
+          }
+          URL.revokeObjectURL(video.src);
+        }, 'image/jpeg', 0.8);
+      };
+      
+      video.onerror = () => {
+        reject(new Error('Failed to load video'));
+        URL.revokeObjectURL(video.src);
+      };
+    });
+  };
+
+  const handleMediaFileChange = async (file: File | null) => {
+    setMediaFile(file);
+    
+    if (mediaPreview) {
+      URL.revokeObjectURL(mediaPreview);
+      setMediaPreview(null);
+    }
+    
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        setMediaPreview(URL.createObjectURL(file));
+      } else if (file.type.startsWith('video/')) {
+        try {
+          const thumbnail = await generateVideoThumbnail(file);
+          setMediaPreview(thumbnail);
+        } catch (error) {
+          console.error('Error generating video thumbnail:', error);
+        }
+      }
+    }
+  };
+
+  const handleThumbnailFileChange = (file: File | null) => {
+    setThumbnailFile(file);
+    
+    if (thumbnailPreview) {
+      URL.revokeObjectURL(thumbnailPreview);
+      setThumbnailPreview(null);
+    }
+    
+    if (file) {
+      setThumbnailPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({ title: "", display_order: 0, published: false });
+    setMediaFile(null);
+    setThumbnailFile(null);
+    if (mediaPreview) URL.revokeObjectURL(mediaPreview);
+    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    setMediaPreview(null);
+    setThumbnailPreview(null);
+    setEditingStory(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -441,42 +341,17 @@ const StoriesManagement = () => {
                     />
                   </div>
                 )}
-                {videoFrames.length > 0 && (
-                  <div className="mt-3 space-y-2">
-                    <Label className="text-sm">Select Thumbnail Frame:</Label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {videoFrames.map((frame, index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() => handleFrameSelect(index)}
-                          className={`relative rounded-md overflow-hidden border-2 transition-all ${
-                            selectedFrameIndex === index 
-                              ? 'border-primary ring-2 ring-primary' 
-                              : 'border-border hover:border-primary/50'
-                          }`}
-                        >
-                          <img 
-                            src={frame} 
-                            alt={`Frame ${index + 1}`} 
-                            className="w-full h-20 object-cover"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div>
-                <Label htmlFor="thumbnail">Custom Thumbnail (Optional)</Label>
+                <Label htmlFor="thumbnail">Thumbnail (Optional, for videos)</Label>
                 <Input
                   id="thumbnail"
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleThumbnailFileChange(e.target.files?.[0] || null)}
                 />
-                {thumbnailPreview && !videoFrames.length && (
+                {thumbnailPreview && (
                   <div className="mt-3 rounded-lg overflow-hidden border border-border">
                     <img 
                       src={thumbnailPreview} 
