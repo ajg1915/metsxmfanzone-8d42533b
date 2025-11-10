@@ -240,12 +240,12 @@ const Gallery = () => {
         <Navigation />
       <main className="pt-20 sm:pt-24">
         <section className="py-8 sm:py-12 md:py-16">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             <div className="text-center mb-8 sm:mb-12">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-3 sm:mb-4">
                 Video Gallery
               </h1>
-              <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto px-2 sm:px-4">
+              <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto">
                 Explore our complete collection of videos, highlights, and exclusive content
               </p>
             </div>

@@ -138,18 +138,18 @@ const Plans = () => {
       </Helmet>
       <Navigation />
       <main className="pt-16">
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
+        <section className="py-8 sm:py-12 md:py-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+            <div className="text-center mb-8 sm:mb-12">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-3 sm:mb-4">
                 Choose Your Plan
               </h1>
-              <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto px-2">
+              <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto">
                 Get unlimited access to live games, replays, highlights, and exclusive Mets content
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {plans.map((plan, index) => (
                 <Card 
                   key={index} 
@@ -157,24 +157,24 @@ const Plans = () => {
                 >
                   {plan.popular && (
                     <div className="absolute top-0 right-0">
-                      <Badge className="bg-primary text-primary-foreground rounded-none rounded-bl-lg px-4 py-2">
+                      <Badge className="bg-primary text-primary-foreground rounded-none rounded-bl-lg px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm">
                         MOST POPULAR
                       </Badge>
                     </div>
                   )}
-                  <CardHeader className="text-center pt-8">
-                    <CardTitle className="text-2xl text-primary mb-2">{plan.name}</CardTitle>
-                    <div className="mb-4">
-                      <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                      <span className="text-muted-foreground ml-2">/ {plan.period}</span>
+                  <CardHeader className="text-center pt-6 sm:pt-8">
+                    <CardTitle className="text-lg sm:text-xl md:text-2xl text-primary mb-2">{plan.name}</CardTitle>
+                    <div className="mb-3 sm:mb-4">
+                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">{plan.price}</span>
+                      <span className="text-sm sm:text-base text-muted-foreground ml-2">/ {plan.period}</span>
                     </div>
-                    <CardDescription className="text-foreground">
+                    <CardDescription className="text-sm sm:text-base text-foreground">
                       {plan.description}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6">
                     <Button 
-                      className="w-full" 
+                      className="w-full text-sm sm:text-base" 
                       size="lg"
                       variant={plan.popular ? "default" : "outline"}
                       onClick={() => {
@@ -188,17 +188,17 @@ const Plans = () => {
                       {plan.cta}
                     </Button>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {plan.features.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex items-start gap-3">
-                          <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                          <span className="text-sm text-foreground">{feature}</span>
+                        <div key={featureIndex} className="flex items-start gap-2 sm:gap-3">
+                          <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-xs sm:text-sm text-foreground">{feature}</span>
                         </div>
                       ))}
                       {plan.notIncluded.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex items-start gap-3 opacity-50">
-                          <div className="w-5 h-5 flex-shrink-0 mt-0.5"></div>
-                          <span className="text-sm text-muted-foreground line-through">{feature}</span>
+                        <div key={featureIndex} className="flex items-start gap-2 sm:gap-3 opacity-50">
+                          <div className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5"></div>
+                          <span className="text-xs sm:text-sm text-muted-foreground line-through">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -207,15 +207,15 @@ const Plans = () => {
               ))}
             </div>
 
-            <div className="mt-16 text-center">
-              <h2 className="text-2xl font-bold text-primary mb-8">Frequently Asked Questions</h2>
+            <div className="mt-12 sm:mt-16 text-center">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-primary mb-6 sm:mb-8">Frequently Asked Questions</h2>
               <div className="max-w-3xl mx-auto space-y-4">
                 <Card className="border-2 border-primary bg-card text-left">
                   <CardHeader>
-                    <CardTitle className="text-lg text-primary">Can I cancel anytime?</CardTitle>
+                    <CardTitle className="text-base sm:text-lg text-primary">Can I cancel anytime?</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-foreground">
+                    <p className="text-sm sm:text-base text-foreground">
                       Yes! You can cancel your subscription at any time. Your access will continue until the end of your billing period.
                     </p>
                   </CardContent>
@@ -223,10 +223,10 @@ const Plans = () => {
                 
                 <Card className="border-2 border-primary bg-card text-left">
                   <CardHeader>
-                    <CardTitle className="text-lg text-primary">What's included in the free trial?</CardTitle>
+                    <CardTitle className="text-base sm:text-lg text-primary">What's included in the free trial?</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-foreground">
+                    <p className="text-sm sm:text-base text-foreground">
                       The 7-day free trial gives you full access to all Premium features. No credit card required to start.
                     </p>
                   </CardContent>
@@ -234,10 +234,10 @@ const Plans = () => {
 
                 <Card className="border-2 border-primary bg-card text-left">
                   <CardHeader>
-                    <CardTitle className="text-lg text-primary">Can I watch on multiple devices?</CardTitle>
+                    <CardTitle className="text-base sm:text-lg text-primary">Can I watch on multiple devices?</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-foreground">
+                    <p className="text-sm sm:text-base text-foreground">
                       Yes! Premium and Annual plans allow streaming on up to 3 devices simultaneously.
                     </p>
                   </CardContent>

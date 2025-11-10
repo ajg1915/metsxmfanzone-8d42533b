@@ -78,35 +78,35 @@ const Podcast = () => {
       </Helmet>
       <Navigation />
       <main className="pt-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
-              <Mic className="w-10 h-10 text-primary" />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-7xl">
+          <div className="text-center mb-8 sm:mb-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary/10 mb-4 sm:mb-6">
+              <Mic className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-3 sm:mb-4">
               Podcasts & Live Shows
             </h1>
-            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
               Listen to exclusive Mets content, live shows, and in-depth discussions
             </p>
           </div>
 
           {/* Live Streams Section */}
-          <section className="mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <Radio className="w-6 h-6 text-primary animate-pulse" />
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Live Now</h2>
+          <section className="mb-8 sm:mb-12">
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-primary animate-pulse" />
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Live Now</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {liveShows.map((show, index) => (
                 <Card key={index} className="border-2 border-primary hover:shadow-xl transition-shadow">
                   <CardHeader>
-                    <CardTitle className="text-xl">{show.title}</CardTitle>
-                    <CardDescription>{show.description}</CardDescription>
+                    <CardTitle className="text-base sm:text-lg md:text-xl">{show.title}</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">{show.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button className="w-full gap-2" size="lg" onClick={() => navigate(show.path)}>
-                      <Play className="w-5 h-5" />
+                    <Button className="w-full gap-2 text-sm sm:text-base" size="lg" onClick={() => navigate(show.path)}>
+                      <Play className="w-4 h-4 sm:w-5 sm:h-5" />
                       Watch Live
                     </Button>
                   </CardContent>
@@ -116,9 +116,9 @@ const Podcast = () => {
           </section>
 
           {/* Social Share Section */}
-          <section className="mb-12">
+          <section className="mb-8 sm:mb-12">
             <Card>
-              <CardContent className="py-6">
+              <CardContent className="py-4 sm:py-6">
                 <SocialShareButtons title="MetsXMFanZone Podcasts" />
               </CardContent>
             </Card>
@@ -126,24 +126,24 @@ const Podcast = () => {
 
           {/* Podcast Episodes */}
           <section>
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Recent Episodes</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground mb-4 sm:mb-6">Recent Episodes</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {podcastEpisodes.map((episode, index) => (
                 <Card key={index} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
-                    <div className="w-full h-40 bg-primary/10 rounded-md flex items-center justify-center mb-4">
-                      <Mic className="w-16 h-16 text-primary" />
+                    <div className="w-full h-32 sm:h-40 bg-primary/10 rounded-md flex items-center justify-center mb-3 sm:mb-4">
+                      <Mic className="w-12 h-12 sm:w-16 sm:h-16 text-primary" />
                     </div>
-                    <CardTitle className="text-lg">{episode.title}</CardTitle>
-                    <CardDescription>{episode.description}</CardDescription>
+                    <CardTitle className="text-sm sm:text-base md:text-lg">{episode.title}</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">{episode.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                    <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                       <span>{episode.duration}</span>
                       <span>{episode.date}</span>
                     </div>
-                    <Button variant="outline" className="w-full gap-2">
-                      <Play className="w-4 h-4" />
+                    <Button variant="outline" className="w-full gap-2 text-sm sm:text-base">
+                      <Play className="w-3 h-3 sm:w-4 sm:h-4" />
                       Listen Now
                     </Button>
                   </CardContent>

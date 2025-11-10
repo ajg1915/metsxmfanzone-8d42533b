@@ -163,12 +163,12 @@ const Live = () => {
       <Navigation />
       <main className="pt-16 sm:pt-20">
         <section className="py-8 sm:py-12 md:py-16 bg-gradient-to-b from-secondary/20 to-background">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             <div className="text-center mb-8 sm:mb-12">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-3 sm:mb-4">
                 Live TV Guide
               </h1>
-              <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto px-2 sm:px-4">
+              <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto">
                 Your complete guide to Mets coverage across all networks
               </p>
             </div>
