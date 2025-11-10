@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Play, Info } from "lucide-react";
 import heroImage from "@/assets/hero-mets.png";
+import logo from "@/assets/metsxmfanzone-logo.png";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -60,6 +61,9 @@ const Hero = () => {
                 </div>
                 
                 <div className="container mx-auto px-3 sm:px-6 lg:px-8 relative z-10 text-center py-6 sm:py-10 md:py-14">
+                  <div className="flex justify-center mb-3 sm:mb-4">
+                    <img src={logo} alt="MetsXMFanZone" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain" />
+                  </div>
                   <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-2 sm:mb-3 animate-fade-in px-2">
                     {slide.title}
                   </h1>
