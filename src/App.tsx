@@ -25,6 +25,7 @@ import StoriesManagement from "./pages/admin/StoriesManagement";
 import MetsNewsTrackerManagement from "./pages/admin/MetsNewsTrackerManagement";
 import FeedbackManagement from "./pages/admin/FeedbackManagement";
 import TVScheduleManagement from "./pages/admin/TVScheduleManagement";
+import NewsletterGenerator from "./pages/admin/NewsletterGenerator";
 import MetsXMFanZone from "./pages/MetsXMFanZone";
 import MLBNetwork from "./pages/MLBNetwork";
 import ESPNNetwork from "./pages/ESPNNetwork";
@@ -86,6 +87,7 @@ const App = () => (
             <Route path="stories" element={<StoriesManagement />} />
             <Route path="mets-news" element={<MetsNewsTrackerManagement />} />
             <Route path="tv-schedule" element={<TVScheduleManagement />} />
+            <Route path="newsletter" element={<NewsletterGenerator />} />
             <Route path="feedbacks" element={<FeedbackManagement />} />
             <Route path="posts" element={<PostsManagement />} />
             <Route path="roles" element={<UserRoles />} />

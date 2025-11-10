@@ -1,4 +1,4 @@
-import { Home, FileText, Settings, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image } from "lucide-react";
+import { Home, FileText, Settings, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -22,6 +22,7 @@ const mediaItems = [
   { title: "Blog Management", url: "/admin/blog", icon: FileText },
   { title: "Video Management", url: "/admin/videos", icon: Video },
   { title: "Podcast Management", url: "/admin/podcasts", icon: Mic },
+  { title: "Newsletter Generator", url: "/admin/newsletter", icon: Mail },
 ];
 
 const liveManagementItems = [
