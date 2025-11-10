@@ -21,6 +21,7 @@ import PodcastManagement from "./pages/admin/PodcastManagement";
 import LiveStreamManagement from "./pages/admin/LiveStreamManagement";
 import LiveNotificationManagement from "./pages/admin/LiveNotificationManagement";
 import SubscriptionManagement from "./pages/admin/SubscriptionManagement";
+import StoriesManagement from "./pages/admin/StoriesManagement";
 import MetsNewsTrackerManagement from "./pages/admin/MetsNewsTrackerManagement";
 import FeedbackManagement from "./pages/admin/FeedbackManagement";
 import TVScheduleManagement from "./pages/admin/TVScheduleManagement";
@@ -80,6 +81,7 @@ const App = () => (
             <Route path="podcasts" element={<PodcastManagement />} />
             <Route path="live-streams" element={<LiveStreamManagement />} />
             <Route path="live-notifications" element={<LiveNotificationManagement />} />
+            <Route path="stories" element={<StoriesManagement />} />
             <Route path="mets-news" element={<MetsNewsTrackerManagement />} />
             <Route path="tv-schedule" element={<TVScheduleManagement />} />
             <Route path="feedbacks" element={<FeedbackManagement />} />
