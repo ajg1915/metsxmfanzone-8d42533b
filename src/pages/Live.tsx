@@ -8,7 +8,9 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Radio, Users, Lock } from "lucide-react";
+import { Lock, Newspaper } from "lucide-react";
+import { TVGuideChannel } from "@/components/TVGuideChannel";
+import { TVScheduleCard } from "@/components/TVScheduleCard";
 
 interface LiveStream {
   id: string;
@@ -22,14 +24,36 @@ interface LiveStream {
   assigned_pages: string[];
 }
 
+interface TVSchedule {
+  id: string;
+  network: string;
+  show_title: string;
+  description?: string;
+  time_slot: string;
+  is_live: boolean;
+}
+
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  featured_image_url?: string;
+  published_at: string;
+}
+
 const Live = () => {
   const navigate = useNavigate();
   const { isPremium, loading: subLoading } = useSubscription();
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
+  const [tvSchedules, setTvSchedules] = useState<TVSchedule[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchStreams();
+    fetchTVSchedules();
+    fetchBlogPosts();
 
     // Set up realtime subscription
     const channel = supabase
@@ -60,7 +84,6 @@ const Live = () => {
         .select("*")
         .eq("published", true)
         .in("status", ["live", "scheduled"])
-        .contains("assigned_pages", ["live"])
         .order("scheduled_start", { ascending: true });
 
       if (error) throw error;
@@ -72,17 +95,62 @@ const Live = () => {
     }
   };
 
-  const getStreamPageUrl = (assignedPages: string[]) => {
-    // Filter out 'live' and get the first available network page
-    const networkPages = assignedPages.filter(page => page !== 'live');
-    
-    if (networkPages.includes('metsxmfanzone')) return '/metsxmfanzone-tv';
-    if (networkPages.includes('mlb-network')) return '/mlb-network';
-    if (networkPages.includes('espn-network')) return '/espn-network';
-    
-    // Default fallback
-    return '/metsxmfanzone-tv';
+  const fetchTVSchedules = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("tv_schedules")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      setTvSchedules(data as TVSchedule[] || []);
+    } catch (error) {
+      console.error("Error fetching TV schedules:", error);
+    }
   };
+
+  const fetchBlogPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("blog_posts")
+        .select("id, title, slug, excerpt, featured_image_url, published_at")
+        .eq("published", true)
+        .order("published_at", { ascending: false })
+        .limit(3);
+
+      if (error) throw error;
+      setBlogPosts(data as BlogPost[] || []);
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+    }
+  };
+
+  const getStreamByPage = (pageName: string) => {
+    return liveStreams.find(stream => 
+      stream.assigned_pages.includes(pageName) && stream.status === 'live'
+    );
+  };
+
+  const channels = [
+    {
+      name: "MetsXMFanZone",
+      page: "metsxmfanzone",
+      route: "/metsxmfanzone-tv",
+      logo: "https://i.ibb.co/8gnsKFYN/250x.jpg"
+    },
+    {
+      name: "MLB Network",
+      page: "mlb-network",
+      route: "/mlb-network",
+      logo: "https://image.discovery.indazn.com/ca/v2/ca/image?id=oujgtbpdbgg41eb1ynteb1fg5_image-header_pDach_1661949080000&quality=70"
+    },
+    {
+      name: "ESPN Network",
+      page: "espn-network",
+      route: "/espn-network",
+      logo: "https://wallpapers.com/images/hd/incredible-espn-logo-lbluyg5qlvhnplyr.jpg"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,15 +166,15 @@ const Live = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-8 sm:mb-12">
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
-                Live Streams
+                Live TV Guide
               </h1>
               <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto px-2 sm:px-4">
-                Watch live Mets coverage, pre-game shows, post-game analysis, and exclusive fan content
+                Your complete guide to Mets coverage across all networks
               </p>
             </div>
 
             {loading || subLoading ? (
-              <div className="text-center py-8 sm:py-12">Loading live streams...</div>
+              <div className="text-center py-8 sm:py-12">Loading TV guide...</div>
             ) : !isPremium ? (
               <Card className="max-w-2xl mx-auto mb-12 border-2 border-primary">
                 <CardContent className="py-12 text-center">
@@ -120,60 +188,75 @@ const Live = () => {
                   </Button>
                 </CardContent>
               </Card>
-            ) : liveStreams.length === 0 ? (
-              <Card className="max-w-2xl mx-auto mb-12">
-                <CardContent className="py-12 text-center text-muted-foreground">
-                  No live or upcoming streams at the moment. Check back soon!
-                </CardContent>
-              </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-5xl mx-auto mb-8 sm:mb-12">
-                {liveStreams.map((stream) => (
-                  <Card 
-                    key={stream.id} 
-                    className="border-2 border-primary bg-card hover:shadow-xl transition-all cursor-pointer"
-                    onClick={() => navigate(getStreamPageUrl(stream.assigned_pages))}
-                  >
-                    {stream.thumbnail_url && (
-                      <div className="aspect-video overflow-hidden">
-                        <img 
-                          src={stream.thumbnail_url} 
-                          alt={stream.title}
-                          className="w-full h-full object-cover"
+              <div className="space-y-8 mb-12">
+                {/* TV Guide Channels */}
+                <div>
+                  <h2 className="text-2xl font-bold text-primary mb-6">Live Channels</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {channels.map((channel) => {
+                      const liveStream = getStreamByPage(channel.page);
+                      return (
+                        <TVGuideChannel
+                          key={channel.page}
+                          channelName={channel.name}
+                          channelLogo={channel.logo}
+                          isLive={!!liveStream}
+                          currentShow={liveStream?.title}
+                          onWatch={() => navigate(channel.route)}
                         />
-                      </div>
-                    )}
-                    <CardHeader>
-                      <div className="flex items-start justify-between mb-2">
-                        <Radio className="w-8 h-8 text-primary" />
-                        <Badge className={stream.status === "live" ? "bg-red-600 text-white" : "bg-blue-600 text-white"}>
-                          {stream.status === "live" ? (
-                            <>
-                              <Radio className="w-3 h-3 mr-1 animate-pulse" />
-                              LIVE NOW
-                            </>
-                          ) : 'STARTING SOON'}
-                        </Badge>
-                      </div>
-                      <CardTitle className="text-xl text-primary">{stream.title}</CardTitle>
-                      <CardDescription className="text-foreground">
-                        {stream.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground flex items-center gap-1">
-                          <Users className="w-4 h-4" />
-                          {stream.viewers_count > 0 ? `${stream.viewers_count} watching` : 'Starting soon'}
-                        </span>
-                        <Button className="gap-2">
-                          <Play className="w-4 h-4" />
-                          Watch Now
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Latest Blog Updates */}
+                {blogPosts.length > 0 && (
+                  <div>
+                    <h2 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+                      <Newspaper className="w-6 h-6" />
+                      Latest Updates
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {blogPosts.map((post) => (
+                        <Card 
+                          key={post.id}
+                          className="border-2 border-primary/20 hover:border-primary transition-all cursor-pointer"
+                          onClick={() => navigate(`/blog/${post.slug}`)}
+                        >
+                          {post.featured_image_url && (
+                            <div className="aspect-video overflow-hidden">
+                              <img 
+                                src={post.featured_image_url} 
+                                alt={post.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          <CardHeader>
+                            <CardTitle className="text-base line-clamp-2">{post.title}</CardTitle>
+                            <CardDescription className="line-clamp-2">{post.excerpt}</CardDescription>
+                          </CardHeader>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* TV Schedules */}
+                <div>
+                  <h2 className="text-2xl font-bold text-primary mb-6">Today's Schedule</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <TVScheduleCard 
+                      network="ESPN Network"
+                      schedules={tvSchedules.filter(s => s.network === "ESPN Network")}
+                    />
+                    <TVScheduleCard 
+                      network="MLB Network"
+                      schedules={tvSchedules.filter(s => s.network === "MLB Network")}
+                    />
+                  </div>
+                </div>
               </div>
             )}
 

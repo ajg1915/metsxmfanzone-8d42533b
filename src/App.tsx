@@ -23,6 +23,7 @@ import LiveNotificationManagement from "./pages/admin/LiveNotificationManagement
 import SubscriptionManagement from "./pages/admin/SubscriptionManagement";
 import MetsNewsTrackerManagement from "./pages/admin/MetsNewsTrackerManagement";
 import FeedbackManagement from "./pages/admin/FeedbackManagement";
+import TVScheduleManagement from "./pages/admin/TVScheduleManagement";
 import MetsXMFanZone from "./pages/MetsXMFanZone";
 import MLBNetwork from "./pages/MLBNetwork";
 import ESPNNetwork from "./pages/ESPNNetwork";
@@ -80,6 +81,7 @@ const App = () => (
             <Route path="live-streams" element={<LiveStreamManagement />} />
             <Route path="live-notifications" element={<LiveNotificationManagement />} />
             <Route path="mets-news" element={<MetsNewsTrackerManagement />} />
+            <Route path="tv-schedule" element={<TVScheduleManagement />} />
             <Route path="feedbacks" element={<FeedbackManagement />} />
             <Route path="posts" element={<PostsManagement />} />
             <Route path="roles" element={<UserRoles />} />
