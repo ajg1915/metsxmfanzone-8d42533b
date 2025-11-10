@@ -229,6 +229,12 @@ export default function NewsletterGenerator() {
                     onChange={(e) => setSubject(e.target.value)}
                   />
                 </div>
+                <div className="border rounded-lg p-4 max-h-[400px] overflow-y-auto bg-muted/50">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: generatedContent }}
+                    className="prose prose-sm dark:prose-invert max-w-none"
+                  />
+                </div>
                 <div className="flex gap-2">
                   <Button
                     onClick={handleCopy}
@@ -258,12 +264,6 @@ export default function NewsletterGenerator() {
                       </>
                     )}
                   </Button>
-                </div>
-                <div className="border rounded-lg p-4 max-h-[500px] overflow-y-auto bg-muted/50">
-                  <div
-                    dangerouslySetInnerHTML={{ __html: generatedContent }}
-                    className="prose prose-sm dark:prose-invert max-w-none"
-                  />
                 </div>
               </div>
             ) : (
