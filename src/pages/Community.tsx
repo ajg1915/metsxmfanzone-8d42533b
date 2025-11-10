@@ -247,9 +247,11 @@ const Community = () => {
       </Helmet>
       <Navigation />
       
-      <StoriesSection />
+      <div className="pt-20 sm:pt-24">
+        <StoriesSection />
+      </div>
       
-      <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20 sm:pt-24">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-3xl mx-auto w-full">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary mb-6 sm:mb-8">
             Community Feed
