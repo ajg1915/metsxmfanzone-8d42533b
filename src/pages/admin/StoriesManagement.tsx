@@ -25,6 +25,7 @@ interface Story {
   display_order: number;
   published: boolean;
   created_at: string;
+  link_url: string | null;
 }
 
 const StoriesManagement = () => {
@@ -39,6 +40,7 @@ const StoriesManagement = () => {
     title: "",
     display_order: 0,
     published: false,
+    link_url: "",
   });
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -127,6 +129,7 @@ const StoriesManagement = () => {
         thumbnail_url: thumbnailUrl,
         display_order: formData.display_order,
         published: formData.published,
+        link_url: formData.link_url || null,
       };
 
       if (editingStory) {
@@ -212,6 +215,7 @@ const StoriesManagement = () => {
       title: story.title,
       display_order: story.display_order,
       published: story.published,
+      link_url: story.link_url || "",
     });
     setIsDialogOpen(true);
   };
@@ -325,7 +329,7 @@ const StoriesManagement = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: "", display_order: 0, published: false });
+    setFormData({ title: "", display_order: 0, published: false, link_url: "" });
     setMediaFile(null);
     setThumbnailFile(null);
     if (mediaPreview) URL.revokeObjectURL(mediaPreview);
@@ -414,6 +418,17 @@ const StoriesManagement = () => {
               </div>
 
               <div>
+                <Label htmlFor="link">Article Link (Optional)</Label>
+                <Input
+                  id="link"
+                  type="url"
+                  placeholder="https://example.com/article"
+                  value={formData.link_url}
+                  onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                />
+              </div>
+
+              <div>
                 <Label htmlFor="order">Display Order</Label>
                 <Input
                   id="order"
@@ -460,6 +475,19 @@ const StoriesManagement = () => {
                         {story.media_type}
                       </span>
                     </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {new Date(story.created_at).toLocaleDateString()}
+                    </div>
+                    {story.link_url && (
+                      <a 
+                        href={story.link_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline mt-1 block truncate"
+                      >
+                        View Article →
+                      </a>
+                    )}
                   </div>
                   <Button
                     variant={story.published ? "default" : "outline"}

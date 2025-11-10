@@ -399,6 +399,7 @@ export type Database = {
           display_order: number | null
           duration: number | null
           id: string
+          link_url: string | null
           media_type: string
           media_url: string
           published: boolean
@@ -411,6 +412,7 @@ export type Database = {
           display_order?: number | null
           duration?: number | null
           id?: string
+          link_url?: string | null
           media_type: string
           media_url: string
           published?: boolean
@@ -423,6 +425,7 @@ export type Database = {
           display_order?: number | null
           duration?: number | null
           id?: string
+          link_url?: string | null
           media_type?: string
           media_url?: string
           published?: boolean
