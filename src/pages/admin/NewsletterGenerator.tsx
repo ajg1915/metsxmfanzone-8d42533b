@@ -8,6 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, Loader2, Copy, Send } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function NewsletterGenerator() {
   const [topic, setTopic] = useState("");
@@ -15,7 +25,10 @@ export default function NewsletterGenerator() {
   const [audience, setAudience] = useState("");
   const [sections, setSections] = useState("");
   const [generatedContent, setGeneratedContent] = useState("");
+  const [subject, setSubject] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [showSendDialog, setShowSendDialog] = useState(false);
   const { toast } = useToast();
 
   const handleGenerate = async () => {
@@ -64,6 +77,49 @@ export default function NewsletterGenerator() {
       title: "Copied!",
       description: "Newsletter content copied to clipboard",
     });
+  };
+
+  const handleSend = async () => {
+    if (!subject.trim()) {
+      toast({
+        title: "Subject Required",
+        description: "Please enter a subject line before sending",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setShowSendDialog(true);
+  };
+
+  const confirmSend = async () => {
+    setShowSendDialog(false);
+    setIsSending(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("send-newsletter", {
+        body: {
+          subject,
+          content: generatedContent,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Newsletter Sent!",
+        description: `Successfully sent to ${data.sent} subscribers`,
+      });
+    } catch (error: any) {
+      console.error("Error sending newsletter:", error);
+      toast({
+        title: "Send Failed",
+        description: error.message || "Failed to send newsletter",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -164,6 +220,15 @@ export default function NewsletterGenerator() {
           <CardContent>
             {generatedContent ? (
               <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="subject">Email Subject *</Label>
+                  <Input
+                    id="subject"
+                    placeholder="Enter newsletter subject line"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                  />
+                </div>
                 <div className="flex gap-2">
                   <Button
                     onClick={handleCopy}
@@ -175,13 +240,23 @@ export default function NewsletterGenerator() {
                     Copy Content
                   </Button>
                   <Button
-                    variant="outline"
+                    onClick={handleSend}
+                    variant="default"
                     size="sm"
                     className="flex-1"
-                    disabled
+                    disabled={isSending || !subject.trim()}
                   >
-                    <Send className="w-4 h-4 mr-2" />
-                    Send Newsletter
+                    {isSending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Send Newsletter
+                      </>
+                    )}
                   </Button>
                 </div>
                 <div className="border rounded-lg p-4 max-h-[500px] overflow-y-auto bg-muted/50">
@@ -202,6 +277,21 @@ export default function NewsletterGenerator() {
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog open={showSendDialog} onOpenChange={setShowSendDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send Newsletter to All Subscribers?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will send the newsletter to all active subscribers. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmSend}>Send Newsletter</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
