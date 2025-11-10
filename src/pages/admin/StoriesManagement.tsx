@@ -42,6 +42,8 @@ const StoriesManagement = () => {
   });
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStories();
@@ -212,10 +214,83 @@ const StoriesManagement = () => {
     setIsDialogOpen(true);
   };
 
+  const generateVideoThumbnail = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      video.preload = 'metadata';
+      video.src = URL.createObjectURL(file);
+      
+      video.onloadedmetadata = () => {
+        video.currentTime = 1; // Capture frame at 1 second
+      };
+      
+      video.onseeked = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(URL.createObjectURL(blob));
+          } else {
+            reject(new Error('Failed to generate thumbnail'));
+          }
+          URL.revokeObjectURL(video.src);
+        }, 'image/jpeg', 0.8);
+      };
+      
+      video.onerror = () => {
+        reject(new Error('Failed to load video'));
+        URL.revokeObjectURL(video.src);
+      };
+    });
+  };
+
+  const handleMediaFileChange = async (file: File | null) => {
+    setMediaFile(file);
+    
+    if (mediaPreview) {
+      URL.revokeObjectURL(mediaPreview);
+      setMediaPreview(null);
+    }
+    
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        setMediaPreview(URL.createObjectURL(file));
+      } else if (file.type.startsWith('video/')) {
+        try {
+          const thumbnail = await generateVideoThumbnail(file);
+          setMediaPreview(thumbnail);
+        } catch (error) {
+          console.error('Error generating video thumbnail:', error);
+        }
+      }
+    }
+  };
+
+  const handleThumbnailFileChange = (file: File | null) => {
+    setThumbnailFile(file);
+    
+    if (thumbnailPreview) {
+      URL.revokeObjectURL(thumbnailPreview);
+      setThumbnailPreview(null);
+    }
+    
+    if (file) {
+      setThumbnailPreview(URL.createObjectURL(file));
+    }
+  };
+
   const resetForm = () => {
     setFormData({ title: "", display_order: 0, published: false });
     setMediaFile(null);
     setThumbnailFile(null);
+    if (mediaPreview) URL.revokeObjectURL(mediaPreview);
+    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    setMediaPreview(null);
+    setThumbnailPreview(null);
     setEditingStory(null);
   };
 
@@ -254,9 +329,18 @@ const StoriesManagement = () => {
                   id="media"
                   type="file"
                   accept="image/*,video/*"
-                  onChange={(e) => setMediaFile(e.target.files?.[0] || null)}
+                  onChange={(e) => handleMediaFileChange(e.target.files?.[0] || null)}
                   required={!editingStory}
                 />
+                {mediaPreview && (
+                  <div className="mt-3 rounded-lg overflow-hidden border border-border">
+                    <img 
+                      src={mediaPreview} 
+                      alt="Media preview" 
+                      className="w-full h-48 object-cover"
+                    />
+                  </div>
+                )}
               </div>
 
               <div>
@@ -265,8 +349,17 @@ const StoriesManagement = () => {
                   id="thumbnail"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
+                  onChange={(e) => handleThumbnailFileChange(e.target.files?.[0] || null)}
                 />
+                {thumbnailPreview && (
+                  <div className="mt-3 rounded-lg overflow-hidden border border-border">
+                    <img 
+                      src={thumbnailPreview} 
+                      alt="Thumbnail preview" 
+                      className="w-full h-32 object-cover"
+                    />
+                  </div>
+                )}
               </div>
 
               <div>
