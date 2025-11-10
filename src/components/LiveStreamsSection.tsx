@@ -59,7 +59,17 @@ const LiveStreamsSection = () => {
         .limit(3);
 
       if (error) throw error;
-      setStreams(data as LiveStream[] || []);
+      
+      // Sort to put MetsXMFanZone first
+      const sortedData = (data || []).sort((a, b) => {
+        const aIsMets = a.assigned_pages.includes('metsxmfanzone');
+        const bIsMets = b.assigned_pages.includes('metsxmfanzone');
+        if (aIsMets && !bIsMets) return -1;
+        if (!aIsMets && bIsMets) return 1;
+        return 0;
+      });
+      
+      setStreams(sortedData as LiveStream[]);
     } catch (error) {
       console.error("Error fetching streams:", error);
     } finally {
