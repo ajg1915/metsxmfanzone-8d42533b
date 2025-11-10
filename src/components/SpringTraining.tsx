@@ -68,7 +68,7 @@ const SpringTraining = () => {
 
   return (
     <section className="py-6 sm:py-10 md:py-14 bg-background">
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
         <div className="mb-4 sm:mb-6">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary mb-2">
             2026 Spring Training

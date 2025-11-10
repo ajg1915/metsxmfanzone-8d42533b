@@ -71,8 +71,8 @@ const BlogSection = () => {
   }
 
   return (
-    <section className="py-16 bg-secondary/20">
-      <div className="container mx-auto px-4">
+      <section className="py-16 bg-secondary/20">
+        <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h2 className="text-lg sm:text-xl font-bold">Latest News</h2>
           <Button variant="outline" size="sm" onClick={() => navigate("/blog")} className="w-full sm:w-auto">

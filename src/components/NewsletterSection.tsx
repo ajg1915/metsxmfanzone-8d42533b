@@ -26,7 +26,7 @@ const NewsletterSection = () => {
 
   return (
     <section className="py-12 md:py-16 bg-gradient-to-br from-primary/10 via-background to-primary/5">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="max-w-2xl mx-auto text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
             <img src={logo} alt="MetsXMFanZone" className="w-8 h-8" />

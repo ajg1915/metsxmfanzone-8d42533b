@@ -35,7 +35,7 @@ const FAQSection = () => {
 
   return (
     <section className="py-6 sm:py-10 md:py-14 bg-muted/30">
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
         <div className="text-center mb-6 sm:mb-10">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 sm:mb-3">
             Frequently Asked Questions

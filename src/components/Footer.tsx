@@ -1,7 +1,7 @@
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-b from-card to-muted/30 border-t border-border">
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-7xl">
         {/* Mobile Footer - Simple */}
         <div className="block lg:hidden">
           <div className="flex flex-col items-center gap-2 mb-2">

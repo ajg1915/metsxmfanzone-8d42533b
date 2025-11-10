@@ -60,7 +60,7 @@ const Hero = () => {
                   <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/80 to-background"></div>
                 </div>
                 
-                <div className="container mx-auto px-3 sm:px-6 lg:px-8 relative z-10 text-center py-6 sm:py-10 md:py-14">
+                <div className="container mx-auto px-3 sm:px-6 lg:px-8 relative z-10 text-center py-6 sm:py-10 md:py-14 max-w-7xl">
                   <div className="flex justify-center mb-3 sm:mb-4">
                     <img src={logo} alt="MetsXMFanZone" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain" />
                   </div>

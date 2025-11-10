@@ -52,7 +52,7 @@ const MetsNewsTracker = () => {
   return (
     <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background relative overflow-hidden">
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 relative z-10 max-w-7xl">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>

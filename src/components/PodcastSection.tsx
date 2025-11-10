@@ -74,7 +74,7 @@ const PodcastSection = () => {
 
   return (
     <section className="py-6 sm:py-10 md:py-14 bg-gradient-to-b from-background to-muted/20">
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
         <div className="text-center mb-6 sm:mb-10">
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
