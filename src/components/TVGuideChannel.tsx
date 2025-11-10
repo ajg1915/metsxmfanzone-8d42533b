@@ -30,7 +30,7 @@ export function TVGuideChannel({
                 className="w-12 h-12 object-contain rounded"
               />
             )}
-            <CardTitle className="text-lg">{channelName}</CardTitle>
+            <CardTitle className="text-base">{channelName}</CardTitle>
           </div>
           {isLive && (
             <Badge className="bg-red-600 text-white">
