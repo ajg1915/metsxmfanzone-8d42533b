@@ -85,23 +85,20 @@ const Navigation = () => {
             </NavLink>
             <NavLink 
               to="/live" 
-              className="text-foreground hover:text-primary transition-colors flex items-center gap-0.5"
+              className="text-foreground hover:text-primary transition-colors"
             >
-              <Trophy className="w-3 h-3" />
               Live
             </NavLink>
             <NavLink 
               to="/spring-training-live" 
-              className="text-foreground hover:text-primary transition-colors flex items-center gap-0.5"
+              className="text-foreground hover:text-primary transition-colors"
             >
-              <Trophy className="w-3 h-3" />
               Spring Training
             </NavLink>
             <NavLink 
               to="/community" 
-              className="text-foreground hover:text-primary transition-colors flex items-center gap-0.5"
+              className="text-foreground hover:text-primary transition-colors"
             >
-              <Users className="w-3 h-3" />
               Community
             </NavLink>
             <NavLink 
@@ -197,26 +194,23 @@ const Navigation = () => {
                   </NavLink>
                   <NavLink 
                     to="/live" 
-                    className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
+                    className="text-foreground hover:text-primary transition-colors py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Trophy className="w-4 h-4" />
                     Live
                   </NavLink>
                   <NavLink 
                     to="/spring-training-live" 
-                    className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
+                    className="text-foreground hover:text-primary transition-colors py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Trophy className="w-4 h-4" />
                     Spring Training
                   </NavLink>
                   <NavLink 
                     to="/community" 
-                    className="text-foreground hover:text-primary transition-colors py-2 flex items-center gap-2"
+                    className="text-foreground hover:text-primary transition-colors py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Users className="w-4 h-4" />
                     Community
                   </NavLink>
                   <NavLink 
