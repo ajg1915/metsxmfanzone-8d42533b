@@ -10,7 +10,8 @@ import MetsNewsTracker from "@/components/MetsNewsTracker";
 import MetsRSSFeed from "@/components/MetsRSSFeed";
 import { StreamPlayer } from "@/components/StreamPlayer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Lock, Calendar, TrendingUp, Facebook } from "lucide-react";
+import { Lock, Calendar, TrendingUp, Facebook } from "lucide-react";
+import logo from "@/assets/metsxmfanzone-logo.png";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -105,7 +106,7 @@ const SpringTrainingLive = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center gap-3 mb-4">
-                <Trophy className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
+                <img src={logo} alt="MetsXMFanZone" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
                 <div>
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary">
                     Mets 2026 Spring Training
