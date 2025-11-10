@@ -43,6 +43,7 @@ const Footer = () => {
                 <li><a href="/blog" className="text-muted-foreground hover:text-primary transition-colors inline-block">Blog</a></li>
                 <li><a href="/podcast" className="text-muted-foreground hover:text-primary transition-colors inline-block">Podcasts</a></li>
                 <li><a href="/community" className="text-muted-foreground hover:text-primary transition-colors inline-block">Community</a></li>
+                <li><a href="/merch" className="text-muted-foreground hover:text-primary transition-colors inline-block">Merch Shop</a></li>
               </ul>
             </div>
 
