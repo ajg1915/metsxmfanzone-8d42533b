@@ -44,6 +44,8 @@ import Feedback from "./pages/Feedback";
 import Sitemap from "./pages/Sitemap";
 import PayPalSuccess from "./pages/PayPalSuccess";
 import SpringTrainingLive from "./pages/SpringTrainingLive";
+import Merch from "./pages/Merch";
+import Product from "./pages/Product";
 
 const queryClient = new QueryClient();
 
@@ -91,6 +93,8 @@ const App = () => (
             <Route path="settings" element={<AdminSettings />} />
           </Route>
           <Route path="/spring-training-live" element={<SpringTrainingLive />} />
+          <Route path="/merch" element={<Merch />} />
+          <Route path="/product/:handle" element={<Product />} />
           <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
           <Route path="/mlb-network" element={<MLBNetwork />} />
           <Route path="/espn-network" element={<ESPNNetwork />} />

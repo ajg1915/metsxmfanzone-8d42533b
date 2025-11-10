@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Calendar, MapPin } from "lucide-react";
 import yankees from "@/assets/spring-mets-yankees.jpg";
 import astros from "@/assets/spring-mets-astros.jpg";
@@ -69,11 +70,18 @@ const SpringTraining = () => {
   return (
     <section className="py-6 sm:py-10 md:py-14 bg-background">
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary mb-2">
-            2026 Spring Training
-          </h2>
-          <p className="text-xs sm:text-sm text-foreground">Upcoming games and exclusive coverage</p>
+        <div className="mb-4 sm:mb-6 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary mb-2">
+              2026 Spring Training
+            </h2>
+            <p className="text-xs sm:text-sm text-foreground">Upcoming games and exclusive coverage</p>
+          </div>
+          <a href="/merch">
+            <Button variant="outline" size="sm" className="text-xs">
+              Shop Merch
+            </Button>
+          </a>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

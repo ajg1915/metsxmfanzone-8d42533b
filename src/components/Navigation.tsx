@@ -113,6 +113,12 @@ const Navigation = () => {
             >
               Plans
             </NavLink>
+            <NavLink 
+              to="/merch" 
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Merch
+            </NavLink>
           </div>
 
           <div className="flex items-center gap-2">
@@ -226,6 +232,13 @@ const Navigation = () => {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Plans
+                  </NavLink>
+                  <NavLink 
+                    to="/merch" 
+                    className="text-foreground hover:text-primary transition-colors py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Merch
                   </NavLink>
                   
                   <div className="border-t border-border pt-4 mt-2">
