@@ -90,8 +90,16 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    @apply overflow-x-hidden;
+    width: 100%;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
+    margin: 0;
+    padding: 0;
+    width: 100%;
   }
 }
 
