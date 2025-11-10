@@ -136,7 +136,7 @@ const SpringTrainingLive = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <StreamPlayer 
-                pageName="spring-training"
+                pageName="spring-training-live"
                 pageTitle="Spring Training Live Stream"
                 pageDescription="Live coverage from Clover Park"
               />
