@@ -61,21 +61,21 @@ const Navigation = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-16">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="flex items-center justify-between h-12">
+          <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => navigate("/")}>
             <img 
               src={logo} 
               alt="MetsXMFanZone Logo" 
-              className="h-10 sm:h-12 w-auto"
+              className="h-8 w-auto"
             />
-            <div className="text-xs sm:text-sm font-semibold">
+            <div className="text-xs font-semibold">
               <span className="text-foreground">MetsXMFanZone</span>
               <span className="text-primary">.com</span>
             </div>
           </div>
           
-          <div className="hidden md:flex items-center gap-4 text-sm">
+          <div className="hidden md:flex items-center gap-2 text-xs">
             <NavLink 
               to="/" 
               className="text-foreground hover:text-primary transition-colors"
@@ -85,21 +85,21 @@ const Navigation = () => {
             </NavLink>
             <NavLink 
               to="/live" 
-              className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
+              className="text-foreground hover:text-primary transition-colors flex items-center gap-0.5"
             >
               <Trophy className="w-3 h-3" />
               Live
             </NavLink>
             <NavLink 
               to="/spring-training-live" 
-              className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
+              className="text-foreground hover:text-primary transition-colors flex items-center gap-0.5"
             >
               <Trophy className="w-3 h-3" />
               Spring Training
             </NavLink>
             <NavLink 
               to="/community" 
-              className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
+              className="text-foreground hover:text-primary transition-colors flex items-center gap-0.5"
             >
               <Users className="w-3 h-3" />
               Community
@@ -118,18 +118,18 @@ const Navigation = () => {
             </NavLink>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {user ? (
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="hidden md:flex gap-2 text-xs">
-                      <Avatar className="h-6 w-6">
-                        <AvatarFallback className="text-xs">
+                    <Button variant="ghost" size="sm" className="hidden md:flex gap-1.5 text-xs h-8 px-2">
+                      <Avatar className="h-5 w-5">
+                        <AvatarFallback className="text-[10px]">
                           {user.email?.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="max-w-[150px] truncate">{user.email}</span>
+                      <span className="max-w-[120px] truncate">{user.email}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 bg-background z-50">
@@ -158,14 +158,14 @@ const Navigation = () => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="hidden md:flex text-xs"
+                  className="hidden md:flex text-xs h-8 px-3"
                   onClick={() => navigate("/auth?mode=login")}
                 >
                   Login
                 </Button>
                 <Button 
                   size="sm" 
-                  className="hidden md:flex text-xs"
+                  className="hidden md:flex text-xs h-8 px-3"
                   onClick={() => navigate("/auth?mode=signup")}
                 >
                   Sign Up
@@ -176,8 +176,8 @@ const Navigation = () => {
             {/* Single mobile menu for all users */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="w-5 h-5" />
+                <Button variant="ghost" size="icon" className="md:hidden h-8 w-8">
+                  <Menu className="w-4 h-4" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] bg-background">
