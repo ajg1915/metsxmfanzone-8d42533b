@@ -394,7 +394,7 @@ export default function VideoManagement() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto max-w-7xl px-4 py-6">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Video Management</h1>
         <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>

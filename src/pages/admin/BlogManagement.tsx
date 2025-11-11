@@ -364,7 +364,7 @@ export default function BlogManagement() {
   }
 
   return (
-    <div>
+    <div className="container mx-auto max-w-7xl px-4 py-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Blog Management</h2>
         <Dialog open={isDialogOpen} onOpenChange={(open) => {
