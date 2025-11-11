@@ -149,6 +149,12 @@ export default function BlogPost() {
         <meta name="twitter:image" content={socialImage} />
         <meta name="twitter:image:alt" content={post.title} />
         
+        {/* Facebook Instant Articles */}
+        <meta property="ia:markup_url" content={currentUrl} />
+        <meta property="ia:markup_url_dev" content={currentUrl} />
+        <meta property="ia:rules_url" content={`${siteUrl}/rules.json`} />
+        <meta property="ia:rules_url_dev" content={`${siteUrl}/rules.json`} />
+        
         {/* Additional Meta Tags */}
         <meta name="author" content="MetsXMFanZone" />
         <link rel="canonical" href={currentUrl} />
