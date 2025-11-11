@@ -62,24 +62,25 @@ export function AdminLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full text-sm">
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-14 border-b flex items-center justify-between px-4">
+          <header className="h-12 border-b flex items-center justify-between px-4">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
-              <h1 className="text-lg font-semibold">Admin Portal</h1>
+              <h1 className="text-base font-semibold">Admin Portal</h1>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigate("/")}
+              className="h-8 text-xs"
             >
-              <Home className="w-4 h-4 mr-2" />
+              <Home className="w-3 h-3 mr-1.5" />
               Back to Site
             </Button>
           </header>
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto [&_button]:text-xs [&_button]:h-8 [&_h1]:text-2xl [&_h2]:text-xl [&_h3]:text-lg">
             <Outlet />
           </main>
         </div>
