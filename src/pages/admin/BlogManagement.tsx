@@ -54,7 +54,6 @@ export default function BlogManagement() {
     tags: "",
     published: false,
   });
-  const [generatingImage, setGeneratingImage] = useState(false);
   const [generatingContent, setGeneratingContent] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -207,43 +206,6 @@ export default function BlogManagement() {
         description: "Failed to delete blog post",
         variant: "destructive",
       });
-    }
-  };
-
-  const handleGenerateImage = async () => {
-    if (!formData.title) {
-      toast({
-        title: "Error",
-        description: "Please enter a blog title first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setGeneratingImage(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-blog-image', {
-        body: { prompt: formData.title }
-      });
-
-      if (error) throw error;
-
-      if (data?.imageUrl) {
-        setFormData({ ...formData, featured_image_url: data.imageUrl });
-        toast({
-          title: "Success",
-          description: "AI image generated successfully!",
-        });
-      }
-    } catch (error: any) {
-      console.error("Error generating image:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate image",
-        variant: "destructive",
-      });
-    } finally {
-      setGeneratingImage(false);
     }
   };
 
@@ -436,24 +398,13 @@ export default function BlogManagement() {
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="featured_image">Featured Image URL</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleGenerateImage}
-                    disabled={generatingImage || !formData.title}
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    {generatingImage ? "Generating..." : "Generate with AI"}
-                  </Button>
-                </div>
+                <Label htmlFor="featured_image">Featured Image URL</Label>
                 <Input
                   id="featured_image"
                   value={formData.featured_image_url}
                   onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
-                  placeholder="https://... or generate with AI"
+                  placeholder="https://..."
+                  className="mt-2"
                 />
                 
                 <div className="mt-3">
