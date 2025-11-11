@@ -97,12 +97,19 @@ export default function BlogPost() {
   const currentUrl = window.location.href;
   const siteUrl = window.location.origin;
   
-  // Ensure we have a proper image for social sharing
-  const socialImage = post.featured_image_url || `${siteUrl}/logo-512.png`;
+  // Ensure we have a proper image for social sharing (not base64)
+  let socialImage = post.featured_image_url || `${siteUrl}/logo-512.png`;
+  
+  // Check if image is base64 (won't work for social media)
+  if (socialImage.startsWith('data:')) {
+    console.warn('Blog post has base64 image which won\'t work for social sharing:', post.slug);
+    socialImage = `${siteUrl}/logo-512.png`; // Fallback to site logo
+  }
+  
   const socialTitle = `${post.title} | MetsXMFanZone`;
-  const socialDescription = post.excerpt.length > 160 
-    ? post.excerpt.substring(0, 157) + '...' 
-    : post.excerpt;
+  const socialDescription = post.excerpt && post.excerpt.length > 0
+    ? (post.excerpt.length > 160 ? post.excerpt.substring(0, 157) + '...' : post.excerpt)
+    : post.title;
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
@@ -118,7 +125,6 @@ export default function BlogPost() {
         <meta property="og:description" content={socialDescription} />
         <meta property="og:image" content={socialImage} />
         <meta property="og:image:secure_url" content={socialImage} />
-        <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content={post.title} />
@@ -146,9 +152,6 @@ export default function BlogPost() {
         {/* Additional Meta Tags */}
         <meta name="author" content="MetsXMFanZone" />
         <link rel="canonical" href={currentUrl} />
-        
-        {/* Facebook App ID (optional but recommended) */}
-        <meta property="fb:app_id" content="your-facebook-app-id" />
       </Helmet>
       
       <Navigation />
