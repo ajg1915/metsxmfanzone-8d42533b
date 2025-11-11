@@ -96,43 +96,59 @@ export default function BlogPost() {
 
   const currentUrl = window.location.href;
   const siteUrl = window.location.origin;
+  
+  // Ensure we have a proper image for social sharing
+  const socialImage = post.featured_image_url || `${siteUrl}/logo-512.png`;
+  const socialTitle = `${post.title} | MetsXMFanZone`;
+  const socialDescription = post.excerpt.length > 160 
+    ? post.excerpt.substring(0, 157) + '...' 
+    : post.excerpt;
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
       <Helmet>
-        <title>{post.title} | MetsXMFanZone</title>
-        <meta name="description" content={post.excerpt} />
+        <title>{socialTitle}</title>
+        <meta name="description" content={socialDescription} />
         
-        {/* Open Graph / Facebook */}
+        {/* Essential Open Graph tags for Facebook */}
         <meta property="og:type" content="article" />
         <meta property="og:url" content={currentUrl} />
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
-        <meta property="og:image" content={post.featured_image_url || `${siteUrl}/logo-512.png`} />
+        <meta property="og:site_name" content="MetsXMFanZone" />
+        <meta property="og:title" content={socialTitle} />
+        <meta property="og:description" content={socialDescription} />
+        <meta property="og:image" content={socialImage} />
+        <meta property="og:image:secure_url" content={socialImage} />
+        <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content={post.title} />
-        <meta property="og:site_name" content="MetsXMFanZone" />
+        <meta property="og:locale" content="en_US" />
+        
+        {/* Article specific tags */}
         <meta property="article:published_time" content={post.published_at} />
+        <meta property="article:modified_time" content={post.published_at} />
         <meta property="article:section" content={post.category} />
         <meta property="article:author" content="MetsXMFanZone" />
         {post.tags.map((tag) => (
           <meta key={tag} property="article:tag" content={tag} />
         ))}
         
-        {/* Twitter */}
+        {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@metsxmfanzone" />
         <meta name="twitter:creator" content="@metsxmfanzone" />
         <meta name="twitter:url" content={currentUrl} />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.excerpt} />
-        <meta name="twitter:image" content={post.featured_image_url || `${siteUrl}/logo-512.png`} />
+        <meta name="twitter:title" content={socialTitle} />
+        <meta name="twitter:description" content={socialDescription} />
+        <meta name="twitter:image" content={socialImage} />
         <meta name="twitter:image:alt" content={post.title} />
         
         {/* Additional Meta Tags */}
         <meta name="author" content="MetsXMFanZone" />
         <link rel="canonical" href={currentUrl} />
+        
+        {/* Facebook App ID (optional but recommended) */}
+        <meta property="fb:app_id" content="your-facebook-app-id" />
       </Helmet>
       
       <Navigation />
