@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Live from "./pages/Live";
 import Community from "./pages/Community";
@@ -58,56 +58,58 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/live" element={<Live />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/gallery" element={<Gallery />} />
-        <Route path="/plans" element={<Plans />} />
-        <Route path="/paypal-success" element={<PayPalSuccess />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/og-blog/:slug" element={<OGBlogPost />} />
-        <Route path="/blog/rss" element={<BlogRSS />} />
-        <Route path="/help-center" element={<HelpCenter />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/feedback" element={<Feedback />} />
-        <Route path="/faqs" element={<FAQs />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/podcast" element={<Podcast />} />
-        <Route path="/business-partner" element={<BusinessPartner />} />
-        <Route path="/legal/admin-setup" element={<AdminSetup />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="blog" element={<BlogManagement />} />
-          <Route path="videos" element={<VideoManagement />} />
-          <Route path="podcasts" element={<PodcastManagement />} />
-          <Route path="live-streams" element={<LiveStreamManagement />} />
-          <Route path="stream-replays" element={<StreamReplayEditor />} />
-          <Route path="live-notifications" element={<LiveNotificationManagement />} />
-          <Route path="stories" element={<StoriesManagement />} />
-          <Route path="mets-news" element={<MetsNewsTrackerManagement />} />
-          <Route path="tv-schedule" element={<TVScheduleManagement />} />
-          <Route path="newsletter" element={<NewsletterGenerator />} />
-          <Route path="feedbacks" element={<FeedbackManagement />} />
-          <Route path="posts" element={<PostsManagement />} />
-          <Route path="business-ads" element={<BusinessAdsManagement />} />
-          <Route path="roles" element={<UserRoles />} />
-          <Route path="subscriptions" element={<SubscriptionManagement />} />
-        </Route>
-        <Route path="/spring-training-live" element={<SpringTrainingLive />} />
-        <Route path="/merch" element={<Merch />} />
-        <Route path="/product/:handle" element={<Product />} />
-        <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
-        <Route path="/mlb-network" element={<MLBNetwork />} />
-        <Route path="/espn-network" element={<ESPNNetwork />} />
-        <Route path="/sitemap.xml" element={<Sitemap />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/live" element={<Live />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/plans" element={<Plans />} />
+          <Route path="/paypal-success" element={<PayPalSuccess />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/og-blog/:slug" element={<OGBlogPost />} />
+          <Route path="/blog/rss" element={<BlogRSS />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/feedback" element={<Feedback />} />
+          <Route path="/faqs" element={<FAQs />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/podcast" element={<Podcast />} />
+          <Route path="/business-partner" element={<BusinessPartner />} />
+          <Route path="/legal/admin-setup" element={<AdminSetup />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="blog" element={<BlogManagement />} />
+            <Route path="videos" element={<VideoManagement />} />
+            <Route path="podcasts" element={<PodcastManagement />} />
+            <Route path="live-streams" element={<LiveStreamManagement />} />
+            <Route path="stream-replays" element={<StreamReplayEditor />} />
+            <Route path="live-notifications" element={<LiveNotificationManagement />} />
+            <Route path="stories" element={<StoriesManagement />} />
+            <Route path="mets-news" element={<MetsNewsTrackerManagement />} />
+            <Route path="tv-schedule" element={<TVScheduleManagement />} />
+            <Route path="newsletter" element={<NewsletterGenerator />} />
+            <Route path="feedbacks" element={<FeedbackManagement />} />
+            <Route path="posts" element={<PostsManagement />} />
+            <Route path="business-ads" element={<BusinessAdsManagement />} />
+            <Route path="roles" element={<UserRoles />} />
+            <Route path="subscriptions" element={<SubscriptionManagement />} />
+          </Route>
+          <Route path="/spring-training-live" element={<SpringTrainingLive />} />
+          <Route path="/merch" element={<Merch />} />
+          <Route path="/product/:handle" element={<Product />} />
+          <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
+          <Route path="/mlb-network" element={<MLBNetwork />} />
+          <Route path="/espn-network" element={<ESPNNetwork />} />
+          <Route path="/sitemap.xml" element={<Sitemap />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
