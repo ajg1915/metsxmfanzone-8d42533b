@@ -47,6 +47,13 @@ export default function BlogPost() {
         .single();
 
       if (error) throw error;
+      
+      // Ensure featured image URL is absolute for social sharing
+      if (data.featured_image_url && !data.featured_image_url.startsWith('http')) {
+        // If it's a relative URL, make it absolute
+        data.featured_image_url = `${window.location.origin}${data.featured_image_url}`;
+      }
+      
       setPost(data);
     } catch (error) {
       console.error("Error fetching post:", error);
