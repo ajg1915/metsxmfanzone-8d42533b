@@ -455,11 +455,6 @@ export default function BlogManagement() {
                   onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
                   placeholder="https://... or generate with AI"
                 />
-                {formData.featured_image_url && formData.featured_image_url.startsWith('data:image') && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    AI-generated image preview will be shown when post is saved
-                  </p>
-                )}
                 
                 <div className="mt-3">
                   <Label htmlFor="image_upload" className="text-sm text-muted-foreground">Or Upload Image</Label>

@@ -118,14 +118,44 @@ serve(async (req) => {
     console.log("Image generation response received");
 
     // Extract the base64 image from the response
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    const base64ImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
     
-    if (!imageUrl) {
+    if (!base64ImageUrl) {
       throw new Error('No image URL in response');
     }
 
+    // Convert base64 to binary and upload to storage for social media sharing
+    console.log("Uploading image to storage...");
+    
+    // Extract the base64 data (remove the data:image/png;base64, prefix)
+    const base64Data = base64ImageUrl.split(',')[1];
+    const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+    
+    // Generate a unique filename
+    const fileName = `blog-images/${crypto.randomUUID()}.png`;
+    
+    // Upload to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from('content_uploads')
+      .upload(fileName, binaryData, {
+        contentType: 'image/png',
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      throw new Error('Failed to upload image to storage');
+    }
+
+    // Get the public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('content_uploads')
+      .getPublicUrl(fileName);
+
+    console.log("Image uploaded successfully:", publicUrl);
+
     return new Response(
-      JSON.stringify({ imageUrl }),
+      JSON.stringify({ imageUrl: publicUrl }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
