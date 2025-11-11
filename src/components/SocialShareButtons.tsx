@@ -7,13 +7,18 @@ interface SocialShareButtonsProps {
 }
 
 export default function SocialShareButtons({ title, url }: SocialShareButtonsProps) {
-  const shareUrl = url || window.location.href;
+  const baseUrl = url || window.location.href;
+  // Convert blog URLs to OG-optimized URLs for better social media previews
+  const shareUrl = baseUrl.includes('/blog/') 
+    ? baseUrl.replace('/blog/', '/og-blog/')
+    : baseUrl;
   const shareTitle = title || "Check this out on MetsXMFanZone!";
 
   const socialLinks = [
     {
       name: "TikTok",
       url: "https://tiktok.com/@metsxmfanzone",
+      shareUrl: undefined as string | undefined,
       color: "hover:bg-[#000000]",
       icon: (
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -24,6 +29,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
     {
       name: "Instagram",
       url: "https://www.instagram.com/metsxmfanzone",
+      shareUrl: undefined as string | undefined,
       color: "hover:bg-gradient-to-r hover:from-[#833AB4] hover:via-[#FD1D1D] hover:to-[#F77737]",
       icon: (
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -34,6 +40,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
     {
       name: "X (Twitter)",
       url: "https://x.com/metsxmfanzone",
+      shareUrl: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`,
       color: "hover:bg-[#000000]",
       icon: (
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -44,6 +51,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
     {
       name: "Facebook",
       url: "https://www.facebook.com/groups/metsxmfanzoneofficial",
+      shareUrl: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
       color: "hover:bg-[#1877F2]",
       icon: (
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -92,7 +100,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
             variant="outline"
             size="sm"
             className={`transition-all ${social.color} hover:text-white`}
-            onClick={() => window.open(social.url, '_blank')}
+            onClick={() => window.open(social.shareUrl || social.url, '_blank')}
           >
             {social.icon}
             <span className="ml-2">{social.name}</span>

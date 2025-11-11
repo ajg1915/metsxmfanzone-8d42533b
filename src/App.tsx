@@ -34,6 +34,7 @@ import ESPNNetwork from "./pages/ESPNNetwork";
 import NotFound from "./pages/NotFound";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import OGBlogPost from "./pages/OGBlogPost";
 import BlogRSS from "./pages/BlogRSS";
 import HelpCenter from "./pages/HelpCenter";
 import Contact from "./pages/Contact";
@@ -69,6 +70,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/og-blog/:slug" element={<OGBlogPost />} />
           <Route path="/blog/rss" element={<BlogRSS />} />
           <Route path="/help-center" element={<HelpCenter />} />
           <Route path="/contact" element={<Contact />} />
