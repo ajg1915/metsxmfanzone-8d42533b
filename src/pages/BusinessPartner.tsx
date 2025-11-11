@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -6,44 +9,127 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Users, TrendingUp, Target } from "lucide-react";
+import { Building2, Users, TrendingUp, Target, Upload as UploadIcon } from "lucide-react";
 
 const BusinessPartner = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    companyName: "",
-    contactName: "",
-    email: "",
-    phone: "",
-    website: "",
-    industry: "",
-    description: "",
-    goals: "",
+    businessName: "",
+    adTitle: "",
+    adDescription: "",
+    contactEmail: "",
+    contactPhone: "",
+    websiteUrl: "",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        toast({
+          title: "Invalid File",
+          description: "Please upload an image file",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File Too Large",
+          description: "Image must be less than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setImageFile(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to submit a business ad",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      let imageUrl = null;
+
+      // Upload image if provided
+      if (imageFile) {
+        const fileExt = imageFile.name.split(".").pop();
+        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("content_uploads")
+          .upload(fileName, imageFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("content_uploads")
+          .getPublicUrl(fileName);
+
+        imageUrl = publicUrl;
+      }
+
+      // Insert business ad
+      const { error } = await supabase.from("business_ads").insert({
+        user_id: user.id,
+        business_name: formData.businessName,
+        ad_title: formData.adTitle,
+        ad_description: formData.adDescription,
+        ad_image_url: imageUrl,
+        contact_email: formData.contactEmail,
+        contact_phone: formData.contactPhone || null,
+        website_url: formData.websiteUrl || null,
+        status: "pending",
+      });
+
+      if (error) throw error;
+
       toast({
-        title: "Partnership request submitted!",
-        description: "Our team will review your application and contact you within 3-5 business days.",
+        title: "Ad Submitted Successfully!",
+        description: "Your business ad will be reviewed by our admin team within 3-5 business days.",
       });
+
+      // Reset form
       setFormData({
-        companyName: "",
-        contactName: "",
-        email: "",
-        phone: "",
-        website: "",
-        industry: "",
-        description: "",
-        goals: "",
+        businessName: "",
+        adTitle: "",
+        adDescription: "",
+        contactEmail: "",
+        contactPhone: "",
+        websiteUrl: "",
       });
+      setImageFile(null);
+    } catch (error: any) {
+      console.error("Error submitting ad:", error);
+      toast({
+        title: "Submission Failed",
+        description: error.message || "Failed to submit business ad",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const benefits = [
@@ -74,10 +160,10 @@ const BusinessPartner = () => {
               <Building2 className="w-10 h-10 text-primary" />
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
-              Business Partnership
+              Business Advertisement
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Partner with MetsXMFanZone to reach thousands of engaged baseball fans
+              Advertise your business to thousands of engaged Mets fans
             </p>
           </div>
 
@@ -105,132 +191,134 @@ const BusinessPartner = () => {
           <section className="max-w-3xl mx-auto">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Partnership Application</CardTitle>
-                <CardDescription>
-                  Fill out the form below and we'll review your partnership proposal
+                <CardTitle className="text-xl sm:text-2xl">Submit Your Business Ad</CardTitle>
+                <CardDescription className="text-sm">
+                  Fill out the form below to submit your advertisement for admin approval
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="companyName" className="text-sm font-medium mb-2 block">
-                        Company Name *
-                      </label>
-                      <Input
-                        id="companyName"
-                        value={formData.companyName}
-                        onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="contactName" className="text-sm font-medium mb-2 block">
-                        Contact Name *
-                      </label>
-                      <Input
-                        id="contactName"
-                        value={formData.contactName}
-                        onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="email" className="text-sm font-medium mb-2 block">
-                        Email Address *
-                      </label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="phone" className="text-sm font-medium mb-2 block">
-                        Phone Number *
-                      </label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="website" className="text-sm font-medium mb-2 block">
-                        Website
-                      </label>
-                      <Input
-                        id="website"
-                        type="url"
-                        value={formData.website}
-                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                        placeholder="https://"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="industry" className="text-sm font-medium mb-2 block">
-                        Industry *
-                      </label>
-                      <Input
-                        id="industry"
-                        value={formData.industry}
-                        onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                        required
-                        placeholder="e.g., Sports Equipment, Food & Beverage"
-                      />
-                    </div>
-                  </div>
-
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="description" className="text-sm font-medium mb-2 block">
-                      Company Description *
+                    <label htmlFor="businessName" className="text-sm font-medium mb-2 block">
+                      Business Name *
                     </label>
-                    <Textarea
-                      id="description"
-                      rows={4}
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    <Input
+                      id="businessName"
+                      value={formData.businessName}
+                      onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                       required
-                      placeholder="Tell us about your company and what you offer"
+                      placeholder="Your Business Name"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="goals" className="text-sm font-medium mb-2 block">
-                      Partnership Goals *
+                    <label htmlFor="adTitle" className="text-sm font-medium mb-2 block">
+                      Ad Title *
+                    </label>
+                    <Input
+                      id="adTitle"
+                      value={formData.adTitle}
+                      onChange={(e) => setFormData({ ...formData, adTitle: e.target.value })}
+                      required
+                      placeholder="Catchy title for your ad"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="adDescription" className="text-sm font-medium mb-2 block">
+                      Ad Description *
                     </label>
                     <Textarea
-                      id="goals"
+                      id="adDescription"
                       rows={4}
-                      value={formData.goals}
-                      onChange={(e) => setFormData({ ...formData, goals: e.target.value })}
+                      value={formData.adDescription}
+                      onChange={(e) => setFormData({ ...formData, adDescription: e.target.value })}
                       required
-                      placeholder="What are you hoping to achieve through this partnership?"
+                      placeholder="Describe your product or service"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="adImage" className="text-sm font-medium mb-2 block">
+                      Ad Image (Optional)
+                    </label>
+                    <Input
+                      id="adImage"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="cursor-pointer"
+                    />
+                    {imageFile && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Selected: {imageFile.name}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Max 5MB • JPG, PNG, GIF, WEBP
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="contactEmail" className="text-sm font-medium mb-2 block">
+                        Contact Email *
+                      </label>
+                      <Input
+                        id="contactEmail"
+                        type="email"
+                        value={formData.contactEmail}
+                        onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
+                        required
+                        placeholder="your@email.com"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="contactPhone" className="text-sm font-medium mb-2 block">
+                        Contact Phone
+                      </label>
+                      <Input
+                        id="contactPhone"
+                        type="tel"
+                        value={formData.contactPhone}
+                        onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
+                        placeholder="(123) 456-7890"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="websiteUrl" className="text-sm font-medium mb-2 block">
+                      Website URL
+                    </label>
+                    <Input
+                      id="websiteUrl"
+                      type="url"
+                      value={formData.websiteUrl}
+                      onChange={(e) => setFormData({ ...formData, websiteUrl: e.target.value })}
+                      placeholder="https://yourbusiness.com"
                     />
                   </div>
 
                   <div className="bg-muted p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2">Partnership Requirements:</h3>
-                    <ul className="text-sm space-y-1 text-muted-foreground">
-                      <li>• Established business with relevant products/services</li>
-                      <li>• Alignment with sports and entertainment values</li>
-                      <li>• Commitment to quality customer experience</li>
-                      <li>• Marketing budget for promotional activities</li>
+                    <h3 className="font-semibold mb-2 text-sm">Ad Review Process:</h3>
+                    <ul className="text-xs space-y-1 text-muted-foreground">
+                      <li>• Your ad will be reviewed within 3-5 business days</li>
+                      <li>• We'll contact you via email with approval status</li>
+                      <li>• Approved ads will appear in the Community section</li>
+                      <li>• All ads must comply with our content guidelines</li>
                     </ul>
                   </div>
 
                   <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Submitting Application..." : "Submit Partnership Request"}
+                    {isLoading ? (
+                      <>
+                        <UploadIcon className="w-4 h-4 mr-2 animate-pulse" />
+                        Submitting...
+                      </>
+                    ) : (
+                      "Submit Ad for Review"
+                    )}
                   </Button>
                 </form>
               </CardContent>

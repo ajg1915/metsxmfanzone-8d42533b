@@ -6,11 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Image as ImageIcon, Send, Trash2, Heart, Lock } from "lucide-react";
+import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import StoriesSection from "@/components/StoriesSection";
@@ -323,6 +323,27 @@ const Community = () => {
               <SocialShareButtons title="MetsXMFanZone Community" />
             </CardContent>
           </Card>
+
+          {user && (
+            <Card className="mb-6">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base sm:text-lg">Business Advertisement</CardTitle>
+                <CardDescription className="text-xs">
+                  Promote your business to the Mets fan community (requires admin approval)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={() => navigate("/business-partner")} 
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Megaphone className="w-4 h-4 mr-2" />
+                  Submit Business Ad
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="space-y-4">
             {posts.map((post) => (

@@ -26,6 +26,8 @@ import MetsNewsTrackerManagement from "./pages/admin/MetsNewsTrackerManagement";
 import FeedbackManagement from "./pages/admin/FeedbackManagement";
 import TVScheduleManagement from "./pages/admin/TVScheduleManagement";
 import NewsletterGenerator from "./pages/admin/NewsletterGenerator";
+import StreamReplayEditor from "./pages/admin/StreamReplayEditor";
+import BusinessAdsManagement from "./pages/admin/BusinessAdsManagement";
 import MetsXMFanZone from "./pages/MetsXMFanZone";
 import MLBNetwork from "./pages/MLBNetwork";
 import ESPNNetwork from "./pages/ESPNNetwork";
@@ -83,6 +85,7 @@ const App = () => (
             <Route path="videos" element={<VideoManagement />} />
             <Route path="podcasts" element={<PodcastManagement />} />
             <Route path="live-streams" element={<LiveStreamManagement />} />
+            <Route path="stream-replays" element={<StreamReplayEditor />} />
             <Route path="live-notifications" element={<LiveNotificationManagement />} />
             <Route path="stories" element={<StoriesManagement />} />
             <Route path="mets-news" element={<MetsNewsTrackerManagement />} />
@@ -90,9 +93,9 @@ const App = () => (
             <Route path="newsletter" element={<NewsletterGenerator />} />
             <Route path="feedbacks" element={<FeedbackManagement />} />
             <Route path="posts" element={<PostsManagement />} />
+            <Route path="business-ads" element={<BusinessAdsManagement />} />
             <Route path="roles" element={<UserRoles />} />
             <Route path="subscriptions" element={<SubscriptionManagement />} />
-            <Route path="settings" element={<AdminSettings />} />
           </Route>
           <Route path="/spring-training-live" element={<SpringTrainingLive />} />
           <Route path="/merch" element={<Merch />} />

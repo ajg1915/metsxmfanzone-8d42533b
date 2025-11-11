@@ -70,6 +70,57 @@ export type Database = {
           },
         ]
       }
+      business_ads: {
+        Row: {
+          ad_description: string
+          ad_image_url: string | null
+          ad_title: string
+          approved_by: string | null
+          business_name: string
+          contact_email: string
+          contact_phone: string | null
+          created_at: string
+          id: string
+          published_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          ad_description: string
+          ad_image_url?: string | null
+          ad_title: string
+          approved_by?: string | null
+          business_name: string
+          contact_email: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          ad_description?: string
+          ad_image_url?: string | null
+          ad_title?: string
+          approved_by?: string | null
+          business_name?: string
+          contact_email?: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       feedbacks: {
         Row: {
           content: string

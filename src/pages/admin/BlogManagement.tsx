@@ -339,135 +339,138 @@ export default function BlogManagement() {
               New Post
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{editingPost ? "Edit Post" : "Create New Post"}</DialogTitle>
-              <DialogDescription>
+          <DialogContent className="max-w-full sm:max-w-3xl max-h-[90vh] overflow-y-auto mx-3 sm:mx-0">
+            <DialogHeader className="pb-2">
+              <DialogTitle className="text-base sm:text-lg">{editingPost ? "Edit Post" : "Create New Post"}</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm">
                 {editingPost ? "Update your blog post" : "Create a new blog post"}
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="slug">Slug (URL)</Label>
-                <Input
-                  id="slug"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="Leave empty to auto-generate"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="tags">Tags (comma separated)</Label>
-                <Input
-                  id="tags"
-                  value={formData.tags}
-                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                  placeholder="sports, baseball, news"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="excerpt">Excerpt</Label>
-                <Textarea
-                  id="excerpt"
-                  value={formData.excerpt}
-                  onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                  rows={2}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="featured_image">Featured Image URL</Label>
-                <Input
-                  id="featured_image"
-                  value={formData.featured_image_url}
-                  onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
-                  placeholder="https://..."
-                  className="mt-2"
-                />
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="sm:col-span-2">
+                  <Label htmlFor="title" className="text-sm">Title</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    required
+                    className="text-sm"
+                  />
+                </div>
                 
-                <div className="mt-3">
-                  <Label htmlFor="image_upload" className="text-sm text-muted-foreground">Or Upload Image</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Input
-                      id="image_upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={uploadingImage}
-                      className="cursor-pointer"
-                    />
-                    {uploadingImage && (
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        <Upload className="w-3 h-3 inline mr-1 animate-pulse" />
-                        Uploading...
-                      </span>
-                    )}
+                <div>
+                  <Label htmlFor="slug" className="text-sm">Slug (URL)</Label>
+                  <Input
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    placeholder="Auto-generated"
+                    className="text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="category" className="text-sm">Category</Label>
+                  <Input
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    required
+                    className="text-sm"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <Label htmlFor="tags" className="text-sm">Tags (comma separated)</Label>
+                  <Input
+                    id="tags"
+                    value={formData.tags}
+                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                    placeholder="sports, baseball, news"
+                    className="text-sm"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <Label htmlFor="excerpt" className="text-sm">Excerpt</Label>
+                  <Textarea
+                    id="excerpt"
+                    value={formData.excerpt}
+                    onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                    rows={2}
+                    className="text-sm"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <Label htmlFor="featured_image" className="text-sm">Featured Image URL</Label>
+                  <Input
+                    id="featured_image"
+                    value={formData.featured_image_url}
+                    onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
+                    placeholder="https://..."
+                    className="mt-1 text-sm"
+                  />
+                  
+                  <div className="mt-2">
+                    <Label htmlFor="image_upload" className="text-xs text-muted-foreground">Or Upload</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Input
+                        id="image_upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                        className="cursor-pointer text-xs"
+                      />
+                      {uploadingImage && (
+                        <Upload className="w-3 h-3 animate-pulse" />
+                      )}
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Max 5MB • JPG, PNG, GIF, WEBP
-                  </p>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <Label htmlFor="content" className="text-sm">Content</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateContent}
+                      disabled={generatingContent || !formData.title}
+                      className="h-7 text-xs"
+                    >
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      {generatingContent ? "Generating..." : "Generate AI"}
+                    </Button>
+                  </div>
+                  <Textarea
+                    id="content"
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    rows={8}
+                    required
+                    className="text-sm font-mono"
+                  />
+                </div>
+
+                <div className="sm:col-span-2 flex items-center space-x-2 pt-2">
+                  <Switch
+                    id="published"
+                    checked={formData.published}
+                    onCheckedChange={(checked) => setFormData({ ...formData, published: checked })}
+                  />
+                  <Label htmlFor="published" className="text-sm">Published</Label>
                 </div>
               </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor="content">Content</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleGenerateContent}
-                    disabled={generatingContent || !formData.title}
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    {generatingContent ? "Generating..." : "Generate with AI"}
-                  </Button>
-                </div>
-                <Textarea
-                  id="content"
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  rows={10}
-                  required
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="published"
-                  checked={formData.published}
-                  onCheckedChange={(checked) => setFormData({ ...formData, published: checked })}
-                />
-                <Label htmlFor="published">Published</Label>
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">
                   Cancel
                 </Button>
-                <Button type="submit">
+                <Button type="submit" className="w-full sm:w-auto">
                   {editingPost ? "Update" : "Create"} Post
                 </Button>
               </div>

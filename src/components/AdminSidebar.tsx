@@ -1,4 +1,4 @@
-import { Home, FileText, Settings, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail } from "lucide-react";
+import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -22,11 +22,12 @@ const mediaItems = [
   { title: "Blog Management", url: "/admin/blog", icon: FileText },
   { title: "Video Management", url: "/admin/videos", icon: Video },
   { title: "Podcast Management", url: "/admin/podcasts", icon: Mic },
-  { title: "Newsletter Generator", url: "/admin/newsletter", icon: Mail },
+  { title: "Newsletter Editor", url: "/admin/newsletter", icon: Mail },
 ];
 
 const liveManagementItems = [
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
+  { title: "Stream Replays", url: "/admin/stream-replays", icon: PlaySquare },
   { title: "Live Notifications", url: "/admin/live-notifications", icon: Bell },
   { title: "Stories", url: "/admin/stories", icon: Image },
   { title: "Mets News Tracker", url: "/admin/mets-news", icon: TrendingUp },
@@ -36,9 +37,9 @@ const liveManagementItems = [
 const userItems = [
   { title: "Feedback", url: "/admin/feedbacks", icon: MessageSquare },
   { title: "Posts", url: "/admin/posts", icon: FileText },
+  { title: "Business Ads", url: "/admin/business-ads", icon: Megaphone },
   { title: "User Roles", url: "/admin/roles", icon: Shield },
   { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
-  { title: "Settings", url: "/admin/settings", icon: Settings },
 ];
 
 export function AdminSidebar() {
