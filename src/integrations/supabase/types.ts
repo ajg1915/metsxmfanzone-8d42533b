@@ -295,6 +295,36 @@ export type Database = {
         }
         Relationships: []
       }
+      podcast_live_stream: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_live: boolean
+          title: string
+          updated_at: string
+          vdo_ninja_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_live?: boolean
+          title?: string
+          updated_at?: string
+          vdo_ninja_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_live?: boolean
+          title?: string
+          updated_at?: string
+          vdo_ninja_url?: string | null
+        }
+        Relationships: []
+      }
       podcasts: {
         Row: {
           audio_url: string

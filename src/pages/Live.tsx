@@ -33,6 +33,14 @@ interface TVSchedule {
   is_live: boolean;
 }
 
+interface PodcastLiveStream {
+  id: string;
+  title: string;
+  description: string | null;
+  vdo_ninja_url: string | null;
+  is_live: boolean;
+}
+
 interface BlogPost {
   id: string;
   title: string;
@@ -48,14 +56,16 @@ const Live = () => {
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [tvSchedules, setTvSchedules] = useState<TVSchedule[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [podcastStream, setPodcastStream] = useState<PodcastLiveStream | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchStreams();
     fetchTVSchedules();
     fetchBlogPosts();
+    fetchPodcastStream();
 
-    // Set up realtime subscription
+    // Set up realtime subscription for live_streams
     const channel = supabase
       .channel('live-page-streams')
       .on(
@@ -72,8 +82,26 @@ const Live = () => {
       )
       .subscribe();
 
+    // Set up realtime subscription for podcast_live_stream
+    const podcastChannel = supabase
+      .channel('podcast-live-stream')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'podcast_live_stream'
+        },
+        () => {
+          console.log('Podcast stream updated, refetching...');
+          fetchPodcastStream();
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(podcastChannel);
     };
   }, []);
 
@@ -122,6 +150,21 @@ const Live = () => {
       setBlogPosts(data as BlogPost[] || []);
     } catch (error) {
       console.error("Error fetching blog posts:", error);
+    }
+  };
+
+  const fetchPodcastStream = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("podcast_live_stream")
+        .select("*")
+        .eq("is_live", true)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      setPodcastStream(data);
+    } catch (error) {
+      console.error("Error fetching podcast stream:", error);
     }
   };
 
@@ -190,6 +233,35 @@ const Live = () => {
               </Card>
             ) : (
               <div className="space-y-8 mb-12">
+                {/* Podcast Live Stream */}
+                {podcastStream && podcastStream.vdo_ninja_url && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-6">
+                      <Badge variant="destructive" className="animate-pulse">
+                        LIVE NOW
+                      </Badge>
+                      <h2 className="text-2xl font-bold text-primary">{podcastStream.title}</h2>
+                    </div>
+                    <Card className="border-2 border-primary">
+                      <CardContent className="p-0">
+                        <div className="aspect-video w-full">
+                          <iframe
+                            src={podcastStream.vdo_ninja_url}
+                            allow="camera;microphone;display-capture;autoplay;clipboard-write"
+                            className="w-full h-full rounded-lg"
+                            title={podcastStream.title}
+                          />
+                        </div>
+                        {podcastStream.description && (
+                          <div className="p-4">
+                            <p className="text-muted-foreground">{podcastStream.description}</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
                 {/* TV Guide Channels */}
                 <div>
                   <h2 className="text-2xl font-bold text-primary mb-6">Live Channels</h2>

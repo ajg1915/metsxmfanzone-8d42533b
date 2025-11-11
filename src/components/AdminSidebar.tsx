@@ -27,6 +27,7 @@ const mediaItems = [
 
 const liveManagementItems = [
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
+  { title: "Podcast Live Stream", url: "/admin/podcast-live-stream", icon: Mic },
   { title: "Stream Replays", url: "/admin/stream-replays", icon: PlaySquare },
   { title: "Live Notifications", url: "/admin/live-notifications", icon: Bell },
   { title: "Stories", url: "/admin/stories", icon: Image },
