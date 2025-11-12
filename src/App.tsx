@@ -19,6 +19,7 @@ import BlogManagement from "./pages/admin/BlogManagement";
 import VideoManagement from "./pages/admin/VideoManagement";
 import PodcastManagement from "./pages/admin/PodcastManagement";
 import PodcastLiveStreamManagement from "./pages/admin/PodcastLiveStreamManagement";
+import QRCodeGenerator from "./pages/admin/QRCodeGenerator";
 import LiveStreamManagement from "./pages/admin/LiveStreamManagement";
 import LiveNotificationManagement from "./pages/admin/LiveNotificationManagement";
 import SubscriptionManagement from "./pages/admin/SubscriptionManagement";
@@ -87,6 +88,7 @@ const App = () => (
             <Route path="blog" element={<BlogManagement />} />
             <Route path="videos" element={<VideoManagement />} />
             <Route path="podcasts" element={<PodcastManagement />} />
+            <Route path="qr-generator" element={<QRCodeGenerator />} />
             <Route path="live-streams" element={<LiveStreamManagement />} />
             <Route path="podcast-live-stream" element={<PodcastLiveStreamManagement />} />
             <Route path="stream-replays" element={<StreamReplayEditor />} />
