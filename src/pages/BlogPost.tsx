@@ -48,10 +48,16 @@ export default function BlogPost() {
 
       if (error) throw error;
       
-      // Ensure featured image URL is absolute for social sharing
-      if (data.featured_image_url && !data.featured_image_url.startsWith('http')) {
+      // Ensure featured_image_url is absolute for social sharing
+      if (data && data.featured_image_url) {
         // If it's a relative URL, make it absolute
-        data.featured_image_url = `${window.location.origin}${data.featured_image_url}`;
+        if (!data.featured_image_url.startsWith('http') && !data.featured_image_url.startsWith('data:')) {
+          data.featured_image_url = `${window.location.origin}${data.featured_image_url}`;
+        }
+        // If it's a Supabase storage URL without protocol, add https
+        if (data.featured_image_url.includes('supabase.co') && !data.featured_image_url.startsWith('http')) {
+          data.featured_image_url = `https://${data.featured_image_url}`;
+        }
       }
       
       setPost(data);
@@ -104,6 +110,11 @@ export default function BlogPost() {
   if (socialImage.startsWith('data:')) {
     console.warn('Blog post has base64 image which won\'t work for social sharing:', post.slug);
     socialImage = `${siteUrl}/logo-512.png`; // Fallback to site logo
+  }
+  
+  // Ensure absolute URL for social media
+  if (!socialImage.startsWith('http')) {
+    socialImage = `${siteUrl}${socialImage}`;
   }
   
   const socialTitle = `${post.title} | MetsXMFanZone`;
