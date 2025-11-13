@@ -3,16 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
- "scripts": {
-  "dev": "vite",
-  "build": "npm run build:client && npm run build:server && npm run prerender",
-  "build:client": "vite build --outDir dist/client",
-  "build:server": "vite build --config vite.config.ssr.ts",
-  "prerender": "node prerender.js",
-  "build:dev": "vite build --mode development",
-  "lint": "eslint .",
-  "preview": "vite preview"
-}
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run build:client && npm run build:server && npm run prerender",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "vite build --config vite.config.ssr.ts",
+    "prerender": "node prerender.js",
+    "build:dev": "vite build --mode development",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "@capacitor/android": "^7.4.4",
     "@capacitor/cli": "^7.4.4",
