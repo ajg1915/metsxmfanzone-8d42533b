@@ -14,70 +14,41 @@ export default function PodcastAIVoiceGenerator() {
   const [text, setText] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [selectedVoice, setSelectedVoice] = useState<string>("");
-  const [rate, setRate] = useState([1]);
-  const [pitch, setPitch] = useState([1]);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<string>("alloy");
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const openAIVoices = [
+    { id: "alloy", name: "Alloy", description: "Neutral and balanced" },
+    { id: "echo", name: "Echo", description: "Clear and authoritative" },
+    { id: "fable", name: "Fable", description: "Warm and engaging" },
+    { id: "onyx", name: "Onyx", description: "Deep and resonant" },
+    { id: "nova", name: "Nova", description: "Bright and energetic" },
+    { id: "shimmer", name: "Shimmer", description: "Soft and calming" },
+  ];
+
   useEffect(() => {
-    // Load available voices
-    const loadVoices = () => {
-      const availableVoices = window.speechSynthesis.getVoices();
-      setVoices(availableVoices);
-      if (availableVoices.length > 0 && !selectedVoice) {
-        setSelectedVoice(availableVoices[0].name);
+    return () => {
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
       }
     };
-
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-
-    return () => {
-      window.speechSynthesis.cancel();
-    };
-  }, [selectedVoice]);
+  }, [audioUrl]);
 
   const handlePreview = () => {
-    if (!text.trim()) {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play();
+    } else {
       toast({
-        title: "Error",
-        description: "Please enter some text to generate speech",
+        title: "No audio to preview",
+        description: "Generate audio first",
         variant: "destructive",
       });
-      return;
     }
-
-    if (isPlaying) {
-      window.speechSynthesis.cancel();
-      setIsPlaying(false);
-      return;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voice = voices.find(v => v.name === selectedVoice);
-    
-    if (voice) {
-      utterance.voice = voice;
-    }
-    utterance.rate = rate[0];
-    utterance.pitch = pitch[0];
-
-    utterance.onstart = () => setIsPlaying(true);
-    utterance.onend = () => setIsPlaying(false);
-    utterance.onerror = () => {
-      setIsPlaying(false);
-      toast({
-        title: "Error",
-        description: "Failed to generate speech",
-        variant: "destructive",
-      });
-    };
-
-    window.speechSynthesis.speak(utterance);
   };
 
   const handleGenerate = async () => {
@@ -90,62 +61,47 @@ export default function PodcastAIVoiceGenerator() {
       return;
     }
 
+    setIsGenerating(true);
+
     try {
-      // For browser-based TTS, we need to record the audio
-      // This is a limitation - we'll need to use MediaRecorder API
-      toast({
-        title: "Generating Audio",
-        description: "Recording speech synthesis...",
+      const { data, error } = await supabase.functions.invoke('generate-podcast-audio', {
+        body: { text, voice: selectedVoice }
       });
 
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      const chunks: BlobPart[] = [];
+      if (error) throw error;
 
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          chunks.push(e.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "audio/webm" });
-        setAudioBlob(blob);
-        stream.getTracks().forEach(track => track.stop());
-        
-        toast({
-          title: "Success",
-          description: "Audio generated successfully. You can now save it as a podcast.",
-        });
-      };
-
-      mediaRecorder.start();
-
-      // Generate speech
-      const utterance = new SpeechSynthesisUtterance(text);
-      const voice = voices.find(v => v.name === selectedVoice);
-      
-      if (voice) {
-        utterance.voice = voice;
+      // Convert base64 to blob
+      const base64Audio = data.audioContent;
+      const binaryString = atob(base64Audio);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
       }
-      utterance.rate = rate[0];
-      utterance.pitch = pitch[0];
+      const blob = new Blob([bytes], { type: "audio/mpeg" });
+      
+      setAudioBlob(blob);
+      
+      // Create URL for preview
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
+      const url = URL.createObjectURL(blob);
+      setAudioUrl(url);
 
-      utterance.onend = () => {
-        setTimeout(() => {
-          mediaRecorder.stop();
-        }, 500);
-      };
-
-      window.speechSynthesis.speak(utterance);
+      toast({
+        title: "Success",
+        description: "High-quality audio generated! You can preview and save it.",
+      });
 
     } catch (error) {
       console.error("Error generating audio:", error);
       toast({
         title: "Error",
-        description: "Failed to generate audio. Make sure microphone access is granted.",
+        description: "Failed to generate audio. Make sure OpenAI API key is configured.",
         variant: "destructive",
       });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -162,7 +118,7 @@ export default function PodcastAIVoiceGenerator() {
     const url = URL.createObjectURL(audioBlob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${title || "podcast"}.webm`;
+    a.download = `${title || "podcast"}.mp3`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -197,7 +153,7 @@ export default function PodcastAIVoiceGenerator() {
 
     try {
       // Upload audio to storage
-      const fileName = `podcast-${Date.now()}.webm`;
+      const fileName = `podcast-${Date.now()}.mp3`;
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("podcasts")
         .upload(fileName, audioBlob);
@@ -231,6 +187,10 @@ export default function PodcastAIVoiceGenerator() {
       setTitle("");
       setDescription("");
       setAudioBlob(null);
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
+      setAudioUrl(null);
 
     } catch (error) {
       console.error("Error saving podcast:", error);
@@ -298,10 +258,10 @@ export default function PodcastAIVoiceGenerator() {
           <CardHeader>
             <CardTitle>Voice Settings</CardTitle>
             <CardDescription>
-              Customize the voice characteristics (using browser TTS - free!)
+              High-quality AI voices powered by OpenAI
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="voice">Voice</Label>
               <Select value={selectedVoice} onValueChange={setSelectedVoice}>
@@ -309,35 +269,13 @@ export default function PodcastAIVoiceGenerator() {
                   <SelectValue placeholder="Select a voice" />
                 </SelectTrigger>
                 <SelectContent>
-                  {voices.map((voice) => (
-                    <SelectItem key={voice.name} value={voice.name}>
-                      {voice.name} ({voice.lang})
+                  {openAIVoices.map((voice) => (
+                    <SelectItem key={voice.id} value={voice.id}>
+                      {voice.name} - {voice.description}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Speed: {rate[0].toFixed(1)}x</Label>
-              <Slider
-                value={rate}
-                onValueChange={setRate}
-                min={0.5}
-                max={2}
-                step={0.1}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Pitch: {pitch[0].toFixed(1)}</Label>
-              <Slider
-                value={pitch}
-                onValueChange={setPitch}
-                min={0.5}
-                max={2}
-                step={0.1}
-              />
             </div>
           </CardContent>
         </Card>
@@ -351,27 +289,30 @@ export default function PodcastAIVoiceGenerator() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-wrap gap-3">
-              <Button onClick={handlePreview} variant="outline">
-                {isPlaying ? (
+              <Button 
+                onClick={handleGenerate} 
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
                   <>
-                    <Pause className="w-4 h-4 mr-2" />
-                    Stop Preview
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Generating...
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    Preview Voice
+                    Generate Audio
                   </>
                 )}
               </Button>
 
-              <Button onClick={handleGenerate} variant="outline">
-                <Download className="w-4 h-4 mr-2" />
-                Generate Audio
-              </Button>
-
               {audioBlob && (
                 <>
+                  <Button onClick={handlePreview} variant="outline">
+                    <Play className="w-4 h-4 mr-2" />
+                    Preview
+                  </Button>
+
                   <Button onClick={handleDownload} variant="outline">
                     <Download className="w-4 h-4 mr-2" />
                     Download
@@ -394,10 +335,15 @@ export default function PodcastAIVoiceGenerator() {
               )}
             </div>
 
-            <div className="p-4 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                <strong>Note:</strong> This uses your browser's built-in text-to-speech (completely free!). 
-                For higher quality voices, you can integrate with ElevenLabs or OpenAI TTS (requires API key).
+            {audioUrl && (
+              <div className="p-4 bg-muted rounded-lg">
+                <audio controls src={audioUrl} className="w-full" />
+              </div>
+            )}
+
+            <div className="p-4 bg-primary/10 rounded-lg">
+              <p className="text-sm">
+                <strong>Professional AI Voices:</strong> Using OpenAI's TTS-1 model for realistic, high-quality speech synthesis.
               </p>
             </div>
           </CardContent>
