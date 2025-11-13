@@ -16,9 +16,11 @@ export default function PodcastAIVoiceGenerator() {
   const [description, setDescription] = useState("");
   const [selectedVoice, setSelectedVoice] = useState<string>("alloy");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   const openAIVoices = [
@@ -35,19 +37,68 @@ export default function PodcastAIVoiceGenerator() {
       if (audioUrl) {
         URL.revokeObjectURL(audioUrl);
       }
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
     };
-  }, [audioUrl]);
+  }, [audioUrl, previewUrl]);
 
-  const handlePreview = () => {
-    if (audioUrl) {
-      const audio = new Audio(audioUrl);
-      audio.play();
-    } else {
+  const handlePreview = async () => {
+    if (!text.trim()) {
       toast({
-        title: "No audio to preview",
-        description: "Generate audio first",
+        title: "Error",
+        description: "Please enter some text to preview",
         variant: "destructive",
       });
+      return;
+    }
+
+    setIsPreviewing(true);
+
+    try {
+      // Use first 150 characters or a sample text for preview
+      const previewText = text.length > 150 ? text.substring(0, 150) + "..." : text;
+      
+      const { data, error } = await supabase.functions.invoke('generate-podcast-audio', {
+        body: { text: previewText, voice: selectedVoice }
+      });
+
+      if (error) throw error;
+
+      // Convert base64 to blob
+      const base64Audio = data.audioContent;
+      const binaryString = atob(base64Audio);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: "audio/mpeg" });
+      
+      // Create URL for preview
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      const url = URL.createObjectURL(blob);
+      setPreviewUrl(url);
+
+      // Auto-play preview
+      const audio = new Audio(url);
+      audio.play();
+
+      toast({
+        title: "Preview Ready",
+        description: "Playing voice sample",
+      });
+
+    } catch (error) {
+      console.error("Error generating preview:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate preview",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPreviewing(false);
     }
   };
 
@@ -290,8 +341,26 @@ export default function PodcastAIVoiceGenerator() {
           <CardContent className="space-y-4">
             <div className="flex flex-wrap gap-3">
               <Button 
+                onClick={handlePreview} 
+                disabled={isPreviewing || isGenerating}
+                variant="outline"
+              >
+                {isPreviewing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Loading Preview...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 mr-2" />
+                    Preview Voice
+                  </>
+                )}
+              </Button>
+
+              <Button 
                 onClick={handleGenerate} 
-                disabled={isGenerating}
+                disabled={isGenerating || isPreviewing}
               >
                 {isGenerating ? (
                   <>
@@ -301,7 +370,7 @@ export default function PodcastAIVoiceGenerator() {
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    Generate Audio
+                    Generate Full Audio
                   </>
                 )}
               </Button>
