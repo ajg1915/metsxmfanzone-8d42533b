@@ -101,6 +101,9 @@ serve(async (req) => {
   <title>${socialTitle}</title>
   <meta name="description" content="${socialDescription}">
   
+  <!-- Facebook App ID -->
+  <meta property="fb:app_id" content="1151558476948104">
+  
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="article">
   <meta property="og:url" content="${postUrl}">
