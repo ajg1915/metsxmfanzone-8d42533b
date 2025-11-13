@@ -22,6 +22,7 @@ const mediaItems = [
   { title: "Blog Management", url: "/admin/blog", icon: FileText },
   { title: "Video Management", url: "/admin/videos", icon: Video },
   { title: "Podcast Management", url: "/admin/podcasts", icon: Mic },
+  { title: "AI Voice Generator", url: "/admin/podcast-ai", icon: Mic },
   { title: "Newsletter Editor", url: "/admin/newsletter", icon: Mail },
   { title: "QR Code Generator", url: "/admin/qr-generator", icon: QrCode },
 ];
