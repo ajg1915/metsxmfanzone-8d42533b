@@ -21,9 +21,11 @@ const Dashboard = () => {
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const [subscriptionEndDate, setSubscriptionEndDate] = useState<Date | null>(null);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState(false);
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string>("active");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -48,6 +50,7 @@ const Dashboard = () => {
 
         if (!subError && subData) {
           setUserPlan(subData.plan_type as "free" | "premium" | "annual");
+          setSubscriptionStatus(subData.status);
           if (subData.end_date) {
             setSubscriptionEndDate(new Date(subData.end_date));
           }
@@ -258,13 +261,66 @@ const Dashboard = () => {
                           {subscriptionEndDate ? subscriptionEndDate.toLocaleDateString() : 'N/A'}
                         </span>
                       </div>
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => navigate("/plans")}
-                      >
-                        Manage Subscription
-                      </Button>
+                      <Dialog open={subscriptionDialogOpen} onOpenChange={setSubscriptionDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="w-full">
+                            Manage Subscription
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Subscription Details</DialogTitle>
+                            <DialogDescription>
+                              Manage your subscription and billing
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label>Current Plan</Label>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="default">
+                                  {userPlan.toUpperCase()}
+                                </Badge>
+                                <span className="text-foreground font-semibold">
+                                  {userPlan === "premium" ? "$12.99/mo" : "$129.99/yr"}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Status</Label>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={subscriptionStatus === "active" ? "default" : "secondary"}>
+                                  {subscriptionStatus.toUpperCase()}
+                                </Badge>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Next Billing Date</Label>
+                              <p className="text-foreground">
+                                {subscriptionEndDate ? subscriptionEndDate.toLocaleDateString() : 'N/A'}
+                              </p>
+                            </div>
+                            <div className="pt-4 space-y-2">
+                              <Button 
+                                className="w-full"
+                                onClick={() => {
+                                  setSubscriptionDialogOpen(false);
+                                  navigate("/plans");
+                                }}
+                              >
+                                Change Plan
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                className="w-full"
+                                onClick={() => setSubscriptionDialogOpen(false)}
+                              >
+                                Close
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   )}
                 </CardContent>
