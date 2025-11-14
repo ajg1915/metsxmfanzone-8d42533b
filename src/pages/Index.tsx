@@ -28,7 +28,6 @@ const Index = () => {
       <main className="pt-12 sm:pt-14">
         <Hero />
         <LiveNotificationBar />
-        <AppInstallSection />
         <LiveNetworks />
         <LiveStreamsSection />
         <SpringTraining />
@@ -38,6 +37,7 @@ const Index = () => {
         <FAQSection />
         <FeedbackSection />
         <NewsletterSection />
+        <AppInstallSection />
       </main>
       <Footer />
       <InstallPrompt />
