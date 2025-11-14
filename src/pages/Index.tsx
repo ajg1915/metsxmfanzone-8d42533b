@@ -13,6 +13,7 @@ import FeedbackSection from "@/components/FeedbackSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
+import AppInstallSection from "@/components/AppInstallSection";
 
 const Index = () => {
   return (
@@ -27,6 +28,7 @@ const Index = () => {
       <main className="pt-12 sm:pt-14">
         <Hero />
         <LiveNotificationBar />
+        <AppInstallSection />
         <LiveNetworks />
         <LiveStreamsSection />
         <SpringTraining />
