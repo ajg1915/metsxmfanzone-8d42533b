@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Tag, ArrowLeft, Lock } from "lucide-react";
+import { Calendar, Tag, ArrowLeft } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
@@ -25,11 +24,8 @@ interface BlogPost {
 export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
-  
-  const isLoggedIn = !!user;
 
   useEffect(() => {
     if (slug) {
@@ -68,7 +64,7 @@ export default function BlogPost() {
     }
   };
 
-  if (loading || authLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
         <Navigation />
@@ -230,26 +226,11 @@ export default function BlogPost() {
               )}
             </header>
 
-            {!isLoggedIn ? (
-              <Card className="border-2 border-primary">
-                <CardContent className="py-12 text-center">
-                  <Lock className="w-16 h-16 mx-auto mb-4 text-primary" />
-                  <h3 className="text-2xl font-bold mb-2">Account Required</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Sign up for free to read full blog posts and access exclusive content
-                  </p>
-                  <Button size="lg" onClick={() => navigate("/auth?mode=signup")}>
-                    Sign Up Free
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardContent className="prose prose-lg max-w-none dark:prose-invert py-8">
-                  <div className="whitespace-pre-wrap">{post.content}</div>
-                </CardContent>
-              </Card>
-            )}
+            <Card>
+              <CardContent className="prose prose-lg max-w-none dark:prose-invert py-8">
+                <div className="whitespace-pre-wrap">{post.content}</div>
+              </CardContent>
+            </Card>
 
             <div className="mt-8">
               <Card>
