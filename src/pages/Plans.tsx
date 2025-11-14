@@ -79,7 +79,7 @@ const Plans = () => {
         "Limited highlights access",
         "Community forum access",
         "Game schedules",
-        "News updates",
+        "Free Spring Training Live",
       ],
       notIncluded: [
         "Live streaming",
