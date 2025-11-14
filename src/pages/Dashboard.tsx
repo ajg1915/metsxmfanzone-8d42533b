@@ -8,13 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User, CreditCard, Calendar, ArrowUpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [userPlan, setUserPlan] = useState<"free" | "premium" | "annual">("free");
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const [subscriptionEndDate, setSubscriptionEndDate] = useState<Date | null>(null);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -23,11 +32,12 @@ const Dashboard = () => {
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    const fetchSubscription = async () => {
+    const fetchUserData = async () => {
       if (!user) return;
       
       try {
-        const { data, error } = await supabase
+        // Fetch subscription
+        const { data: subData, error: subError } = await supabase
           .from('subscriptions')
           .select('*')
           .eq('user_id', user.id)
@@ -36,21 +46,65 @@ const Dashboard = () => {
           .limit(1)
           .single();
 
-        if (!error && data) {
-          setUserPlan(data.plan_type as "free" | "premium" | "annual");
-          if (data.end_date) {
-            setSubscriptionEndDate(new Date(data.end_date));
+        if (!subError && subData) {
+          setUserPlan(subData.plan_type as "free" | "premium" | "annual");
+          if (subData.end_date) {
+            setSubscriptionEndDate(new Date(subData.end_date));
           }
         }
+
+        // Fetch profile
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('id', user.id)
+          .single();
+
+        if (!profileError && profileData) {
+          setFullName(profileData.full_name || "");
+          setAvatarUrl(profileData.avatar_url || "");
+        }
       } catch (error) {
-        console.error('Error fetching subscription:', error);
+        console.error('Error fetching user data:', error);
       } finally {
         setSubscriptionLoading(false);
       }
     };
 
-    fetchSubscription();
+    fetchUserData();
   }, [user]);
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    
+    setSavingProfile(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          full_name: fullName,
+          avatar_url: avatarUrl 
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been updated successfully.",
+      });
+      setProfileDialogOpen(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -93,15 +147,68 @@ const Dashboard = () => {
                     <p className="text-sm text-muted-foreground">Email</p>
                     <p className="text-foreground">{user.email}</p>
                   </div>
+                  {fullName && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Full Name</p>
+                      <p className="text-foreground">{fullName}</p>
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm text-muted-foreground">Member Since</p>
                     <p className="text-foreground">
                       {new Date(user.created_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <Button variant="outline" className="w-full">
-                    Edit Profile
-                  </Button>
+                  <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        Edit Profile
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Profile</DialogTitle>
+                        <DialogDescription>
+                          Update your profile information below.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="fullName">Full Name</Label>
+                          <Input
+                            id="fullName"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            placeholder="Enter your full name"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="avatarUrl">Avatar URL</Label>
+                          <Input
+                            id="avatarUrl"
+                            value={avatarUrl}
+                            onChange={(e) => setAvatarUrl(e.target.value)}
+                            placeholder="https://example.com/avatar.jpg"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setProfileDialogOpen(false)}
+                          disabled={savingProfile}
+                        >
+                          Cancel
+                        </Button>
+                        <Button 
+                          onClick={handleSaveProfile}
+                          disabled={savingProfile}
+                        >
+                          {savingProfile ? "Saving..." : "Save Changes"}
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
 
