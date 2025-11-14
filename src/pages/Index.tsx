@@ -36,8 +36,8 @@ const Index = () => {
         <PodcastSection />
         <FAQSection />
         <FeedbackSection />
-        <NewsletterSection />
         <AppInstallSection />
+        <NewsletterSection />
       </main>
       <Footer />
       <InstallPrompt />
