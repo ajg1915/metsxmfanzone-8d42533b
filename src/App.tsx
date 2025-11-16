@@ -9,6 +9,7 @@ import Community from "./pages/Community";
 import Gallery from "./pages/Gallery";
 import Plans from "./pages/Plans";
 import Auth from "./pages/Auth";
+import ConfirmAccount from "./pages/ConfirmAccount";
 import AdminSetup from "./pages/AdminSetup";
 import { AdminLayout } from "./components/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -69,6 +70,7 @@ const App = () => (
         <Route path="/plans" element={<Plans />} />
         <Route path="/paypal-success" element={<PayPalSuccess />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/confirm-account" element={<ConfirmAccount />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />

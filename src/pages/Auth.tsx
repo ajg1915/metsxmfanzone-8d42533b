@@ -107,9 +107,9 @@ const Auth = () => {
       if (data.user) {
         toast({
           title: "Success!",
-          description: "Account created successfully. You're now logged in!",
+          description: "Please check your email to confirm your account.",
         });
-        navigate("/dashboard");
+        navigate(`/confirm-account?email=${encodeURIComponent(validated.email)}`);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
