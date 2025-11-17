@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Edit, Eye, EyeOff, Image as ImageIcon, Video } from "lucide-react";
+import { Plus, Trash2, Edit, Eye, EyeOff, Image as ImageIcon, Video, Sparkles, Upload } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
@@ -48,6 +48,12 @@ const StoriesManagement = () => {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [videoFrames, setVideoFrames] = useState<string[]>([]);
   const [selectedFrameIndex, setSelectedFrameIndex] = useState<number>(0);
+
+  // AI Video Generation states
+  const [aiImageFile, setAiImageFile] = useState<File | null>(null);
+  const [aiImagePreview, setAiImagePreview] = useState<string | null>(null);
+  const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState<string>("");
 
   useEffect(() => {
     fetchStories();
@@ -342,6 +348,133 @@ const StoriesManagement = () => {
     setEditingStory(null);
   };
 
+  const handleAiImageChange = (file: File | null) => {
+    setAiImageFile(file);
+    if (aiImagePreview) {
+      URL.revokeObjectURL(aiImagePreview);
+    }
+    if (file) {
+      setAiImagePreview(URL.createObjectURL(file));
+    } else {
+      setAiImagePreview(null);
+    }
+  };
+
+  const handleGenerateVideo = async () => {
+    if (!aiImageFile) {
+      toast({
+        title: "Error",
+        description: "Please select an image first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingVideo(true);
+    setGenerationProgress("Uploading image...");
+
+    try {
+      // Upload image to Supabase storage first
+      const fileExt = aiImageFile.name.split(".").pop();
+      const fileName = `ai_input_${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("stories")
+        .upload(fileName, aiImageFile);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from("stories")
+        .getPublicUrl(fileName);
+
+      setGenerationProgress("Starting AI video generation...");
+
+      // Call edge function to start video generation
+      const { data: startData, error: startError } = await supabase.functions.invoke(
+        "generate-video",
+        {
+          body: { imageUrl: publicUrl },
+        }
+      );
+
+      if (startError) throw startError;
+
+      const predictionId = startData.id;
+      setGenerationProgress("Processing video... This may take 1-2 minutes");
+
+      // Poll for completion
+      let attempts = 0;
+      const maxAttempts = 60; // 5 minutes max
+      
+      while (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+        
+        const { data: statusData, error: statusError } = await supabase.functions.invoke(
+          "generate-video",
+          {
+            body: { predictionId },
+          }
+        );
+
+        if (statusError) throw statusError;
+
+        if (statusData.status === "succeeded") {
+          setGenerationProgress("Downloading video...");
+          
+          // Download the generated video
+          const videoUrl = statusData.output[0];
+          const videoResponse = await fetch(videoUrl);
+          const videoBlob = await videoResponse.blob();
+          
+          // Upload to Supabase storage
+          const videoFileName = `ai_generated_${Date.now()}.mp4`;
+          const { error: videoUploadError } = await supabase.storage
+            .from("stories")
+            .upload(videoFileName, videoBlob);
+
+          if (videoUploadError) throw videoUploadError;
+
+          toast({
+            title: "Success!",
+            description: "AI video generated successfully! You can now add it as a story.",
+          });
+
+          // Clean up
+          setAiImageFile(null);
+          if (aiImagePreview) URL.revokeObjectURL(aiImagePreview);
+          setAiImagePreview(null);
+          setGenerationProgress("");
+          
+          // Refresh stories to show the new option
+          await fetchStories();
+          break;
+        } else if (statusData.status === "failed") {
+          throw new Error("Video generation failed");
+        }
+        
+        attempts++;
+        setGenerationProgress(`Processing video... ${Math.min(Math.round((attempts / maxAttempts) * 100), 95)}%`);
+      }
+
+      if (attempts >= maxAttempts) {
+        throw new Error("Video generation timed out");
+      }
+
+    } catch (error) {
+      console.error("Error generating video:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate video",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingVideo(false);
+      setGenerationProgress("");
+    }
+  };
+
   return (
     <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -454,6 +587,72 @@ const StoriesManagement = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* AI Video Generator Section */}
+      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-primary" />
+            AI Video Generator
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Transform your images into animated videos using AI. Upload an image and let AI bring it to life!
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 space-y-3">
+              <Label htmlFor="ai-image">Upload Image</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="ai-image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleAiImageChange(e.target.files?.[0] || null)}
+                  disabled={isGeneratingVideo}
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleGenerateVideo}
+                  disabled={!aiImageFile || isGeneratingVideo}
+                  className="min-w-[140px]"
+                >
+                  {isGeneratingVideo ? (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Generate Video
+                    </>
+                  )}
+                </Button>
+              </div>
+              {generationProgress && (
+                <p className="text-sm text-primary animate-pulse">
+                  {generationProgress}
+                </p>
+              )}
+            </div>
+            
+            {aiImagePreview && (
+              <div className="w-full sm:w-48">
+                <Label>Preview</Label>
+                <div className="mt-2 rounded-lg overflow-hidden border-2 border-border">
+                  <img
+                    src={aiImagePreview}
+                    alt="AI input preview"
+                    className="w-full h-32 object-cover"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {loading ? (
         <div className="text-center py-8">Loading stories...</div>
