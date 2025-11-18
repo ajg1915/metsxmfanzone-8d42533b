@@ -15,13 +15,13 @@ const PayPalSuccess = () => {
 
   useEffect(() => {
     const verifyPayment = async () => {
-      const checkoutToken = searchParams.get('session_id') || searchParams.get('token');
+      const orderId = searchParams.get('token');
       
-      if (!checkoutToken) {
+      if (!orderId) {
         setStatus('error');
         toast({
           title: "Error",
-          description: "Invalid payment token",
+          description: "Invalid payment session",
           variant: "destructive",
         });
         setTimeout(() => navigate('/plans'), 3000);
@@ -29,8 +29,8 @@ const PayPalSuccess = () => {
       }
 
       try {
-        const { data, error } = await supabase.functions.invoke('verify-helcim-payment', {
-          body: { checkoutToken },
+        const { data, error } = await supabase.functions.invoke('verify-paypal-payment', {
+          body: { orderId },
         });
 
         if (error) throw error;
@@ -41,9 +41,6 @@ const PayPalSuccess = () => {
             title: "Payment Successful!",
             description: "Your subscription has been activated.",
           });
-          // Clear stored tokens
-          sessionStorage.removeItem('helcim_checkout_token');
-          sessionStorage.removeItem('helcim_secret_token');
           setTimeout(() => navigate('/dashboard'), 2000);
         } else {
           setStatus('error');
