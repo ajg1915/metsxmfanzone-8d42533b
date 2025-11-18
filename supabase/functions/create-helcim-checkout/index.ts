@@ -66,7 +66,7 @@ serve(async (req) => {
     if (!checkoutResponse.ok) {
       const errorText = await checkoutResponse.text();
       console.error("Helcim API error:", errorText);
-      throw new Error(`Helcim API error: ${checkoutResponse.status}`);
+      throw new Error(`Helcim API error: ${checkoutResponse.status} - ${errorText}`);
     }
 
     const checkoutData = await checkoutResponse.json();
