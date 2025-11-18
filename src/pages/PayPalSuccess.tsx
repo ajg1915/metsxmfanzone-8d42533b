@@ -15,9 +15,9 @@ const PayPalSuccess = () => {
 
   useEffect(() => {
     const verifyPayment = async () => {
-      const token = searchParams.get('token');
+      const checkoutId = searchParams.get('session_id') || searchParams.get('token');
       
-      if (!token) {
+      if (!checkoutId) {
         setStatus('error');
         toast({
           title: "Error",
@@ -29,8 +29,8 @@ const PayPalSuccess = () => {
       }
 
       try {
-        const { data, error } = await supabase.functions.invoke('verify-paypal-payment', {
-          body: { orderId: token },
+        const { data, error } = await supabase.functions.invoke('verify-helcim-payment', {
+          body: { checkoutId },
         });
 
         if (error) throw error;

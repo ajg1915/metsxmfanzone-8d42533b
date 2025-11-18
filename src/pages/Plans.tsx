@@ -31,13 +31,13 @@ const Plans = () => {
     }
 
     try {
-      console.log('Calling create-paypal-order edge function...');
+      console.log('Calling create-helcim-checkout edge function...');
       toast({
         title: "Processing...",
         description: "Creating your payment session",
       });
 
-      const { data, error } = await supabase.functions.invoke('create-paypal-order', {
+      const { data, error } = await supabase.functions.invoke('create-helcim-checkout', {
         body: { planType },
       });
 
@@ -48,11 +48,11 @@ const Plans = () => {
         throw error;
       }
 
-      if (data?.approvalUrl) {
-        console.log('Redirecting to PayPal:', data.approvalUrl);
-        window.location.href = data.approvalUrl;
+      if (data?.checkoutUrl) {
+        console.log('Redirecting to Helcim:', data.checkoutUrl);
+        window.location.href = data.checkoutUrl;
       } else {
-        console.error('No approval URL returned:', data);
+        console.error('No checkout URL returned:', data);
         toast({
           title: "Error",
           description: "Failed to get payment URL. Please try again.",
@@ -60,7 +60,7 @@ const Plans = () => {
         });
       }
     } catch (error) {
-      console.error('Error creating PayPal order:', error);
+      console.error('Error creating Helcim checkout:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to initiate payment. Please try again.",
