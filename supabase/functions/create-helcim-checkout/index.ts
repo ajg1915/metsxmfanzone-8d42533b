@@ -49,24 +49,17 @@ serve(async (req) => {
     }
 
     // Create Helcim checkout session
-    const checkoutResponse = await fetch("https://api.helcim.com/v2/payment/checkout", {
+    const checkoutResponse = await fetch("https://api.helcim.com/v2/helcim-pay/initialize", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "accept": "application/json",
         "api-token": helcimApiToken,
+        "content-type": "application/json",
       },
       body: JSON.stringify({
         paymentType: "purchase",
         amount: amount,
         currency: "USD",
-        customerCode: user.id,
-        invoiceNumber: `SUB-${Date.now()}`,
-        taxAmount: 0,
-        description: `MetsXMFanZone ${planType} subscription`,
-        allowPartial: 0,
-        checkoutOptions: {
-          redirectUrl: `${req.headers.get("origin")}/paypal-success`,
-        },
       }),
     });
 
@@ -78,6 +71,11 @@ serve(async (req) => {
 
     const checkoutData = await checkoutResponse.json();
     console.log("Helcim checkout created:", checkoutData);
+
+    // HelcimPay.js returns checkoutToken and secretToken, not a redirect URL
+    if (!checkoutData.checkoutToken) {
+      throw new Error("Failed to get checkout token from Helcim");
+    }
 
     // Create pending subscription in database
     const { data: subscription, error: dbError } = await supabase
@@ -101,7 +99,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         checkoutToken: checkoutData.checkoutToken,
-        checkoutUrl: checkoutData.checkoutUrl,
+        secretToken: checkoutData.secretToken,
         subscriptionId: subscription.id,
       }),
       {
