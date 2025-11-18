@@ -15,6 +15,12 @@ verify_jwt = true
 [functions.paypal-webhook]
 verify_jwt = false
 
+[functions.create-helcim-checkout]
+verify_jwt = true
+
+[functions.verify-helcim-payment]
+verify_jwt = true
+
 [functions.generate-podcast-audio]
 verify_jwt = true
 

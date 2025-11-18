@@ -15,6 +15,51 @@ const PayPalSuccess = () => {
 
   useEffect(() => {
     const verifyPayment = async () => {
+      // Check for Helcim checkout token first
+      const checkoutToken = sessionStorage.getItem('helcim_checkout_token');
+      
+      if (checkoutToken) {
+        // Helcim payment flow
+        try {
+          const { data, error } = await supabase.functions.invoke('verify-helcim-payment', {
+            body: { checkoutToken },
+          });
+
+          if (error) throw error;
+
+          // Clear the checkout token
+          sessionStorage.removeItem('helcim_checkout_token');
+
+          if (data.success) {
+            setStatus('success');
+            toast({
+              title: "Payment Successful!",
+              description: "Your subscription has been activated.",
+            });
+            setTimeout(() => navigate('/dashboard'), 2000);
+          } else {
+            setStatus('error');
+            toast({
+              title: "Payment Failed",
+              description: "There was an issue processing your payment.",
+              variant: "destructive",
+            });
+            setTimeout(() => navigate('/plans'), 3000);
+          }
+        } catch (error) {
+          console.error('Error verifying Helcim payment:', error);
+          setStatus('error');
+          toast({
+            title: "Error",
+            description: "Failed to verify payment. Please contact support.",
+            variant: "destructive",
+          });
+          setTimeout(() => navigate('/plans'), 3000);
+        }
+        return;
+      }
+
+      // Fallback to PayPal flow for backward compatibility
       const token = searchParams.get('token');
       
       if (!token) {
