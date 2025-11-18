@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 interface Story {
   id: string;
   title: string;
@@ -17,6 +18,15 @@ const StoriesSection = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 300;
+      const newScrollLeft = scrollContainerRef.current.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
+      scrollContainerRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+    }
+  };
   useEffect(() => {
     fetchStories();
   }, []);
@@ -68,7 +78,24 @@ const StoriesSection = () => {
       <section className="py-6 sm:py-8">
         <div className="container mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">MetsXMFanZone Stories</h2>
-          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+              onClick={() => scroll('left')}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+              onClick={() => scroll('right')}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          <div ref={scrollContainerRef} className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide">
             {stories.map(story => {
               const handleClick = () => {
                 if (story.link_url) {
@@ -105,6 +132,7 @@ const StoriesSection = () => {
                 </Card>
               );
             })}
+          </div>
           </div>
         </div>
       </section>
