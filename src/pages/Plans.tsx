@@ -112,7 +112,7 @@ const Plans = () => {
       popular: true,
     },
     {
-      name: "AnnualMembership,
+      name: "Annual Membership",
       price: "$129.99",
       period: "per year",
       description: "Best value - Save 2 months",
