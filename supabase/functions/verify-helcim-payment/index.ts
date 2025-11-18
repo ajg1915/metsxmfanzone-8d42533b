@@ -13,6 +13,8 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get('Authorization');
+    console.log('Auth header received:', authHeader ? 'present' : 'missing');
+    
     if (!authHeader) {
       throw new Error('No authorization header');
     }
@@ -24,8 +26,11 @@ serve(async (req) => {
     });
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
+    console.log('getUser result:', { user: user?.id, error: userError?.message });
+    
     if (userError || !user) {
-      throw new Error('Unauthorized');
+      console.error('Auth error:', userError);
+      throw new Error(`Unauthorized: ${userError?.message || 'No user found'}`);
     }
 
     const { checkoutId } = await req.json();
