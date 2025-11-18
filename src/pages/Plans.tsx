@@ -10,6 +10,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
+// Declare Helcim global function
+declare global {
+  interface Window {
+    appendHelcimPayIframe: (checkoutToken: string) => void;
+  }
+}
+
 const Plans = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -48,16 +55,31 @@ const Plans = () => {
         throw error;
       }
 
-      if (data?.checkoutUrl) {
-        console.log('Redirecting to Helcim:', data.checkoutUrl);
-        // Store checkout token for verification
+      if (data?.checkoutToken) {
+        console.log('Loading Helcim payment modal with token:', data.checkoutToken);
+        
+        // Load HelcimPay.js script if not already loaded
+        if (!window.appendHelcimPayIframe) {
+          const script = document.createElement('script');
+          script.src = 'https://myhelcim.com/js/version2/helcim-pay.js';
+          script.onload = () => {
+            // Render Helcim payment modal
+            window.appendHelcimPayIframe(data.checkoutToken);
+          };
+          document.head.appendChild(script);
+        } else {
+          // Script already loaded, just render the modal
+          window.appendHelcimPayIframe(data.checkoutToken);
+        }
+        
+        // Store tokens for verification
         sessionStorage.setItem('helcim_checkout_token', data.checkoutToken);
-        window.location.href = data.checkoutUrl;
+        sessionStorage.setItem('helcim_secret_token', data.secretToken);
       } else {
-        console.error('No checkout URL returned:', data);
+        console.error('No checkout token returned:', data);
         toast({
           title: "Error",
-          description: "Failed to get payment URL. Please try again.",
+          description: "Failed to initialize payment. Please try again.",
           variant: "destructive",
         });
       }
