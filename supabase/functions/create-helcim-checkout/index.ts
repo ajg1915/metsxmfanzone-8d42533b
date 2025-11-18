@@ -48,27 +48,21 @@ serve(async (req) => {
     
     // Create Helcim checkout session
     const helcimApiToken = Deno.env.get('HELCIM_API_TOKEN');
-    const helcimAccountId = Deno.env.get('HELCIM_ACCOUNT_ID');
     
-    if (!helcimApiToken || !helcimAccountId) {
+    if (!helcimApiToken) {
       throw new Error('Helcim credentials not configured');
     }
 
-    const helcimResponse = await fetch('https://api.helcim.com/v2/payment/checkout', {
+    const helcimResponse = await fetch('https://api.helcim.com/v2/helcim-pay/initialize', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'api-token': helcimApiToken,
       },
       body: JSON.stringify({
-        accountId: helcimAccountId,
+        paymentType: 'purchase',
         amount: amount,
         currency: 'USD',
-        description: `${planType === 'premium' ? 'Premium Monthly' : 'Premium Annual'} Subscription`,
-        customerCode: user.id,
-        invoiceNumber: `SUB-${user.id}-${Date.now()}`,
-        successUrl: `${req.headers.get('origin')}/paypal-success?session_id={CHECKOUT_ID}`,
-        cancelUrl: `${req.headers.get('origin')}/plans`,
       }),
     });
 
@@ -79,6 +73,7 @@ serve(async (req) => {
     }
 
     const helcimData = await helcimResponse.json();
+    console.log('Helcim response:', helcimData);
     
     // Store pending subscription
     const { error: insertError } = await supabase
@@ -89,7 +84,7 @@ serve(async (req) => {
         status: 'pending',
         amount: amount,
         currency: 'USD',
-        paypal_order_id: helcimData.checkoutId, // Reusing this field for Helcim checkout ID
+        paypal_order_id: helcimData.checkoutToken, // Reusing this field for Helcim checkout token
       });
 
     if (insertError) {
@@ -99,8 +94,8 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        checkoutId: helcimData.checkoutId,
-        checkoutUrl: helcimData.checkoutUrl,
+        checkoutToken: helcimData.checkoutToken,
+        secretToken: helcimData.secretToken,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

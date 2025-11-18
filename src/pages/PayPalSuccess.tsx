@@ -15,9 +15,9 @@ const PayPalSuccess = () => {
 
   useEffect(() => {
     const verifyPayment = async () => {
-      const checkoutId = searchParams.get('session_id') || searchParams.get('token');
+      const checkoutToken = searchParams.get('session_id') || searchParams.get('token');
       
-      if (!checkoutId) {
+      if (!checkoutToken) {
         setStatus('error');
         toast({
           title: "Error",
@@ -30,7 +30,7 @@ const PayPalSuccess = () => {
 
       try {
         const { data, error } = await supabase.functions.invoke('verify-helcim-payment', {
-          body: { checkoutId },
+          body: { checkoutToken },
         });
 
         if (error) throw error;
@@ -41,6 +41,9 @@ const PayPalSuccess = () => {
             title: "Payment Successful!",
             description: "Your subscription has been activated.",
           });
+          // Clear stored tokens
+          sessionStorage.removeItem('helcim_checkout_token');
+          sessionStorage.removeItem('helcim_secret_token');
           setTimeout(() => navigate('/dashboard'), 2000);
         } else {
           setStatus('error');
