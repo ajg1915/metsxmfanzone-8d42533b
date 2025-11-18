@@ -16,11 +16,7 @@ const Plans = () => {
   const { user } = useAuth();
 
   const handleSubscribe = async (planType: string) => {
-    console.log('handleSubscribe called with planType:', planType);
-    console.log('User:', user);
-    
     if (!user) {
-      console.log('No user found, redirecting to auth');
       toast({
         title: "Authentication Required",
         description: "Please sign in to subscribe",
@@ -31,39 +27,29 @@ const Plans = () => {
     }
 
     try {
-      console.log('Calling create-helcim-checkout edge function...');
       toast({
         title: "Processing...",
         description: "Creating your payment session",
       });
 
-      const { data, error } = await supabase.functions.invoke('create-helcim-checkout', {
+      const { data, error } = await supabase.functions.invoke('create-paypal-order', {
         body: { planType },
       });
 
-      console.log('Edge function response:', { data, error });
+      if (error) throw error;
 
-      if (error) {
-        console.error('Edge function error:', error);
-        throw error;
-      }
-
-      if (data?.checkoutToken && data?.secretToken) {
-        console.log('Received Helcim tokens, navigating to checkout');
-        // Store tokens and navigate to Helcim checkout page
-        sessionStorage.setItem('helcim_checkout_token', data.checkoutToken);
-        sessionStorage.setItem('helcim_secret_token', data.secretToken);
-        navigate(`/helcim-checkout?token=${data.checkoutToken}`);
+      if (data?.orderId && data?.approvalUrl) {
+        // Redirect to PayPal for payment
+        window.location.href = data.approvalUrl;
       } else {
-        console.error('No tokens returned:', data);
         toast({
           title: "Error",
-          description: "Failed to get payment tokens. Please try again.",
+          description: "Failed to create payment session. Please try again.",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error creating Helcim checkout:', error);
+      console.error('Error creating PayPal order:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to initiate payment. Please try again.",

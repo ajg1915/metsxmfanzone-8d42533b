@@ -51,7 +51,6 @@ import Dashboard from "./pages/Dashboard";
 import Feedback from "./pages/Feedback";
 import Sitemap from "./pages/Sitemap";
 import PayPalSuccess from "./pages/PayPalSuccess";
-import HelcimCheckout from "./pages/HelcimCheckout";
 import SpringTrainingLive from "./pages/SpringTrainingLive";
 import Merch from "./pages/Merch";
 import Product from "./pages/Product";
@@ -70,7 +69,6 @@ const App = () => (
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/plans" element={<Plans />} />
         <Route path="/paypal-success" element={<PayPalSuccess />} />
-        <Route path="/helcim-checkout" element={<HelcimCheckout />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/confirm-account" element={<ConfirmAccount />} />
           <Route path="/dashboard" element={<Dashboard />} />
