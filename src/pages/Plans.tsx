@@ -10,13 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
-// Declare Helcim global function
-declare global {
-  interface Window {
-    appendHelcimPayIframe: (checkoutToken: string) => void;
-  }
-}
-
 const Plans = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -38,13 +31,13 @@ const Plans = () => {
     }
 
     try {
-      console.log('Calling create-helcim-checkout edge function...');
+      console.log('Calling create-paypal-order edge function...');
       toast({
         title: "Processing...",
         description: "Creating your payment session",
       });
 
-      const { data, error } = await supabase.functions.invoke('create-helcim-checkout', {
+      const { data, error } = await supabase.functions.invoke('create-paypal-order', {
         body: { planType },
       });
 
@@ -55,36 +48,19 @@ const Plans = () => {
         throw error;
       }
 
-      if (data?.checkoutToken) {
-        console.log('Loading Helcim payment modal with token:', data.checkoutToken);
-        
-        // Load HelcimPay.js script if not already loaded
-        if (!window.appendHelcimPayIframe) {
-          const script = document.createElement('script');
-          script.src = 'https://myhelcim.com/js/version2/helcim-pay.js';
-          script.onload = () => {
-            // Render Helcim payment modal
-            window.appendHelcimPayIframe(data.checkoutToken);
-          };
-          document.head.appendChild(script);
-        } else {
-          // Script already loaded, just render the modal
-          window.appendHelcimPayIframe(data.checkoutToken);
-        }
-        
-        // Store tokens for verification
-        sessionStorage.setItem('helcim_checkout_token', data.checkoutToken);
-        sessionStorage.setItem('helcim_secret_token', data.secretToken);
+      if (data?.approvalUrl) {
+        console.log('Redirecting to PayPal:', data.approvalUrl);
+        window.location.href = data.approvalUrl;
       } else {
-        console.error('No checkout token returned:', data);
+        console.error('No approval URL returned:', data);
         toast({
           title: "Error",
-          description: "Failed to initialize payment. Please try again.",
+          description: "Failed to get payment URL. Please try again.",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error creating Helcim checkout:', error);
+      console.error('Error creating PayPal order:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to initiate payment. Please try again.",
@@ -115,7 +91,7 @@ const Plans = () => {
       popular: false,
     },
     {
-      name: "Premium Membership",
+      name: "Premium",
       price: "$12.99",
       period: "per month",
       description: "Most popular for true fans",
@@ -134,7 +110,7 @@ const Plans = () => {
       popular: true,
     },
     {
-      name: "Annual Membership",
+      name: "Annual",
       price: "$129.99",
       period: "per year",
       description: "Best value - Save 2 months",

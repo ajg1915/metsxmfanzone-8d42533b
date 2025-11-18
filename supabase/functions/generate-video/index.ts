@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
-import Replicate from "https://esm.sh/replicate@0.30.2"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import Replicate from "https://esm.sh/replicate@0.25.2"
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
