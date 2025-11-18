@@ -20,17 +20,17 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization');
     console.log('Auth header received:', authHeader ? 'present' : 'missing');
     
-    if (!authHeader) {
-      throw new Error('No authorization header');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new Error('No bearer token in authorization header');
     }
+
+    const token = authHeader.replace('Bearer ', '').trim();
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     console.log('getUser result:', { user: user?.id, error: userError?.message });
     
     if (userError || !user) {
