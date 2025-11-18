@@ -16,8 +16,9 @@ const PayPalSuccess = () => {
   useEffect(() => {
     const verifyPayment = async () => {
       const orderId = searchParams.get('token');
+      const sessionId = searchParams.get('session_id');
       
-      if (!orderId) {
+      if (!orderId && !sessionId) {
         setStatus('error');
         toast({
           title: "Error",
@@ -29,27 +30,55 @@ const PayPalSuccess = () => {
       }
 
       try {
-        const { data, error } = await supabase.functions.invoke('verify-paypal-payment', {
-          body: { orderId },
-        });
-
-        if (error) throw error;
-
-        if (data.success) {
-          setStatus('success');
-          toast({
-            title: "Payment Successful!",
-            description: "Your subscription has been activated.",
+        // Check if it's a Helcim payment (session_id) or PayPal (token)
+        if (sessionId) {
+          const { data, error } = await supabase.functions.invoke('verify-helcim-payment', {
+            body: { checkoutToken: sessionId },
           });
-          setTimeout(() => navigate('/dashboard'), 2000);
+
+          if (error) throw error;
+
+          if (data.success) {
+            setStatus('success');
+            toast({
+              title: "Payment Successful!",
+              description: "Your subscription has been activated.",
+            });
+            sessionStorage.removeItem('helcim_checkout_token');
+            sessionStorage.removeItem('helcim_secret_token');
+            setTimeout(() => navigate('/dashboard'), 2000);
+          } else {
+            setStatus('error');
+            toast({
+              title: "Payment Failed",
+              description: "There was an issue processing your payment.",
+              variant: "destructive",
+            });
+            setTimeout(() => navigate('/plans'), 3000);
+          }
         } else {
-          setStatus('error');
-          toast({
-            title: "Payment Failed",
-            description: "There was an issue processing your payment.",
-            variant: "destructive",
+          const { data, error } = await supabase.functions.invoke('verify-paypal-payment', {
+            body: { orderId },
           });
-          setTimeout(() => navigate('/plans'), 3000);
+
+          if (error) throw error;
+
+          if (data.success) {
+            setStatus('success');
+            toast({
+              title: "Payment Successful!",
+              description: "Your subscription has been activated.",
+            });
+            setTimeout(() => navigate('/dashboard'), 2000);
+          } else {
+            setStatus('error');
+            toast({
+              title: "Payment Failed",
+              description: "There was an issue processing your payment.",
+              variant: "destructive",
+            });
+            setTimeout(() => navigate('/plans'), 3000);
+          }
         }
       } catch (error) {
         console.error('Error verifying payment:', error);

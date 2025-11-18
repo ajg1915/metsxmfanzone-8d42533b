@@ -9,11 +9,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 const Plans = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'helcim'>('paypal');
 
   const handleSubscribe = async (planType: string) => {
     if (!user) {
@@ -32,24 +36,43 @@ const Plans = () => {
         description: "Creating your payment session",
       });
 
-      const { data, error } = await supabase.functions.invoke('create-paypal-order', {
-        body: { planType },
-      });
-
-      if (error) throw error;
-
-      if (data?.orderId && data?.approvalUrl) {
-        // Redirect to PayPal for payment
-        window.location.href = data.approvalUrl;
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to create payment session. Please try again.",
-          variant: "destructive",
+      if (paymentMethod === 'paypal') {
+        const { data, error } = await supabase.functions.invoke('create-paypal-order', {
+          body: { planType },
         });
+
+        if (error) throw error;
+
+        if (data?.orderId && data?.approvalUrl) {
+          window.location.href = data.approvalUrl;
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to create payment session. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        const { data, error } = await supabase.functions.invoke('create-helcim-checkout', {
+          body: { planType },
+        });
+
+        if (error) throw error;
+
+        if (data?.checkoutToken && data?.secretToken) {
+          sessionStorage.setItem('helcim_checkout_token', data.checkoutToken);
+          sessionStorage.setItem('helcim_secret_token', data.secretToken);
+          navigate(`/helcim-checkout?token=${data.checkoutToken}`);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to get payment tokens. Please try again.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
-      console.error('Error creating PayPal order:', error);
+      console.error('Error creating payment:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to initiate payment. Please try again.",
@@ -133,9 +156,27 @@ const Plans = () => {
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-3 sm:mb-4">
                 Choose Your Plan
               </h1>
-              <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto mb-6">
                 Get unlimited access to live games, replays, highlights, and exclusive Mets content
               </p>
+              
+              <Card className="max-w-md mx-auto border-2 border-primary bg-card">
+                <CardHeader>
+                  <CardTitle className="text-base sm:text-lg text-primary">Select Payment Method</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <RadioGroup value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as 'paypal' | 'helcim')}>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <RadioGroupItem value="paypal" id="paypal" />
+                      <Label htmlFor="paypal" className="text-sm sm:text-base cursor-pointer">PayPal</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="helcim" id="helcim" />
+                      <Label htmlFor="helcim" className="text-sm sm:text-base cursor-pointer">Credit/Debit Card (Helcim)</Label>
+                    </div>
+                  </RadioGroup>
+                </CardContent>
+              </Card>
             </div>
 
             <div className="grid md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
