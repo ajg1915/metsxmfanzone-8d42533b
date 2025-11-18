@@ -48,14 +48,17 @@ const Plans = () => {
         throw error;
       }
 
-      if (data?.checkoutUrl) {
-        console.log('Redirecting to Helcim:', data.checkoutUrl);
-        window.location.href = data.checkoutUrl;
+      if (data?.checkoutToken && data?.secretToken) {
+        console.log('Received Helcim tokens, navigating to checkout');
+        // Store tokens and navigate to Helcim checkout page
+        sessionStorage.setItem('helcim_checkout_token', data.checkoutToken);
+        sessionStorage.setItem('helcim_secret_token', data.secretToken);
+        navigate(`/helcim-checkout?token=${data.checkoutToken}`);
       } else {
-        console.error('No checkout URL returned:', data);
+        console.error('No tokens returned:', data);
         toast({
           title: "Error",
-          description: "Failed to get payment URL. Please try again.",
+          description: "Failed to get payment tokens. Please try again.",
           variant: "destructive",
         });
       }

@@ -33,45 +33,19 @@ serve(async (req) => {
       throw new Error(`Unauthorized: ${userError?.message || 'No user found'}`);
     }
 
-    const { checkoutId } = await req.json();
+    const { checkoutToken } = await req.json();
     
-    if (!checkoutId) {
-      throw new Error('Checkout ID is required');
+    if (!checkoutToken) {
+      throw new Error('Checkout token is required');
     }
 
-    // Verify payment with Helcim
-    const helcimApiToken = Deno.env.get('HELCIM_API_TOKEN');
-    
-    if (!helcimApiToken) {
-      throw new Error('Helcim credentials not configured');
-    }
-
-    const helcimResponse = await fetch(`https://api.helcim.com/v2/payment/checkout/${checkoutId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'api-token': helcimApiToken,
-      },
-    });
-
-    if (!helcimResponse.ok) {
-      const errorData = await helcimResponse.text();
-      console.error('Helcim verification error:', errorData);
-      throw new Error(`Failed to verify payment: ${helcimResponse.status}`);
-    }
-
-    const paymentData = await helcimResponse.json();
-    
-    // Check if payment was successful
-    if (paymentData.status !== 'APPROVED') {
-      throw new Error('Payment was not approved');
-    }
+    console.log('Processing Helcim checkout token:', checkoutToken);
 
     // Get subscription from database
     const { data: subscription, error: fetchError } = await supabase
       .from('subscriptions')
       .select('*')
-      .eq('paypal_order_id', checkoutId) // Using paypal_order_id field for Helcim checkout ID
+      .eq('paypal_order_id', checkoutToken) // Using paypal_order_id field for Helcim checkout token
       .single();
 
     if (fetchError || !subscription) {
