@@ -6,9 +6,9 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const PLAN_PRICES = {
-  premium: 9.99,
-  annual: 99.99,
+const PLAN_PRICES: Record<string, number> = {
+  "premium membership": 12.99,
+  "annual membership": 129.99,
 };
 
 serve(async (req) => {
