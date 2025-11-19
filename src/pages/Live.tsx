@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { Lock, Newspaper } from "lucide-react";
 import { TVGuideChannel } from "@/components/TVGuideChannel";
 import { TVScheduleCard } from "@/components/TVScheduleCard";
+import LiveStreamDisclaimer from "@/components/LiveStreamDisclaimer";
+import AdminLiveUpdate from "@/components/AdminLiveUpdate";
 
 interface LiveStream {
   id: string;
@@ -233,6 +235,11 @@ const Live = () => {
               </Card>
             ) : (
               <div className="space-y-8 mb-12">
+                <LiveStreamDisclaimer />
+                
+                {/* Admin Welcome Message for General Live Page */}
+                <AdminLiveUpdate />
+                
                 {/* Podcast Live Stream */}
                 {podcastStream && podcastStream.vdo_ninja_url && (
                   <div>

@@ -8,6 +8,7 @@ import { Calendar, Tag, ArrowLeft } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
+import BlogComments from "@/components/BlogComments";
 
 interface BlogPost {
   id: string;
@@ -239,6 +240,8 @@ export default function BlogPost() {
                 </CardContent>
               </Card>
             </div>
+
+            <BlogComments blogPostId={post.id} />
           </article>
         </div>
       </main>

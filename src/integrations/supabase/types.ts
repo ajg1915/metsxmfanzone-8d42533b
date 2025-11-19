@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_comments: {
+        Row: {
+          blog_post_id: string
+          content: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          blog_post_id: string
+          content: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          blog_post_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_comments_blog_post_id_fkey"
+            columns: ["blog_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           category: string
@@ -174,6 +209,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      live_stream_admin_updates: {
+        Row: {
+          admin_id: string
+          created_at: string
+          id: string
+          live_stream_id: string
+          topics: string[] | null
+          updated_at: string
+          welcome_message: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          id?: string
+          live_stream_id: string
+          topics?: string[] | null
+          updated_at?: string
+          welcome_message: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          id?: string
+          live_stream_id?: string
+          topics?: string[] | null
+          updated_at?: string
+          welcome_message?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_stream_admin_updates_live_stream_id_fkey"
+            columns: ["live_stream_id"]
+            isOneToOne: false
+            referencedRelation: "live_streams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       live_streams: {
         Row: {

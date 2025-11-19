@@ -55,6 +55,7 @@ import HelcimCheckout from "./pages/HelcimCheckout";
 import SpringTrainingLive from "./pages/SpringTrainingLive";
 import Merch from "./pages/Merch";
 import Product from "./pages/Product";
+import LiveStreamAdminUpdates from "./pages/admin/LiveStreamAdminUpdates";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,7 @@ const App = () => (
             <Route path="business-ads" element={<BusinessAdsManagement />} />
             <Route path="roles" element={<UserRoles />} />
             <Route path="subscriptions" element={<SubscriptionManagement />} />
+            <Route path="live-updates" element={<LiveStreamAdminUpdates />} />
           </Route>
           <Route path="/spring-training-live" element={<SpringTrainingLive />} />
           <Route path="/merch" element={<Merch />} />
