@@ -5,7 +5,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import CommunityGuidelines from "@/components/CommunityGuidelines";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -257,8 +256,6 @@ const Community = () => {
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary mb-6 sm:mb-8">
             Community Feed
           </h1>
-
-          <CommunityGuidelines />
 
           <Card className="mb-6">
             <CardHeader>
