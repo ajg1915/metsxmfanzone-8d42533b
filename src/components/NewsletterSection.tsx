@@ -28,8 +28,8 @@ const NewsletterSection = () => {
     <section className="py-12 md:py-16 bg-gradient-to-br from-primary/10 via-background to-primary/5">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="max-w-2xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
-            <img src={logo} alt="MetsXMFanZone" className="w-8 h-8" />
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary/10 mb-6">
+            <img src={logo} alt="MetsXMFanZone" className="w-16 h-16" />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Stay in the Loop
