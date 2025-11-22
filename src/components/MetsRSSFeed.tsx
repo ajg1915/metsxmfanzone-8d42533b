@@ -57,7 +57,7 @@ const MetsRSSFeed = () => {
 
         // Sort by date
         allItems.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-        setFeedItems(allItems.slice(0, 10));
+        setFeedItems(allItems.slice(0, 4));
       } catch (error) {
         console.error('Error fetching RSS feeds:', error);
       } finally {
