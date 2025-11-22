@@ -94,8 +94,14 @@ const SpringTrainingLive = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Helmet>
         <title>Mets 2026 Spring Training Live - Exclusive Coverage | MetsXMFanZone</title>
-        <meta name="description" content="Watch Mets 2026 Spring Training live streams, get game stats, latest news and exclusive coverage from Port St. Lucie, Florida." />
-        <meta name="keywords" content="Mets spring training 2026, spring training live, Mets preseason, Port St. Lucie, Mets training camp, Mets news" />
+        <meta
+          name="description"
+          content="Watch Mets 2026 Spring Training live streams, get game stats, latest news and exclusive coverage from Port St. Lucie, Florida."
+        />
+        <meta
+          name="keywords"
+          content="Mets spring training 2026, spring training live, Mets preseason, Port St. Lucie, Mets training camp, Mets news"
+        />
         <link rel="canonical" href="https://www.metsxmfanzone.com/spring-training-live" />
       </Helmet>
       <Navigation />
@@ -108,21 +114,19 @@ const SpringTrainingLive = () => {
               <div className="flex items-center gap-3 mb-4">
                 <img src={logo} alt="MetsXMFanZone" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
                 <div>
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary">
-                    Mets 2026 Spring Training
-                  </h1>
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary">Mets 2026 Spring Training</h1>
                   <p className="text-sm sm:text-base text-muted-foreground mt-1">
                     Live from Clover Park, Port St. Lucie, Florida
                   </p>
                 </div>
               </div>
-              
+
               {/* Follow Facebook Button */}
               <div className="mt-6">
                 <Button
                   variant="outline"
                   className="gap-2"
-                  onClick={() => window.open('https://facebook.com/metsxmfanzone', '_blank')}
+                  onClick={() => window.open("https://facebook.com/metsxmfanzone", "_blank")}
                 >
                   <Facebook className="w-5 h-5" />
                   Follow MetsXMFanZone on Facebook
@@ -136,7 +140,7 @@ const SpringTrainingLive = () => {
         <section className="py-8 sm:py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
-              <StreamPlayer 
+              <StreamPlayer
                 pageName="spring-training-live"
                 pageTitle="Spring Training Live Stream"
                 pageDescription="Live coverage from Clover Park"
@@ -156,35 +160,31 @@ const SpringTrainingLive = () => {
                 <TrendingUp className="w-8 h-8 text-primary" />
                 <h2 className="text-3xl font-bold">Latest Mets News</h2>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {blogPosts.map((post) => (
-                  <Card 
+                  <Card
                     key={post.id}
                     className="border-2 border-primary bg-card overflow-hidden hover:shadow-lg transition-all cursor-pointer group"
                     onClick={() => navigate(`/blog/${post.slug}`)}
                   >
                     {post.featured_image_url && (
                       <div className="aspect-video overflow-hidden">
-                        <img 
-                          src={post.featured_image_url} 
+                        <img
+                          src={post.featured_image_url}
                           alt={post.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                     )}
                     <CardHeader>
-                      <Badge className="w-fit mb-2 bg-primary text-primary-foreground">
-                        {post.category}
-                      </Badge>
+                      <Badge className="w-fit mb-2 bg-primary text-primary-foreground">{post.category}</Badge>
                       <CardTitle className="line-clamp-2 text-lg group-hover:text-primary transition-colors">
                         {post.title}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-muted-foreground line-clamp-3">
-                        {post.excerpt}
-                      </p>
+                      <p className="text-sm text-muted-foreground line-clamp-3">{post.excerpt}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -197,11 +197,11 @@ const SpringTrainingLive = () => {
         <section className="py-12 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center gap-3 mb-6">
                 <TrendingUp className="w-8 h-8 text-primary" />
                 <h2 className="text-3xl font-bold">Mets News Feed</h2>
               </div>
-              
+
               <MetsRSSFeed />
             </div>
           </div>
