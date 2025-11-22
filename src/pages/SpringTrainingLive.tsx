@@ -26,8 +26,7 @@ interface BlogPost {
 }
 
 const SpringTrainingLive = () => {
-  const { user, loading } = useAuth();
-  const { isPremium, loading: subLoading } = useSubscription();
+  const { loading } = useAuth();
   const navigate = useNavigate();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
 
@@ -48,44 +47,10 @@ const SpringTrainingLive = () => {
     fetchBlogPosts();
   }, []);
 
-  // Redirect non-logged-in users
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth?mode=login&redirect=/spring-training-live");
-    }
-  }, [user, loading, navigate]);
-
-  if (loading || subLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
-  if (!isPremium) {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Navigation />
-        <main className="flex-1 container mx-auto px-4 py-8 pt-20 sm:pt-24">
-          <Card className="max-w-2xl mx-auto border-2 border-primary">
-            <CardContent className="py-12 text-center">
-              <Lock className="w-16 h-16 mx-auto mb-4 text-primary" />
-              <h2 className="text-2xl font-bold mb-2">Premium Access Required</h2>
-              <p className="text-muted-foreground mb-6">
-                Subscribe to unlock Spring Training live streams and exclusive content
-              </p>
-              <Button size="lg" onClick={() => navigate("/plans")}>
-                View Plans
-              </Button>
-            </CardContent>
-          </Card>
-        </main>
-        <Footer />
       </div>
     );
   }

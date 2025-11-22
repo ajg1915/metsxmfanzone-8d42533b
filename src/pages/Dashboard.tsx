@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 import { Badge } from "@/components/ui/badge";
 import { User, CreditCard, Calendar, ArrowUpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -123,6 +124,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <OnboardingWalkthrough onComplete={() => {}} />
       <Navigation />
       <main className="pt-16">
         <section className="py-12">

@@ -27,15 +27,15 @@ const HelcimCheckout = () => {
           onSuccess: (transaction: any) => {
             console.log('Payment successful:', transaction);
             // Redirect to success page with checkout token
-            navigate(`/paypal-success?session_id=${checkoutToken}`);
+            navigate(`/payment-success?session_id=${checkoutToken}`);
           },
           onError: (error: any) => {
             console.error('Payment error:', error);
-            navigate('/plans');
+            navigate('/payment-error');
           },
           onCancel: () => {
             console.log('Payment cancelled');
-            navigate('/plans');
+            navigate('/payment-error');
           }
         });
       }

@@ -88,7 +88,7 @@ const PayPalSuccess = () => {
           description: "Failed to verify payment. Please contact support.",
           variant: "destructive",
         });
-        setTimeout(() => navigate('/plans'), 3000);
+        setTimeout(() => navigate('/payment-error'), 1000);
       }
     };
 

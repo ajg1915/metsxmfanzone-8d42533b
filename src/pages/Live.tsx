@@ -52,7 +52,6 @@ interface BlogPost {
 
 const Live = () => {
   const navigate = useNavigate();
-  const { isPremium, loading: subLoading } = useSubscription();
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [tvSchedules, setTvSchedules] = useState<TVSchedule[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
@@ -216,21 +215,8 @@ const Live = () => {
               </p>
             </div>
 
-            {loading || subLoading ? (
+            {loading ? (
               <div className="text-center py-8 sm:py-12">Loading TV guide...</div>
-            ) : !isPremium ? (
-              <Card className="max-w-2xl mx-auto mb-12 border-2 border-primary">
-                <CardContent className="py-12 text-center">
-                  <Lock className="w-16 h-16 mx-auto mb-4 text-primary" />
-                  <h3 className="text-2xl font-bold mb-2">Premium Access Required</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Subscribe to unlock all live streaming content and exclusive coverage
-                  </p>
-                  <Button size="lg" onClick={() => navigate("/plans")}>
-                    View Plans
-                  </Button>
-                </CardContent>
-              </Card>
             ) : (
               <div className="space-y-8 mb-12">
                 {/* Podcast Live Stream */}
@@ -332,9 +318,8 @@ const Live = () => {
               </div>
             )}
 
-            {isPremium && (
-              <div className="text-center">
-                <Card className="border-2 border-primary bg-card max-w-2xl mx-auto">
+            <div className="text-center">
+              <Card className="border-2 border-primary bg-card max-w-2xl mx-auto">
                   <CardHeader>
                     <CardTitle className="text-2xl text-primary">Need More Access?</CardTitle>
                     <CardDescription className="text-foreground">
@@ -345,10 +330,9 @@ const Live = () => {
                     <Button size="lg" className="w-full md:w-auto" onClick={() => navigate("/plans")}>
                       View All Plans
                     </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </section>
       </main>

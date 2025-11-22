@@ -6,6 +6,8 @@ import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Live from "./pages/Live";
 import Community from "./pages/Community";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentError from "./pages/PaymentError";
 import Gallery from "./pages/Gallery";
 import Plans from "./pages/Plans";
 import Auth from "./pages/Auth";
@@ -68,9 +70,11 @@ const App = () => (
         <Route path="/live" element={<Live />} />
         <Route path="/community" element={<Community />} />
         <Route path="/gallery" element={<Gallery />} />
-        <Route path="/plans" element={<Plans />} />
-        <Route path="/paypal-success" element={<PayPalSuccess />} />
-        <Route path="/helcim-checkout" element={<HelcimCheckout />} />
+          <Route path="/plans" element={<Plans />} />
+          <Route path="/paypal-success" element={<PayPalSuccess />} />
+          <Route path="/helcim-checkout" element={<HelcimCheckout />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-error" element={<PaymentError />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/confirm-account" element={<ConfirmAccount />} />
           <Route path="/dashboard" element={<Dashboard />} />
