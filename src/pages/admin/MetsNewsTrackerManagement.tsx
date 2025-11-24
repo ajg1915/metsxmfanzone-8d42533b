@@ -20,7 +20,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 interface NewsItem {
   id: string;
-  type: "signing" | "rumor" | "traded";
+  type: "signing" | "traded";
   title: string;
   player: string;
   details: string;
@@ -58,7 +58,7 @@ export default function MetsNewsTrackerManagement() {
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
-    type: "signing" as "signing" | "rumor" | "traded",
+    type: "signing" as "signing" | "traded",
     title: "",
     player: "",
     details: "",
@@ -415,7 +415,7 @@ export default function MetsNewsTrackerManagement() {
                 <Label htmlFor="type">Type</Label>
                 <Select
                   value={formData.type}
-                  onValueChange={(value: "signing" | "rumor" | "traded") =>
+                  onValueChange={(value: "signing" | "traded") =>
                     setFormData({ ...formData, type: value })
                   }
                 >
@@ -424,7 +424,6 @@ export default function MetsNewsTrackerManagement() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="signing">New Signing</SelectItem>
-                    <SelectItem value="rumor">Trade Rumor</SelectItem>
                     <SelectItem value="traded">Traded Player</SelectItem>
                   </SelectContent>
                 </Select>
