@@ -15,17 +15,25 @@ interface OnboardingStep {
 
 interface OnboardingWalkthroughProps {
   onComplete: () => void;
+  previewMode?: boolean;
+  previewSteps?: OnboardingStep[];
 }
 
-const OnboardingWalkthrough = ({ onComplete }: OnboardingWalkthroughProps) => {
+const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps = [] }: OnboardingWalkthroughProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [open, setOpen] = useState(false);
   const [steps, setSteps] = useState<OnboardingStep[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSteps();
-  }, []);
+    if (previewMode && previewSteps.length > 0) {
+      setSteps(previewSteps);
+      setOpen(true);
+      setLoading(false);
+    } else {
+      fetchSteps();
+    }
+  }, [previewMode, previewSteps]);
 
   const fetchSteps = async () => {
     try {

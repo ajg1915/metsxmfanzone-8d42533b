@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit2, Save, X, MoveUp, MoveDown, ImageIcon, Loader2 } from "lucide-react";
+import { Plus, Trash2, Edit2, Save, X, MoveUp, MoveDown, ImageIcon, Loader2, Eye } from "lucide-react";
+import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 
 interface TutorialStep {
   id: string;
@@ -25,6 +26,7 @@ export default function TutorialManagement() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -185,15 +187,25 @@ export default function TutorialManagement() {
           <h1 className="text-3xl font-bold tracking-tight">Tutorial Management</h1>
           <p className="text-muted-foreground">Manage the onboarding steps shown on the main page.</p>
         </div>
-        <Button
-          onClick={() => {
-            resetForm();
-            setShowForm(!showForm);
-          }}
-        >
-          {showForm ? <X className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-          {showForm ? "Cancel" : "Add New Step"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowPreview(true)}
+            disabled={steps.length === 0}
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            Preview Tutorial
+          </Button>
+          <Button
+            onClick={() => {
+              resetForm();
+              setShowForm(!showForm);
+            }}
+          >
+            {showForm ? <X className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
+            {showForm ? "Cancel" : "Add New Step"}
+          </Button>
+        </div>
       </div>
 
       {/* Form Section */}
@@ -349,6 +361,14 @@ export default function TutorialManagement() {
           </Card>
         ))}
       </div>
+
+      {showPreview && (
+        <OnboardingWalkthrough 
+          onComplete={() => setShowPreview(false)}
+          previewMode={true}
+          previewSteps={steps}
+        />
+      )}
     </div>
   );
 }
