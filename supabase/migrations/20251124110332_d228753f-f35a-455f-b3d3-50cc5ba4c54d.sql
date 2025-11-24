@@ -1,0 +1,7 @@
+-- Update the check constraint on mets_news_tracker to allow 'traded' type
+ALTER TABLE public.mets_news_tracker 
+DROP CONSTRAINT IF EXISTS mets_news_tracker_type_check;
+
+ALTER TABLE public.mets_news_tracker 
+ADD CONSTRAINT mets_news_tracker_type_check 
+CHECK (type IN ('signing', 'rumor', 'traded'));
