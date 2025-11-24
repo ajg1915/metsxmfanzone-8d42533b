@@ -51,6 +51,8 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
         if (!hasSeenWalkthrough) {
           setOpen(true);
         }
+      } else {
+        console.log("No active tutorial steps found in database");
       }
     } catch (error) {
       console.error("Error fetching tutorial steps:", error);
