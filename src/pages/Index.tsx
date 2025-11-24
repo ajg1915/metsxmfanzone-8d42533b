@@ -14,6 +14,7 @@ import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
 import AppInstallSection from "@/components/AppInstallSection";
+import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 
 const Index = () => {
   return (
@@ -41,6 +42,7 @@ const Index = () => {
       </main>
       <Footer />
       <InstallPrompt />
+      <OnboardingWalkthrough onComplete={() => {}} />
     </div>
   );
 };
