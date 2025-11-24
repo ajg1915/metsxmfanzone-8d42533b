@@ -2,53 +2,16 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-stadium.jpg";
-import liveImage from "@/assets/highlight-1.jpg";
-import springTrainingImage from "@/assets/spring-training.jpg";
 
 interface OnboardingStep {
+  id: string;
+  step_number: number;
   title: string;
   description: string;
-  image: string;
-  features: string[];
+  image_url?: string;
 }
-
-const steps: OnboardingStep[] = [
-  {
-    title: "Welcome to MetsXMFanZone! 🎉",
-    description: "Your ultimate destination for New York Mets content, live streams, and community.",
-    image: heroImage,
-    features: [
-      "Live game streams and replays",
-      "Exclusive Mets content and analysis",
-      "Active fan community",
-      "Latest news and updates"
-    ]
-  },
-  {
-    title: "Live Streams & Premium Content",
-    description: "Access live Mets games, spring training, and exclusive premium content with your subscription.",
-    image: liveImage,
-    features: [
-      "HD live streaming",
-      "Full game replays",
-      "Multiple camera angles",
-      "Ad-free experience"
-    ]
-  },
-  {
-    title: "Spring Training Coverage",
-    description: "Get exclusive access to Mets spring training games from Clover Park, Port St. Lucie.",
-    image: springTrainingImage,
-    features: [
-      "Live spring training games",
-      "Player interviews",
-      "Behind-the-scenes content",
-      "Game highlights"
-    ]
-  }
-];
 
 interface OnboardingWalkthroughProps {
   onComplete: () => void;
@@ -57,13 +20,36 @@ interface OnboardingWalkthroughProps {
 const OnboardingWalkthrough = ({ onComplete }: OnboardingWalkthroughProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [open, setOpen] = useState(false);
+  const [steps, setSteps] = useState<OnboardingStep[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const hasSeenWalkthrough = localStorage.getItem('hasSeenWalkthrough');
-    if (!hasSeenWalkthrough) {
-      setOpen(true);
-    }
+    fetchSteps();
   }, []);
+
+  const fetchSteps = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("tutorial_steps")
+        .select("*")
+        .eq("is_active", true)
+        .order("step_number", { ascending: true });
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        setSteps(data as OnboardingStep[]);
+        const hasSeenWalkthrough = localStorage.getItem('hasSeenWalkthrough');
+        if (!hasSeenWalkthrough) {
+          setOpen(true);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching tutorial steps:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -91,6 +77,10 @@ const OnboardingWalkthrough = ({ onComplete }: OnboardingWalkthroughProps) => {
     onComplete();
   };
 
+  if (loading || steps.length === 0) {
+    return null;
+  }
+
   const step = steps[currentStep];
 
   return (
@@ -108,7 +98,7 @@ const OnboardingWalkthrough = ({ onComplete }: OnboardingWalkthroughProps) => {
 
           <div className="aspect-video overflow-hidden rounded-t-lg">
             <img 
-              src={step.image} 
+              src={step.image_url || heroImage} 
               alt={step.title}
               className="w-full h-full object-cover"
             />
@@ -123,17 +113,6 @@ const OnboardingWalkthrough = ({ onComplete }: OnboardingWalkthroughProps) => {
                 {step.description}
               </p>
             </div>
-
-            <Card className="border-2 border-primary bg-primary/5 p-4">
-              <ul className="space-y-2">
-                {step.features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2 text-sm">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
 
             <div className="flex items-center justify-between pt-4">
               <Button

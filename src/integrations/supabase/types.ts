@@ -634,6 +634,39 @@ export type Database = {
         }
         Relationships: []
       }
+      tutorial_steps: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          step_number: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          step_number: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          step_number?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tv_schedules: {
         Row: {
           created_at: string
