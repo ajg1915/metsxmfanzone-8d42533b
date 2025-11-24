@@ -6,7 +6,7 @@ import { TrendingUp, Users, Clock } from "lucide-react";
 
 interface NewsItem {
   id: string;
-  type: "signing" | "rumor";
+  type: "signing" | "rumor" | "traded";
   title: string;
   player: string;
   details: string;
@@ -82,10 +82,12 @@ const MetsNewsTracker = () => {
                     />
                   </div>
                   <div className={`absolute -top-1 -right-1 p-2 rounded-full ${
-                    item.type === 'signing' ? 'bg-green-500' : 'bg-amber-500'
+                    item.type === 'signing' ? 'bg-green-500' : item.type === 'traded' ? 'bg-blue-500' : 'bg-amber-500'
                   }`}>
                     {item.type === 'signing' ? (
                       <TrendingUp className="w-4 h-4 text-white" />
+                    ) : item.type === 'traded' ? (
+                      <Users className="w-4 h-4 text-white" />
                     ) : (
                       <Users className="w-4 h-4 text-white" />
                     )}
@@ -98,10 +100,12 @@ const MetsNewsTracker = () => {
                       className={`w-fit mb-2 ${
                         item.type === 'signing' 
                           ? 'bg-green-500 hover:bg-green-600' 
+                          : item.type === 'traded'
+                          ? 'bg-blue-500 hover:bg-blue-600'
                           : 'bg-amber-500 hover:bg-amber-600'
                       } text-white`}
                     >
-                      {item.type === 'signing' ? 'NEW SIGNING' : 'TRADE RUMOR'}
+                      {item.type === 'signing' ? 'NEW SIGNING' : item.type === 'traded' ? 'TRADED PLAYER' : 'TRADE RUMOR'}
                     </Badge>
                     <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
                       {item.title}
