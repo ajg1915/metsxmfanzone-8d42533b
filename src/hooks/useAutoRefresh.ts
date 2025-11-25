@@ -3,26 +3,33 @@ import { useEffect } from 'react';
 export const useAutoRefresh = () => {
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      // Check for service worker updates every minute
-      const checkForUpdates = () => {
-        navigator.serviceWorker.getRegistration().then((registration) => {
+      let refreshing = false;
+
+      // Reload page when new service worker takes control
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        console.log('New version detected, reloading...');
+        window.location.reload();
+      });
+
+      // Check for updates every 30 seconds
+      const checkForUpdates = async () => {
+        try {
+          const registration = await navigator.serviceWorker.getRegistration();
           if (registration) {
-            registration.update();
+            await registration.update();
           }
-        });
+        } catch (error) {
+          console.error('Error checking for updates:', error);
+        }
       };
 
-      // Check immediately
+      // Check immediately on mount
       checkForUpdates();
 
-      // Check every 60 seconds
-      const interval = setInterval(checkForUpdates, 60000);
-
-      // Listen for updates
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log('New version available, will refresh on next visit');
-        sessionStorage.setItem('needsRefresh', 'true');
-      });
+      // Check every 30 seconds
+      const interval = setInterval(checkForUpdates, 30000);
 
       return () => clearInterval(interval);
     }
