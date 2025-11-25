@@ -4,6 +4,12 @@ import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 
+// Auto-refresh check on page load
+if (sessionStorage.getItem('needsRefresh') === 'true') {
+  sessionStorage.removeItem('needsRefresh');
+  window.location.reload();
+}
+
 const rootElement = document.getElementById("root")!;
 
 // Check if we're in production and the HTML has been prerendered
