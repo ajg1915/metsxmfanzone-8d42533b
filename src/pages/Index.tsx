@@ -30,7 +30,6 @@ const Index = () => {
         <LiveNotificationBar />
         <LiveNetworks />
         <LiveStreamsSection />
-        <SectionScrollIndicator />
         <SpringTraining />
         <SectionScrollIndicator />
         <MetsNewsTracker />
