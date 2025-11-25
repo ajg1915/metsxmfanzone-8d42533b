@@ -29,7 +29,6 @@ const Index = () => {
         <Hero />
         <LiveNotificationBar />
         <LiveNetworks />
-        <SectionScrollIndicator />
         <LiveStreamsSection />
         <SectionScrollIndicator />
         <SpringTraining />
