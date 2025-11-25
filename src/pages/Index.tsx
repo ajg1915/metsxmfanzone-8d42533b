@@ -28,7 +28,6 @@ const Index = () => {
       <main className="pt-12 sm:pt-14">
         <Hero />
         <LiveNotificationBar />
-        <SectionScrollIndicator />
         <LiveNetworks />
         <SectionScrollIndicator />
         <LiveStreamsSection />
