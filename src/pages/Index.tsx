@@ -16,7 +16,16 @@ import InstallPrompt from "@/components/InstallPrompt";
 import AppInstallSection from "@/components/AppInstallSection";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 import SectionScrollIndicator from "@/components/SectionScrollIndicator";
+import NotificationPrompt from "@/components/NotificationPrompt";
+import { useEffect } from "react";
+import { setupNotificationListeners } from "@/utils/notificationTriggers";
+
 const Index = () => {
+  useEffect(() => {
+    // Set up notification listeners
+    const cleanup = setupNotificationListeners();
+    return cleanup;
+  }, []);
   return <div className="min-h-screen bg-background">
       <Helmet>
         <title>MetsXMFanZone - Watch Mets Live Streams, Highlights & Exclusive Coverage</title>
@@ -49,6 +58,7 @@ const Index = () => {
       </main>
       <Footer />
       <InstallPrompt />
+      <NotificationPrompt />
       <OnboardingWalkthrough onComplete={() => {}} />
     </div>;
 };

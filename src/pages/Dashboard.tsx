@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
+import NotificationSettings from "@/components/NotificationSettings";
 import { Badge } from "@/components/ui/badge";
 import { User, CreditCard, Calendar, ArrowUpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -328,6 +329,8 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </div>
+
+            <NotificationSettings />
 
             {/* Features Access Card */}
             <Card className="border-2 border-primary">
