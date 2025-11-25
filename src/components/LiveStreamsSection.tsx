@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
-import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +22,6 @@ const LiveStreamsSection = () => {
   const { tier } = useSubscription();
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   useEffect(() => {
     fetchStreams();
 
@@ -75,21 +73,6 @@ const LiveStreamsSection = () => {
     // Default fallback
     return '/live';
   };
-  const handleStreamClick = (stream: LiveStream) => {
-    if (tier === "free" || !tier) {
-      setShowUpgradePrompt(true);
-    } else {
-      navigate(getStreamPageUrl(stream));
-    }
-  };
-
-  const handleViewAllClick = () => {
-    if (tier === "free" || !tier) {
-      setShowUpgradePrompt(true);
-    } else {
-      navigate("/live");
-    }
-  };
 
   if (loading) {
     return <section className="py-8 bg-secondary/20">
@@ -102,20 +85,48 @@ const LiveStreamsSection = () => {
     return null;
   }
 
-  return (
-    <>
-      <UpgradePrompt open={showUpgradePrompt} />
-      <section className="py-8 sm:py-10 bg-secondary/20">
+  // Show upgrade card for free users
+  if (tier === "free" || !tier) {
+    return <section className="py-8 sm:py-10 bg-secondary/20">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h2 className="font-bold sm:text-2xl text-xl">Live & Upcoming Streams</h2>
-          <Button variant="outline" onClick={handleViewAllClick}>
+        </div>
+
+        <Card className="border-2 border-primary bg-card max-w-2xl mx-auto">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="p-4 bg-primary/10 rounded-full">
+                <Lock className="w-8 h-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl text-primary">Premium Content</CardTitle>
+            <CardDescription className="text-base mt-2">
+              Access to live streams requires a Monthly or Annual membership. 
+              Upgrade your plan to enjoy exclusive live content and premium features.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center pb-6">
+            <Button size="lg" onClick={() => navigate("/plans")}>
+              View Plans
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </section>;
+  }
+
+  return <section className="py-8 sm:py-10 bg-secondary/20">
+      <div className="container mx-auto px-4 max-w-7xl">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <h2 className="font-bold sm:text-2xl text-xl">Live & Upcoming Streams</h2>
+          <Button variant="outline" onClick={() => navigate("/live")}>
             View All Streams
           </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          {streams.map(stream => <Card key={stream.id} className="border-2 border-primary bg-card overflow-hidden hover:shadow-lg transition-all cursor-pointer group" onClick={() => handleStreamClick(stream)}>
+          {streams.map(stream => <Card key={stream.id} className="border-2 border-primary bg-card overflow-hidden hover:shadow-lg transition-all cursor-pointer group" onClick={() => navigate(getStreamPageUrl(stream))}>
               {stream.thumbnail_url && <div className="aspect-video overflow-hidden relative">
                   <img src={stream.thumbnail_url} alt={stream.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -142,8 +153,6 @@ const LiveStreamsSection = () => {
             </Card>)}
         </div>
       </div>
-    </section>
-    </>
-  );
+    </section>;
 };
 export default LiveStreamsSection;
