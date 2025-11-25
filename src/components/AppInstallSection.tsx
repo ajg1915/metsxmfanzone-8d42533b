@@ -103,7 +103,7 @@ const AppInstallSection = () => {
           </Card>
 
           {/* Enable Notifications Card */}
-          <Card className="p-6 hover:shadow-lg transition-shadow">
+          <Card className="p-6 hover:shadow-lg transition-shadow px-0 py-0">
             <div className="flex items-start gap-4">
               <div className="p-3 rounded-lg bg-primary/10">
                 <Bell className="h-6 w-6 text-primary" />
