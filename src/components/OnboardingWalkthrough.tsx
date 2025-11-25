@@ -98,7 +98,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-3xl p-0 gap-0">
+      <DialogContent className="max-w-xl p-0 gap-0">
         <div className="relative">
           <Button
             variant="ghost"
@@ -117,17 +117,17 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
             />
           </div>
 
-          <div className="p-6 space-y-4">
+          <div className="p-4 space-y-3">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-primary mb-2">
+              <h2 className="text-xl font-bold text-primary mb-2">
                 {step.title}
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {step.description}
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-4">
+            <div className="flex items-center justify-between pt-3">
               <Button
                 variant="ghost"
                 onClick={handlePrevious}
