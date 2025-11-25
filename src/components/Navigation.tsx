@@ -49,6 +49,14 @@ const Navigation = () => {
     checkAdmin();
   }, [user]);
 
+  const handleProtectedNavigation = (path: string) => {
+    if (!user) {
+      navigate("/auth");
+    } else {
+      navigate(path);
+    }
+  };
+
   const handleAuthClick = async () => {
     if (user) {
       setMobileMenuOpen(false);
@@ -83,34 +91,30 @@ const Navigation = () => {
             >
               Home
             </NavLink>
-            {user && (
-              <>
-                <NavLink 
-                  to="/live" 
-                  className="text-foreground hover:text-primary transition-colors"
-                >
-                  Live
-                </NavLink>
-                <NavLink 
-                  to="/spring-training-live" 
-                  className="text-foreground hover:text-primary transition-colors"
-                >
-                  Spring Training
-                </NavLink>
-                <NavLink 
-                  to="/community" 
-                  className="text-foreground hover:text-primary transition-colors"
-                >
-                  Community
-                </NavLink>
-                <NavLink 
-                  to="/blog" 
-                  className="text-foreground hover:text-primary transition-colors"
-                >
-                  Blog
-                </NavLink>
-              </>
-            )}
+            <button
+              onClick={() => handleProtectedNavigation("/live")}
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Live
+            </button>
+            <button
+              onClick={() => handleProtectedNavigation("/spring-training-live")}
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Spring Training
+            </button>
+            <button
+              onClick={() => handleProtectedNavigation("/community")}
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Community
+            </button>
+            <button
+              onClick={() => handleProtectedNavigation("/blog")}
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Blog
+            </button>
             <NavLink 
               to="/plans" 
               className="text-foreground hover:text-primary transition-colors"
@@ -196,38 +200,42 @@ const Navigation = () => {
                   >
                     Home
                   </NavLink>
-                  {user && (
-                    <>
-                      <NavLink 
-                        to="/live" 
-                        className="text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Live
-                      </NavLink>
-                      <NavLink 
-                        to="/spring-training-live" 
-                        className="text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Spring Training
-                      </NavLink>
-                      <NavLink 
-                        to="/community" 
-                        className="text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Community
-                      </NavLink>
-                      <NavLink 
-                        to="/blog" 
-                        className="text-foreground hover:text-primary transition-colors py-2"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Blog
-                      </NavLink>
-                    </>
-                  )}
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleProtectedNavigation("/live");
+                    }}
+                    className="text-foreground hover:text-primary transition-colors py-2 text-left"
+                  >
+                    Live
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleProtectedNavigation("/spring-training-live");
+                    }}
+                    className="text-foreground hover:text-primary transition-colors py-2 text-left"
+                  >
+                    Spring Training
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleProtectedNavigation("/community");
+                    }}
+                    className="text-foreground hover:text-primary transition-colors py-2 text-left"
+                  >
+                    Community
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleProtectedNavigation("/blog");
+                    }}
+                    className="text-foreground hover:text-primary transition-colors py-2 text-left"
+                  >
+                    Blog
+                  </button>
                   <NavLink 
                     to="/plans" 
                     className="text-foreground hover:text-primary transition-colors py-2"
