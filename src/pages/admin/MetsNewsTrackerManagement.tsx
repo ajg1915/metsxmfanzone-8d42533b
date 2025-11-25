@@ -397,7 +397,7 @@ export default function MetsNewsTrackerManagement() {
 
         <TabsContent value="news" className="space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">Mets News Tracker</h2>
+            <h2 className="text-2xl font-semibold">Mets Live Tracker</h2>
             <Button onClick={() => setShowForm(!showForm)}>
               {showForm ? <X className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
               {showForm ? "Cancel" : "Add News Item"}

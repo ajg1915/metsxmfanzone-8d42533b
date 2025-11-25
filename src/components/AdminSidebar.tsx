@@ -34,7 +34,7 @@ const liveManagementItems = [
   { title: "Stream Replays", url: "/admin/stream-replays", icon: PlaySquare },
   { title: "Live Notifications", url: "/admin/live-notifications", icon: Bell },
   { title: "Stories", url: "/admin/stories", icon: Image },
-  { title: "Mets News Tracker", url: "/admin/mets-news", icon: TrendingUp },
+  { title: "Mets Live Tracker", url: "/admin/mets-news", icon: TrendingUp },
   { title: "TV Schedule", url: "/admin/tv-schedule", icon: Calendar },
   { title: "Events", url: "/admin/events", icon: CalendarDays },
   { title: "Spring Training", url: "/admin/spring-training", icon: Trophy },
