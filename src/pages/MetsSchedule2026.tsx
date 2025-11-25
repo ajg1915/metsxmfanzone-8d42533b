@@ -35,7 +35,7 @@ export default function MetsSchedule2026() {
       
       <Navigation />
       
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
+      <main className="flex-1 container mx-auto px-4 pt-24 pb-8 max-w-6xl">
         <div className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">
             2026 New York Mets Schedule
