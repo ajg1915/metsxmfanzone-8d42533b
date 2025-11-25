@@ -79,7 +79,7 @@ const AppInstallSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-1xl">
+        <div className="grid md:grid-cols-2 gap-6">
           {/* Install App Card */}
           <Card className="p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-start gap-4">
@@ -103,7 +103,7 @@ const AppInstallSection = () => {
           </Card>
 
           {/* Enable Notifications Card */}
-          <Card className="p-6 hover:shadow-lg transition-shadow px-0 py-0">
+          <Card className="p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-start gap-4">
               <div className="p-3 rounded-lg bg-primary/10">
                 <Bell className="h-6 w-6 text-primary" />
