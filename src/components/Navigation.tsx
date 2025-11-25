@@ -56,7 +56,7 @@ const Navigation = () => {
   const handleProtectedNavigation = (path: string) => {
     if (!user) {
       navigate("/auth");
-    } else if (path === "/live" && tier === "free") {
+    } else if (path === "/live" && (tier === "free" || !tier)) {
       setShowUpgradePrompt(true);
     } else {
       navigate(path);

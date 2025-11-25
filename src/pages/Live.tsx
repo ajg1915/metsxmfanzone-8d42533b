@@ -62,12 +62,11 @@ const Live = () => {
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
   useEffect(() => {
-    if (tier === "free") {
+    if (tier === "free" || !tier) {
       setShowUpgradePrompt(true);
+      return;
     }
-  }, [tier]);
-
-  useEffect(() => {
+    
     fetchStreams();
     fetchTVSchedules();
     fetchBlogPosts();
@@ -111,7 +110,7 @@ const Live = () => {
       supabase.removeChannel(channel);
       supabase.removeChannel(podcastChannel);
     };
-  }, []);
+  }, [tier]);
 
   const fetchStreams = async () => {
     try {
@@ -203,13 +202,19 @@ const Live = () => {
     }
   ];
 
-  if (tier === "free") {
+  if (tier === "free" || !tier) {
     return (
       <>
         <UpgradePrompt open={true} />
         <div className="min-h-screen bg-background">
+          <Helmet>
+            <title>Watch Mets Live Streams - Live Game Coverage & Analysis | MetsXMFanZone</title>
+            <meta name="description" content="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7." />
+            <meta name="keywords" content="Mets live stream, watch Mets live, Mets game stream, live baseball, Mets pre-game, Mets post-game, MLB live stream" />
+            <link rel="canonical" href="https://www.metsxmfanzone.com/live" />
+          </Helmet>
           <Navigation />
-          <main className="pt-16 flex items-center justify-center min-h-screen">
+          <main className="pt-16 flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background">
             <div className="text-center">
               <p className="text-muted-foreground">Loading...</p>
             </div>
