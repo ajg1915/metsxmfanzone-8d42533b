@@ -47,8 +47,11 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       
       if (data && data.length > 0) {
         setSteps(data as OnboardingStep[]);
-        const hasSeenWalkthrough = localStorage.getItem('hasSeenWalkthrough');
-        if (!hasSeenWalkthrough) {
+        const lastSeenTimestamp = localStorage.getItem('walkthroughLastSeen');
+        const now = Date.now();
+        const oneDayInMs = 24 * 60 * 60 * 1000;
+        
+        if (!lastSeenTimestamp || (now - parseInt(lastSeenTimestamp)) > oneDayInMs) {
           setOpen(true);
         }
       } else {
@@ -76,13 +79,13 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   };
 
   const handleComplete = () => {
-    localStorage.setItem('hasSeenWalkthrough', 'true');
+    localStorage.setItem('walkthroughLastSeen', Date.now().toString());
     setOpen(false);
     onComplete();
   };
 
   const handleSkip = () => {
-    localStorage.setItem('hasSeenWalkthrough', 'true');
+    localStorage.setItem('walkthroughLastSeen', Date.now().toString());
     setOpen(false);
     onComplete();
   };
