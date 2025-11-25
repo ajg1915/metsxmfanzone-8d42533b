@@ -15,6 +15,7 @@ import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
 import AppInstallSection from "@/components/AppInstallSection";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
+import SectionScrollIndicator from "@/components/SectionScrollIndicator";
 const Index = () => {
   return <div className="min-h-screen bg-background">
       <Helmet>
@@ -26,16 +27,27 @@ const Index = () => {
       <Navigation />
       <main className="pt-12 sm:pt-14">
         <Hero />
+        <SectionScrollIndicator />
         <LiveNotificationBar />
+        <SectionScrollIndicator />
         <LiveNetworks />
+        <SectionScrollIndicator />
         <LiveStreamsSection />
+        <SectionScrollIndicator />
         <SpringTraining />
+        <SectionScrollIndicator />
         <MetsNewsTracker />
-        <BlogSection className="" />
+        <SectionScrollIndicator />
+        <BlogSection />
+        <SectionScrollIndicator />
         <PodcastSection />
+        <SectionScrollIndicator />
         <FAQSection />
+        <SectionScrollIndicator />
         <FeedbackSection />
+        <SectionScrollIndicator />
         <AppInstallSection />
+        <SectionScrollIndicator />
         <NewsletterSection />
       </main>
       <Footer />
