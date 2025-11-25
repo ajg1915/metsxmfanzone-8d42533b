@@ -47,13 +47,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       
       if (data && data.length > 0) {
         setSteps(data as OnboardingStep[]);
-        const lastSeenTimestamp = localStorage.getItem('walkthroughLastSeen');
-        const now = Date.now();
-        const oneDayInMs = 24 * 60 * 60 * 1000;
-        
-        if (!lastSeenTimestamp || (now - parseInt(lastSeenTimestamp)) > oneDayInMs) {
-          setOpen(true);
-        }
+        setOpen(true);
       } else {
         console.log("No active tutorial steps found in database");
       }
