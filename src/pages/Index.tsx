@@ -30,6 +30,7 @@ const Index = () => {
         <LiveNotificationBar />
         <LiveNetworks />
         <LiveStreamsSection />
+        <SectionScrollIndicator />
         <SpringTraining />
         <SectionScrollIndicator />
         <MetsNewsTracker />
@@ -40,7 +41,7 @@ const Index = () => {
         <SectionScrollIndicator />
         <FAQSection />
         <SectionScrollIndicator />
-        <FeedbackSection className="my-px" />
+        <FeedbackSection />
         <SectionScrollIndicator />
         <AppInstallSection />
         <SectionScrollIndicator />
