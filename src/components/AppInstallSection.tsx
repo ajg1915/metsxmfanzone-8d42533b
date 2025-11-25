@@ -68,10 +68,10 @@ const AppInstallSection = () => {
       toast.error("Notification permission denied");
     }
   };
-  return <section className="py-16 px-4 bg-gradient-to-b from-background to-secondary/20">
-      <div className="container max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+  return <section className="py-8 sm:py-16 px-4 bg-gradient-to-b from-background to-secondary/20">
+      <div className="container max-w-6xl mx-auto px-0 sm:px-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
             Get the Best Experience
           </h2>
           <p className="text-muted-foreground text-sm">
@@ -79,7 +79,7 @@ const AppInstallSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* Install App Card */}
           <Card className="p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-start gap-4">
