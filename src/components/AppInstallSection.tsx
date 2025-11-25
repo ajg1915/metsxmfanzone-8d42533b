@@ -79,7 +79,7 @@ const AppInstallSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
+        <div className="grid md:grid-cols-2 gap-6 max-w-1xl">
           {/* Install App Card */}
           <Card className="p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-start gap-4">
