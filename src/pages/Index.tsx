@@ -40,7 +40,7 @@ const Index = () => {
         <SectionScrollIndicator />
         <FAQSection />
         <SectionScrollIndicator />
-        <FeedbackSection />
+        <FeedbackSection className="my-px" />
         <SectionScrollIndicator />
         <AppInstallSection />
         <SectionScrollIndicator />
