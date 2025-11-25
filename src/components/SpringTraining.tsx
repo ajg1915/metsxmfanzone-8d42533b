@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Calendar } from "lucide-react";
 export default function SpringTraining() {
   const {
@@ -34,18 +34,20 @@ export default function SpringTraining() {
         </div>
 
         {isLoading ? <p className="text-center text-muted-foreground">Loading games...</p> : games && games.length > 0 ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
-            {games.map(game => <Card key={game.id} className="overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300">
-                <div className="relative h-64 overflow-hidden">
-                  <img src={game.preview_image_url} alt={`Mets vs ${game.opponent}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <CardContent className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">
-                      Mets vs {game.opponent}
-                    </h3>
-                    <p className="text-white/90">Spring Training Matchup</p>
-                  </CardContent>
-                </div>
-              </Card>)}
+            {games.map(game => <Link key={game.id} to="/spring-training-live">
+                <Card className="overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300">
+                  <div className="relative h-64 overflow-hidden">
+                    <img src={game.preview_image_url} alt={`Mets vs ${game.opponent}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <CardContent className="absolute bottom-0 left-0 right-0 p-6">
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        Mets vs {game.opponent}
+                      </h3>
+                      <p className="text-white/90">Spring Training Matchup</p>
+                    </CardContent>
+                  </div>
+                </Card>
+              </Link>)}
           </div> : <p className="text-center text-muted-foreground">No spring training games scheduled yet.</p>}
       </div>
     </section>;
