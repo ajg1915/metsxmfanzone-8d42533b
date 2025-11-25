@@ -69,7 +69,7 @@ const AppInstallSection = () => {
     }
   };
   return <section className="py-16 px-4 bg-gradient-to-b from-background to-secondary/20">
-      <div className="container max-w-6xl mx-0">
+      <div className="container max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Get the Best Experience
@@ -79,7 +79,7 @@ const AppInstallSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 px-0 py-0 mx-0">
+        <div className="grid md:grid-cols-2 gap-6 mx-auto">
           {/* Install App Card */}
           <Card className="p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-start gap-4">
