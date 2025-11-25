@@ -84,7 +84,7 @@ const LiveStreamsSection = () => {
   return <section className="py-12 sm:py-16 bg-secondary/20">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <h2 className="text-3xl font-bold sm:text-2xl">Live & Upcoming Streams</h2>
+          <h2 className="font-bold sm:text-2xl text-xl">Live & Upcoming Streams</h2>
           <Button variant="outline" onClick={() => navigate("/live")}>
             View All Streams
           </Button>

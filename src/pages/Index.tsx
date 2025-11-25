@@ -15,10 +15,8 @@ import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
 import AppInstallSection from "@/components/AppInstallSection";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
-
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Helmet>
         <title>MetsXMFanZone - Watch Mets Live Streams, Highlights & Exclusive Coverage</title>
         <meta name="description" content="The ultimate Mets fan community. Watch live game streams, highlights, podcasts, and exclusive Mets coverage. Join thousands of passionate New York Mets fans." />
@@ -33,7 +31,7 @@ const Index = () => {
         <LiveStreamsSection />
         <SpringTraining />
         <MetsNewsTracker />
-        <BlogSection />
+        <BlogSection className="" />
         <PodcastSection />
         <FAQSection />
         <FeedbackSection />
@@ -43,8 +41,6 @@ const Index = () => {
       <Footer />
       <InstallPrompt />
       <OnboardingWalkthrough onComplete={() => {}} />
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
