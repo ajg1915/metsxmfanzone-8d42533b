@@ -83,30 +83,34 @@ const Navigation = () => {
             >
               Home
             </NavLink>
-            <NavLink 
-              to="/live" 
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Live
-            </NavLink>
-            <NavLink 
-              to="/spring-training-live" 
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Spring Training
-            </NavLink>
-            <NavLink 
-              to="/community" 
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Community
-            </NavLink>
-            <NavLink 
-              to="/blog" 
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Blog
-            </NavLink>
+            {user && (
+              <>
+                <NavLink 
+                  to="/live" 
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  Live
+                </NavLink>
+                <NavLink 
+                  to="/spring-training-live" 
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  Spring Training
+                </NavLink>
+                <NavLink 
+                  to="/community" 
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  Community
+                </NavLink>
+                <NavLink 
+                  to="/blog" 
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  Blog
+                </NavLink>
+              </>
+            )}
             <NavLink 
               to="/plans" 
               className="text-foreground hover:text-primary transition-colors"
@@ -192,34 +196,38 @@ const Navigation = () => {
                   >
                     Home
                   </NavLink>
-                  <NavLink 
-                    to="/live" 
-                    className="text-foreground hover:text-primary transition-colors py-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Live
-                  </NavLink>
-                  <NavLink 
-                    to="/spring-training-live" 
-                    className="text-foreground hover:text-primary transition-colors py-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Spring Training
-                  </NavLink>
-                  <NavLink 
-                    to="/community" 
-                    className="text-foreground hover:text-primary transition-colors py-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Community
-                  </NavLink>
-                  <NavLink 
-                    to="/blog" 
-                    className="text-foreground hover:text-primary transition-colors py-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Blog
-                  </NavLink>
+                  {user && (
+                    <>
+                      <NavLink 
+                        to="/live" 
+                        className="text-foreground hover:text-primary transition-colors py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Live
+                      </NavLink>
+                      <NavLink 
+                        to="/spring-training-live" 
+                        className="text-foreground hover:text-primary transition-colors py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Spring Training
+                      </NavLink>
+                      <NavLink 
+                        to="/community" 
+                        className="text-foreground hover:text-primary transition-colors py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Community
+                      </NavLink>
+                      <NavLink 
+                        to="/blog" 
+                        className="text-foreground hover:text-primary transition-colors py-2"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Blog
+                      </NavLink>
+                    </>
+                  )}
                   <NavLink 
                     to="/plans" 
                     className="text-foreground hover:text-primary transition-colors py-2"
