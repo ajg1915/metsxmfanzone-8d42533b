@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import Index from "./pages/Index";
 import Live from "./pages/Live";
 import Community from "./pages/Community";
@@ -64,12 +65,15 @@ import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <Routes>
+const App = () => {
+  useAutoRefresh();
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/live" element={<Live />} />
         <Route path="/community" element={<Community />} />
@@ -129,9 +133,10 @@ const App = () => (
           <Route path="/sitemap.xml" element={<Sitemap />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
+      </Routes>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
