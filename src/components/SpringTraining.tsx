@@ -20,7 +20,7 @@ export default function SpringTraining() {
       return data;
     }
   });
-  return <section className="py-16 bg-gradient-to-b from-background to-muted/20">
+  return <section className="py-10 bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
           <h2 className="font-bold mb-4 text-2xl">Spring Training 2026</h2>

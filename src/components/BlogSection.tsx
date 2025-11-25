@@ -49,7 +49,7 @@ const BlogSection = () => {
     return postDate.toLocaleDateString();
   };
   if (loading) {
-    return <section className="py-16 bg-secondary/20">
+    return <section className="py-8 bg-secondary/20">
         <div className="container mx-auto px-4">
           <div className="text-center">Loading latest posts...</div>
         </div>
@@ -58,9 +58,9 @@ const BlogSection = () => {
   if (posts.length === 0) {
     return null;
   }
-  return <section className="py-16 bg-secondary/20">
+  return <section className="py-10 bg-secondary/20">
         <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5">
           <h2 className="sm:text-xl font-bold text-lg">MetsXMFanZone Latest News</h2>
           <Button variant="outline" size="sm" onClick={() => navigate("/blog")} className="w-full sm:w-auto">
             View All Posts

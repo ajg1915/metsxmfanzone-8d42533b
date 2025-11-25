@@ -72,7 +72,7 @@ const LiveStreamsSection = () => {
     return '/live';
   };
   if (loading) {
-    return <section className="py-16 bg-secondary/20">
+    return <section className="py-8 bg-secondary/20">
         <div className="container mx-auto px-4">
           <div className="text-center">Loading live streams...</div>
         </div>
@@ -81,9 +81,9 @@ const LiveStreamsSection = () => {
   if (streams.length === 0) {
     return null;
   }
-  return <section className="py-12 sm:py-16 bg-secondary/20">
+  return <section className="py-8 sm:py-10 bg-secondary/20">
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h2 className="font-bold sm:text-2xl text-xl">Live & Upcoming Streams</h2>
           <Button variant="outline" onClick={() => navigate("/live")}>
             View All Streams

@@ -71,9 +71,9 @@ const FeedbackSection = () => {
 
   if (loading) {
     return (
-      <section className="py-16 bg-muted/30">
+      <section className="py-10 bg-muted/30">
         <div className="container mx-auto px-4 max-w-7xl">
-          <h2 className="text-3xl font-bold text-center mb-12">Community Feedback</h2>
+          <h2 className="text-2xl font-bold text-center mb-6">Community Feedback</h2>
           <div className="text-center text-muted-foreground">Loading feedbacks...</div>
         </div>
       </section>
@@ -82,9 +82,9 @@ const FeedbackSection = () => {
 
   if (feedbacks.length === 0) {
     return (
-      <section className="py-16 bg-muted/30">
+      <section className="py-10 bg-muted/30">
         <div className="container mx-auto px-4 max-w-7xl">
-          <h2 className="text-3xl font-bold text-center mb-12">Community Feedback</h2>
+          <h2 className="text-2xl font-bold text-center mb-6">Community Feedback</h2>
           <div className="text-center text-muted-foreground">
             No feedback yet. Be the first to share your thoughts!
           </div>
@@ -94,9 +94,9 @@ const FeedbackSection = () => {
   }
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-10 bg-muted/30">
       <div className="container mx-auto px-4 max-w-7xl">
-        <h2 className="text-3xl font-bold text-center mb-12">Community Feedback</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Community Feedback</h2>
         <div className="grid gap-6 md:grid-cols-3 max-w-6xl mx-auto">
           {feedbacks.map((feedback) => (
             <Card key={feedback.id} className="hover:shadow-lg transition-shadow">
