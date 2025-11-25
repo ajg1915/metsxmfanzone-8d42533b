@@ -49,7 +49,7 @@ const MetsNewsTracker = () => {
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live Updates</span>
           </div>
           <h2 className="text-4xl font-bold text-foreground mb-4">
-            Mets News Tracker
+            Mets Live Tracker
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Stay updated with the latest signings, trades, and rumors from the Mets front office

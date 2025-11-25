@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const setupNotificationListeners = () => {
-  // Listen for new Mets news tracker items
+  // Listen for new Mets Live Tracker items
   const newsChannel = supabase
     .channel('news-notifications')
     .on(
