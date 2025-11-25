@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,11 +53,19 @@ interface BlogPost {
 
 const Live = () => {
   const navigate = useNavigate();
+  const { tier } = useSubscription();
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [tvSchedules, setTvSchedules] = useState<TVSchedule[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [podcastStream, setPodcastStream] = useState<PodcastLiveStream | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+
+  useEffect(() => {
+    if (tier === "free") {
+      setShowUpgradePrompt(true);
+    }
+  }, [tier]);
 
   useEffect(() => {
     fetchStreams();
@@ -195,8 +204,13 @@ const Live = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Helmet>
+    <>
+      <UpgradePrompt 
+        open={showUpgradePrompt} 
+        onOpenChange={setShowUpgradePrompt} 
+      />
+      <div className="min-h-screen bg-background">
+        <Helmet>
         <title>Watch Mets Live Streams - Live Game Coverage & Analysis | MetsXMFanZone</title>
         <meta name="description" content="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7." />
         <meta name="keywords" content="Mets live stream, watch Mets live, Mets game stream, live baseball, Mets pre-game, Mets post-game, MLB live stream" />
@@ -338,6 +352,7 @@ const Live = () => {
       </main>
       <Footer />
     </div>
+    </>
   );
 };
 

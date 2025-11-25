@@ -6,6 +6,8 @@ import logo from "@/assets/metsxmfanzone-logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,9 +28,11 @@ import {
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
+  const { tier } = useSubscription();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -52,6 +56,8 @@ const Navigation = () => {
   const handleProtectedNavigation = (path: string) => {
     if (!user) {
       navigate("/auth");
+    } else if (path === "/live" && tier === "free") {
+      setShowUpgradePrompt(true);
     } else {
       navigate(path);
     }
@@ -68,8 +74,13 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-      <div className="container mx-auto px-3 sm:px-4">
+    <>
+      <UpgradePrompt 
+        open={showUpgradePrompt} 
+        onOpenChange={setShowUpgradePrompt} 
+      />
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+        <div className="container mx-auto px-3 sm:px-4">
         <div className="flex items-center justify-between h-12">
           <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => navigate("/")}>
             <img 
@@ -323,6 +334,7 @@ const Navigation = () => {
         </div>
       </div>
     </nav>
+    </>
   );
 };
 
