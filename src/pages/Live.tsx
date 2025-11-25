@@ -203,14 +203,26 @@ const Live = () => {
     }
   ];
 
+  if (tier === "free") {
+    return (
+      <>
+        <UpgradePrompt open={true} />
+        <div className="min-h-screen bg-background">
+          <Navigation />
+          <main className="pt-16 flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      </>
+    );
+  }
+
   return (
-    <>
-      <UpgradePrompt 
-        open={showUpgradePrompt} 
-        onOpenChange={setShowUpgradePrompt} 
-      />
-      <div className="min-h-screen bg-background">
-        <Helmet>
+    <div className="min-h-screen bg-background">
+      <Helmet>
         <title>Watch Mets Live Streams - Live Game Coverage & Analysis | MetsXMFanZone</title>
         <meta name="description" content="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7." />
         <meta name="keywords" content="Mets live stream, watch Mets live, Mets game stream, live baseball, Mets pre-game, Mets post-game, MLB live stream" />
@@ -352,7 +364,6 @@ const Live = () => {
       </main>
       <Footer />
     </div>
-    </>
   );
 };
 

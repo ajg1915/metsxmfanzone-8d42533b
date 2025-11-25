@@ -4,14 +4,17 @@ import { useNavigate } from "react-router-dom";
 
 interface UpgradePromptProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
 }
 
-export function UpgradePrompt({ open, onOpenChange }: UpgradePromptProps) {
+export function UpgradePrompt({ open }: UpgradePromptProps) {
   const navigate = useNavigate();
 
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Upgrade Required</AlertDialogTitle>
@@ -21,13 +24,10 @@ export function UpgradePrompt({ open, onOpenChange }: UpgradePromptProps) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+          <Button variant="outline" onClick={handleGoBack}>
+            Go Back
           </Button>
-          <Button onClick={() => {
-            onOpenChange(false);
-            navigate("/plans");
-          }}>
+          <Button onClick={() => navigate("/plans")}>
             View Plans
           </Button>
         </AlertDialogFooter>
