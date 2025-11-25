@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Star, MessageSquare } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "react-router-dom";
 
 interface Feedback {
   id: string;
@@ -115,6 +117,14 @@ const FeedbackSection = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+        <div className="text-center mt-8">
+          <Button asChild variant="default" size="lg">
+            <Link to="/feedback">
+              <MessageSquare className="mr-2 h-5 w-5" />
+              Submit Your Feedback
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
