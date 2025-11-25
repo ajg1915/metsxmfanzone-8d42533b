@@ -156,6 +156,45 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          event_date: string
+          external_link: string | null
+          id: string
+          image_url: string | null
+          location: string | null
+          published: boolean | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          event_date: string
+          external_link?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          published?: boolean | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          event_date?: string
+          external_link?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          published?: boolean | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       feedbacks: {
         Row: {
           content: string
@@ -544,6 +583,39 @@ export type Database = {
           title?: string
           twitter_card?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      spring_training_games: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          game_date: string
+          id: string
+          opponent: string
+          preview_image_url: string
+          published: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          game_date: string
+          id?: string
+          opponent: string
+          preview_image_url: string
+          published?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          game_date?: string
+          id?: string
+          opponent?: string
+          preview_image_url?: string
+          published?: boolean | null
+          updated_at?: string | null
         }
         Relationships: []
       }

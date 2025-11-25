@@ -58,6 +58,9 @@ import HelcimCheckout from "./pages/HelcimCheckout";
 import SpringTrainingLive from "./pages/SpringTrainingLive";
 import Merch from "./pages/Merch";
 import Product from "./pages/Product";
+import MetsSchedule2026 from "./pages/MetsSchedule2026";
+import EventsManagement from "./pages/admin/EventsManagement";
+import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
 
 const queryClient = new QueryClient();
 
@@ -113,10 +116,13 @@ const App = () => (
             <Route path="business-ads" element={<BusinessAdsManagement />} />
             <Route path="roles" element={<UserRoles />} />
             <Route path="subscriptions" element={<SubscriptionManagement />} />
+            <Route path="events" element={<EventsManagement />} />
+            <Route path="spring-training" element={<SpringTrainingManagement />} />
           </Route>
           <Route path="/spring-training-live" element={<SpringTrainingLive />} />
-          <Route path="/merch" element={<Merch />} />
-          <Route path="/product/:handle" element={<Product />} />
+            <Route path="/merch" element={<Merch />} />
+            <Route path="/product/:handle" element={<Product />} />
+            <Route path="/mets-schedule-2026" element={<MetsSchedule2026 />} />
           <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
           <Route path="/mlb-network" element={<MLBNetwork />} />
           <Route path="/espn-network" element={<ESPNNetwork />} />

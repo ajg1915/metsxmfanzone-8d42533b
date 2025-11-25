@@ -1,4 +1,4 @@
-import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen } from "lucide-react";
+import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -36,6 +36,8 @@ const liveManagementItems = [
   { title: "Stories", url: "/admin/stories", icon: Image },
   { title: "Mets News Tracker", url: "/admin/mets-news", icon: TrendingUp },
   { title: "TV Schedule", url: "/admin/tv-schedule", icon: Calendar },
+  { title: "Events", url: "/admin/events", icon: CalendarDays },
+  { title: "Spring Training", url: "/admin/spring-training", icon: Trophy },
 ];
 
 const userItems = [
