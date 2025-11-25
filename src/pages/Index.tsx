@@ -27,7 +27,6 @@ const Index = () => {
       <Navigation />
       <main className="pt-12 sm:pt-14">
         <Hero />
-        <SectionScrollIndicator />
         <LiveNotificationBar />
         <SectionScrollIndicator />
         <LiveNetworks />
