@@ -147,7 +147,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
                 onClick={handleNext}
                 className="gap-2"
               >
-                {currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
+                {currentStep === steps.length - 1 ? 'Show Home' : 'Next'}
                 {currentStep < steps.length - 1 && <ChevronRight className="w-4 h-4" />}
               </Button>
             </div>
