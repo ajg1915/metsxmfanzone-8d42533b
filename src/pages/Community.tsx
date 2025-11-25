@@ -14,6 +14,7 @@ import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone } from "lucide
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import StoriesSection from "@/components/StoriesSection";
+import Events from "./Events";
 import { z } from "zod";
 
 interface Post {
@@ -410,6 +411,11 @@ const Community = () => {
                 </CardContent>
               </Card>
             )}
+          </div>
+          
+          {/* Events Section */}
+          <div className="mt-16">
+            <Events />
           </div>
         </div>
       </main>

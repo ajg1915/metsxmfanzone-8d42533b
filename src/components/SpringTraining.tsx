@@ -1,134 +1,65 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar, MapPin } from "lucide-react";
-import yankees from "@/assets/spring-mets-yankees.jpg";
-import astros from "@/assets/spring-mets-astros.jpg";
-import cards from "@/assets/spring-mets-cards.jpg";
-import nats from "@/assets/spring-mets-nats.jpg";
-import redsox from "@/assets/spring-mets-redsox.jpg";
-import braves from "@/assets/spring-mets-braves.jpg";
+import { Card, CardContent } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
+import { Calendar } from "lucide-react";
 
-const SpringTraining = () => {
-  const games = [
-    {
-      id: 1,
-      home: "Mets",
-      away: "Yankees",
-      date: "Sat, Feb 28, 1:05 PM",
-      location: "Clover Park, Port St. Lucie, FL",
-      description: "Spring training opener against the Yankees",
-      image: yankees
+export default function SpringTraining() {
+  const { data: games, isLoading } = useQuery({
+    queryKey: ["spring-training-games"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("spring_training_games")
+        .select("*")
+        .eq("published", true)
+        .order("display_order", { ascending: true });
+
+      if (error) throw error;
+      return data;
     },
-    {
-      id: 2,
-      home: "Mets",
-      away: "Astros",
-      date: "Mon, Mar 2, 1:05 PM",
-      location: "Clover Park, Port St. Lucie, FL",
-      description: "Spring training matchup",
-      image: astros
-    },
-    {
-      id: 3,
-      home: "Mets",
-      away: "Cardinals",
-      date: "Thu, Mar 5, 1:05 PM",
-      location: "Roger Dean Stadium, Jupiter, FL",
-      description: "Away spring training game",
-      image: cards
-    },
-    {
-      id: 4,
-      home: "Mets",
-      away: "Nationals",
-      date: "Sun, Mar 8, 1:05 PM",
-      location: "Clover Park, Port St. Lucie, FL",
-      description: "Spring training home game",
-      image: nats
-    },
-    {
-      id: 5,
-      home: "Mets",
-      away: "Red Sox",
-      date: "Wed, Mar 11, 1:05 PM",
-      location: "JetBlue Park, Fort Myers, FL",
-      description: "Away spring training game",
-      image: redsox
-    },
-    {
-      id: 6,
-      home: "Mets",
-      away: "Braves",
-      date: "Sat, Mar 14, 1:05 PM",
-      location: "Clover Park, Port St. Lucie, FL",
-      description: "Spring training divisional matchup",
-      image: braves
-    }
-  ];
+  });
 
   return (
-    <section className="py-6 sm:py-10 md:py-14 bg-background">
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="mb-4 sm:mb-6 flex justify-between items-center">
-          <div>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary mb-2">
-              2026 Spring Training
-            </h2>
-            <p className="text-xs sm:text-sm text-foreground">Upcoming games and exclusive coverage</p>
-          </div>
-          <a href="/merch">
-            <Button variant="outline" size="sm" className="text-xs">
-              Shop Merch
-            </Button>
-          </a>
+    <section className="py-16 bg-gradient-to-b from-background to-muted/20">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold mb-4">Spring Training 2026</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
+            Get ready for the upcoming spring training season. Follow the Mets as they prepare for another exciting year.
+          </p>
+          <Link to="/mets-schedule-2026" className="inline-flex items-center gap-2 text-primary hover:underline font-medium">
+            <Calendar className="w-4 h-4" />
+            View Full 2026 Regular Season Schedule
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {games.map((game) => (
-            <Card key={game.id} className="border-2 border-primary bg-card overflow-hidden hover:shadow-xl transition-shadow">
-              <div className="h-48 relative overflow-hidden">
-                <img 
-                  src={game.image} 
-                  alt={`${game.home} vs ${game.away}`}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute top-4 right-4">
-                  <Badge className="bg-primary text-primary-foreground">
-                    UPCOMING
-                  </Badge>
+        {isLoading ? (
+          <p className="text-center text-muted-foreground">Loading games...</p>
+        ) : games && games.length > 0 ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
+            {games.map((game) => (
+              <Card key={game.id} className="overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300">
+                <div className="relative h-64 overflow-hidden">
+                  <img
+                    src={game.preview_image_url}
+                    alt={`Mets vs ${game.opponent}`}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <CardContent className="absolute bottom-0 left-0 right-0 p-6">
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      Mets vs {game.opponent}
+                    </h3>
+                    <p className="text-white/90">Spring Training Matchup</p>
+                  </CardContent>
                 </div>
-                <div className="absolute bottom-4 left-4 right-4 text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-white">
-                    {game.home} vs {game.away}
-                  </div>
-                </div>
-              </div>
-              <CardHeader>
-                <CardTitle className="text-xl text-primary">
-                  {game.home} vs {game.away}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-foreground">
-                  <Calendar className="w-4 h-4 text-primary" />
-                  {game.date}
-                </div>
-                <div className="flex items-center gap-2 text-sm text-foreground">
-                  <MapPin className="w-4 h-4 text-primary" />
-                  {game.location}
-                </div>
-                <p className="text-sm text-muted-foreground pt-2">
-                  {game.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-muted-foreground">No spring training games scheduled yet.</p>
+        )}
       </div>
     </section>
   );
-};
-
-export default SpringTraining;
+}
