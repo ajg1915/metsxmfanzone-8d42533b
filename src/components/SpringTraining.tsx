@@ -23,7 +23,7 @@ export default function SpringTraining() {
     <section className="py-16 bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">Spring Training 2026</h2>
+          <h2 className="text-3xl font-bold mb-4">Spring Training 2026</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
             Get ready for the upcoming spring training season. Follow the Mets as they prepare for another exciting year.
           </p>
