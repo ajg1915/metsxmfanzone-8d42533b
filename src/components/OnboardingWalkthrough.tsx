@@ -26,6 +26,13 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const sessionDismissed = sessionStorage.getItem('tutorialDismissed');
+    
+    if (sessionDismissed === 'true') {
+      setLoading(false);
+      return;
+    }
+
     if (previewMode && previewSteps.length > 0) {
       setSteps(previewSteps);
       setOpen(true);
@@ -73,13 +80,13 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   };
 
   const handleComplete = () => {
-    localStorage.setItem('walkthroughLastSeen', Date.now().toString());
+    sessionStorage.setItem('tutorialDismissed', 'true');
     setOpen(false);
     onComplete();
   };
 
   const handleSkip = () => {
-    localStorage.setItem('walkthroughLastSeen', Date.now().toString());
+    sessionStorage.setItem('tutorialDismissed', 'true');
     setOpen(false);
     onComplete();
   };
