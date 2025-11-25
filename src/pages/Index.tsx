@@ -13,7 +13,7 @@ import FeedbackSection from "@/components/FeedbackSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
-import AppInstallSection from "@/components/AppInstallSection";
+import WebAppInstall from "@/components/WebAppInstall";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 
 const Index = () => {
@@ -37,7 +37,7 @@ const Index = () => {
         <PodcastSection />
         <FAQSection />
         <FeedbackSection />
-        <AppInstallSection />
+        <WebAppInstall />
         <NewsletterSection />
       </main>
       <Footer />
