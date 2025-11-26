@@ -222,6 +222,48 @@ export type Database = {
         }
         Relationships: []
       }
+      lineup_cards: {
+        Row: {
+          created_at: string
+          game_date: string
+          game_time: string
+          id: string
+          lineup_data: Json
+          location: string | null
+          notes: string | null
+          opponent: string
+          published: boolean
+          starting_pitcher: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          game_date: string
+          game_time: string
+          id?: string
+          lineup_data?: Json
+          location?: string | null
+          notes?: string | null
+          opponent: string
+          published?: boolean
+          starting_pitcher?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          game_date?: string
+          game_time?: string
+          id?: string
+          lineup_data?: Json
+          location?: string | null
+          notes?: string | null
+          opponent?: string
+          published?: boolean
+          starting_pitcher?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       live_notifications: {
         Row: {
           created_at: string

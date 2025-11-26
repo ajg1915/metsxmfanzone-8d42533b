@@ -62,6 +62,8 @@ import Merch from "./pages/Merch";
 import Product from "./pages/Product";
 import MetsSchedule2026 from "./pages/MetsSchedule2026";
 import MetsLineupCard from "./pages/MetsLineupCard";
+import VideoGallery from "./pages/VideoGallery";
+import LineupCardManagement from "./pages/admin/LineupCardManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
 import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
 import CreateAccount from "./pages/help/CreateAccount";
@@ -157,12 +159,14 @@ const App = () => {
             <Route path="subscriptions" element={<SubscriptionManagement />} />
             <Route path="events" element={<EventsManagement />} />
             <Route path="spring-training" element={<SpringTrainingManagement />} />
+            <Route path="lineup-card-management" element={<LineupCardManagement />} />
           </Route>
           <Route path="/spring-training-live" element={<SpringTrainingLive />} />
             <Route path="/merch" element={<Merch />} />
             <Route path="/product/:handle" element={<Product />} />
-            <Route path="/mets-schedule-2026" element={<MetsSchedule2026 />} />
-            <Route path="/mets-lineup-card" element={<MetsLineupCard />} />
+          <Route path="/mets-schedule-2026" element={<MetsSchedule2026 />} />
+          <Route path="/mets-lineup-card" element={<MetsLineupCard />} />
+          <Route path="/video-gallery" element={<VideoGallery />} />
           <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
           <Route path="/mlb-network" element={<MLBNetwork />} />
           <Route path="/espn-network" element={<ESPNNetwork />} />
