@@ -61,6 +61,7 @@ import SpringTrainingLive from "./pages/SpringTrainingLive";
 import Merch from "./pages/Merch";
 import Product from "./pages/Product";
 import MetsSchedule2026 from "./pages/MetsSchedule2026";
+import MetsLineupCard from "./pages/MetsLineupCard";
 import EventsManagement from "./pages/admin/EventsManagement";
 import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
 import CreateAccount from "./pages/help/CreateAccount";
@@ -161,6 +162,7 @@ const App = () => {
             <Route path="/merch" element={<Merch />} />
             <Route path="/product/:handle" element={<Product />} />
             <Route path="/mets-schedule-2026" element={<MetsSchedule2026 />} />
+            <Route path="/mets-lineup-card" element={<MetsLineupCard />} />
           <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
           <Route path="/mlb-network" element={<MLBNetwork />} />
           <Route path="/espn-network" element={<ESPNNetwork />} />

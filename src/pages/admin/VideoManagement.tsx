@@ -43,6 +43,7 @@ export default function VideoManagement() {
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
+  const [uploadMethod, setUploadMethod] = useState<'file' | 'youtube' | 'link'>('file');
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -374,6 +375,7 @@ export default function VideoManagement() {
     setVideoFile(null);
     setThumbnailFile(null);
     setUploadProgress(0);
+    setUploadMethod('file');
     setFormData({
       title: "",
       description: "",
@@ -433,60 +435,112 @@ export default function VideoManagement() {
               </div>
 
               <div>
-                <Label htmlFor="video_file">Upload Video *</Label>
-                <p className="text-xs text-muted-foreground mb-2">
-                  Maximum size: 500MB. Formats: MP4, MOV, AVI
-                </p>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="video_file"
-                    type="file"
-                    accept="video/mp4,video/quicktime,video/x-msvideo"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const MAX_SIZE = 500 * 1024 * 1024;
-                        if (file.size > MAX_SIZE) {
-                          toast({
-                            title: "Error",
-                            description: "Video file must be less than 500MB",
-                            variant: "destructive",
-                          });
-                          e.target.value = '';
-                          return;
-                        }
-                        setVideoFile(file);
-                      }
-                    }}
-                    disabled={uploading}
-                    required={!editingVideo && !formData.video_url}
-                  />
-                  <Upload className="w-4 h-4 text-muted-foreground" />
-                </div>
-                {videoFile && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Selected: {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
-                  </p>
-                )}
-                {editingVideo && formData.video_url && !videoFile && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Current video will be kept if no new file is uploaded
-                  </p>
-                )}
-                {uploading && uploadProgress > 0 && (
-                  <div className="mt-2">
-                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {generatingThumbnail ? 'Generating thumbnail...' : `Uploading... ${uploadProgress}%`}
-                    </p>
-                  </div>
-                )}
+                <Label>Upload Method *</Label>
+                <Select value={uploadMethod} onValueChange={(value: 'file' | 'youtube' | 'link') => setUploadMethod(value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="file">File Upload (High Quality)</SelectItem>
+                    <SelectItem value="youtube">YouTube Link</SelectItem>
+                    <SelectItem value="link">Other Video Link</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
+              {uploadMethod === 'file' && (
+                <div>
+                  <Label htmlFor="video_file">Upload Video *</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Maximum size: 500MB. Formats: MP4, MOV, AVI
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="video_file"
+                      type="file"
+                      accept="video/mp4,video/quicktime,video/x-msvideo"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const MAX_SIZE = 500 * 1024 * 1024;
+                          if (file.size > MAX_SIZE) {
+                            toast({
+                              title: "Error",
+                              description: "Video file must be less than 500MB",
+                              variant: "destructive",
+                            });
+                            e.target.value = '';
+                            return;
+                          }
+                          setVideoFile(file);
+                        }
+                      }}
+                      disabled={uploading}
+                      required={!editingVideo && !formData.video_url}
+                    />
+                    <Upload className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                  {videoFile && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Selected: {videoFile.name} ({(videoFile.size / 1024 / 1024).toFixed(2)} MB)
+                    </p>
+                  )}
+                  {editingVideo && formData.video_url && !videoFile && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Current video will be kept if no new file is uploaded
+                    </p>
+                  )}
+                  {uploading && uploadProgress > 0 && (
+                    <div className="mt-2">
+                      <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary transition-all duration-300"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {generatingThumbnail ? 'Generating thumbnail...' : `Uploading... ${uploadProgress}%`}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {uploadMethod === 'youtube' && (
+                <div>
+                  <Label htmlFor="youtube_url">YouTube Video URL *</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Paste the full YouTube video URL (e.g., https://www.youtube.com/watch?v=...)
+                  </p>
+                  <Input
+                    id="youtube_url"
+                    type="url"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    value={formData.video_url}
+                    onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                    required
+                    disabled={uploading}
+                  />
+                </div>
+              )}
+
+              {uploadMethod === 'link' && (
+                <div>
+                  <Label htmlFor="video_url">Video URL *</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Paste any video URL (direct link, Vimeo, etc.)
+                  </p>
+                  <Input
+                    id="video_url"
+                    type="url"
+                    placeholder="https://..."
+                    value={formData.video_url}
+                    onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                    required
+                    disabled={uploading}
+                  />
+                </div>
+              )}
 
               <div>
                 <Label htmlFor="thumbnail_file">Upload Custom Thumbnail (Optional)</Label>
