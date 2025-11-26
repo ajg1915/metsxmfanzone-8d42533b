@@ -37,47 +37,47 @@ export default function HomeLineupCard() {
   if (!lineupCard) return null;
   const lineup = lineupCard.lineup_data as unknown as LineupPlayer[];
   const pitcher = lineupCard.starting_pitcher as unknown as StartingPitcher | null;
-  return <div className="container mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="md:text-3xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent text-lg">
+  return <div className="container mx-auto px-4 py-4">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg md:text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
           Today's Mets Lineup
         </h2>
-        <Link to="/video-gallery" className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
-          <Video className="w-5 h-5" />
+        <Link to="/video-gallery" className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-sm">
+          <Video className="w-4 h-4" />
           <span className="font-medium">Video Gallery</span>
         </Link>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-lg">
-              <Clock className="w-5 h-5" />
+        <CardHeader className="pb-3">
+          <CardTitle className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2 text-sm">
+              <Clock className="w-4 h-4" />
               <span>
                 {format(new Date(lineupCard.game_date), "EEEE, MMMM d, yyyy")} at{" "}
                 {lineupCard.game_time}
               </span>
             </div>
-            <div className="text-xl font-bold">vs {lineupCard.opponent}</div>
-            {lineupCard.location && <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="w-4 h-4" />
+            <div className="text-lg font-bold">vs {lineupCard.opponent}</div>
+            {lineupCard.location && <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <MapPin className="w-3 h-3" />
                 <span>{lineupCard.location}</span>
               </div>}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
+        <CardContent className="pt-0">
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <h3 className="font-semibold text-lg mb-3">Batting Order</h3>
-              <div className="space-y-2">
-                {lineup.map(player => <div key={player.position} className="flex items-center gap-3 p-2 rounded hover:bg-muted/30 transition-colors">
-                    <span className="text-xl font-bold text-primary w-8">
+              <h3 className="font-semibold text-base mb-2">Batting Order</h3>
+              <div className="space-y-1.5">
+                {lineup.map(player => <div key={player.position} className="flex items-center gap-2 p-1.5 rounded hover:bg-muted/30 transition-colors">
+                    <span className="text-base font-bold text-primary w-6">
                       {player.position}
                     </span>
-                    {player.imageUrl && <img src={player.imageUrl} alt={player.name} className="w-10 h-10 rounded-full object-cover" />}
+                    {player.imageUrl && <img src={player.imageUrl} alt={player.name} className="w-8 h-8 rounded-full object-cover" />}
                     <div className="flex-1">
-                      <p className="font-medium">{player.name}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="font-medium text-sm">{player.name}</p>
+                      <p className="text-xs text-muted-foreground">
                         {player.fieldPosition}
                       </p>
                     </div>
@@ -86,17 +86,17 @@ export default function HomeLineupCard() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-lg mb-3">Starting Pitcher</h3>
-              {pitcher && <div className="bg-primary/10 rounded-lg p-4">
-                  <p className="font-medium text-lg">{pitcher.name}</p>
-                  <p className="text-sm text-muted-foreground">
+              <h3 className="font-semibold text-base mb-2">Starting Pitcher</h3>
+              {pitcher && <div className="bg-primary/10 rounded-lg p-3">
+                  <p className="font-medium text-base">{pitcher.name}</p>
+                  <p className="text-xs text-muted-foreground">
                     {pitcher.hand} • {pitcher.era} ERA • {pitcher.strikeouts} K
                   </p>
                 </div>}
 
-              {lineupCard.notes && <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-                  <h4 className="font-semibold mb-2">Notes</h4>
-                  <p className="text-sm text-muted-foreground">
+              {lineupCard.notes && <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                  <h4 className="font-semibold text-sm mb-1">Notes</h4>
+                  <p className="text-xs text-muted-foreground">
                     {lineupCard.notes}
                   </p>
                 </div>}
