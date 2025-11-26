@@ -25,40 +25,71 @@ const NavigatePlatform = () => {
             <CardHeader>
               <CardTitle className="text-2xl sm:text-3xl">Navigating the Platform</CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-slate max-w-none">
-              <h2>Main Navigation Menu</h2>
-              <p>Access key sections from the navigation bar at the top of every page:</p>
+            <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Main Navigation Menu</h2>
+                <p className="text-muted-foreground leading-relaxed">Access key sections from the navigation bar at the top of every page:</p>
+              </div>
               
-              <h3>Home</h3>
-              <p>Your starting point featuring latest updates, stories, news tracker, and upcoming streams.</p>
+              <div className="grid gap-6">
+                <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">Home</h3>
+                  <p className="text-muted-foreground leading-relaxed">Your starting point featuring latest updates, stories, news tracker, and upcoming streams.</p>
+                </div>
+                
+                <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">Live</h3>
+                  <p className="text-muted-foreground leading-relaxed">Watch live streams of Mets games, analysis, and special events. Available for Premium and Annual plan members.</p>
+                </div>
+                
+                <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">Spring Training</h3>
+                  <p className="text-muted-foreground leading-relaxed">Access exclusive spring training content, game previews, and matchup information.</p>
+                </div>
+                
+                <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">Community</h3>
+                  <p className="text-muted-foreground leading-relaxed">Connect with fellow Mets fans, share posts, view business advertisements, and participate in discussions.</p>
+                </div>
+                
+                <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">Blog</h3>
+                  <p className="text-muted-foreground leading-relaxed">Read the latest articles, analysis, and news about the New York Mets.</p>
+                </div>
+                
+                <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">Gallery</h3>
+                  <p className="text-muted-foreground leading-relaxed">Browse photos and video highlights from games and events.</p>
+                </div>
+                
+                <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">Podcast</h3>
+                  <p className="text-muted-foreground leading-relaxed">Listen to podcast episodes and catch live podcast shows.</p>
+                </div>
+              </div>
               
-              <h3>Live</h3>
-              <p>Watch live streams of Mets games, analysis, and special events. Available for Premium and Annual plan members.</p>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Mobile Features</h2>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong className="text-foreground">Pull to Refresh:</strong> Drag down on any page to refresh content</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong className="text-foreground">Hamburger Menu:</strong> Tap the menu icon to access all navigation links</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong className="text-foreground">App Install:</strong> Add MetsXMFanZone to your home screen for a native app experience</span>
+                  </li>
+                </ul>
+              </div>
               
-              <h3>Spring Training</h3>
-              <p>Access exclusive spring training content, game previews, and matchup information.</p>
-              
-              <h3>Community</h3>
-              <p>Connect with fellow Mets fans, share posts, view business advertisements, and participate in discussions.</p>
-              
-              <h3>Blog</h3>
-              <p>Read the latest articles, analysis, and news about the New York Mets.</p>
-              
-              <h3>Gallery</h3>
-              <p>Browse photos and video highlights from games and events.</p>
-              
-              <h3>Podcast</h3>
-              <p>Listen to podcast episodes and catch live podcast shows.</p>
-              
-              <h2>Mobile Features</h2>
-              <ul>
-                <li><strong>Pull to Refresh:</strong> Drag down on any page to refresh content</li>
-                <li><strong>Hamburger Menu:</strong> Tap the menu icon to access all navigation links</li>
-                <li><strong>App Install:</strong> Add MetsXMFanZone to your home screen for a native app experience</li>
-              </ul>
-              
-              <h2>Dashboard</h2>
-              <p>Access your personal dashboard to manage your profile, subscription, and preferences.</p>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
+                <p className="text-muted-foreground leading-relaxed">Access your personal dashboard to manage your profile, subscription, and preferences.</p>
+              </div>
             </CardContent>
           </Card>
         </div>

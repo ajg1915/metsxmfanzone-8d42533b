@@ -25,90 +25,122 @@ const CommentsReactions = () => {
             <CardHeader>
               <CardTitle className="text-2xl sm:text-3xl">Commenting and Reactions</CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-slate max-w-none">
-              <h2>Adding Comments</h2>
-              <p>Engage in discussions by commenting on posts and blog articles:</p>
+            <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Adding Comments</h2>
+                <p className="text-muted-foreground leading-relaxed">Engage in discussions by commenting on posts and blog articles:</p>
+              </div>
               
-              <h3>On Community Posts</h3>
-              <ol>
-                <li>Navigate to the <Link to="/community" className="text-primary hover:underline">Community</Link> page</li>
-                <li>Find the post you want to comment on</li>
-                <li>Click in the comment text field below the post</li>
-                <li>Type your comment</li>
-                <li>Click "Post Comment" or press Enter</li>
-              </ol>
+              <div className="grid gap-6">
+                <div className="space-y-3 p-5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
+                  <h3 className="text-xl font-semibold text-foreground">On Community Posts</h3>
+                  <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
+                    <li>Navigate to the <Link to="/community" className="text-primary hover:underline font-medium">Community</Link> page</li>
+                    <li>Find the post you want to comment on</li>
+                    <li>Click in the comment text field below the post</li>
+                    <li>Type your comment</li>
+                    <li>Click "Post Comment" or press Enter</li>
+                  </ol>
+                </div>
+                
+                <div className="space-y-3 p-5 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-l-4 border-purple-500">
+                  <h3 className="text-xl font-semibold text-foreground">On Blog Articles</h3>
+                  <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
+                    <li>Read the blog article</li>
+                    <li>Scroll to the comments section at the bottom</li>
+                    <li>Click in the comment field</li>
+                    <li>Write your thoughts</li>
+                    <li>Submit your comment</li>
+                  </ol>
+                </div>
+              </div>
               
-              <h3>On Blog Articles</h3>
-              <ol>
-                <li>Read the blog article</li>
-                <li>Scroll to the comments section at the bottom</li>
-                <li>Click in the comment field</li>
-                <li>Write your thoughts</li>
-                <li>Submit your comment</li>
-              </ol>
+              <div className="space-y-6 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Comment Guidelines</h2>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-3 p-5 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <h3 className="text-xl font-semibold text-green-700 dark:text-green-300">Do's ✓</h3>
+                    <ul className="space-y-2 text-muted-foreground">
+                      <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Add value to the conversation</span></li>
+                      <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Be respectful of different opinions</span></li>
+                      <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Stay on topic</span></li>
+                      <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Use proper language</span></li>
+                      <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Engage constructively</span></li>
+                    </ul>
+                  </div>
+                  
+                  <div className="space-y-3 p-5 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                    <h3 className="text-xl font-semibold text-red-700 dark:text-red-300">Don'ts ✗</h3>
+                    <ul className="space-y-2 text-muted-foreground">
+                      <li className="flex items-start gap-2"><span className="text-red-600 font-bold">✗</span><span>Post spam or off-topic comments</span></li>
+                      <li className="flex items-start gap-2"><span className="text-red-600 font-bold">✗</span><span>Attack other users personally</span></li>
+                      <li className="flex items-start gap-2"><span className="text-red-600 font-bold">✗</span><span>Use offensive language</span></li>
+                      <li className="flex items-start gap-2"><span className="text-red-600 font-bold">✗</span><span>Share misinformation</span></li>
+                      <li className="flex items-start gap-2"><span className="text-red-600 font-bold">✗</span><span>Advertise without permission</span></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
               
-              <h2>Comment Guidelines</h2>
+              <div className="space-y-6 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Managing Your Comments</h2>
+                
+                <div className="grid gap-4">
+                  <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                    <h3 className="text-xl font-semibold text-foreground">Edit a Comment</h3>
+                    <p className="text-muted-foreground leading-relaxed mb-3">To edit your comment after posting:</p>
+                    <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
+                      <li>Find your comment</li>
+                      <li>Click the edit icon or three-dot menu</li>
+                      <li>Select "Edit"</li>
+                      <li>Make changes and save</li>
+                    </ol>
+                  </div>
+                  
+                  <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                    <h3 className="text-xl font-semibold text-foreground">Delete a Comment</h3>
+                    <p className="text-muted-foreground leading-relaxed mb-3">To remove your comment:</p>
+                    <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
+                      <li>Find your comment</li>
+                      <li>Click the three-dot menu</li>
+                      <li>Select "Delete"</li>
+                      <li>Confirm deletion</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
               
-              <h3>Do's</h3>
-              <ul>
-                <li>Add value to the conversation</li>
-                <li>Be respectful of different opinions</li>
-                <li>Stay on topic</li>
-                <li>Use proper language</li>
-                <li>Engage constructively</li>
-              </ul>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Reactions and Likes</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">Show appreciation for content without commenting:</p>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">❤️</span><span>Click the like/heart icon on posts</span></li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">👍</span><span>React to comments you agree with</span></li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">👁️</span><span>Your reactions are visible to other users</span></li>
+                </ul>
+              </div>
               
-              <h3>Don'ts</h3>
-              <ul>
-                <li>Post spam or off-topic comments</li>
-                <li>Attack other users personally</li>
-                <li>Use offensive language</li>
-                <li>Share misinformation</li>
-                <li>Advertise without permission</li>
-              </ul>
+              <div className="space-y-4 pt-6 border-t bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
+                <h2 className="text-2xl font-bold text-foreground">Notifications</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">Get notified when:</p>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-start gap-2"><span className="text-blue-600 font-bold">🔔</span><span>Someone replies to your comment</span></li>
+                  <li className="flex items-start gap-2"><span className="text-blue-600 font-bold">🔔</span><span>Your post receives comments</span></li>
+                  <li className="flex items-start gap-2"><span className="text-blue-600 font-bold">🔔</span><span>Someone reacts to your content</span></li>
+                </ul>
+                <p className="text-muted-foreground leading-relaxed mt-4">Enable push notifications for real-time alerts about interactions.</p>
+              </div>
               
-              <h2>Managing Your Comments</h2>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Reporting Comments</h2>
+                <p className="text-muted-foreground leading-relaxed">If you see inappropriate comments, report them following our <Link to="/help/report-content" className="text-primary hover:underline font-medium">Reporting Inappropriate Content</Link> guide.</p>
+              </div>
               
-              <h3>Edit a Comment</h3>
-              <p>To edit your comment after posting:</p>
-              <ol>
-                <li>Find your comment</li>
-                <li>Click the edit icon or three-dot menu</li>
-                <li>Select "Edit"</li>
-                <li>Make changes and save</li>
-              </ol>
-              
-              <h3>Delete a Comment</h3>
-              <p>To remove your comment:</p>
-              <ol>
-                <li>Find your comment</li>
-                <li>Click the three-dot menu</li>
-                <li>Select "Delete"</li>
-                <li>Confirm deletion</li>
-              </ol>
-              
-              <h2>Reactions and Likes</h2>
-              <p>Show appreciation for content without commenting:</p>
-              <ul>
-                <li>Click the like/heart icon on posts</li>
-                <li>React to comments you agree with</li>
-                <li>Your reactions are visible to other users</li>
-              </ul>
-              
-              <h2>Notifications</h2>
-              <p>Get notified when:</p>
-              <ul>
-                <li>Someone replies to your comment</li>
-                <li>Your post receives comments</li>
-                <li>Someone reacts to your content</li>
-              </ul>
-              <p>Enable push notifications for real-time alerts about interactions.</p>
-              
-              <h2>Reporting Comments</h2>
-              <p>If you see inappropriate comments, report them following our <Link to="/help/report-content" className="text-primary hover:underline">Reporting Inappropriate Content</Link> guide.</p>
-              
-              <h2>Community Standards</h2>
-              <p>All comments must follow our <Link to="/help/community-guidelines" className="text-primary hover:underline">Community Guidelines</Link>. Violations may result in comment removal or account restrictions.</p>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Community Standards</h2>
+                <p className="text-muted-foreground leading-relaxed">All comments must follow our <Link to="/help/community-guidelines" className="text-primary hover:underline font-medium">Community Guidelines</Link>. Violations may result in comment removal or account restrictions.</p>
+              </div>
             </CardContent>
           </Card>
         </div>

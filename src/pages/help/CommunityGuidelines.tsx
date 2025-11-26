@@ -25,48 +25,62 @@ const CommunityGuidelines = () => {
             <CardHeader>
               <CardTitle className="text-2xl sm:text-3xl">Community Guidelines</CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-slate max-w-none">
-              <h2>Our Community Values</h2>
-              <p>MetsXMFanZone is a community for passionate Mets fans to connect, share, and celebrate our team. We expect all members to follow these guidelines.</p>
+            <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Our Community Values</h2>
+                <p className="text-muted-foreground leading-relaxed">MetsXMFanZone is a community for passionate Mets fans to connect, share, and celebrate our team. We expect all members to follow these guidelines.</p>
+              </div>
               
-              <h2>Be Respectful</h2>
-              <ul>
-                <li>Treat all community members with respect and kindness</li>
-                <li>No personal attacks, harassment, or bullying</li>
-                <li>Respect different opinions and perspectives</li>
-                <li>Keep discussions civil, even during heated debates</li>
-              </ul>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Be Respectful</h2>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">✓</span><span>Treat all community members with respect and kindness</span></li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">✓</span><span>No personal attacks, harassment, or bullying</span></li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">✓</span><span>Respect different opinions and perspectives</span></li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">✓</span><span>Keep discussions civil, even during heated debates</span></li>
+                </ul>
+              </div>
               
-              <h2>Prohibited Content</h2>
-              <ul>
-                <li>Hate speech, discrimination, or offensive language</li>
-                <li>Spam, advertising, or promotional content without permission</li>
-                <li>Copyrighted material without proper authorization</li>
-                <li>Misinformation or false news</li>
-                <li>NSFW content or inappropriate material</li>
-              </ul>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Prohibited Content</h2>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2"><span className="text-destructive font-bold">✗</span><span>Hate speech, discrimination, or offensive language</span></li>
+                  <li className="flex items-start gap-2"><span className="text-destructive font-bold">✗</span><span>Spam, advertising, or promotional content without permission</span></li>
+                  <li className="flex items-start gap-2"><span className="text-destructive font-bold">✗</span><span>Copyrighted material without proper authorization</span></li>
+                  <li className="flex items-start gap-2"><span className="text-destructive font-bold">✗</span><span>Misinformation or false news</span></li>
+                  <li className="flex items-start gap-2"><span className="text-destructive font-bold">✗</span><span>NSFW content or inappropriate material</span></li>
+                </ul>
+              </div>
               
-              <h2>Posting Guidelines</h2>
-              <ul>
-                <li>Stay on topic and relevant to the Mets and baseball</li>
-                <li>Use clear, descriptive titles for your posts</li>
-                <li>Credit sources when sharing news or content</li>
-                <li>Avoid excessive posting or duplicate content</li>
-              </ul>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Posting Guidelines</h2>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Stay on topic and relevant to the Mets and baseball</span></li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Use clear, descriptive titles for your posts</span></li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Credit sources when sharing news or content</span></li>
+                  <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Avoid excessive posting or duplicate content</span></li>
+                </ul>
+              </div>
               
-              <h2>Reporting Violations</h2>
-              <p>If you see content that violates these guidelines, please report it immediately. See our <Link to="/help/report-content" className="text-primary hover:underline">Reporting Inappropriate Content</Link> guide.</p>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Reporting Violations</h2>
+                <p className="text-muted-foreground leading-relaxed">If you see content that violates these guidelines, please report it immediately. See our <Link to="/help/report-content" className="text-primary hover:underline font-medium">Reporting Inappropriate Content</Link> guide.</p>
+              </div>
               
-              <h2>Consequences</h2>
-              <p>Violations of these guidelines may result in:</p>
-              <ul>
-                <li>Warning from moderators</li>
-                <li>Temporary suspension of posting privileges</li>
-                <li>Permanent account ban for serious or repeated violations</li>
-              </ul>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Consequences</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">Violations of these guidelines may result in:</p>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2"><span className="text-yellow-500 font-bold">1.</span><span>Warning from moderators</span></li>
+                  <li className="flex items-start gap-2"><span className="text-orange-500 font-bold">2.</span><span>Temporary suspension of posting privileges</span></li>
+                  <li className="flex items-start gap-2"><span className="text-destructive font-bold">3.</span><span>Permanent account ban for serious or repeated violations</span></li>
+                </ul>
+              </div>
               
-              <h2>Questions</h2>
-              <p>If you have questions about these guidelines, please <Link to="/contact" className="text-primary hover:underline">contact us</Link>.</p>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Questions</h2>
+                <p className="text-muted-foreground leading-relaxed">If you have questions about these guidelines, please <Link to="/contact" className="text-primary hover:underline font-medium">contact us</Link>.</p>
+              </div>
             </CardContent>
           </Card>
         </div>
