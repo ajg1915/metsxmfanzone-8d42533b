@@ -326,16 +326,16 @@ export default function BlogManagement() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold">Blog Management</h2>
+    <div className="max-w-7xl mx-auto px-2 py-3">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold">Blog Management</h2>
         <Dialog open={isDialogOpen} onOpenChange={(open) => {
           setIsDialogOpen(open);
           if (!open) resetForm();
         }}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
+            <Button size="sm" className="h-8">
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
               New Post
             </Button>
           </DialogTrigger>
@@ -479,10 +479,10 @@ export default function BlogManagement() {
         </Dialog>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {posts.length === 0 ? (
           <Card>
-            <CardContent className="py-8 text-center text-muted-foreground">
+            <CardContent className="py-6 text-center text-sm text-muted-foreground">
               No blog posts yet. Create your first post!
             </CardContent>
           </Card>
