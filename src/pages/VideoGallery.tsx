@@ -4,11 +4,9 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Play, Clock, Eye, X } from "lucide-react";
+import { Play, Clock, Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -29,8 +27,7 @@ export default function VideoGallery() {
   const { toast } = useToast();
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
@@ -74,8 +71,7 @@ export default function VideoGallery() {
   };
 
   const handleVideoClick = async (video: Video) => {
-    setSelectedVideo(video);
-    setDialogOpen(true);
+    setPlayingVideoId(video.id);
 
     // Increment view count
     try {
@@ -160,27 +156,51 @@ export default function VideoGallery() {
             {filteredVideos.map((video) => (
               <Card 
                 key={video.id} 
-                className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow group"
-                onClick={() => handleVideoClick(video)}
+                className="overflow-hidden"
               >
-                <div className="relative">
-                  <img
-                    src={video.thumbnail_url || "/placeholder.svg"}
-                    alt={video.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="bg-primary rounded-full p-4">
-                      <Play className="h-8 w-8 text-primary-foreground" />
-                    </div>
+                {playingVideoId === video.id ? (
+                  <div className="aspect-video w-full bg-black">
+                    {isYouTubeUrl(video.video_url) ? (
+                      <iframe
+                        src={getYouTubeEmbedUrl(video.video_url)}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video
+                        src={video.video_url}
+                        controls
+                        autoPlay
+                        className="w-full h-full"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
                   </div>
-                  {video.duration > 0 && (
-                    <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {formatDuration(video.duration)}
+                ) : (
+                  <div 
+                    className="relative cursor-pointer group"
+                    onClick={() => handleVideoClick(video)}
+                  >
+                    <img
+                      src={video.thumbnail_url || "/placeholder.svg"}
+                      alt={video.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="bg-primary rounded-full p-4">
+                        <Play className="h-8 w-8 text-primary-foreground" />
+                      </div>
                     </div>
-                  )}
-                </div>
+                    {video.duration > 0 && (
+                      <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatDuration(video.duration)}
+                      </div>
+                    )}
+                  </div>
+                )}
                 <CardContent className="p-4">
                   <h3 className="font-semibold text-lg mb-2 line-clamp-2">{video.title}</h3>
                   <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
@@ -203,73 +223,6 @@ export default function VideoGallery() {
           </div>
         )}
       </main>
-
-      {/* Video Player Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0">
-          {selectedVideo && (
-            <>
-              <DialogHeader className="p-6 pb-0">
-                <div className="flex items-start justify-between gap-4">
-                  <DialogTitle className="text-2xl">{selectedVideo.title}</DialogTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDialogOpen(false)}
-                    className="shrink-0"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </DialogHeader>
-              
-              <div className="aspect-video w-full bg-black">
-                {isYouTubeUrl(selectedVideo.video_url) ? (
-                  <iframe
-                    src={getYouTubeEmbedUrl(selectedVideo.video_url)}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <video
-                    src={selectedVideo.video_url}
-                    controls
-                    autoPlay
-                    className="w-full h-full"
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                )}
-              </div>
-
-              <div className="p-6">
-                <div className="flex items-center gap-4 mb-4 flex-wrap">
-                  <Badge variant="secondary" className="capitalize">
-                    {selectedVideo.category}
-                  </Badge>
-                  {selectedVideo.views > 0 && (
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Eye className="h-4 w-4" />
-                      {selectedVideo.views} views
-                    </div>
-                  )}
-                  {selectedVideo.duration > 0 && (
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      {formatDuration(selectedVideo.duration)}
-                    </div>
-                  )}
-                </div>
-                
-                <p className="text-muted-foreground whitespace-pre-wrap">
-                  {selectedVideo.description}
-                </p>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
 
       <Footer />
     </div>
