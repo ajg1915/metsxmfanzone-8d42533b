@@ -25,68 +25,79 @@ const VideoQuality = () => {
             <CardHeader>
               <CardTitle className="text-2xl sm:text-3xl">Video Quality Settings</CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-slate max-w-none">
-              <h2>Available Quality Options</h2>
-              <p>MetsXMFanZone streams are available in multiple quality settings:</p>
+            <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Available Quality Options</h2>
+                <p className="text-muted-foreground leading-relaxed">MetsXMFanZone streams are available in multiple quality settings:</p>
+              </div>
               
-              <h3>Auto (Recommended)</h3>
-              <p>Automatically adjusts quality based on your internet connection speed for optimal viewing without buffering.</p>
+              <div className="grid gap-6">
+                <div className="space-y-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border-l-4 border-green-500">
+                  <h3 className="text-xl font-semibold text-foreground">Auto (Recommended)</h3>
+                  <p className="text-muted-foreground leading-relaxed">Automatically adjusts quality based on your internet connection speed for optimal viewing without buffering.</p>
+                </div>
+                
+                <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">1080p (Full HD)</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Best quality available</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Requires minimum 8 Mbps connection</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Recommended for high-speed broadband</span></li>
+                  </ul>
+                </div>
+                
+                <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">720p (HD)</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Good quality with lower bandwidth</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Requires minimum 5 Mbps connection</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Recommended for standard broadband</span></li>
+                  </ul>
+                </div>
+                
+                <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-xl font-semibold text-foreground">480p (SD)</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Standard definition quality</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Requires minimum 2.5 Mbps connection</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Recommended for slower connections or mobile data</span></li>
+                  </ul>
+                </div>
+              </div>
               
-              <h3>1080p (Full HD)</h3>
-              <ul>
-                <li>Best quality available</li>
-                <li>Requires minimum 8 Mbps connection</li>
-                <li>Recommended for high-speed broadband</li>
-              </ul>
+              <div className="space-y-6 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">How to Change Quality</h2>
+                <ol className="space-y-3 text-muted-foreground list-decimal list-inside">
+                  <li>Click on the video player while watching a stream</li>
+                  <li>Look for the settings/gear icon in the player controls</li>
+                  <li>Click on "Quality" option</li>
+                  <li>Select your preferred quality level</li>
+                </ol>
+              </div>
               
-              <h3>720p (HD)</h3>
-              <ul>
-                <li>Good quality with lower bandwidth</li>
-                <li>Requires minimum 5 Mbps connection</li>
-                <li>Recommended for standard broadband</li>
-              </ul>
+              <div className="space-y-6 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Recommended Settings</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b-2 border-border">
+                        <th className="text-left p-3 font-semibold text-foreground">Connection Type</th>
+                        <th className="text-left p-3 font-semibold text-foreground">Recommended Quality</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-muted-foreground">
+                      <tr className="border-b border-border"><td className="p-3">Fiber/High-speed Broadband</td><td className="p-3">Auto or 1080p</td></tr>
+                      <tr className="border-b border-border"><td className="p-3">Standard Broadband</td><td className="p-3">720p</td></tr>
+                      <tr className="border-b border-border"><td className="p-3">Mobile Data/Slower Connections</td><td className="p-3">480p</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
               
-              <h3>480p (SD)</h3>
-              <ul>
-                <li>Standard definition quality</li>
-                <li>Requires minimum 2.5 Mbps connection</li>
-                <li>Recommended for slower connections or mobile data</li>
-              </ul>
-              
-              <h2>How to Change Quality</h2>
-              <ol>
-                <li>Click on the video player while watching a stream</li>
-                <li>Look for the settings/gear icon in the player controls</li>
-                <li>Click on "Quality" option</li>
-                <li>Select your preferred quality level</li>
-              </ol>
-              
-              <h2>Recommended Settings</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Connection Type</th>
-                    <th>Recommended Quality</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Fiber/High-speed Broadband</td>
-                    <td>Auto or 1080p</td>
-                  </tr>
-                  <tr>
-                    <td>Standard Broadband</td>
-                    <td>720p</td>
-                  </tr>
-                  <tr>
-                    <td>Mobile Data/Slower Connections</td>
-                    <td>480p</td>
-                  </tr>
-                </tbody>
-              </table>
-              
-              <h2>Troubleshooting Buffering</h2>
-              <p>If you experience buffering issues, try lowering the quality setting or see our <Link to="/help/playback-issues" className="text-primary hover:underline">Troubleshooting Playback Issues</Link> guide.</p>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Troubleshooting Buffering</h2>
+                <p className="text-muted-foreground leading-relaxed">If you experience buffering issues, try lowering the quality setting or see our <Link to="/help/playback-issues" className="text-primary hover:underline font-medium">Troubleshooting Playback Issues</Link> guide.</p>
+              </div>
             </CardContent>
           </Card>
         </div>

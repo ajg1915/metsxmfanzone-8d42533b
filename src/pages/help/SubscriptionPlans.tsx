@@ -25,155 +25,44 @@ const SubscriptionPlans = () => {
             <CardHeader>
               <CardTitle className="text-2xl sm:text-3xl">Subscription Plans Explained</CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-slate max-w-none">
-              <h2>Available Plans</h2>
-              <p>MetsXMFanZone offers three subscription tiers to fit your needs:</p>
+            <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Available Plans</h2>
+                <p className="text-muted-foreground leading-relaxed">MetsXMFanZone offers three subscription tiers to fit your needs:</p>
+              </div>
               
-              <h3>Free Plan</h3>
-              <p><strong>Price:</strong> $0/month</p>
-              <p><strong>What's Included:</strong></p>
-              <ul>
-                <li>Access to all blog articles</li>
-                <li>Community posting and comments</li>
-                <li>Gallery browsing</li>
-                <li>Basic podcast access</li>
-                <li>Standard quality streaming (where available)</li>
-              </ul>
-              <p><strong>Not Included:</strong></p>
-              <ul>
-                <li>Live game streams</li>
-                <li>Spring Training exclusive content</li>
-                <li>HD/Full HD quality</li>
-                <li>Priority support</li>
-              </ul>
-              
-              <h3>Premium Plan</h3>
-              <p><strong>Price:</strong> $9.99/month</p>
-              <p><strong>What's Included:</strong></p>
-              <ul>
-                <li>Everything in Free plan</li>
-                <li>Access to all live game streams</li>
-                <li>Spring Training exclusive content</li>
-                <li>HD and Full HD streaming quality</li>
-                <li>Stream replays and archives</li>
-                <li>Ad-free experience</li>
-                <li>Priority customer support</li>
-                <li>Early access to new features</li>
-              </ul>
-              
-              <h3>Annual Plan</h3>
-              <p><strong>Price:</strong> $99.99/year (Save $20!)</p>
-              <p><strong>What's Included:</strong></p>
-              <ul>
-                <li>Everything in Premium plan</li>
-                <li>2 months free compared to monthly</li>
-                <li>Locked-in pricing for one year</li>
-                <li>Exclusive annual member perks</li>
-                <li>Special badges and recognition</li>
-              </ul>
-              
-              <h2>Plan Comparison</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Feature</th>
-                    <th>Free</th>
-                    <th>Premium</th>
-                    <th>Annual</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Blog Access</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>Community</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>Gallery</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>Live Streams</td>
-                    <td>✗</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>Spring Training</td>
-                    <td>✗</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>HD Quality</td>
-                    <td>✗</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>Ad-Free</td>
-                    <td>✗</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>Price</td>
-                    <td>Free</td>
-                    <td>$9.99/mo</td>
-                    <td>$99.99/yr</td>
-                  </tr>
-                </tbody>
-              </table>
-              
-              <h2>Choosing the Right Plan</h2>
-              
-              <h3>Choose Free If:</h3>
-              <ul>
-                <li>You're new and want to explore the platform</li>
-                <li>You mainly want to read articles and engage in the community</li>
-                <li>You don't need live streaming access</li>
-              </ul>
-              
-              <h3>Choose Premium If:</h3>
-              <ul>
-                <li>You want to watch live games and streams</li>
-                <li>You prefer monthly billing flexibility</li>
-                <li>You want to try premium features before committing annually</li>
-              </ul>
-              
-              <h3>Choose Annual If:</h3>
-              <ul>
-                <li>You're a dedicated Mets fan committed for the season</li>
-                <li>You want the best value (save $20/year)</li>
-                <li>You prefer not to worry about monthly renewals</li>
-              </ul>
-              
-              <h2>How to Subscribe</h2>
-              <ol>
-                <li>Visit the <Link to="/plans" className="text-primary hover:underline">Plans</Link> page</li>
-                <li>Choose your preferred plan</li>
-                <li>Click "Subscribe" or "Get Started"</li>
-                <li>Select payment method (PayPal or Helcim)</li>
-                <li>Complete checkout</li>
-                <li>Start enjoying your benefits immediately</li>
-              </ol>
-              
-              <h2>Billing and Renewals</h2>
-              <ul>
-                <li>Premium plans auto-renew monthly</li>
-                <li>Annual plans auto-renew yearly</li>
-                <li>You can cancel anytime (see <Link to="/help/cancel-subscription" className="text-primary hover:underline">Cancel or Change Subscription</Link>)</li>
-                <li>No refunds for partial months/years</li>
-              </ul>
+              <div className="grid gap-6">
+                <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-lg border-2 border-gray-300">
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Free Plan</h3>
+                  <p className="text-3xl font-bold text-primary mb-4">$0<span className="text-lg text-muted-foreground">/month</span></p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Access to all blog articles</span></li>
+                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Community posting and comments</span></li>
+                    <li className="flex items-start gap-2"><span className="text-red-600">✗</span><span>Live game streams</span></li>
+                  </ul>
+                </div>
+                
+                <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border-2 border-primary">
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Premium Plan</h3>
+                  <p className="text-3xl font-bold text-primary mb-4">$9.99<span className="text-lg text-muted-foreground">/month</span></p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Everything in Free plan</span></li>
+                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Access to all live game streams</span></li>
+                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>HD and Full HD quality</span></li>
+                  </ul>
+                </div>
+                
+                <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 rounded-lg border-2 border-green-500">
+                  <div className="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold mb-2">SAVE $20</div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Annual Plan</h3>
+                  <p className="text-3xl font-bold text-primary mb-4">$99.99<span className="text-lg text-muted-foreground">/year</span></p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Everything in Premium plan</span></li>
+                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>2 months free compared to monthly</span></li>
+                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Exclusive annual member perks</span></li>
+                  </ul>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

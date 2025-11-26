@@ -25,94 +25,53 @@ const FollowFans = () => {
             <CardHeader>
               <CardTitle className="text-2xl sm:text-3xl">Following Other Fans</CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-slate max-w-none">
-              <h2>Discovering Fans</h2>
-              <p>Connect with fellow Mets supporters on MetsXMFanZone:</p>
+            <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Discovering Fans</h2>
+                <p className="text-muted-foreground leading-relaxed">Connect with fellow Mets supporters on MetsXMFanZone:</p>
+              </div>
               
-              <h3>In the Community Feed</h3>
-              <ul>
-                <li>Browse posts in the <Link to="/community" className="text-primary hover:underline">Community</Link> section</li>
-                <li>Click on usernames to view profiles</li>
-                <li>See posts, comments, and activity</li>
-              </ul>
+              <div className="grid gap-6">
+                <div className="space-y-3 p-5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
+                  <h3 className="text-xl font-semibold text-foreground">In the Community Feed</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Browse posts in the <Link to="/community" className="text-primary hover:underline font-medium">Community</Link> section</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Click on usernames to view profiles</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>See posts, comments, and activity</span></li>
+                  </ul>
+                </div>
+                
+                <div className="space-y-3 p-5 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-l-4 border-purple-500">
+                  <h3 className="text-xl font-semibold text-foreground">In Comments</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Engage with fans who comment on blog posts</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Reply to comments you find interesting</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Check out profiles of active community members</span></li>
+                  </ul>
+                </div>
+              </div>
               
-              <h3>In Comments</h3>
-              <ul>
-                <li>Engage with fans who comment on blog posts</li>
-                <li>Reply to comments you find interesting</li>
-                <li>Check out profiles of active community members</li>
-              </ul>
+              <div className="space-y-6 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Following Users</h2>
+                <div className="p-5 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <p className="text-muted-foreground leading-relaxed mb-4">To follow another fan:</p>
+                  <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
+                    <li>Navigate to their profile</li>
+                    <li>Click the "Follow" button</li>
+                    <li>You'll now see their activity in your feed</li>
+                  </ol>
+                </div>
+              </div>
               
-              <h2>Following Users</h2>
-              <p>To follow another fan:</p>
-              <ol>
-                <li>Navigate to their profile</li>
-                <li>Click the "Follow" button</li>
-                <li>You'll now see their activity in your feed</li>
-              </ol>
-              
-              <h2>Benefits of Following</h2>
-              <ul>
-                <li>See posts from fans you follow in your personalized feed</li>
-                <li>Get notifications about their activity</li>
-                <li>Build a network of like-minded Mets supporters</li>
-                <li>Participate in focused discussions</li>
-              </ul>
-              
-              <h2>Managing Follows</h2>
-              
-              <h3>View Your Following List</h3>
-              <p>To see who you're following:</p>
-              <ol>
-                <li>Go to your <Link to="/dashboard" className="text-primary hover:underline">Dashboard</Link></li>
-                <li>Click on "Following" or "Connections"</li>
-                <li>Browse your list of followed users</li>
-              </ol>
-              
-              <h3>Unfollow Users</h3>
-              <p>To stop following someone:</p>
-              <ol>
-                <li>Visit their profile or your following list</li>
-                <li>Click the "Following" button</li>
-                <li>Confirm you want to unfollow</li>
-              </ol>
-              
-              <h2>Your Followers</h2>
-              <p>See who's following you:</p>
-              <ul>
-                <li>Access your followers list from your profile</li>
-                <li>View profiles of your followers</li>
-                <li>Follow back users you're interested in</li>
-              </ul>
-              
-              <h2>Privacy Settings</h2>
-              <p>Control your visibility:</p>
-              <ul>
-                <li>Your posts are visible to all logged-in community members</li>
-                <li>Your profile information is public to other users</li>
-                <li>You can update privacy preferences in your account settings</li>
-              </ul>
-              
-              <h2>Engagement Tips</h2>
-              
-              <h3>Building Connections</h3>
-              <ul>
-                <li>Post regularly to stay visible</li>
-                <li>Engage with others' content</li>
-                <li>Participate in game day discussions</li>
-                <li>Share quality content and insights</li>
-              </ul>
-              
-              <h3>Respectful Interaction</h3>
-              <ul>
-                <li>Follow <Link to="/help/community-guidelines" className="text-primary hover:underline">Community Guidelines</Link></li>
-                <li>Respect different opinions and perspectives</li>
-                <li>Avoid spam or excessive tagging</li>
-                <li>Build positive relationships</li>
-              </ul>
-              
-              <h2>Reporting Issues</h2>
-              <p>If you experience harassment or inappropriate behavior from another user, see our <Link to="/help/report-content" className="text-primary hover:underline">Reporting Inappropriate Content</Link> guide.</p>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Benefits of Following</h2>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>See posts from fans you follow in your personalized feed</span></li>
+                  <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Get notifications about their activity</span></li>
+                  <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Build a network of like-minded Mets supporters</span></li>
+                  <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Participate in focused discussions</span></li>
+                </ul>
+              </div>
             </CardContent>
           </Card>
         </div>

@@ -25,87 +25,81 @@ const PremiumContent = () => {
             <CardHeader>
               <CardTitle className="text-2xl sm:text-3xl">Accessing Premium Content</CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-slate max-w-none">
-              <h2>What's Included in Premium</h2>
-              <p>Premium and Annual plan members get access to exclusive content:</p>
+            <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground border-b pb-3">What's Included in Premium</h2>
+                <p className="text-muted-foreground leading-relaxed">Premium and Annual plan members get access to exclusive content:</p>
+              </div>
               
-              <h3>Live Streams</h3>
-              <ul>
-                <li>Watch all Mets games live</li>
-                <li>Pre-game and post-game analysis</li>
-                <li>Special live events and Q&A sessions</li>
-                <li>Live podcast shows</li>
-              </ul>
+              <div className="grid gap-6">
+                <div className="space-y-3 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border-l-4 border-primary">
+                  <h3 className="text-xl font-semibold text-foreground">Live Streams</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Watch all Mets games live</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Pre-game and post-game analysis</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Special live events and Q&A sessions</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Live podcast shows</span></li>
+                  </ul>
+                </div>
+                
+                <div className="space-y-3 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border-l-4 border-primary">
+                  <h3 className="text-xl font-semibold text-foreground">Spring Training Content</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Exclusive spring training game coverage</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Behind-the-scenes content</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Player interviews and insights</span></li>
+                  </ul>
+                </div>
+                
+                <div className="space-y-3 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border-l-4 border-primary">
+                  <h3 className="text-xl font-semibold text-foreground">Premium Features</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>HD/Full HD streaming quality</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Access to stream archives and replays</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Ad-free experience</span></li>
+                    <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Priority customer support</span></li>
+                  </ul>
+                </div>
+              </div>
               
-              <h3>Spring Training Content</h3>
-              <ul>
-                <li>Exclusive spring training game coverage</li>
-                <li>Behind-the-scenes content</li>
-                <li>Player interviews and insights</li>
-              </ul>
+              <div className="space-y-6 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">How to Upgrade</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">If you're on the Free plan and want to access premium content:</p>
+                <ol className="space-y-3 text-muted-foreground list-decimal list-inside">
+                  <li>Navigate to the <Link to="/plans" className="text-primary hover:underline font-medium">Plans</Link> page</li>
+                  <li>Select either Premium ($9.99/month) or Annual ($99.99/year)</li>
+                  <li>Complete the checkout process</li>
+                  <li>Start enjoying premium content immediately</li>
+                </ol>
+              </div>
               
-              <h3>Premium Features</h3>
-              <ul>
-                <li>HD/Full HD streaming quality</li>
-                <li>Access to stream archives and replays</li>
-                <li>Ad-free experience</li>
-                <li>Priority customer support</li>
-              </ul>
+              <div className="space-y-6 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Free vs Premium</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b-2 border-border bg-muted/50">
+                        <th className="text-left p-4 font-semibold text-foreground">Feature</th>
+                        <th className="text-center p-4 font-semibold text-foreground">Free</th>
+                        <th className="text-center p-4 font-semibold text-foreground">Premium/Annual</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-muted-foreground">
+                      <tr className="border-b border-border"><td className="p-4">Blog Articles</td><td className="text-center p-4">✓</td><td className="text-center p-4">✓</td></tr>
+                      <tr className="border-b border-border"><td className="p-4">Community Access</td><td className="text-center p-4">✓</td><td className="text-center p-4">✓</td></tr>
+                      <tr className="border-b border-border"><td className="p-4">Gallery</td><td className="text-center p-4">✓</td><td className="text-center p-4">✓</td></tr>
+                      <tr className="border-b border-border bg-primary/5"><td className="p-4 font-medium">Live Streams</td><td className="text-center p-4 text-destructive">✗</td><td className="text-center p-4 text-green-600">✓</td></tr>
+                      <tr className="border-b border-border bg-primary/5"><td className="p-4 font-medium">Spring Training</td><td className="text-center p-4 text-destructive">✗</td><td className="text-center p-4 text-green-600">✓</td></tr>
+                      <tr className="border-b border-border bg-primary/5"><td className="p-4 font-medium">HD Quality</td><td className="text-center p-4 text-destructive">✗</td><td className="text-center p-4 text-green-600">✓</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
               
-              <h2>How to Upgrade</h2>
-              <p>If you're on the Free plan and want to access premium content:</p>
-              <ol>
-                <li>Navigate to the <Link to="/plans" className="text-primary hover:underline">Plans</Link> page</li>
-                <li>Select either Premium ($9.99/month) or Annual ($99.99/year)</li>
-                <li>Complete the checkout process</li>
-                <li>Start enjoying premium content immediately</li>
-              </ol>
-              
-              <h2>Free vs Premium</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Feature</th>
-                    <th>Free</th>
-                    <th>Premium/Annual</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Blog Articles</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>Community Access</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>Gallery</td>
-                    <td>✓</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>Live Streams</td>
-                    <td>✗</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>Spring Training</td>
-                    <td>✗</td>
-                    <td>✓</td>
-                  </tr>
-                  <tr>
-                    <td>HD Quality</td>
-                    <td>✗</td>
-                    <td>✓</td>
-                  </tr>
-                </tbody>
-              </table>
-              
-              <h2>Questions</h2>
-              <p>For more details about subscription plans, visit our <Link to="/help/subscription-plans" className="text-primary hover:underline">Subscription Plans Explained</Link> guide.</p>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Questions</h2>
+                <p className="text-muted-foreground leading-relaxed">For more details about subscription plans, visit our <Link to="/help/subscription-plans" className="text-primary hover:underline font-medium">Subscription Plans Explained</Link> guide.</p>
+              </div>
             </CardContent>
           </Card>
         </div>

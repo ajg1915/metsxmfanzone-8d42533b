@@ -25,41 +25,76 @@ const WatchStreams = () => {
             <CardHeader>
               <CardTitle className="text-2xl sm:text-3xl">Watching Live Streams</CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-slate max-w-none">
-              <h2>Requirements</h2>
-              <p>To watch live streams on MetsXMFanZone:</p>
-              <ul>
-                <li>Active Premium ($9.99/month) or Annual ($99.99/year) subscription</li>
-                <li>Stable internet connection (minimum 5 Mbps recommended)</li>
-                <li>Modern web browser (Chrome, Firefox, Safari, Edge)</li>
-              </ul>
-              
-              <h2>How to Watch</h2>
-              <h3>Step 1: Navigate to Live Page</h3>
-              <p>Click "Live" in the main navigation menu to access the live streaming section.</p>
-              
-              <h3>Step 2: Select a Stream</h3>
-              <p>Browse available live streams and click on the stream you want to watch.</p>
-              
-              <h3>Step 3: Enjoy the Stream</h3>
-              <p>The video player will load automatically. Use the controls to adjust volume, quality, and fullscreen mode.</p>
-              
-              <h2>Device Restrictions</h2>
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                <p className="font-semibold text-yellow-800 dark:text-yellow-200">Important:</p>
-                <p className="text-yellow-700 dark:text-yellow-300">Users who access live streams from more than 2 devices or accounts will face automatic penalties including account restriction, plan downgrade, or account deactivation without warning.</p>
+            <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Requirements</h2>
+                <p className="text-muted-foreground leading-relaxed mb-4">To watch live streams on MetsXMFanZone:</p>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">✓</span>
+                    <span>Active Premium ($9.99/month) or Annual ($99.99/year) subscription</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">✓</span>
+                    <span>Stable internet connection (minimum 5 Mbps recommended)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">✓</span>
+                    <span>Modern web browser (Chrome, Firefox, Safari, Edge)</span>
+                  </li>
+                </ul>
               </div>
               
-              <h2>Supported Devices</h2>
-              <ul>
-                <li>Desktop computers (Windows, Mac, Linux)</li>
-                <li>Tablets (iPad, Android tablets)</li>
-                <li>Mobile phones (iPhone, Android)</li>
-                <li>Smart TVs with web browsers</li>
-              </ul>
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-foreground border-b pb-3">How to Watch</h2>
+                
+                <div className="space-y-3 pl-4 border-l-4 border-primary/30">
+                  <h3 className="text-xl font-semibold text-foreground">Step 1: Navigate to Live Page</h3>
+                  <p className="text-muted-foreground leading-relaxed">Click "Live" in the main navigation menu to access the live streaming section.</p>
+                </div>
+                
+                <div className="space-y-3 pl-4 border-l-4 border-primary/30">
+                  <h3 className="text-xl font-semibold text-foreground">Step 2: Select a Stream</h3>
+                  <p className="text-muted-foreground leading-relaxed">Browse available live streams and click on the stream you want to watch.</p>
+                </div>
+                
+                <div className="space-y-3 pl-4 border-l-4 border-primary/30">
+                  <h3 className="text-xl font-semibold text-foreground">Step 3: Enjoy the Stream</h3>
+                  <p className="text-muted-foreground leading-relaxed">The video player will load automatically. Use the controls to adjust volume, quality, and fullscreen mode.</p>
+                </div>
+              </div>
               
-              <h2>Troubleshooting</h2>
-              <p>If you experience issues with streaming, see our <Link to="/help/playback-issues" className="text-primary hover:underline">Troubleshooting Playback Issues</Link> guide.</p>
+              <div className="space-y-4 bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border-l-4 border-yellow-500">
+                <h2 className="text-xl font-bold text-yellow-900 dark:text-yellow-200">Device Restrictions</h2>
+                <p className="text-yellow-800 dark:text-yellow-300 leading-relaxed"><strong>Important:</strong> Users who access live streams from more than 2 devices or accounts will face automatic penalties including account restriction, plan downgrade, or account deactivation without warning.</p>
+              </div>
+              
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Supported Devices</h2>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span>Desktop computers (Windows, Mac, Linux)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span>Tablets (iPad, Android tablets)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span>Mobile phones (iPhone, Android)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span>Smart TVs with web browsers</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Troubleshooting</h2>
+                <p className="text-muted-foreground leading-relaxed">If you experience issues with streaming, see our <Link to="/help/playback-issues" className="text-primary hover:underline font-medium">Troubleshooting Playback Issues</Link> guide.</p>
+              </div>
             </CardContent>
           </Card>
         </div>

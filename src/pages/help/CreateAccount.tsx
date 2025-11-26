@@ -25,36 +25,50 @@ const CreateAccount = () => {
             <CardHeader>
               <CardTitle className="text-2xl sm:text-3xl">How to Create an Account</CardTitle>
             </CardHeader>
-            <CardContent className="prose prose-slate max-w-none">
-              <h2>Getting Started</h2>
-              <p>Creating your MetsXMFanZone account is quick and easy. Follow these steps:</p>
+            <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Getting Started</h2>
+                <p className="text-muted-foreground leading-relaxed">Creating your MetsXMFanZone account is quick and easy. Follow these steps:</p>
+              </div>
               
-              <h3>Step 1: Navigate to Sign Up</h3>
-              <p>Click the "Sign Up" button in the top right corner of the website or navigate directly to the authentication page.</p>
+              <div className="space-y-3 pl-4 border-l-4 border-primary/30">
+                <h3 className="text-xl font-semibold text-foreground">Step 1: Navigate to Sign Up</h3>
+                <p className="text-muted-foreground leading-relaxed">Click the "Sign Up" button in the top right corner of the website or navigate directly to the authentication page.</p>
+              </div>
               
-              <h3>Step 2: Enter Your Information</h3>
-              <ul>
-                <li>Provide your email address</li>
-                <li>Create a secure password</li>
-                <li>Confirm your password</li>
-              </ul>
+              <div className="space-y-3 pl-4 border-l-4 border-primary/30">
+                <h3 className="text-xl font-semibold text-foreground">Step 2: Enter Your Information</h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>Provide your email address</li>
+                  <li>Create a secure password</li>
+                  <li>Confirm your password</li>
+                </ul>
+              </div>
               
-              <h3>Step 3: Select Your Plan</h3>
-              <p>After creating your account, you'll be prompted to choose a subscription plan:</p>
-              <ul>
-                <li><strong>Free Plan:</strong> Access to basic content and community features</li>
-                <li><strong>Premium Plan ($9.99/month):</strong> Full access to live streams and exclusive content</li>
-                <li><strong>Annual Plan ($99.99/year):</strong> All premium features with significant savings</li>
-              </ul>
+              <div className="space-y-3 pl-4 border-l-4 border-primary/30">
+                <h3 className="text-xl font-semibold text-foreground">Step 3: Select Your Plan</h3>
+                <p className="text-muted-foreground leading-relaxed mb-3">After creating your account, you'll be prompted to choose a subscription plan:</p>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li><strong>Free Plan:</strong> Access to basic content and community features</li>
+                  <li><strong>Premium Plan ($9.99/month):</strong> Full access to live streams and exclusive content</li>
+                  <li><strong>Annual Plan ($99.99/year):</strong> All premium features with significant savings</li>
+                </ul>
+              </div>
               
-              <h3>Step 4: Complete Payment (for paid plans)</h3>
-              <p>Choose your preferred payment method (PayPal or Helcim) and complete the checkout process.</p>
+              <div className="space-y-3 pl-4 border-l-4 border-primary/30">
+                <h3 className="text-xl font-semibold text-foreground">Step 4: Complete Payment (for paid plans)</h3>
+                <p className="text-muted-foreground leading-relaxed">Choose your preferred payment method (PayPal or Helcim) and complete the checkout process.</p>
+              </div>
               
-              <h3>Step 5: Start Enjoying Content</h3>
-              <p>Once your account is set up, you can immediately start accessing content based on your plan tier.</p>
+              <div className="space-y-3 pl-4 border-l-4 border-primary/30">
+                <h3 className="text-xl font-semibold text-foreground">Step 5: Start Enjoying Content</h3>
+                <p className="text-muted-foreground leading-relaxed">Once your account is set up, you can immediately start accessing content based on your plan tier.</p>
+              </div>
               
-              <h2>Troubleshooting</h2>
-              <p>If you encounter any issues during account creation, please visit our <Link to="/contact" className="text-primary hover:underline">Contact</Link> page for assistance.</p>
+              <div className="space-y-4 pt-6 border-t">
+                <h2 className="text-2xl font-bold text-foreground">Troubleshooting</h2>
+                <p className="text-muted-foreground leading-relaxed">If you encounter any issues during account creation, please visit our <Link to="/contact" className="text-primary hover:underline font-medium">Contact</Link> page for assistance.</p>
+              </div>
             </CardContent>
           </Card>
         </div>
