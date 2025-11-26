@@ -13,8 +13,8 @@ export default function MetsLineupCard() {
 
       <Navigation />
 
-      <main className="flex-1 container mx-auto px-4 py-6 max-w-4xl">
-        <div className="text-center mb-8">
+      <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
+        <div className="text-center mb-8 mt-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
             Daily 2026 Mets Lineup Card
           </h1>
