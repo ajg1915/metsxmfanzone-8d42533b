@@ -200,13 +200,13 @@ export default function LiveStreamManagement() {
   };
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Live Stream Management</h1>
+    <div className="max-w-7xl mx-auto px-2 py-3">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-lg font-bold">Live Stream Management</h1>
         <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
+            <Button size="sm" className="h-8">
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
               Add Live Stream
             </Button>
           </DialogTrigger>
@@ -363,12 +363,12 @@ export default function LiveStreamManagement() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {streams.map((stream) => (
             <Card key={stream.id}>
-              <CardHeader>
+              <CardHeader className="pb-3">
                 {stream.thumbnail_url && (
-                  <div className="aspect-video overflow-hidden rounded-lg mb-2 bg-muted">
+                  <div className="aspect-video overflow-hidden rounded-md mb-2 bg-muted">
                     <img
                       src={stream.thumbnail_url}
                       alt={stream.title}
@@ -376,7 +376,7 @@ export default function LiveStreamManagement() {
                     />
                   </div>
                 )}
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-1.5 mb-2">
                   <Badge className={getStatusBadge(stream.status)}>
                     {stream.status === 'live' && <Radio className="w-3 h-3 mr-1" />}
                     {stream.status.toUpperCase()}
@@ -385,10 +385,10 @@ export default function LiveStreamManagement() {
                     <Badge variant="outline">Draft</Badge>
                   )}
                 </div>
-                <CardTitle className="line-clamp-2">{stream.title}</CardTitle>
+                <CardTitle className="line-clamp-2 text-base">{stream.title}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm text-muted-foreground mb-4">
+              <CardContent className="pt-0">
+                <div className="space-y-1.5 text-xs text-muted-foreground mb-3">
                   <p>Assigned to: {stream.assigned_pages?.length > 0 ? stream.assigned_pages.map(p => {
                     if (p === 'live') return 'Live Page';
                     if (p === 'metsxmfanzone') return 'MetsXMFanZone TV';
@@ -407,17 +407,18 @@ export default function LiveStreamManagement() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleEdit(stream)}
-                    className="flex-1"
+                    className="flex-1 h-7 text-xs"
                   >
-                    <Edit className="w-4 h-4 mr-1" />
+                    <Edit className="w-3 h-3 mr-1" />
                     Edit
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
                     onClick={() => handleDelete(stream.id)}
+                    className="h-7 text-xs"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3 h-3" />
                   </Button>
                 </div>
               </CardContent>
