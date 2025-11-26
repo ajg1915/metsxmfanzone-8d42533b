@@ -3,6 +3,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HelpCircle, Book, Video, MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HelpCenter = () => {
   const categories = [
@@ -11,10 +12,10 @@ const HelpCenter = () => {
       title: "Getting Started",
       description: "Learn the basics of MetsXMFanZone",
       articles: [
-        "How to create an account",
-        "Navigating the platform",
-        "Watching live streams",
-        "Community guidelines",
+        { title: "How to create an account", path: "/help/create-account" },
+        { title: "Navigating the platform", path: "/help/navigate-platform" },
+        { title: "Watching live streams", path: "/help/watch-streams" },
+        { title: "Community guidelines", path: "/help/community-guidelines" },
       ],
     },
     {
@@ -22,10 +23,10 @@ const HelpCenter = () => {
       title: "Streaming & Content",
       description: "Everything about our video content",
       articles: [
-        "Video quality settings",
-        "Accessing premium content",
-        "Download and offline viewing",
-        "Troubleshooting playback issues",
+        { title: "Video quality settings", path: "/help/video-quality" },
+        { title: "Accessing premium content", path: "/help/premium-content" },
+        { title: "Download and offline viewing", path: "/help/offline-viewing" },
+        { title: "Troubleshooting playback issues", path: "/help/playback-issues" },
       ],
     },
     {
@@ -33,10 +34,10 @@ const HelpCenter = () => {
       title: "Community & Engagement",
       description: "Connect with other fans",
       articles: [
-        "Posting in the community",
-        "Commenting and reactions",
-        "Following other fans",
-        "Reporting inappropriate content",
+        { title: "Posting in the community", path: "/help/post-community" },
+        { title: "Commenting and reactions", path: "/help/comments-reactions" },
+        { title: "Following other fans", path: "/help/follow-fans" },
+        { title: "Reporting inappropriate content", path: "/help/report-content" },
       ],
     },
     {
@@ -44,10 +45,10 @@ const HelpCenter = () => {
       title: "Account & Billing",
       description: "Manage your account and subscriptions",
       articles: [
-        "Update profile information",
-        "Subscription plans explained",
-        "Payment methods",
-        "Cancel or change subscription",
+        { title: "Update profile information", path: "/help/update-profile" },
+        { title: "Subscription plans explained", path: "/help/subscription-plans" },
+        { title: "Payment methods", path: "/help/payment-methods" },
+        { title: "Cancel or change subscription", path: "/help/cancel-subscription" },
       ],
     },
   ];
@@ -86,9 +87,9 @@ const HelpCenter = () => {
                   <ul className="space-y-2">
                     {category.articles.map((article, articleIndex) => (
                       <li key={articleIndex}>
-                        <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                          • {article}
-                        </a>
+                        <Link to={article.path} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                          • {article.title}
+                        </Link>
                       </li>
                     ))}
                   </ul>
