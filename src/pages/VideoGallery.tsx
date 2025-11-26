@@ -1,11 +1,13 @@
 import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Play, Clock, Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,13 +27,24 @@ export default function VideoGallery() {
   const {
     toast
   } = useToast();
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
+  
   useEffect(() => {
-    fetchVideos();
-  }, []);
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      fetchVideos();
+    }
+  }, [user]);
   const fetchVideos = async () => {
     try {
       const {
@@ -84,6 +97,11 @@ export default function VideoGallery() {
   };
   const filteredVideos = filter === "all" ? videos : videos.filter(v => v.category.toLowerCase() === filter.toLowerCase());
   const categories = ["all", ...Array.from(new Set(videos.map(v => v.category)))];
+  
+  if (authLoading || !user) {
+    return null;
+  }
+
   return <div className="min-h-screen flex flex-col bg-background">
       <Helmet>
         <title>Video Gallery | MetsXMFanZone</title>
