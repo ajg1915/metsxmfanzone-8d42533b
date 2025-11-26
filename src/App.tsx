@@ -63,6 +63,22 @@ import Product from "./pages/Product";
 import MetsSchedule2026 from "./pages/MetsSchedule2026";
 import EventsManagement from "./pages/admin/EventsManagement";
 import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
+import CreateAccount from "./pages/help/CreateAccount";
+import NavigatePlatform from "./pages/help/NavigatePlatform";
+import WatchStreams from "./pages/help/WatchStreams";
+import CommunityGuidelines from "./pages/help/CommunityGuidelines";
+import VideoQuality from "./pages/help/VideoQuality";
+import PremiumContent from "./pages/help/PremiumContent";
+import OfflineViewing from "./pages/help/OfflineViewing";
+import PlaybackIssues from "./pages/help/PlaybackIssues";
+import PostCommunity from "./pages/help/PostCommunity";
+import CommentsReactions from "./pages/help/CommentsReactions";
+import FollowFans from "./pages/help/FollowFans";
+import ReportContent from "./pages/help/ReportContent";
+import UpdateProfile from "./pages/help/UpdateProfile";
+import SubscriptionPlans from "./pages/help/SubscriptionPlans";
+import PaymentMethods from "./pages/help/PaymentMethods";
+import CancelSubscription from "./pages/help/CancelSubscription";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +109,22 @@ const App = () => {
           <Route path="/og-blog/:slug" element={<OGBlogPost />} />
           <Route path="/blog/rss" element={<BlogRSS />} />
           <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/help/create-account" element={<CreateAccount />} />
+          <Route path="/help/navigate-platform" element={<NavigatePlatform />} />
+          <Route path="/help/watch-streams" element={<WatchStreams />} />
+          <Route path="/help/community-guidelines" element={<CommunityGuidelines />} />
+          <Route path="/help/video-quality" element={<VideoQuality />} />
+          <Route path="/help/premium-content" element={<PremiumContent />} />
+          <Route path="/help/offline-viewing" element={<OfflineViewing />} />
+          <Route path="/help/playback-issues" element={<PlaybackIssues />} />
+          <Route path="/help/post-community" element={<PostCommunity />} />
+          <Route path="/help/comments-reactions" element={<CommentsReactions />} />
+          <Route path="/help/follow-fans" element={<FollowFans />} />
+          <Route path="/help/report-content" element={<ReportContent />} />
+          <Route path="/help/update-profile" element={<UpdateProfile />} />
+          <Route path="/help/subscription-plans" element={<SubscriptionPlans />} />
+          <Route path="/help/payment-methods" element={<PaymentMethods />} />
+          <Route path="/help/cancel-subscription" element={<CancelSubscription />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/faqs" element={<FAQs />} />
