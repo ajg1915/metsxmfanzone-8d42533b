@@ -7,6 +7,7 @@ import LiveStreamsSection from "@/components/LiveStreamsSection";
 import SpringTraining from "@/components/SpringTraining";
 import MetsNewsTracker from "@/components/MetsNewsTracker";
 import BlogSection from "@/components/BlogSection";
+import HomeLineupCard from "@/components/HomeLineupCard";
 import PodcastSection from "@/components/PodcastSection";
 import NewsletterSection from "@/components/NewsletterSection";
 import FeedbackSection from "@/components/FeedbackSection";
@@ -42,6 +43,7 @@ const Index = () => {
         <SectionScrollIndicator />
         <SpringTraining />
         <SectionScrollIndicator />
+        <HomeLineupCard />
         <MetsNewsTracker />
         <SectionScrollIndicator />
         <BlogSection />
