@@ -14,6 +14,7 @@ interface LineupPlayer {
   position: number;
   name: string;
   fieldPosition: string;
+  imageUrl?: string;
 }
 
 interface StartingPitcher {
@@ -36,15 +37,15 @@ export default function LineupCardManagement() {
     published: false,
   });
   const [lineup, setLineup] = useState<LineupPlayer[]>([
-    { position: 1, name: "", fieldPosition: "" },
-    { position: 2, name: "", fieldPosition: "" },
-    { position: 3, name: "", fieldPosition: "" },
-    { position: 4, name: "", fieldPosition: "" },
-    { position: 5, name: "", fieldPosition: "" },
-    { position: 6, name: "", fieldPosition: "" },
-    { position: 7, name: "", fieldPosition: "" },
-    { position: 8, name: "", fieldPosition: "" },
-    { position: 9, name: "", fieldPosition: "" },
+    { position: 1, name: "", fieldPosition: "", imageUrl: "" },
+    { position: 2, name: "", fieldPosition: "", imageUrl: "" },
+    { position: 3, name: "", fieldPosition: "", imageUrl: "" },
+    { position: 4, name: "", fieldPosition: "", imageUrl: "" },
+    { position: 5, name: "", fieldPosition: "", imageUrl: "" },
+    { position: 6, name: "", fieldPosition: "", imageUrl: "" },
+    { position: 7, name: "", fieldPosition: "", imageUrl: "" },
+    { position: 8, name: "", fieldPosition: "", imageUrl: "" },
+    { position: 9, name: "", fieldPosition: "", imageUrl: "" },
   ]);
   const [pitcher, setPitcher] = useState<StartingPitcher>({
     name: "",
@@ -120,15 +121,15 @@ export default function LineupCardManagement() {
       published: false,
     });
     setLineup([
-      { position: 1, name: "", fieldPosition: "" },
-      { position: 2, name: "", fieldPosition: "" },
-      { position: 3, name: "", fieldPosition: "" },
-      { position: 4, name: "", fieldPosition: "" },
-      { position: 5, name: "", fieldPosition: "" },
-      { position: 6, name: "", fieldPosition: "" },
-      { position: 7, name: "", fieldPosition: "" },
-      { position: 8, name: "", fieldPosition: "" },
-      { position: 9, name: "", fieldPosition: "" },
+      { position: 1, name: "", fieldPosition: "", imageUrl: "" },
+      { position: 2, name: "", fieldPosition: "", imageUrl: "" },
+      { position: 3, name: "", fieldPosition: "", imageUrl: "" },
+      { position: 4, name: "", fieldPosition: "", imageUrl: "" },
+      { position: 5, name: "", fieldPosition: "", imageUrl: "" },
+      { position: 6, name: "", fieldPosition: "", imageUrl: "" },
+      { position: 7, name: "", fieldPosition: "", imageUrl: "" },
+      { position: 8, name: "", fieldPosition: "", imageUrl: "" },
+      { position: 9, name: "", fieldPosition: "", imageUrl: "" },
     ]);
     setPitcher({ name: "", hand: "RHP", era: "", strikeouts: "" });
   };
@@ -221,30 +222,43 @@ export default function LineupCardManagement() {
 
           <div className="border-t pt-4">
             <h3 className="font-semibold mb-4">Batting Order</h3>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {lineup.map((player, index) => (
-                <div key={index} className="grid grid-cols-12 gap-2">
-                  <div className="col-span-1 flex items-center justify-center font-bold text-primary">
-                    {player.position}
+                <div key={index} className="space-y-2 p-3 border rounded-lg">
+                  <div className="grid grid-cols-12 gap-2">
+                    <div className="col-span-1 flex items-center justify-center font-bold text-primary">
+                      {player.position}
+                    </div>
+                    <div className="col-span-6">
+                      <Input
+                        placeholder="Player Name"
+                        value={player.name}
+                        onChange={(e) => {
+                          const newLineup = [...lineup];
+                          newLineup[index].name = e.target.value;
+                          setLineup(newLineup);
+                        }}
+                      />
+                    </div>
+                    <div className="col-span-5">
+                      <Input
+                        placeholder="Position (e.g., CF)"
+                        value={player.fieldPosition}
+                        onChange={(e) => {
+                          const newLineup = [...lineup];
+                          newLineup[index].fieldPosition = e.target.value;
+                          setLineup(newLineup);
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="col-span-6">
+                  <div className="pl-7">
                     <Input
-                      placeholder="Player Name"
-                      value={player.name}
+                      placeholder="Player Image URL"
+                      value={player.imageUrl || ""}
                       onChange={(e) => {
                         const newLineup = [...lineup];
-                        newLineup[index].name = e.target.value;
-                        setLineup(newLineup);
-                      }}
-                    />
-                  </div>
-                  <div className="col-span-5">
-                    <Input
-                      placeholder="Position (e.g., CF)"
-                      value={player.fieldPosition}
-                      onChange={(e) => {
-                        const newLineup = [...lineup];
-                        newLineup[index].fieldPosition = e.target.value;
+                        newLineup[index].imageUrl = e.target.value;
                         setLineup(newLineup);
                       }}
                     />

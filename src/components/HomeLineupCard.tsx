@@ -8,6 +8,7 @@ interface LineupPlayer {
   position: number;
   name: string;
   fieldPosition: string;
+  imageUrl?: string;
 }
 interface StartingPitcher {
   name: string;
@@ -73,6 +74,7 @@ export default function HomeLineupCard() {
                     <span className="text-xl font-bold text-primary w-8">
                       {player.position}
                     </span>
+                    {player.imageUrl && <img src={player.imageUrl} alt={player.name} className="w-10 h-10 rounded-full object-cover" />}
                     <div className="flex-1">
                       <p className="font-medium">{player.name}</p>
                       <p className="text-sm text-muted-foreground">
