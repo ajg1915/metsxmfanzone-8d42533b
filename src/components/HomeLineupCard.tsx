@@ -39,7 +39,7 @@ export default function HomeLineupCard() {
   const pitcher = lineupCard.starting_pitcher as unknown as StartingPitcher | null;
   return <div className="container mx-auto px-4 py-4">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg md:text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+        <h2 className="text-lg md:text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-primary">
           Today's Mets Lineup
         </h2>
         <Link to="/video-gallery" className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-sm">
