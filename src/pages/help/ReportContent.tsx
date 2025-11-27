@@ -23,11 +23,11 @@ const ReportContent = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Reporting Inappropriate Content</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Reporting Inappropriate Content</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">When to Report</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">When to Report</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">Report content or behavior that violates our <Link to="/help/community-guidelines" className="text-primary hover:underline font-medium">Community Guidelines</Link>:</p>
                 
                 <div className="grid sm:grid-cols-2 gap-3">
@@ -51,11 +51,11 @@ const ReportContent = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">How to Report</h2>
+                <h2 className="text-2xl font-bold text-primary">How to Report</h2>
                 
                 <div className="grid gap-6">
                   <div className="space-y-3 p-5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
-                    <h3 className="text-xl font-semibold text-foreground">Reporting Posts</h3>
+                    <h3 className="text-xl font-semibold text-primary">Reporting Posts</h3>
                     <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                       <li>Find the post you want to report</li>
                       <li>Click the three-dot menu icon</li>
@@ -66,7 +66,7 @@ const ReportContent = () => {
                   </div>
                   
                   <div className="space-y-3 p-5 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-l-4 border-purple-500">
-                    <h3 className="text-xl font-semibold text-foreground">Reporting Comments</h3>
+                    <h3 className="text-xl font-semibold text-primary">Reporting Comments</h3>
                     <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                       <li>Locate the inappropriate comment</li>
                       <li>Click the flag or report icon</li>

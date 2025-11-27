@@ -23,22 +23,22 @@ const PostCommunity = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Posting in the Community</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Posting in the Community</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Creating a Post</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">Creating a Post</h2>
                 <p className="text-muted-foreground leading-relaxed">Share your thoughts and engage with fellow Mets fans:</p>
               </div>
               
               <div className="space-y-6">
                 <div className="space-y-3 pl-4 border-l-4 border-primary/30">
-                  <h3 className="text-xl font-semibold text-foreground">Step 1: Navigate to Community</h3>
+                  <h3 className="text-xl font-semibold text-primary">Step 1: Navigate to Community</h3>
                   <p className="text-muted-foreground leading-relaxed">Click "Community" in the main navigation menu to access the community section.</p>
                 </div>
                 
                 <div className="space-y-3 pl-4 border-l-4 border-primary/30">
-                  <h3 className="text-xl font-semibold text-foreground">Step 2: Create Your Post</h3>
+                  <h3 className="text-xl font-semibold text-primary">Step 2: Create Your Post</h3>
                   <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                     <li>Click the "Create Post" button or text area</li>
                     <li>Write your message in the text field</li>
@@ -49,11 +49,11 @@ const PostCommunity = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Post Types</h2>
+                <h2 className="text-2xl font-bold text-primary">Post Types</h2>
                 
                 <div className="grid gap-4">
                   <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
-                    <h3 className="text-xl font-semibold text-foreground mb-3">Text Posts</h3>
+                    <h3 className="text-xl font-semibold text-primary mb-3">Text Posts</h3>
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Share opinions, analysis, or discussion topics</span></li>
                       <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Ask questions to the community</span></li>
@@ -62,7 +62,7 @@ const PostCommunity = () => {
                   </div>
                   
                   <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-l-4 border-purple-500">
-                    <h3 className="text-xl font-semibold text-foreground mb-3">Image Posts</h3>
+                    <h3 className="text-xl font-semibold text-primary mb-3">Image Posts</h3>
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Share photos from games or Mets events</span></li>
                       <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Post memes and fan art</span></li>
@@ -73,11 +73,11 @@ const PostCommunity = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Best Practices</h2>
+                <h2 className="text-2xl font-bold text-primary">Best Practices</h2>
                 
                 <div className="space-y-4">
                   <div className="space-y-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <h3 className="text-xl font-semibold text-foreground">Write Engaging Content</h3>
+                    <h3 className="text-xl font-semibold text-primary">Write Engaging Content</h3>
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Use clear, descriptive titles</span></li>
                       <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Stay on topic (Mets and baseball related)</span></li>
@@ -87,7 +87,7 @@ const PostCommunity = () => {
                   </div>
                   
                   <div className="space-y-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                    <h3 className="text-xl font-semibold text-foreground">Be Respectful</h3>
+                    <h3 className="text-xl font-semibold text-primary">Be Respectful</h3>
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex items-start gap-2"><span className="text-yellow-600 font-bold">!</span><span>Follow <Link to="/help/community-guidelines" className="text-primary hover:underline font-medium">Community Guidelines</Link></span></li>
                       <li className="flex items-start gap-2"><span className="text-yellow-600 font-bold">!</span><span>Avoid spam or duplicate posts</span></li>
@@ -99,11 +99,11 @@ const PostCommunity = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Editing and Deleting</h2>
+                <h2 className="text-2xl font-bold text-primary">Editing and Deleting</h2>
                 
                 <div className="space-y-4">
                   <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                    <h3 className="text-xl font-semibold text-foreground">Edit Your Post</h3>
+                    <h3 className="text-xl font-semibold text-primary">Edit Your Post</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">To edit a post you've created:</p>
                     <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                       <li>Find your post in the community feed</li>
@@ -114,7 +114,7 @@ const PostCommunity = () => {
                   </div>
                   
                   <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                    <h3 className="text-xl font-semibold text-foreground">Delete Your Post</h3>
+                    <h3 className="text-xl font-semibold text-primary">Delete Your Post</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">To delete a post:</p>
                     <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                       <li>Find your post in the community feed</li>
@@ -127,7 +127,7 @@ const PostCommunity = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Post Visibility</h2>
+                <h2 className="text-2xl font-bold text-primary">Post Visibility</h2>
                 <p className="text-muted-foreground leading-relaxed mb-3">All posts are visible to:</p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Logged-in community members</span></li>
@@ -137,7 +137,7 @@ const PostCommunity = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Engagement</h2>
+                <h2 className="text-2xl font-bold text-primary">Engagement</h2>
                 <p className="text-muted-foreground leading-relaxed">Learn how to interact with posts in our <Link to="/help/comments-reactions" className="text-primary hover:underline font-medium">Commenting and Reactions</Link> guide.</p>
               </div>
             </CardContent>

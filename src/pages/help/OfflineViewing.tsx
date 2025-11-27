@@ -23,20 +23,20 @@ const OfflineViewing = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Download and Offline Viewing</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Download and Offline Viewing</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Offline Viewing Options</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">Offline Viewing Options</h2>
                 <p className="text-muted-foreground leading-relaxed">MetsXMFanZone offers limited offline viewing capabilities through our Progressive Web App (PWA).</p>
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Installing the PWA</h2>
+                <h2 className="text-2xl font-bold text-primary">Installing the PWA</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">Install MetsXMFanZone as an app on your device for the best offline experience:</p>
                 
                 <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
-                  <h3 className="text-xl font-semibold text-foreground">Mobile (iOS/Android)</h3>
+                  <h3 className="text-xl font-semibold text-primary">Mobile (iOS/Android)</h3>
                   <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                     <li>Visit metsxmfanzone.com in your mobile browser</li>
                     <li>Look for the "Add to Home Screen" or "Install App" prompt</li>
@@ -46,7 +46,7 @@ const OfflineViewing = () => {
                 </div>
                 
                 <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
-                  <h3 className="text-xl font-semibold text-foreground">Desktop (Windows/Mac/Linux)</h3>
+                  <h3 className="text-xl font-semibold text-primary">Desktop (Windows/Mac/Linux)</h3>
                   <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                     <li>Visit metsxmfanzone.com in Chrome, Edge, or other compatible browser</li>
                     <li>Look for the install icon in the address bar</li>
@@ -57,7 +57,7 @@ const OfflineViewing = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">What Works Offline</h2>
+                <h2 className="text-2xl font-bold text-primary">What Works Offline</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">Once installed, certain features work with limited or no internet:</p>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-green-500 font-bold">✓</span><span>Previously loaded pages and content</span></li>
@@ -67,7 +67,7 @@ const OfflineViewing = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">What Requires Internet</h2>
+                <h2 className="text-2xl font-bold text-primary">What Requires Internet</h2>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-orange-500 font-bold">!</span><span>Live streams and video playback</span></li>
                   <li className="flex items-start gap-2"><span className="text-orange-500 font-bold">!</span><span>Real-time updates and new content</span></li>
@@ -82,7 +82,7 @@ const OfflineViewing = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Improving Offline Experience</h2>
+                <h2 className="text-2xl font-bold text-primary">Improving Offline Experience</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">To make the most of offline capabilities:</p>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Browse pages while online to cache content</span></li>

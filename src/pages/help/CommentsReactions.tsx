@@ -23,17 +23,17 @@ const CommentsReactions = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Commenting and Reactions</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Commenting and Reactions</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Adding Comments</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">Adding Comments</h2>
                 <p className="text-muted-foreground leading-relaxed">Engage in discussions by commenting on posts and blog articles:</p>
               </div>
               
               <div className="grid gap-6">
                 <div className="space-y-3 p-5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
-                  <h3 className="text-xl font-semibold text-foreground">On Community Posts</h3>
+                  <h3 className="text-xl font-semibold text-primary">On Community Posts</h3>
                   <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                     <li>Navigate to the <Link to="/community" className="text-primary hover:underline font-medium">Community</Link> page</li>
                     <li>Find the post you want to comment on</li>
@@ -44,7 +44,7 @@ const CommentsReactions = () => {
                 </div>
                 
                 <div className="space-y-3 p-5 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-l-4 border-purple-500">
-                  <h3 className="text-xl font-semibold text-foreground">On Blog Articles</h3>
+                  <h3 className="text-xl font-semibold text-primary">On Blog Articles</h3>
                   <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                     <li>Read the blog article</li>
                     <li>Scroll to the comments section at the bottom</li>
@@ -56,7 +56,7 @@ const CommentsReactions = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Comment Guidelines</h2>
+                <h2 className="text-2xl font-bold text-primary">Comment Guidelines</h2>
                 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-3 p-5 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -84,11 +84,11 @@ const CommentsReactions = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Managing Your Comments</h2>
+                <h2 className="text-2xl font-bold text-primary">Managing Your Comments</h2>
                 
                 <div className="grid gap-4">
                   <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                    <h3 className="text-xl font-semibold text-foreground">Edit a Comment</h3>
+                    <h3 className="text-xl font-semibold text-primary">Edit a Comment</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">To edit your comment after posting:</p>
                     <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                       <li>Find your comment</li>
@@ -99,7 +99,7 @@ const CommentsReactions = () => {
                   </div>
                   
                   <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                    <h3 className="text-xl font-semibold text-foreground">Delete a Comment</h3>
+                    <h3 className="text-xl font-semibold text-primary">Delete a Comment</h3>
                     <p className="text-muted-foreground leading-relaxed mb-3">To remove your comment:</p>
                     <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                       <li>Find your comment</li>
@@ -112,7 +112,7 @@ const CommentsReactions = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Reactions and Likes</h2>
+                <h2 className="text-2xl font-bold text-primary">Reactions and Likes</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">Show appreciation for content without commenting:</p>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">❤️</span><span>Click the like/heart icon on posts</span></li>
@@ -122,7 +122,7 @@ const CommentsReactions = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
-                <h2 className="text-2xl font-bold text-foreground">Notifications</h2>
+                <h2 className="text-2xl font-bold text-primary">Notifications</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">Get notified when:</p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-blue-600 font-bold">🔔</span><span>Someone replies to your comment</span></li>
@@ -133,12 +133,12 @@ const CommentsReactions = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Reporting Comments</h2>
+                <h2 className="text-2xl font-bold text-primary">Reporting Comments</h2>
                 <p className="text-muted-foreground leading-relaxed">If you see inappropriate comments, report them following our <Link to="/help/report-content" className="text-primary hover:underline font-medium">Reporting Inappropriate Content</Link> guide.</p>
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Community Standards</h2>
+                <h2 className="text-2xl font-bold text-primary">Community Standards</h2>
                 <p className="text-muted-foreground leading-relaxed">All comments must follow our <Link to="/help/community-guidelines" className="text-primary hover:underline font-medium">Community Guidelines</Link>. Violations may result in comment removal or account restrictions.</p>
               </div>
             </CardContent>

@@ -26,11 +26,11 @@ const SubscriptionPlans = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Subscription Plans Explained</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Subscription Plans Explained</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Available Plans</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">Available Plans</h2>
                 <p className="text-muted-foreground leading-relaxed">
                   MetsXMFanZone offers three subscription tiers to fit your needs:
                 </p>
@@ -38,7 +38,7 @@ const SubscriptionPlans = () => {
 
               <div className="grid gap-6">
                 <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-lg border-2 border-gray-300">
-                  <h3 className="text-2xl font-bold text-foreground mb-2">Free Plan</h3>
+                  <h3 className="text-2xl font-bold text-primary mb-2">Free Plan</h3>
                   <p className="text-3xl font-bold text-primary mb-4">
                     $0<span className="text-lg text-muted-foreground">/month</span>
                   </p>
@@ -59,7 +59,7 @@ const SubscriptionPlans = () => {
                 </div>
 
                 <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border-2 border-primary">
-                  <h3 className="text-2xl font-bold text-foreground mb-2">Premium Plan</h3>
+                  <h3 className="text-2xl font-bold text-primary mb-2">Premium Plan</h3>
                   <p className="text-3xl font-bold text-primary mb-4">
                     $12.99<span className="text-lg text-muted-foreground">/month</span>
                   </p>
@@ -83,7 +83,7 @@ const SubscriptionPlans = () => {
                   <div className="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold mb-2">
                     SAVE $20
                   </div>
-                  <h3 className="text-2xl font-bold text-foreground mb-2">Annual Plan</h3>
+                  <h3 className="text-2xl font-bold text-primary mb-2">Annual Plan</h3>
                   <p className="text-3xl font-bold text-primary mb-4">
                     $129.99<span className="text-lg text-muted-foreground">/year</span>
                   </p>

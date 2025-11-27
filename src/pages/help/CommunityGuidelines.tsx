@@ -23,16 +23,16 @@ const CommunityGuidelines = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Community Guidelines</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Community Guidelines</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Our Community Values</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">Our Community Values</h2>
                 <p className="text-muted-foreground leading-relaxed">MetsXMFanZone is a community for passionate Mets fans to connect, share, and celebrate our team. We expect all members to follow these guidelines.</p>
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Be Respectful</h2>
+                <h2 className="text-2xl font-bold text-primary">Be Respectful</h2>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">✓</span><span>Treat all community members with respect and kindness</span></li>
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">✓</span><span>No personal attacks, harassment, or bullying</span></li>
@@ -42,7 +42,7 @@ const CommunityGuidelines = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Prohibited Content</h2>
+                <h2 className="text-2xl font-bold text-primary">Prohibited Content</h2>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-destructive font-bold">✗</span><span>Hate speech, discrimination, or offensive language</span></li>
                   <li className="flex items-start gap-2"><span className="text-destructive font-bold">✗</span><span>Spam, advertising, or promotional content without permission</span></li>
@@ -53,7 +53,7 @@ const CommunityGuidelines = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Posting Guidelines</h2>
+                <h2 className="text-2xl font-bold text-primary">Posting Guidelines</h2>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Stay on topic and relevant to the Mets and baseball</span></li>
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Use clear, descriptive titles for your posts</span></li>
@@ -63,12 +63,12 @@ const CommunityGuidelines = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Reporting Violations</h2>
+                <h2 className="text-2xl font-bold text-primary">Reporting Violations</h2>
                 <p className="text-muted-foreground leading-relaxed">If you see content that violates these guidelines, please report it immediately. See our <Link to="/help/report-content" className="text-primary hover:underline font-medium">Reporting Inappropriate Content</Link> guide.</p>
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Consequences</h2>
+                <h2 className="text-2xl font-bold text-primary">Consequences</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">Violations of these guidelines may result in:</p>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-yellow-500 font-bold">1.</span><span>Warning from moderators</span></li>
@@ -78,7 +78,7 @@ const CommunityGuidelines = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Questions</h2>
+                <h2 className="text-2xl font-bold text-primary">Questions</h2>
                 <p className="text-muted-foreground leading-relaxed">If you have questions about these guidelines, please <Link to="/contact" className="text-primary hover:underline font-medium">contact us</Link>.</p>
               </div>
             </CardContent>

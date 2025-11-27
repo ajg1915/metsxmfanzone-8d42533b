@@ -21,11 +21,11 @@ const VideoQuality = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Video Quality Settings</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Video Quality Settings</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Available Quality Options</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">Available Quality Options</h2>
                 <p className="text-muted-foreground leading-relaxed">MetsXMFanZone streams are available in multiple quality settings:</p>
               </div>
               
@@ -36,7 +36,7 @@ const VideoQuality = () => {
                 </div>
                 
                 <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                  <h3 className="text-xl font-semibold text-foreground">1080p (Full HD)</h3>
+                  <h3 className="text-xl font-semibold text-primary">1080p (Full HD)</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Best quality available</span></li>
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Requires minimum 8 Mbps connection</span></li>
@@ -45,7 +45,7 @@ const VideoQuality = () => {
                 </div>
                 
                 <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                  <h3 className="text-xl font-semibold text-foreground">720p (HD)</h3>
+                  <h3 className="text-xl font-semibold text-primary">720p (HD)</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Good quality with lower bandwidth</span></li>
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Requires minimum 5 Mbps connection</span></li>
@@ -54,7 +54,7 @@ const VideoQuality = () => {
                 </div>
                 
                 <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
-                  <h3 className="text-xl font-semibold text-foreground">480p (SD)</h3>
+                  <h3 className="text-xl font-semibold text-primary">480p (SD)</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Standard definition quality</span></li>
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Requires minimum 2.5 Mbps connection</span></li>
@@ -64,7 +64,7 @@ const VideoQuality = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">How to Change Quality</h2>
+                <h2 className="text-2xl font-bold text-primary">How to Change Quality</h2>
                 <ol className="space-y-3 text-muted-foreground list-decimal list-inside">
                   <li>Click on the video player while watching a stream</li>
                   <li>Look for the settings/gear icon in the player controls</li>
@@ -74,7 +74,7 @@ const VideoQuality = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Recommended Settings</h2>
+                <h2 className="text-2xl font-bold text-primary">Recommended Settings</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
@@ -93,7 +93,7 @@ const VideoQuality = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Troubleshooting Buffering</h2>
+                <h2 className="text-2xl font-bold text-primary">Troubleshooting Buffering</h2>
                 <p className="text-muted-foreground leading-relaxed">If you experience buffering issues, try lowering the quality setting or see our <Link to="/help/playback-issues" className="text-primary hover:underline font-medium">Troubleshooting Playback Issues</Link> guide.</p>
               </div>
             </CardContent>
