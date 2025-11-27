@@ -4,10 +4,8 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-
 const VideoQuality = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Helmet>
         <title>Video Quality Settings - MetsXMFanZone Help</title>
         <meta name="description" content="Learn how to adjust video quality settings for optimal streaming on MetsXMFanZone based on your internet speed." />
@@ -15,7 +13,7 @@ const VideoQuality = () => {
       </Helmet>
       <Navigation />
       <main className="pt-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl text-primary">
           <Link to="/help-center" className="inline-flex items-center text-primary hover:underline mb-6">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Help Center
@@ -33,7 +31,7 @@ const VideoQuality = () => {
               
               <div className="grid gap-6">
                 <div className="space-y-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border-l-4 border-green-500">
-                  <h3 className="text-xl font-semibold text-foreground">Auto (Recommended)</h3>
+                  <h3 className="text-xl font-semibold text-primary">Auto (Recommended)</h3>
                   <p className="text-muted-foreground leading-relaxed">Automatically adjusts quality based on your internet connection speed for optimal viewing without buffering.</p>
                 </div>
                 
@@ -103,8 +101,6 @@ const VideoQuality = () => {
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default VideoQuality;
