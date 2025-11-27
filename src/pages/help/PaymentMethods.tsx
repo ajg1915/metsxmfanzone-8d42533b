@@ -21,17 +21,17 @@ const PaymentMethods = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Payment Methods</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Payment Methods</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Accepted Payment Methods</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">Accepted Payment Methods</h2>
                 <p className="text-muted-foreground leading-relaxed">MetsXMFanZone offers two secure payment processors for your convenience:</p>
               </div>
               
               <div className="grid md:grid-cols-2 gap-6 text-primary bg-secondary">
                 <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500 text-primary">
-                  <h3 className="text-xl font-semibold text-foreground mb-4">PayPal</h3>
+                  <h3 className="text-xl font-semibold text-primary mb-4">PayPal</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-2"><span className="text-blue-600">✓</span><span>Pay with PayPal balance</span></li>
                     <li className="flex items-start gap-2"><span className="text-blue-600">✓</span><span>Use credit/debit cards</span></li>

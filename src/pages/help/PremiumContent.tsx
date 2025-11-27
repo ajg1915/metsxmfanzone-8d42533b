@@ -23,17 +23,17 @@ const PremiumContent = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Accessing Premium Content</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Accessing Premium Content</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">What's Included in Premium</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">What's Included in Premium</h2>
                 <p className="text-muted-foreground leading-relaxed">Premium and Annual plan members get access to exclusive content:</p>
               </div>
               
               <div className="grid gap-6">
                 <div className="space-y-3 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border-l-4 border-primary">
-                  <h3 className="text-xl font-semibold text-foreground">Live Streams</h3>
+                  <h3 className="text-xl font-semibold text-primary">Live Streams</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Watch all Mets games live</span></li>
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Pre-game and post-game analysis</span></li>
@@ -43,7 +43,7 @@ const PremiumContent = () => {
                 </div>
                 
                 <div className="space-y-3 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border-l-4 border-primary">
-                  <h3 className="text-xl font-semibold text-foreground">Spring Training Content</h3>
+                  <h3 className="text-xl font-semibold text-primary">Spring Training Content</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Exclusive spring training game coverage</span></li>
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Behind-the-scenes content</span></li>
@@ -52,7 +52,7 @@ const PremiumContent = () => {
                 </div>
                 
                 <div className="space-y-3 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border-l-4 border-primary">
-                  <h3 className="text-xl font-semibold text-foreground">Premium Features</h3>
+                  <h3 className="text-xl font-semibold text-primary">Premium Features</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>HD/Full HD streaming quality</span></li>
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Access to stream archives and replays</span></li>
@@ -63,7 +63,7 @@ const PremiumContent = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">How to Upgrade</h2>
+                <h2 className="text-2xl font-bold text-primary">How to Upgrade</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">If you're on the Free plan and want to access premium content:</p>
                 <ol className="space-y-3 text-muted-foreground list-decimal list-inside">
                   <li>Navigate to the <Link to="/plans" className="text-primary hover:underline font-medium">Plans</Link> page</li>
@@ -74,7 +74,7 @@ const PremiumContent = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Free vs Premium</h2>
+                <h2 className="text-2xl font-bold text-primary">Free vs Premium</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
@@ -97,7 +97,7 @@ const PremiumContent = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Questions</h2>
+                <h2 className="text-2xl font-bold text-primary">Questions</h2>
                 <p className="text-muted-foreground leading-relaxed">For more details about subscription plans, visit our <Link to="/help/subscription-plans" className="text-primary hover:underline font-medium">Subscription Plans Explained</Link> guide.</p>
               </div>
             </CardContent>

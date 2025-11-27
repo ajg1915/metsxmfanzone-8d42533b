@@ -21,11 +21,11 @@ const PlaybackIssues = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Troubleshooting Playback Issues</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Troubleshooting Playback Issues</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Common Issues and Solutions</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">Common Issues and Solutions</h2>
               </div>
               
               <div className="space-y-4 p-5 bg-red-50 dark:bg-red-900/20 rounded-lg border-l-4 border-red-500">
@@ -86,7 +86,7 @@ const PlaybackIssues = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Browser Compatibility</h2>
+                <h2 className="text-2xl font-bold text-primary">Browser Compatibility</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">Recommended browsers for best performance:</p>
                 <div className="grid gap-3">
                   <div className="p-3 bg-muted/50 rounded-lg flex items-center gap-3">
@@ -109,7 +109,7 @@ const PlaybackIssues = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">System Requirements</h2>
+                <h2 className="text-2xl font-bold text-primary">System Requirements</h2>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Internet:</strong> Minimum 5 Mbps download speed</span></li>
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Browser:</strong> Latest version recommended</span></li>
@@ -119,7 +119,7 @@ const PlaybackIssues = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t bg-green-50 dark:bg-green-900/20 p-6 rounded-lg">
-                <h2 className="text-2xl font-bold text-foreground">Still Having Issues?</h2>
+                <h2 className="text-2xl font-bold text-primary">Still Having Issues?</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">If problems persist after trying these solutions, please <Link to="/contact" className="text-primary hover:underline font-medium">contact support</Link> with:</p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Description of the issue</span></li>

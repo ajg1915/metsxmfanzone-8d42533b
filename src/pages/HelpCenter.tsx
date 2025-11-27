@@ -80,7 +80,7 @@ const HelpCenter = () => {
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                     <category.icon className="w-6 h-6 text-primary" />
                   </div>
-                  <CardTitle className="text-xl">{category.title}</CardTitle>
+                  <CardTitle className="text-xl text-primary">{category.title}</CardTitle>
                   <CardDescription>{category.description}</CardDescription>
                 </CardHeader>
                 <CardContent>

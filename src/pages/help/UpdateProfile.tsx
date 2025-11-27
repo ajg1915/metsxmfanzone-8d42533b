@@ -23,11 +23,11 @@ const UpdateProfile = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Update Profile Information</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Update Profile Information</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Accessing Your Profile</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">Accessing Your Profile</h2>
                 <div className="p-5 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <p className="text-muted-foreground leading-relaxed mb-4">To update your profile information:</p>
                   <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
@@ -40,11 +40,11 @@ const UpdateProfile = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Profile Information</h2>
+                <h2 className="text-2xl font-bold text-primary">Profile Information</h2>
                 
                 <div className="grid gap-4">
                   <div className="p-4 bg-muted/50 rounded-lg border-l-4 border-primary">
-                    <h3 className="text-xl font-semibold text-foreground mb-2">Full Name</h3>
+                    <h3 className="text-xl font-semibold text-primary mb-2">Full Name</h3>
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex items-start gap-2"><span className="text-primary">•</span><span>Update your display name</span></li>
                       <li className="flex items-start gap-2"><span className="text-primary">•</span><span>This appears on all your posts and comments</span></li>
@@ -52,7 +52,7 @@ const UpdateProfile = () => {
                   </div>
                   
                   <div className="p-4 bg-muted/50 rounded-lg border-l-4 border-primary">
-                    <h3 className="text-xl font-semibold text-foreground mb-2">Email Address</h3>
+                    <h3 className="text-xl font-semibold text-primary mb-2">Email Address</h3>
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex items-start gap-2"><span className="text-primary">•</span><span>Update your email for account notifications</span></li>
                       <li className="flex items-start gap-2"><span className="text-primary">•</span><span>Used for password recovery</span></li>

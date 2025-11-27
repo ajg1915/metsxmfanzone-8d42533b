@@ -23,17 +23,17 @@ const FollowFans = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl sm:text-3xl">Following Other Fans</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl text-primary">Following Other Fans</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-foreground border-b pb-3">Discovering Fans</h2>
+                <h2 className="text-2xl font-bold text-primary border-b pb-3">Discovering Fans</h2>
                 <p className="text-muted-foreground leading-relaxed">Connect with fellow Mets supporters on MetsXMFanZone:</p>
               </div>
               
               <div className="grid gap-6">
                 <div className="space-y-3 p-5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
-                  <h3 className="text-xl font-semibold text-foreground">In the Community Feed</h3>
+                  <h3 className="text-xl font-semibold text-primary">In the Community Feed</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Browse posts in the <Link to="/community" className="text-primary hover:underline font-medium">Community</Link> section</span></li>
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Click on usernames to view profiles</span></li>
@@ -42,7 +42,7 @@ const FollowFans = () => {
                 </div>
                 
                 <div className="space-y-3 p-5 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-l-4 border-purple-500">
-                  <h3 className="text-xl font-semibold text-foreground">In Comments</h3>
+                  <h3 className="text-xl font-semibold text-primary">In Comments</h3>
                   <ul className="space-y-2 text-muted-foreground">
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Engage with fans who comment on blog posts</span></li>
                     <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Reply to comments you find interesting</span></li>
@@ -52,7 +52,7 @@ const FollowFans = () => {
               </div>
               
               <div className="space-y-6 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Following Users</h2>
+                <h2 className="text-2xl font-bold text-primary">Following Users</h2>
                 <div className="p-5 bg-green-50 dark:bg-green-900/20 rounded-lg">
                   <p className="text-muted-foreground leading-relaxed mb-4">To follow another fan:</p>
                   <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
@@ -64,7 +64,7 @@ const FollowFans = () => {
               </div>
               
               <div className="space-y-4 pt-6 border-t">
-                <h2 className="text-2xl font-bold text-foreground">Benefits of Following</h2>
+                <h2 className="text-2xl font-bold text-primary">Benefits of Following</h2>
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>See posts from fans you follow in your personalized feed</span></li>
                   <li className="flex items-start gap-2"><span className="text-green-600 font-bold">✓</span><span>Get notifications about their activity</span></li>
