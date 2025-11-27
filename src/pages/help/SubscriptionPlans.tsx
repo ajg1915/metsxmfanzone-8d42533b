@@ -10,7 +10,10 @@ const SubscriptionPlans = () => {
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>Subscription Plans Explained - MetsXMFanZone Help</title>
-        <meta name="description" content="Compare MetsXMFanZone subscription plans including Free, Premium, and Annual options. Find the right plan for you." />
+        <meta
+          name="description"
+          content="Compare MetsXMFanZone subscription plans including Free, Premium, and Annual options. Find the right plan for you."
+        />
         <link rel="canonical" href="https://www.metsxmfanzone.com/help/subscription-plans" />
       </Helmet>
       <Navigation />
@@ -20,7 +23,7 @@ const SubscriptionPlans = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Help Center
           </Link>
-          
+
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl sm:text-3xl">Subscription Plans Explained</CardTitle>
@@ -28,38 +31,75 @@ const SubscriptionPlans = () => {
             <CardContent className="prose prose-lg prose-slate dark:prose-invert max-w-none space-y-8">
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold text-foreground border-b pb-3">Available Plans</h2>
-                <p className="text-muted-foreground leading-relaxed">MetsXMFanZone offers three subscription tiers to fit your needs:</p>
+                <p className="text-muted-foreground leading-relaxed">
+                  MetsXMFanZone offers three subscription tiers to fit your needs:
+                </p>
               </div>
-              
+
               <div className="grid gap-6">
                 <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-lg border-2 border-gray-300">
                   <h3 className="text-2xl font-bold text-foreground mb-2">Free Plan</h3>
-                  <p className="text-3xl font-bold text-primary mb-4">$0<span className="text-lg text-muted-foreground">/month</span></p>
+                  <p className="text-3xl font-bold text-primary mb-4">
+                    $0<span className="text-lg text-muted-foreground">/month</span>
+                  </p>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Access to all blog articles</span></li>
-                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Community posting and comments</span></li>
-                    <li className="flex items-start gap-2"><span className="text-red-600">✗</span><span>Live game streams</span></li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>Access to all blog articles</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>Community posting and comments</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-red-600">✗</span>
+                      <span>Live game streams</span>
+                    </li>
                   </ul>
                 </div>
-                
+
                 <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border-2 border-primary">
                   <h3 className="text-2xl font-bold text-foreground mb-2">Premium Plan</h3>
-                  <p className="text-3xl font-bold text-primary mb-4">$9.99<span className="text-lg text-muted-foreground">/month</span></p>
+                  <p className="text-3xl font-bold text-primary mb-4">
+                    $12.99<span className="text-lg text-muted-foreground">/month</span>
+                  </p>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Everything in Free plan</span></li>
-                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Access to all live game streams</span></li>
-                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>HD and Full HD quality</span></li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>Everything in Free plan</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>Access to all live game streams</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>HD and Full HD quality</span>
+                    </li>
                   </ul>
                 </div>
-                
+
                 <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 rounded-lg border-2 border-green-500">
-                  <div className="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold mb-2">SAVE $20</div>
+                  <div className="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold mb-2">
+                    SAVE $20
+                  </div>
                   <h3 className="text-2xl font-bold text-foreground mb-2">Annual Plan</h3>
-                  <p className="text-3xl font-bold text-primary mb-4">$99.99<span className="text-lg text-muted-foreground">/year</span></p>
+                  <p className="text-3xl font-bold text-primary mb-4">
+                    $129.99<span className="text-lg text-muted-foreground">/year</span>
+                  </p>
                   <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Everything in Premium plan</span></li>
-                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>2 months free compared to monthly</span></li>
-                    <li className="flex items-start gap-2"><span className="text-green-600">✓</span><span>Exclusive annual member perks</span></li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>Everything in Premium plan</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>2 months free compared to monthly</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600">✓</span>
+                      <span>Exclusive annual member perks</span>
+                    </li>
                   </ul>
                 </div>
               </div>
