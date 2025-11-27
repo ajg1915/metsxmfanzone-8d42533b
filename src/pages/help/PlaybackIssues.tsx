@@ -4,10 +4,8 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-
 const PlaybackIssues = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Helmet>
         <title>Troubleshooting Playback Issues - MetsXMFanZone Help</title>
         <meta name="description" content="Fix common video playback issues on MetsXMFanZone including buffering, loading errors, and quality problems." />
@@ -31,7 +29,7 @@ const PlaybackIssues = () => {
               </div>
               
               <div className="space-y-4 p-5 bg-red-50 dark:bg-red-900/20 rounded-lg border-l-4 border-red-500">
-                <h3 className="text-xl font-semibold text-foreground">Video Won't Load or Start</h3>
+                <h3 className="text-xl font-semibold text-primary">Video Won't Load or Start</h3>
                 <p className="text-muted-foreground leading-relaxed mb-3">If your video won't play:</p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Refresh the page</span></li>
@@ -43,7 +41,7 @@ const PlaybackIssues = () => {
               </div>
               
               <div className="space-y-4 p-5 bg-orange-50 dark:bg-orange-900/20 rounded-lg border-l-4 border-orange-500">
-                <h3 className="text-xl font-semibold text-foreground">Constant Buffering</h3>
+                <h3 className="text-xl font-semibold text-primary">Constant Buffering</h3>
                 <p className="text-muted-foreground leading-relaxed mb-3">To reduce buffering issues:</p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Lower the video quality setting (see <Link to="/help/video-quality" className="text-primary hover:underline font-medium">Video Quality Settings</Link>)</span></li>
@@ -55,7 +53,7 @@ const PlaybackIssues = () => {
               </div>
               
               <div className="space-y-4 p-5 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border-l-4 border-yellow-500">
-                <h3 className="text-xl font-semibold text-foreground">Poor Video Quality</h3>
+                <h3 className="text-xl font-semibold text-primary">Poor Video Quality</h3>
                 <p className="text-muted-foreground leading-relaxed mb-3">If video appears blurry or pixelated:</p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Manually select a higher quality setting (720p or 1080p)</span></li>
@@ -66,7 +64,7 @@ const PlaybackIssues = () => {
               </div>
               
               <div className="space-y-4 p-5 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-l-4 border-purple-500">
-                <h3 className="text-xl font-semibold text-foreground">Audio/Video Out of Sync</h3>
+                <h3 className="text-xl font-semibold text-primary">Audio/Video Out of Sync</h3>
                 <p className="text-muted-foreground leading-relaxed mb-3">If audio and video don't match:</p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span>Pause and resume the video</span></li>
@@ -77,10 +75,10 @@ const PlaybackIssues = () => {
               </div>
               
               <div className="space-y-4 p-5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
-                <h3 className="text-xl font-semibold text-foreground">Error Messages</h3>
+                <h3 className="text-xl font-semibold text-primary">Error Messages</h3>
                 <p className="text-muted-foreground leading-relaxed mb-3">Common error codes and fixes:</p>
                 <ul className="space-y-2 text-muted-foreground">
-                  <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span><strong className="text-foreground">"Video unavailable":</strong> Stream may have ended or subscription required</span></li>
+                  <li className="flex items-start gap-2 text-primary"><span className="text-primary font-bold">•</span><span><strong className="text-foreground">"Video unavailable":</strong> Stream may have ended or subscription required</span></li>
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span><strong className="text-foreground">"Playback error":</strong> Try refreshing or different browser</span></li>
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span><strong className="text-foreground">"Network error":</strong> Check internet connection</span></li>
                   <li className="flex items-start gap-2"><span className="text-primary font-bold">•</span><span><strong className="text-foreground">"Too many devices":</strong> You've exceeded the 2-device limit</span></li>
@@ -135,8 +133,6 @@ const PlaybackIssues = () => {
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default PlaybackIssues;
