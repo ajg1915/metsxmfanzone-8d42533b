@@ -100,12 +100,6 @@ const Navigation = () => {
               Home
             </NavLink>
             <button
-              onClick={() => handleProtectedNavigation("/live")}
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Live
-            </button>
-            <button
               onClick={() => handleProtectedNavigation("/spring-training-live")}
               className="text-foreground hover:text-primary transition-colors"
             >
@@ -122,6 +116,12 @@ const Navigation = () => {
               className="text-foreground hover:text-primary transition-colors"
             >
               Blog
+            </button>
+            <button
+              onClick={() => handleProtectedNavigation("/live")}
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Guide
             </button>
             <NavLink 
               to="/plans" 
@@ -211,15 +211,6 @@ const Navigation = () => {
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      handleProtectedNavigation("/live");
-                    }}
-                    className="text-foreground hover:text-primary transition-colors py-2 text-left"
-                  >
-                    Live
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
                       handleProtectedNavigation("/spring-training-live");
                     }}
                     className="text-foreground hover:text-primary transition-colors py-2 text-left"
@@ -243,6 +234,15 @@ const Navigation = () => {
                     className="text-foreground hover:text-primary transition-colors py-2 text-left"
                   >
                     Blog
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleProtectedNavigation("/live");
+                    }}
+                    className="text-foreground hover:text-primary transition-colors py-2 text-left"
+                  >
+                    Guide
                   </button>
                   <NavLink 
                     to="/plans" 
