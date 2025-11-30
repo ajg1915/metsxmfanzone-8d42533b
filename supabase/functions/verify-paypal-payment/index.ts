@@ -118,6 +118,30 @@ serve(async (req) => {
       throw updateError;
     }
 
+    // Get user profile for email
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('email, full_name')
+      .eq('id', user.id)
+      .single();
+
+    // Send confirmation email
+    try {
+      const amount = subscription.plan_type === 'annual' ? '99.99' : '9.99';
+      await supabase.functions.invoke('send-confirmation-email', {
+        body: {
+          type: 'subscription',
+          email: profile?.email || user.email,
+          name: profile?.full_name,
+          planType: subscription.plan_type,
+          amount: amount,
+        },
+      });
+    } catch (emailError) {
+      console.error('Error sending confirmation email:', emailError);
+      // Don't fail the payment if email fails
+    }
+
     return new Response(
       JSON.stringify({ success: true, subscription }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
