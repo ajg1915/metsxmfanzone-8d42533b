@@ -164,7 +164,23 @@ const Auth = () => {
           title: "Welcome back!",
           description: "You've successfully logged in.",
         });
-        navigate("/dashboard");
+        
+        // Check subscription plan to determine redirect
+        const { data: subscription } = await supabase
+          .from("subscriptions")
+          .select("plan_type, status")
+          .eq("user_id", data.user.id)
+          .eq("status", "active")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+
+        // Redirect based on plan: if premium or annual go home, otherwise go to plans
+        if (subscription && (subscription.plan_type === "premium" || subscription.plan_type === "annual")) {
+          navigate("/");
+        } else {
+          navigate("/plans");
+        }
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
