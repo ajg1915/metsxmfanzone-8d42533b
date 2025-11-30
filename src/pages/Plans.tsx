@@ -104,7 +104,7 @@ const Plans = () => {
     },
     {
       name: "Premium",
-      price: "$12.99",
+      price: "$9.99",
       period: "per month",
       description: "Most popular for true fans",
       features: [
@@ -123,12 +123,12 @@ const Plans = () => {
     },
     {
       name: "Annual",
-      price: "$129.99",
+      price: "$99.99",
       period: "per year",
       description: "Best value - Save 2 months",
       features: [
         "Everything in Premium",
-        "Save $26/year",
+        "Save $20/year",
         "Priority support",
         "Early access to content",
         "Exclusive merchandise discounts",

@@ -35,7 +35,7 @@ const PaymentSuccess = () => {
           });
         } else {
           result = await supabase.functions.invoke('verify-paypal-payment', {
-            body: { token }
+            body: { orderId: token }
           });
         }
 

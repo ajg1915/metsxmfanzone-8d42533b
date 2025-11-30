@@ -66,6 +66,7 @@ import VideoGallery from "./pages/VideoGallery";
 import LineupCardManagement from "./pages/admin/LineupCardManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
 import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
+import UserManagement from "./pages/admin/UserManagement";
 import CreateAccount from "./pages/help/CreateAccount";
 import NavigatePlatform from "./pages/help/NavigatePlatform";
 import WatchStreams from "./pages/help/WatchStreams";
@@ -156,6 +157,7 @@ const App = () => {
             <Route path="posts" element={<PostsManagement />} />
             <Route path="business-ads" element={<BusinessAdsManagement />} />
             <Route path="roles" element={<UserRoles />} />
+            <Route path="user-management" element={<UserManagement />} />
             <Route path="subscriptions" element={<SubscriptionManagement />} />
             <Route path="events" element={<EventsManagement />} />
             <Route path="spring-training" element={<SpringTrainingManagement />} />
