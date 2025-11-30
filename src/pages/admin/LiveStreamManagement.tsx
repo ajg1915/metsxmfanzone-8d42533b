@@ -287,7 +287,7 @@ export default function LiveStreamManagement() {
                 <div>
                   <Label htmlFor="assigned_pages">Assign to Pages *</Label>
                   <div className="space-y-2 mt-2">
-                    {['live', 'metsxmfanzone', 'mlb-network', 'espn-network', 'spring-training-live'].map((page) => (
+                    {['guide', 'live', 'metsxmfanzone', 'mlb-network', 'espn-network', 'spring-training-live'].map((page) => (
                       <div key={page} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
@@ -302,7 +302,7 @@ export default function LiveStreamManagement() {
                           className="rounded border-gray-300"
                         />
                         <Label htmlFor={page} className="cursor-pointer font-normal">
-                          {page === 'live' ? 'Live Page' : page === 'metsxmfanzone' ? 'MetsXMFanZone TV' : page === 'mlb-network' ? 'MLB Network' : page === 'espn-network' ? 'ESPN Network' : 'Spring Training Live'}
+                          {page === 'guide' ? 'Guide Page' : page === 'live' ? 'Live Page' : page === 'metsxmfanzone' ? 'MetsXMFanZone TV' : page === 'mlb-network' ? 'MLB Network' : page === 'espn-network' ? 'ESPN Network' : 'Spring Training Live'}
                         </Label>
                       </div>
                     ))}
@@ -390,6 +390,7 @@ export default function LiveStreamManagement() {
               <CardContent className="pt-0">
                 <div className="space-y-1.5 text-xs text-muted-foreground mb-3">
                   <p>Assigned to: {stream.assigned_pages?.length > 0 ? stream.assigned_pages.map(p => {
+                    if (p === 'guide') return 'Guide Page';
                     if (p === 'live') return 'Live Page';
                     if (p === 'metsxmfanzone') return 'MetsXMFanZone TV';
                     if (p === 'mlb-network') return 'MLB Network';
