@@ -1,4 +1,4 @@
-import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, ClipboardList } from "lucide-react";
+import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, ClipboardList, UserCog } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -46,6 +46,7 @@ const userItems = [
   { title: "Posts", url: "/admin/posts", icon: FileText },
   { title: "Business Ads", url: "/admin/business-ads", icon: Megaphone },
   { title: "User Roles", url: "/admin/roles", icon: Shield },
+  { title: "User Management", url: "/admin/user-management", icon: UserCog },
   { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
 ];
 

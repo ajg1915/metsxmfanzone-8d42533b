@@ -8,8 +8,8 @@ const corsHeaders = {
 
 // Server-side plan pricing - never trust client
 const PLAN_PRICES: Record<string, number> = {
-  'premium': 12.99,
-  'annual': 129.99,
+  'premium': 9.99,
+  'annual': 99.99,
 };
 
 serve(async (req) => {
@@ -92,8 +92,8 @@ serve(async (req) => {
           description: `MetsXMFanZone ${planType} subscription`,
         }],
         application_context: {
-          return_url: `${supabaseUrl.replace('.supabase.co', '')}/paypal-success`,
-          cancel_url: `${supabaseUrl.replace('.supabase.co', '')}/plans`,
+          return_url: 'https://metsxmfanzone.com/payment-success',
+          cancel_url: 'https://metsxmfanzone.com/plans',
         },
       }),
     });
