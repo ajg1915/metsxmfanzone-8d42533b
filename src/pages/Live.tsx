@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Lock, Newspaper } from "lucide-react";
 import { TVGuideChannel } from "@/components/TVGuideChannel";
 import { TVScheduleCard } from "@/components/TVScheduleCard";
+import { StreamPlayer } from "@/components/StreamPlayer";
 
 interface LiveStream {
   id: string;
@@ -278,6 +279,13 @@ const Live = () => {
                     </Card>
                   </div>
                 )}
+
+                {/* M3U8 Live Stream Player */}
+                <StreamPlayer 
+                  pageName="guide"
+                  pageTitle="Live Stream"
+                  pageDescription="Watch live streaming content"
+                />
 
                 {/* TV Guide Channels */}
                 <div>
