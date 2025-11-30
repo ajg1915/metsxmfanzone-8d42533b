@@ -33,19 +33,45 @@ interface UserSubscription {
 }
 
 const UserManagement = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [users, setUsers] = useState<UserSubscription[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (user?.email !== "ajg1915@gmail.com") {
-      navigate("/");
-      return;
-    }
-    fetchUsers();
-  }, [user, navigate]);
+    const checkAdminAndFetch = async () => {
+      if (authLoading) return;
+      
+      if (!user) {
+        navigate("/auth");
+        return;
+      }
+
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .single();
+
+      if (!roleData) {
+        toast({
+          title: "Access Denied",
+          description: "You don't have admin privileges",
+          variant: "destructive",
+        });
+        navigate("/");
+        return;
+      }
+
+      setIsAdmin(true);
+      fetchUsers();
+    };
+
+    checkAdminAndFetch();
+  }, [user, authLoading, navigate]);
 
   const fetchUsers = async () => {
     try {
@@ -167,7 +193,7 @@ const UserManagement = () => {
     }
   };
 
-  if (loading) {
+  if (loading || authLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
