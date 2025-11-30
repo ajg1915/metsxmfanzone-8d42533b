@@ -156,17 +156,7 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
               )}
             </div>
           </div>
-        ) : (
-          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <Play className="w-16 h-16 text-primary mx-auto mb-4" />
-              <p className="text-lg font-semibold mb-2">No Live Stream</p>
-              <p className="text-muted-foreground">
-                Stream will appear here when live
-              </p>
-            </div>
-          </div>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );
