@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Volume2, VolumeX } from "lucide-react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 
@@ -23,6 +24,7 @@ interface StreamPlayerProps {
 export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPlayerProps) {
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
 
@@ -64,7 +66,7 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       playerRef.current = videojs(videoRef.current, {
         controls: true,
         autoplay: true,
-        muted: false,
+        muted: true,
         preload: 'auto',
         fluid: true,
         liveui: true,
@@ -102,6 +104,14 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       }
     };
   }, [stream]);
+
+  const toggleMute = () => {
+    if (playerRef.current) {
+      const newMutedState = !isMuted;
+      playerRef.current.muted(newMutedState);
+      setIsMuted(newMutedState);
+    }
+  };
 
   const fetchStream = async () => {
     try {
@@ -143,12 +153,20 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       <CardContent>
         {stream ? (
           <div className="space-y-4">
-            <div className="aspect-video bg-black rounded-lg overflow-hidden">
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
               <video
                 ref={videoRef}
                 className="video-js vjs-big-play-centered vjs-theme-fantasy"
                 style={{ width: '100%', height: '100%' }}
               />
+              <Button
+                onClick={toggleMute}
+                variant="secondary"
+                size="icon"
+                className="absolute top-4 right-4 z-50 bg-background/80 hover:bg-background"
+              >
+                {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+              </Button>
             </div>
             <div>
               <h3 className="text-lg font-semibold">{stream.title}</h3>
