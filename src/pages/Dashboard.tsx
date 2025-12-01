@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -326,6 +327,14 @@ const Dashboard = () => {
                       </Dialog>
                     </div>
                   )}
+                  <div className="pt-2 border-t">
+                    <Link 
+                      to="/help/return-policy" 
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      View Return Policy
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             </div>

@@ -49,6 +49,7 @@ const HelpCenter = () => {
         { title: "Subscription plans explained", path: "/help/subscription-plans" },
         { title: "Payment methods", path: "/help/payment-methods" },
         { title: "Cancel or change subscription", path: "/help/cancel-subscription" },
+        { title: "Return policy", path: "/help/return-policy" },
       ],
     },
   ];
