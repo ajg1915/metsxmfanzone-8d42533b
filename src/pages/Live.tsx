@@ -196,7 +196,7 @@ const Live = () => {
       </Helmet>
       <Navigation />
       <main className="pt-16 sm:pt-20">
-        <section className="py-8 sm:py-12 md:py-16 bg-gradient-to-b from-secondary/20 to-background">
+        <section className="sm:py-12 md:py-16 bg-gradient-to-b from-secondary/20 to-background py-px">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             <div className="text-center mb-8 sm:mb-12">
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-3 sm:mb-4">
