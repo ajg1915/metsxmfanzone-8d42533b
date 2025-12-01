@@ -63,7 +63,8 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       
       playerRef.current = videojs(videoRef.current, {
         controls: true,
-        autoplay: 'muted',
+        autoplay: true,
+        muted: true,
         preload: 'auto',
         fluid: true,
         liveui: true,
