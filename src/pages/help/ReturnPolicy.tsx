@@ -38,7 +38,7 @@ const ReturnPolicy = () => {
                   <p>
                     MetsXMFanZone subscription plans are billed on a recurring basis (monthly or annually). Due to the
                     nature of digital content and immediate access granted upon subscription, we generally do not offer
-                    refunds for subscription fees.
+                    refunds for subscription Membership fees.
                   </p>
                   <p>
                     However, we understand that special circumstances may arise. If you believe you're entitled to a
@@ -51,8 +51,8 @@ const ReturnPolicy = () => {
                 <h2 className="text-xl font-semibold text-foreground mb-3">Cancellation Policy</h2>
                 <div className="space-y-3">
                   <p>
-                    You may cancel your subscription at any time through your account settings or by contacting support.
-                    Upon cancellation:
+                    You may cancel your Membership subscription at any time through your account settings or by
+                    contacting support. Upon cancellation:
                   </p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
                     <li>You will Not retain access to premium content if you cancel within 2 days</li>
@@ -62,7 +62,7 @@ const ReturnPolicy = () => {
                   <p className="text-sm">
                     Learn more about{" "}
                     <Link to="/help/cancel-subscription" className="text-primary hover:underline">
-                      how to cancel your subscription
+                      how to cancel your Membership subscription
                     </Link>
                     .
                   </p>
