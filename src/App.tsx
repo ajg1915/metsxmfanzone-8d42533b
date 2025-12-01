@@ -83,6 +83,7 @@ import UpdateProfile from "./pages/help/UpdateProfile";
 import SubscriptionPlans from "./pages/help/SubscriptionPlans";
 import PaymentMethods from "./pages/help/PaymentMethods";
 import CancelSubscription from "./pages/help/CancelSubscription";
+import ReturnPolicy from "./pages/help/ReturnPolicy";
 
 const queryClient = new QueryClient();
 
@@ -129,6 +130,7 @@ const App = () => {
           <Route path="/help/subscription-plans" element={<SubscriptionPlans />} />
           <Route path="/help/payment-methods" element={<PaymentMethods />} />
           <Route path="/help/cancel-subscription" element={<CancelSubscription />} />
+          <Route path="/help/return-policy" element={<ReturnPolicy />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/faqs" element={<FAQs />} />
