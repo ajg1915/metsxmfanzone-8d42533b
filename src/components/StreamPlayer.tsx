@@ -25,6 +25,7 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [loading, setLoading] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+  const [showUnmuteBanner, setShowUnmuteBanner] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
 
@@ -110,6 +111,9 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       const newMutedState = !isMuted;
       playerRef.current.muted(newMutedState);
       setIsMuted(newMutedState);
+      if (!newMutedState) {
+        setShowUnmuteBanner(false);
+      }
     }
   };
 
@@ -153,6 +157,12 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       <CardContent>
         {stream ? (
           <div className="space-y-4">
+            {isMuted && showUnmuteBanner && (
+              <div className="bg-primary/20 border-2 border-primary rounded-lg p-4 text-center animate-pulse">
+                <p className="text-sm sm:text-base font-semibold mb-2">🔊 Click the volume icon to hear audio</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Stream is muted by default for autoplay</p>
+              </div>
+            )}
             <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
               <video
                 ref={videoRef}
@@ -163,7 +173,8 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
                 onClick={toggleMute}
                 variant="secondary"
                 size="icon"
-                className="absolute top-4 right-4 z-50 bg-background/80 hover:bg-background"
+                className="absolute top-4 right-4 z-50 bg-primary/90 hover:bg-primary shadow-lg"
+                title={isMuted ? "Unmute to hear audio" : "Mute audio"}
               >
                 {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
               </Button>

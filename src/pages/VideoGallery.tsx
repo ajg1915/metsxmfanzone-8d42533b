@@ -152,7 +152,7 @@ export default function VideoGallery() {
           </Card> : <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredVideos.map(video => <Card key={video.id} className="overflow-hidden">
                 {playingVideoId === video.id ? <div className="aspect-video w-full bg-black">
-                    {isYouTubeUrl(video.video_url) ? <iframe src={getYouTubeEmbedUrl(video.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /> : <video src={video.video_url} controls autoPlay className="w-full h-full">
+                    {isYouTubeUrl(video.video_url) ? <iframe src={getYouTubeEmbedUrl(video.video_url)} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /> : <video src={video.video_url} controls autoPlay playsInline controlsList="nodownload" className="w-full h-full">
                         Your browser does not support the video tag.
                       </video>}
                   </div> : <div className="relative cursor-pointer group" onClick={() => handleVideoClick(video)}>
