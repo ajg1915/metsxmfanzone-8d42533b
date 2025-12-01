@@ -214,7 +214,7 @@ const Live = () => {
                       <Badge variant="destructive" className="animate-pulse">
                         LIVE NOW
                       </Badge>
-                      <h2 className="text-2xl font-bold text-primary">{podcastStream.title}</h2>
+                      <h2 className="font-bold text-primary text-lg text-center font-serif">{podcastStream.title}</h2>
                     </div>
                     <Card className="border-2 border-primary">
                       <CardContent className="p-0">
