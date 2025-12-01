@@ -280,13 +280,6 @@ const Live = () => {
                   </div>
                 )}
 
-                {/* M3U8 Live Stream Player */}
-                <StreamPlayer 
-                  pageName="guide"
-                  pageTitle="Live Stream"
-                  pageDescription="Watch live streaming content"
-                />
-
                 {/* TV Guide Channels */}
                 <div>
                   <h2 className="text-2xl font-bold text-primary mb-6">Live Channels</h2>
