@@ -199,9 +199,7 @@ const Live = () => {
         <section className="sm:py-12 md:py-16 bg-gradient-to-b from-secondary/20 to-background py-px">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             <div className="text-center mb-8 sm:mb-12">
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-3 sm:mb-4">
-                Live TV Guide
-              </h1>
+              <h1 className="sm:text-2xl lg:text-4xl font-bold text-primary mb-3 sm:mb-4 md:text-4xl text-lg">MetsXMFanZone TV Guide</h1>
               <p className="sm:text-base text-foreground max-w-2xl mx-auto text-center text-xs">
                 Your complete guide to Mets coverage across all networks
               </p>
