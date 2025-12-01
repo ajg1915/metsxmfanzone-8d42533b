@@ -12,7 +12,7 @@ const ReturnPolicy = () => {
         <title>Return Policy - MetsXMFanZone Help Center</title>
         <meta
           name="description"
-          content="Learn about MetsXMFanZone's return and refund policy for subscriptions and merchandise purchases."
+          content="Learn about MetsXMFanZone's return and refund policy for Memberships and merchandise purchases."
         />
         <link rel="canonical" href="https://www.metsxmfanzone.com/help/return-policy" />
       </Helmet>
@@ -33,12 +33,12 @@ const ReturnPolicy = () => {
             </CardHeader>
             <CardContent className="space-y-6 text-muted-foreground">
               <section>
-                <h2 className="text-xl font-semibold text-foreground mb-3">Subscription Plans</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-3">Membership Subscription Plans</h2>
                 <div className="space-y-3">
                   <p>
-                    MetsXMFanZone subscription plans are billed on a recurring basis (monthly or annually). Due to the
-                    nature of digital content and immediate access granted upon subscription, we generally do not offer
-                    refunds for subscription Membership fees.
+                    MetsXMFanZone Mmebership plans are billed on a recurring basis (monthly or annually). Due to the
+                    nature of digital content and immediate access granted upon membership, we generally do not offer
+                    refunds for Membership fees.
                   </p>
                   <p>
                     However, we understand that special circumstances may arise. If you believe you're entitled to a
