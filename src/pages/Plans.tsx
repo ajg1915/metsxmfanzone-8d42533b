@@ -17,7 +17,7 @@ const Plans = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'helcim'>('paypal');
+  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "helcim">("paypal");
 
   const handleSubscribe = async (planType: string) => {
     if (!user) {
@@ -26,7 +26,7 @@ const Plans = () => {
         description: "Please sign in to subscribe",
         variant: "destructive",
       });
-      navigate('/auth');
+      navigate("/auth");
       return;
     }
 
@@ -36,8 +36,8 @@ const Plans = () => {
         description: "Creating your payment session",
       });
 
-      if (paymentMethod === 'paypal') {
-        const { data, error } = await supabase.functions.invoke('create-paypal-order', {
+      if (paymentMethod === "paypal") {
+        const { data, error } = await supabase.functions.invoke("create-paypal-order", {
           body: { planType },
         });
 
@@ -53,15 +53,15 @@ const Plans = () => {
           });
         }
       } else {
-        const { data, error } = await supabase.functions.invoke('create-helcim-checkout', {
+        const { data, error } = await supabase.functions.invoke("create-helcim-checkout", {
           body: { planType },
         });
 
         if (error) throw error;
 
         if (data?.checkoutToken && data?.secretToken) {
-          sessionStorage.setItem('helcim_checkout_token', data.checkoutToken);
-          sessionStorage.setItem('helcim_secret_token', data.secretToken);
+          sessionStorage.setItem("helcim_checkout_token", data.checkoutToken);
+          sessionStorage.setItem("helcim_secret_token", data.secretToken);
           navigate(`/helcim-checkout?token=${data.checkoutToken}`);
         } else {
           toast({
@@ -72,7 +72,7 @@ const Plans = () => {
         }
       }
     } catch (error) {
-      console.error('Error creating payment:', error);
+      console.error("Error creating payment:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to initiate payment. Please try again.",
@@ -87,24 +87,14 @@ const Plans = () => {
       price: "$0",
       period: "forever",
       description: "Perfect for casual fans",
-      features: [
-        "Limited highlights access",
-        "Community forum access",
-        "Game schedules",
-        "Free Spring Training Live",
-      ],
-      notIncluded: [
-        "Live streaming",
-        "Full game replays",
-        "Exclusive content",
-        "Ad-free experience",
-      ],
+      features: ["Limited highlights access", "Community forum access", "Game schedules", "Free Spring Training Live"],
+      notIncluded: ["Live streaming", "Full game replays", "Exclusive content", "Ad-free experience"],
       cta: "Sign Up Free",
       popular: false,
     },
     {
       name: "Premium",
-      price: "$9.99",
+      price: "$12.99",
       period: "per month",
       description: "Most popular for true fans",
       features: [
@@ -144,8 +134,14 @@ const Plans = () => {
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>Mets Fan Subscription Plans - Premium Access | MetsXMFanZone</title>
-        <meta name="description" content="Choose your MetsXMFanZone plan. Get unlimited access to live Mets streams, game replays, exclusive content, and more. Start your free trial today." />
-        <meta name="keywords" content="Mets subscription, Mets premium, baseball streaming plans, Mets fan membership, live stream subscription" />
+        <meta
+          name="description"
+          content="Choose your MetsXMFanZone plan. Get unlimited access to live Mets streams, game replays, exclusive content, and more. Start your free trial today."
+        />
+        <meta
+          name="keywords"
+          content="Mets subscription, Mets premium, baseball streaming plans, Mets fan membership, live stream subscription"
+        />
         <link rel="canonical" href="https://www.metsxmfanzone.com/plans" />
       </Helmet>
       <Navigation />
@@ -159,20 +155,27 @@ const Plans = () => {
               <p className="text-sm sm:text-base text-foreground max-w-2xl mx-auto mb-6">
                 Get unlimited access to live games, replays, highlights, and exclusive Mets content
               </p>
-              
+
               <Card className="max-w-md mx-auto border-2 border-primary bg-card">
                 <CardHeader>
                   <CardTitle className="text-base sm:text-lg text-primary">Select Payment Method</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <RadioGroup value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as 'paypal' | 'helcim')}>
+                  <RadioGroup
+                    value={paymentMethod}
+                    onValueChange={(value) => setPaymentMethod(value as "paypal" | "helcim")}
+                  >
                     <div className="flex items-center space-x-2 mb-3">
                       <RadioGroupItem value="paypal" id="paypal" />
-                      <Label htmlFor="paypal" className="text-sm sm:text-base cursor-pointer">PayPal</Label>
+                      <Label htmlFor="paypal" className="text-sm sm:text-base cursor-pointer">
+                        PayPal
+                      </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="helcim" id="helcim" />
-                      <Label htmlFor="helcim" className="text-sm sm:text-base cursor-pointer">Credit/Debit Card (Helcim)</Label>
+                      <Label htmlFor="helcim" className="text-sm sm:text-base cursor-pointer">
+                        Credit/Debit Card (Helcim)
+                      </Label>
                     </div>
                   </RadioGroup>
                 </CardContent>
@@ -181,9 +184,9 @@ const Plans = () => {
 
             <div className="grid md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {plans.map((plan, index) => (
-                <Card 
-                  key={index} 
-                  className={`border-2 ${plan.popular ? 'border-primary shadow-2xl scale-105' : 'border-primary'} bg-card relative overflow-hidden transition-all hover:shadow-xl`}
+                <Card
+                  key={index}
+                  className={`border-2 ${plan.popular ? "border-primary shadow-2xl scale-105" : "border-primary"} bg-card relative overflow-hidden transition-all hover:shadow-xl`}
                 >
                   {plan.popular && (
                     <div className="absolute top-0 right-0">
@@ -203,13 +206,13 @@ const Plans = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4 sm:space-y-6">
-                    <Button 
-                      className="w-full text-sm sm:text-base" 
+                    <Button
+                      className="w-full text-sm sm:text-base"
                       size="lg"
                       variant={plan.popular ? "default" : "outline"}
                       onClick={() => {
-                        if (plan.name === 'Free') {
-                          navigate('/auth');
+                        if (plan.name === "Free") {
+                          navigate("/auth");
                         } else {
                           handleSubscribe(plan.name.toLowerCase());
                         }
@@ -217,7 +220,7 @@ const Plans = () => {
                     >
                       {plan.cta}
                     </Button>
-                    
+
                     <div className="space-y-2 sm:space-y-3">
                       {plan.features.map((feature, featureIndex) => (
                         <div key={featureIndex} className="flex items-start gap-2 sm:gap-3">
@@ -238,7 +241,9 @@ const Plans = () => {
             </div>
 
             <div className="mt-12 sm:mt-16 text-center">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-primary mb-6 sm:mb-8">Frequently Asked Questions</h2>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-primary mb-6 sm:mb-8">
+                Frequently Asked Questions
+              </h2>
               <div className="max-w-3xl mx-auto space-y-4">
                 <Card className="border-2 border-primary bg-card text-left">
                   <CardHeader>
@@ -246,25 +251,31 @@ const Plans = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm sm:text-base text-foreground">
-                      Yes! You can cancel your subscription at any time. Your access will continue until the end of your billing period.
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="border-2 border-primary bg-card text-left">
-                  <CardHeader>
-                    <CardTitle className="text-base sm:text-lg text-primary">What's included in the free trial?</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm sm:text-base text-foreground">
-                      The 7-day free trial gives you full access to all Premium features. No credit card required to start.
+                      Yes! You can cancel your subscription at any time. Your access will continue until the end of your
+                      billing period.
                     </p>
                   </CardContent>
                 </Card>
 
                 <Card className="border-2 border-primary bg-card text-left">
                   <CardHeader>
-                    <CardTitle className="text-base sm:text-lg text-primary">Can I watch on multiple devices?</CardTitle>
+                    <CardTitle className="text-base sm:text-lg text-primary">
+                      What's included in the free trial?
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm sm:text-base text-foreground">
+                      The 7-day free trial gives you full access to all Premium features. No credit card required to
+                      start.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2 border-primary bg-card text-left">
+                  <CardHeader>
+                    <CardTitle className="text-base sm:text-lg text-primary">
+                      Can I watch on multiple devices?
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm sm:text-base text-foreground">
