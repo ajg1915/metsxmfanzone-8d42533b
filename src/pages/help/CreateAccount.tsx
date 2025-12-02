@@ -4,10 +4,8 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-
 const CreateAccount = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Helmet>
         <title>How to Create an Account - MetsXMFanZone Help</title>
         <meta name="description" content="Step-by-step guide on creating your MetsXMFanZone account to access exclusive Mets content and live streams." />
@@ -50,7 +48,7 @@ const CreateAccount = () => {
                 <p className="text-muted-foreground leading-relaxed mb-3">After creating your account, you'll be prompted to choose a subscription plan:</p>
                 <ul className="space-y-2 text-muted-foreground">
                   <li><strong>Free Plan:</strong> Access to basic content and community features</li>
-                  <li><strong>Premium Plan ($9.99/month):</strong> Full access to live streams and exclusive content</li>
+                  <li><strong>Premium Plan ($9.99/month):</strong>Premium Plan ($12.99/month):</li>
                   <li><strong>Annual Plan ($99.99/year):</strong> All premium features with significant savings</li>
                 </ul>
               </div>
@@ -74,8 +72,6 @@ const CreateAccount = () => {
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default CreateAccount;
