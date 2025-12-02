@@ -113,7 +113,7 @@ const Plans = () => {
     },
     {
       name: "Annual",
-      price: "$99.99",
+      price: "$129.99",
       period: "per year",
       description: "Best value - Save 2 months",
       features: [
