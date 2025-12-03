@@ -4,14 +4,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+
+const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
 const signupSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   fullName: z.string().min(2, "Name must be at least 2 characters"),
+  phoneNumber: z.string().optional().refine((val) => !val || phoneRegex.test(val), {
+    message: "Invalid phone number format (e.g., 555-123-4567)",
+  }),
+  smsOptIn: z.boolean().optional(),
 });
 
 const loginSchema = z.object({
@@ -41,6 +48,8 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [smsOptIn, setSmsOptIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -73,7 +82,7 @@ const Auth = () => {
     e.preventDefault();
     
     try {
-      const validated = signupSchema.parse({ email, password, fullName });
+      const validated = signupSchema.parse({ email, password, fullName, phoneNumber, smsOptIn });
       setLoading(true);
 
       const { data, error } = await supabase.auth.signUp({
@@ -83,6 +92,8 @@ const Auth = () => {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: validated.fullName,
+            phone_number: validated.phoneNumber || null,
+            sms_notifications_enabled: validated.smsOptIn || false,
           },
         },
       });
@@ -105,6 +116,17 @@ const Auth = () => {
       }
 
       if (data.user) {
+        // Update profile with phone number and SMS preference
+        if (validated.phoneNumber || validated.smsOptIn) {
+          await supabase
+            .from("profiles")
+            .update({
+              phone_number: validated.phoneNumber || null,
+              sms_notifications_enabled: validated.smsOptIn || false,
+            })
+            .eq("id", data.user.id);
+        }
+
         toast({
           title: "Success!",
           description: "Please check your email to confirm your account.",
@@ -331,6 +353,36 @@ const Auth = () => {
                     disabled={loading}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">Phone Number (optional)</Label>
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    placeholder="555-123-4567"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="smsOptIn"
+                    checked={smsOptIn}
+                    onCheckedChange={(checked) => setSmsOptIn(checked === true)}
+                    disabled={loading || !phoneNumber}
+                  />
+                  <div className="grid gap-1.5 leading-none">
+                    <Label
+                      htmlFor="smsOptIn"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Receive SMS notifications
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Get text alerts for news, live streams, and updates. Msg & data rates may apply.
+                    </p>
+                  </div>
+                </div>
               </>
             )}
             
@@ -432,6 +484,8 @@ const Auth = () => {
                     setEmail("");
                     setPassword("");
                     setFullName("");
+                    setPhoneNumber("");
+                    setSmsOptIn(false);
                   }}
                   className="text-primary hover:underline"
                   disabled={loading}
