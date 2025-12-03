@@ -1,5 +1,19 @@
 import { supabase } from "@/integrations/supabase/client";
 
+// Helper to send SMS notifications
+const sendSMSNotification = async (message: string) => {
+  try {
+    await supabase.functions.invoke('send-sms-notification', {
+      body: {
+        message,
+        sendToAll: true
+      }
+    });
+  } catch (error) {
+    console.error('Failed to send SMS notification:', error);
+  }
+};
+
 export const setupNotificationListeners = () => {
   // Listen for new Mets Live Tracker items
   const newsChannel = supabase
@@ -24,6 +38,9 @@ export const setupNotificationListeners = () => {
             url: '/#news'
           }
         });
+
+        // Send SMS notification
+        await sendSMSNotification(`🔥 Breaking Mets News: ${news.title}`);
 
         // Show browser notification if permission granted
         if ('Notification' in window && Notification.permission === 'granted') {
@@ -61,6 +78,9 @@ export const setupNotificationListeners = () => {
             }
           });
 
+          // Send SMS notification
+          await sendSMSNotification(`🔴 LIVE NOW: ${stream.title}`);
+
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('🔴 LIVE NOW!', {
               body: stream.title,
@@ -95,6 +115,9 @@ export const setupNotificationListeners = () => {
             url: `/blog/${post.slug}`
           }
         });
+
+        // Send SMS notification
+        await sendSMSNotification(`📰 New Blog Post: ${post.title}`);
 
         if ('Notification' in window && Notification.permission === 'granted') {
           new Notification('📰 New Blog Post', {
