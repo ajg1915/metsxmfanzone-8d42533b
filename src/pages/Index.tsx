@@ -37,9 +37,9 @@ const Index = () => {
       <main className="pt-12 sm:pt-14">
         <Hero />
         <LiveNotificationBar />
-        <LiveNetworks />
+        <LiveNetworks className="py-[10px]" />
         <LiveStreamsSection />
-        <SectionScrollIndicator />
+        <SectionScrollIndicator className="py-[10px]" />
         <SpringTraining />
         <SectionScrollIndicator />
         <HomeLineupCard className="py-[10px]" />
