@@ -784,6 +784,69 @@ export type Database = {
         }
         Relationships: []
       }
+      team_leaders: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          player_name: string
+          stat_value: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          player_name: string
+          stat_value: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          player_name?: string
+          stat_value?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      team_standings: {
+        Row: {
+          created_at: string
+          division: string
+          games_back: string
+          id: string
+          losses: number
+          position: number
+          team_name: string
+          updated_at: string
+          wins: number
+        }
+        Insert: {
+          created_at?: string
+          division?: string
+          games_back?: string
+          id?: string
+          losses?: number
+          position?: number
+          team_name: string
+          updated_at?: string
+          wins?: number
+        }
+        Update: {
+          created_at?: string
+          division?: string
+          games_back?: string
+          id?: string
+          losses?: number
+          position?: number
+          team_name?: string
+          updated_at?: string
+          wins?: number
+        }
+        Relationships: []
+      }
       tutorial_steps: {
         Row: {
           created_at: string

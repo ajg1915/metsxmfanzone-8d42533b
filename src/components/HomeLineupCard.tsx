@@ -19,6 +19,22 @@ interface StartingPitcher {
   strikeouts: string;
 }
 
+interface Standing {
+  id: string;
+  team_name: string;
+  wins: number;
+  losses: number;
+  games_back: string;
+  position: number;
+}
+
+interface TeamLeader {
+  id: string;
+  category: string;
+  player_name: string;
+  stat_value: string;
+}
+
 export default function HomeLineupCard() {
   const { data: lineupCard } = useQuery({
     queryKey: ["today-lineup-card"],
@@ -52,8 +68,37 @@ export default function HomeLineupCard() {
     },
   });
 
+  const { data: standings } = useQuery({
+    queryKey: ["nl-east-standings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("team_standings")
+        .select("*")
+        .eq("division", "NL East")
+        .order("position", { ascending: true });
+      if (error) throw error;
+      return data as Standing[];
+    },
+  });
+
+  const { data: teamLeaders } = useQuery({
+    queryKey: ["team-leaders"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("team_leaders")
+        .select("*");
+      if (error) throw error;
+      return data as TeamLeader[];
+    },
+  });
+
   const lineup = lineupCard?.lineup_data as unknown as LineupPlayer[] | undefined;
   const pitcher = lineupCard?.starting_pitcher as unknown as StartingPitcher | null;
+
+  const getLeaderStat = (category: string) => {
+    const leader = teamLeaders?.find((l) => l.category === category);
+    return leader ? { name: leader.player_name, value: leader.stat_value } : null;
+  };
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -154,24 +199,37 @@ export default function HomeLineupCard() {
                     </div>
                   )}
 
-                  {/* Quick Stats */}
+                  {/* Quick Stats from DB */}
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                       Season Stats
                     </p>
                     <div className="grid grid-cols-3 gap-2">
-                      <div className="bg-muted/50 rounded p-2 text-center">
-                        <p className="text-lg font-bold text-primary">45</p>
-                        <p className="text-[10px] text-muted-foreground">Wins</p>
-                      </div>
-                      <div className="bg-muted/50 rounded p-2 text-center">
-                        <p className="text-lg font-bold text-primary">32</p>
-                        <p className="text-[10px] text-muted-foreground">Losses</p>
-                      </div>
-                      <div className="bg-muted/50 rounded p-2 text-center">
-                        <p className="text-lg font-bold text-primary">1st</p>
-                        <p className="text-[10px] text-muted-foreground">NL East</p>
-                      </div>
+                      {standings && (
+                        <>
+                          <div className="bg-muted/50 rounded p-2 text-center">
+                            <p className="text-lg font-bold text-primary">
+                              {standings.find((s) => s.team_name === "Mets")?.wins || 0}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground">Wins</p>
+                          </div>
+                          <div className="bg-muted/50 rounded p-2 text-center">
+                            <p className="text-lg font-bold text-primary">
+                              {standings.find((s) => s.team_name === "Mets")?.losses || 0}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground">Losses</p>
+                          </div>
+                          <div className="bg-muted/50 rounded p-2 text-center">
+                            <p className="text-lg font-bold text-primary">
+                              {standings.find((s) => s.team_name === "Mets")?.position || "-"}
+                              {standings.find((s) => s.team_name === "Mets")?.position === 1 ? "st" : 
+                               standings.find((s) => s.team_name === "Mets")?.position === 2 ? "nd" :
+                               standings.find((s) => s.team_name === "Mets")?.position === 3 ? "rd" : "th"}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground">NL East</p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -238,7 +296,7 @@ export default function HomeLineupCard() {
             </CardContent>
           </Card>
 
-          {/* NL East Standings */}
+          {/* NL East Standings from DB */}
           <Card className="border-primary/20">
             <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-2.5 text-white">
               <div className="flex items-center gap-2">
@@ -248,35 +306,29 @@ export default function HomeLineupCard() {
             </div>
             <CardContent className="p-2.5">
               <div className="space-y-1.5">
-                {[
-                  { team: "Mets", w: 45, l: 32, gb: "-" },
-                  { team: "Braves", w: 43, l: 34, gb: "2.0" },
-                  { team: "Phillies", w: 42, l: 35, gb: "3.0" },
-                  { team: "Marlins", w: 35, l: 42, gb: "10.0" },
-                  { team: "Nationals", w: 30, l: 47, gb: "15.0" },
-                ].map((team, i) => (
+                {standings?.map((team) => (
                   <div
-                    key={team.team}
+                    key={team.id}
                     className={`flex items-center gap-2 p-1.5 rounded text-xs ${
-                      team.team === "Mets"
+                      team.team_name === "Mets"
                         ? "bg-primary/10 border border-primary/20"
                         : "bg-muted/30"
                     }`}
                   >
                     <span className="font-bold w-4 text-center text-muted-foreground">
-                      {i + 1}
+                      {team.position}
                     </span>
                     <span
                       className={`flex-1 font-medium ${
-                        team.team === "Mets" ? "text-primary" : ""
+                        team.team_name === "Mets" ? "text-primary" : ""
                       }`}
                     >
-                      {team.team}
+                      {team.team_name}
                     </span>
-                    <span className="w-8 text-center">{team.w}</span>
-                    <span className="w-8 text-center">{team.l}</span>
+                    <span className="w-8 text-center">{team.wins}</span>
+                    <span className="w-8 text-center">{team.losses}</span>
                     <span className="w-8 text-center text-muted-foreground">
-                      {team.gb}
+                      {team.games_back}
                     </span>
                   </div>
                 ))}
@@ -291,7 +343,7 @@ export default function HomeLineupCard() {
             </CardContent>
           </Card>
 
-          {/* Team Leaders */}
+          {/* Team Leaders from DB */}
           <Card className="border-primary/20">
             <div className="bg-gradient-to-r from-primary/80 to-primary p-2.5 text-primary-foreground">
               <div className="flex items-center gap-2">
@@ -301,21 +353,27 @@ export default function HomeLineupCard() {
             </div>
             <CardContent className="p-2.5">
               <div className="grid grid-cols-3 gap-2 text-center">
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase">AVG</p>
-                  <p className="font-bold text-sm text-primary">.312</p>
-                  <p className="text-[10px] truncate">Lindor</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase">HR</p>
-                  <p className="font-bold text-sm text-primary">24</p>
-                  <p className="text-[10px] truncate">Alonso</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase">RBI</p>
-                  <p className="font-bold text-sm text-primary">58</p>
-                  <p className="text-[10px] truncate">Alonso</p>
-                </div>
+                {getLeaderStat("AVG") && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">AVG</p>
+                    <p className="font-bold text-sm text-primary">{getLeaderStat("AVG")?.value}</p>
+                    <p className="text-[10px] truncate">{getLeaderStat("AVG")?.name}</p>
+                  </div>
+                )}
+                {getLeaderStat("HR") && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">HR</p>
+                    <p className="font-bold text-sm text-primary">{getLeaderStat("HR")?.value}</p>
+                    <p className="text-[10px] truncate">{getLeaderStat("HR")?.name}</p>
+                  </div>
+                )}
+                {getLeaderStat("RBI") && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">RBI</p>
+                    <p className="font-bold text-sm text-primary">{getLeaderStat("RBI")?.value}</p>
+                    <p className="text-[10px] truncate">{getLeaderStat("RBI")?.name}</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

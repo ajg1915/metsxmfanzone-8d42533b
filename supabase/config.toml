@@ -1,5 +1,8 @@
 project_id = "clwghkbtkofacsjeyrtk"
 
+[functions.update-standings]
+verify_jwt = false
+
 [functions.blog-og-meta]
 verify_jwt = false
 
