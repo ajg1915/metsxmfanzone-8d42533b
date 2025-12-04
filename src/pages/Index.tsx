@@ -29,8 +29,8 @@ const Index = () => {
   }, []);
   return <div className="min-h-screen bg-background">
       <Helmet>
-        <title>MetsXMFanZone - "ultimate Destination where the fans go" </title>
-        <meta name="description" content="The ultimate Destination where the fans go". Watch live game streams, highlights, podcasts, and exclusive Mets coverage. Join thousands of passionate New York Mets fans." />
+        <title>MetsXMFanZone - Watch Mets Live Streams, Highlights & Exclusive Coverage</title>
+        <meta name="description" content="The ultimate Mets fan community. Watch live game streams, highlights, podcasts, and exclusive Mets coverage. Join thousands of passionate New York Mets fans." />
         <meta name="keywords" content="Mets live streams, New York Mets, Mets highlights, Mets podcast, Mets fan community, MLB streams, Mets games, baseball live stream" />
         <link rel="canonical" href="https://www.metsxmfanzone.com/" />
       </Helmet>
