@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy } from "lucide-react";
+import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 
 interface LineupPlayer {
@@ -19,20 +19,17 @@ interface StartingPitcher {
   strikeouts: string;
 }
 
-interface Standing {
-  id: string;
-  team_name: string;
+interface MLBStanding {
+  team: { name: string };
   wins: number;
   losses: number;
-  games_back: string;
-  position: number;
+  gamesBack: string;
+  divisionRank: string;
 }
 
-interface TeamLeader {
-  id: string;
-  category: string;
-  player_name: string;
-  stat_value: string;
+interface MLBLeader {
+  person: { fullName: string };
+  value: string;
 }
 
 export default function HomeLineupCard() {
@@ -68,40 +65,92 @@ export default function HomeLineupCard() {
     },
   });
 
+  // Real-time NL East Standings from MLB API
   const { data: standings } = useQuery({
-    queryKey: ["nl-east-standings"],
+    queryKey: ["mlb-nl-east-standings"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("team_standings")
-        .select("*")
-        .eq("division", "NL East")
-        .order("position", { ascending: true });
-      if (error) throw error;
-      return data as Standing[];
+      const response = await fetch(
+        "https://statsapi.mlb.com/api/v1/standings?leagueId=104&season=2025&standingsTypes=regularSeason"
+      );
+      const data = await response.json();
+      // NL East is division ID 204
+      const nlEast = data.records?.find((r: any) => r.division?.id === 204);
+      if (!nlEast) return [];
+      return nlEast.teamRecords.map((team: any) => ({
+        team_name: team.team.name.replace("New York ", "").replace("Atlanta ", "").replace("Philadelphia ", "").replace("Miami ", "").replace("Washington ", ""),
+        wins: team.wins,
+        losses: team.losses,
+        games_back: team.gamesBack === "-" ? "-" : team.gamesBack,
+        position: parseInt(team.divisionRank),
+      }));
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
   });
 
+  // Real-time Mets Team Leaders from MLB API
   const { data: teamLeaders } = useQuery({
-    queryKey: ["team-leaders"],
+    queryKey: ["mlb-mets-leaders"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("team_leaders")
-        .select("*");
-      if (error) throw error;
-      return data as TeamLeader[];
+      const [avgRes, hrRes, rbiRes, eraRes, winsRes, soRes] = await Promise.all([
+        fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=battingAverage&season=2025&limit=1"),
+        fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=homeRuns&season=2025&limit=1"),
+        fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=runsBattedIn&season=2025&limit=1"),
+        fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=earnedRunAverage&season=2025&limit=1"),
+        fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=wins&season=2025&limit=1"),
+        fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=strikeouts&season=2025&limit=1"),
+      ]);
+
+      const [avgData, hrData, rbiData, eraData, winsData, soData] = await Promise.all([
+        avgRes.json(),
+        hrRes.json(),
+        rbiRes.json(),
+        eraRes.json(),
+        winsRes.json(),
+        soRes.json(),
+      ]);
+
+      const getLeader = (data: any) => {
+        const leaders = data.teamLeaders?.[0]?.leaders;
+        if (leaders && leaders.length > 0) {
+          return { name: leaders[0].person.fullName, value: leaders[0].value };
+        }
+        return null;
+      };
+
+      return {
+        AVG: getLeader(avgData),
+        HR: getLeader(hrData),
+        RBI: getLeader(rbiData),
+        ERA: getLeader(eraData),
+        W: getLeader(winsData),
+        SO: getLeader(soData),
+      };
     },
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
   });
 
   const lineup = lineupCard?.lineup_data as unknown as LineupPlayer[] | undefined;
   const pitcher = lineupCard?.starting_pitcher as unknown as StartingPitcher | null;
 
-  const getLeaderStat = (category: string) => {
-    const leader = teamLeaders?.find((l) => l.category === category);
-    return leader ? { name: leader.player_name, value: leader.stat_value } : null;
-  };
+  const metsStanding = standings?.find((s: any) => s.team_name === "Mets");
+
+  const ScrollIndicator = () => (
+    <div className="flex justify-center py-2">
+      <div className="flex items-center gap-1 text-muted-foreground animate-bounce">
+        <ChevronDown className="w-4 h-4" />
+        <span className="text-xs">Scroll</span>
+        <ChevronDown className="w-4 h-4" />
+      </div>
+    </div>
+  );
 
   return (
     <div className="container mx-auto px-4 py-6">
+      {/* Top Scroll Indicator */}
+      <ScrollIndicator />
+
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-foreground">
@@ -199,37 +248,33 @@ export default function HomeLineupCard() {
                     </div>
                   )}
 
-                  {/* Quick Stats from DB */}
+                  {/* Quick Stats from MLB API */}
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                      Season Stats
+                      2025 Season Stats
                     </p>
                     <div className="grid grid-cols-3 gap-2">
-                      {standings && (
-                        <>
-                          <div className="bg-muted/50 rounded p-2 text-center">
-                            <p className="text-lg font-bold text-primary">
-                              {standings.find((s) => s.team_name === "Mets")?.wins || 0}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground">Wins</p>
-                          </div>
-                          <div className="bg-muted/50 rounded p-2 text-center">
-                            <p className="text-lg font-bold text-primary">
-                              {standings.find((s) => s.team_name === "Mets")?.losses || 0}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground">Losses</p>
-                          </div>
-                          <div className="bg-muted/50 rounded p-2 text-center">
-                            <p className="text-lg font-bold text-primary">
-                              {standings.find((s) => s.team_name === "Mets")?.position || "-"}
-                              {standings.find((s) => s.team_name === "Mets")?.position === 1 ? "st" : 
-                               standings.find((s) => s.team_name === "Mets")?.position === 2 ? "nd" :
-                               standings.find((s) => s.team_name === "Mets")?.position === 3 ? "rd" : "th"}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground">NL East</p>
-                          </div>
-                        </>
-                      )}
+                      <div className="bg-muted/50 rounded p-2 text-center">
+                        <p className="text-lg font-bold text-primary">
+                          {metsStanding?.wins || "-"}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">Wins</p>
+                      </div>
+                      <div className="bg-muted/50 rounded p-2 text-center">
+                        <p className="text-lg font-bold text-primary">
+                          {metsStanding?.losses || "-"}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">Losses</p>
+                      </div>
+                      <div className="bg-muted/50 rounded p-2 text-center">
+                        <p className="text-lg font-bold text-primary">
+                          {metsStanding?.position || "-"}
+                          {metsStanding?.position === 1 ? "st" : 
+                           metsStanding?.position === 2 ? "nd" :
+                           metsStanding?.position === 3 ? "rd" : "th"}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">NL East</p>
+                      </div>
                     </div>
                   </div>
 
@@ -296,89 +341,134 @@ export default function HomeLineupCard() {
             </CardContent>
           </Card>
 
-          {/* NL East Standings from DB */}
+          {/* NL East Standings - Real-time from MLB API */}
           <Card className="border-primary/20">
             <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-2.5 text-white">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-4 h-4" />
-                <span className="font-bold text-sm">NL East Standings</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-4 h-4" />
+                  <span className="font-bold text-sm">NL East Standings</span>
+                </div>
+                <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded">LIVE</span>
               </div>
             </div>
             <CardContent className="p-2.5">
               <div className="space-y-1.5">
-                {standings?.map((team) => (
-                  <div
-                    key={team.id}
-                    className={`flex items-center gap-2 p-1.5 rounded text-xs ${
-                      team.team_name === "Mets"
-                        ? "bg-primary/10 border border-primary/20"
-                        : "bg-muted/30"
-                    }`}
-                  >
-                    <span className="font-bold w-4 text-center text-muted-foreground">
-                      {team.position}
-                    </span>
-                    <span
-                      className={`flex-1 font-medium ${
-                        team.team_name === "Mets" ? "text-primary" : ""
-                      }`}
-                    >
-                      {team.team_name}
-                    </span>
-                    <span className="w-8 text-center">{team.wins}</span>
-                    <span className="w-8 text-center">{team.losses}</span>
-                    <span className="w-8 text-center text-muted-foreground">
-                      {team.games_back}
-                    </span>
-                  </div>
-                ))}
-                <div className="flex items-center gap-2 pt-1 text-[10px] text-muted-foreground border-t border-border mt-2">
-                  <span className="w-4" />
-                  <span className="flex-1">Team</span>
-                  <span className="w-8 text-center">W</span>
-                  <span className="w-8 text-center">L</span>
-                  <span className="w-8 text-center">GB</span>
-                </div>
+                {standings && standings.length > 0 ? (
+                  <>
+                    {standings.map((team: any) => (
+                      <div
+                        key={team.team_name}
+                        className={`flex items-center gap-2 p-1.5 rounded text-xs ${
+                          team.team_name === "Mets"
+                            ? "bg-primary/10 border border-primary/20"
+                            : "bg-muted/30"
+                        }`}
+                      >
+                        <span className="font-bold w-4 text-center text-muted-foreground">
+                          {team.position}
+                        </span>
+                        <span
+                          className={`flex-1 font-medium ${
+                            team.team_name === "Mets" ? "text-primary" : ""
+                          }`}
+                        >
+                          {team.team_name}
+                        </span>
+                        <span className="w-8 text-center">{team.wins}</span>
+                        <span className="w-8 text-center">{team.losses}</span>
+                        <span className="w-8 text-center text-muted-foreground">
+                          {team.games_back}
+                        </span>
+                      </div>
+                    ))}
+                    <div className="flex items-center gap-2 pt-1 text-[10px] text-muted-foreground border-t border-border mt-2">
+                      <span className="w-4" />
+                      <span className="flex-1">Team</span>
+                      <span className="w-8 text-center">W</span>
+                      <span className="w-8 text-center">L</span>
+                      <span className="w-8 text-center">GB</span>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-xs text-muted-foreground text-center py-2">
+                    Season not started
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Team Leaders from DB */}
+          {/* Team Leaders - Real-time from MLB API */}
           <Card className="border-primary/20">
             <div className="bg-gradient-to-r from-primary/80 to-primary p-2.5 text-primary-foreground">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                <span className="font-bold text-sm">Team Leaders</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="font-bold text-sm">Team Leaders</span>
+                </div>
+                <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded">2025</span>
               </div>
             </div>
             <CardContent className="p-2.5">
               <div className="grid grid-cols-3 gap-2 text-center">
-                {getLeaderStat("AVG") && (
+                {teamLeaders?.AVG && (
                   <div>
                     <p className="text-[10px] text-muted-foreground uppercase">AVG</p>
-                    <p className="font-bold text-sm text-primary">{getLeaderStat("AVG")?.value}</p>
-                    <p className="text-[10px] truncate">{getLeaderStat("AVG")?.name}</p>
+                    <p className="font-bold text-sm text-primary">{teamLeaders.AVG.value}</p>
+                    <p className="text-[10px] truncate">{teamLeaders.AVG.name.split(" ").pop()}</p>
                   </div>
                 )}
-                {getLeaderStat("HR") && (
+                {teamLeaders?.HR && (
                   <div>
                     <p className="text-[10px] text-muted-foreground uppercase">HR</p>
-                    <p className="font-bold text-sm text-primary">{getLeaderStat("HR")?.value}</p>
-                    <p className="text-[10px] truncate">{getLeaderStat("HR")?.name}</p>
+                    <p className="font-bold text-sm text-primary">{teamLeaders.HR.value}</p>
+                    <p className="text-[10px] truncate">{teamLeaders.HR.name.split(" ").pop()}</p>
                   </div>
                 )}
-                {getLeaderStat("RBI") && (
+                {teamLeaders?.RBI && (
                   <div>
                     <p className="text-[10px] text-muted-foreground uppercase">RBI</p>
-                    <p className="font-bold text-sm text-primary">{getLeaderStat("RBI")?.value}</p>
-                    <p className="text-[10px] truncate">{getLeaderStat("RBI")?.name}</p>
+                    <p className="font-bold text-sm text-primary">{teamLeaders.RBI.value}</p>
+                    <p className="text-[10px] truncate">{teamLeaders.RBI.name.split(" ").pop()}</p>
                   </div>
                 )}
               </div>
+              <div className="grid grid-cols-3 gap-2 text-center mt-2 pt-2 border-t border-border">
+                {teamLeaders?.ERA && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">ERA</p>
+                    <p className="font-bold text-sm text-primary">{teamLeaders.ERA.value}</p>
+                    <p className="text-[10px] truncate">{teamLeaders.ERA.name.split(" ").pop()}</p>
+                  </div>
+                )}
+                {teamLeaders?.W && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">W</p>
+                    <p className="font-bold text-sm text-primary">{teamLeaders.W.value}</p>
+                    <p className="text-[10px] truncate">{teamLeaders.W.name.split(" ").pop()}</p>
+                  </div>
+                )}
+                {teamLeaders?.SO && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">K</p>
+                    <p className="font-bold text-sm text-primary">{teamLeaders.SO.value}</p>
+                    <p className="text-[10px] truncate">{teamLeaders.SO.name.split(" ").pop()}</p>
+                  </div>
+                )}
+              </div>
+              {!teamLeaders?.AVG && !teamLeaders?.HR && (
+                <p className="text-xs text-muted-foreground text-center py-2">
+                  Season stats coming soon
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* Bottom Scroll Indicator */}
+      <ScrollIndicator />
     </div>
   );
 }
