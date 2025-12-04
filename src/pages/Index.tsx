@@ -54,7 +54,7 @@ const Index = () => {
         <FeedbackSection />
         <SectionScrollIndicator />
         <AppInstallSection />
-        <SectionScrollIndicator />
+        <SectionScrollIndicator className="py-[10px]" />
         <NewsletterSection />
       </main>
       <Footer />
