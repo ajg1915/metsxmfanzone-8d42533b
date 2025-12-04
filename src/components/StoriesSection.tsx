@@ -19,12 +19,14 @@ const StoriesSection = () => {
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = 300;
       const newScrollLeft = scrollContainerRef.current.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
-      scrollContainerRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+      scrollContainerRef.current.scrollTo({
+        left: newScrollLeft,
+        behavior: 'smooth'
+      });
     }
   };
   useEffect(() => {
@@ -79,20 +81,10 @@ const StoriesSection = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">MetsXMFanZone Stories</h2>
           <div className="relative">
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
-              onClick={() => scroll('left')}
-            >
+            <Button variant="outline" size="icon" className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm" onClick={() => scroll('left')}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
-              onClick={() => scroll('right')}
-            >
+            <Button variant="outline" size="icon" className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm" onClick={() => scroll('right')}>
               <ChevronRight className="h-4 w-4" />
             </Button>
           <div ref={scrollContainerRef} className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide">
@@ -104,24 +96,12 @@ const StoriesSection = () => {
                   setSelectedStory(story);
                 }
               };
-
-              return (
-                <Card 
-                  key={story.id} 
-                  className="flex-shrink-0 w-40 h-56 sm:w-44 sm:h-64 cursor-pointer overflow-hidden group border-2 border-primary/20 hover:border-primary transition-all relative" 
-                  onClick={handleClick}
-                >
+              return <Card key={story.id} className="flex-shrink-0 w-40 h-56 sm:w-44 sm:h-64 cursor-pointer overflow-hidden group border-2 border-primary/20 hover:border-primary transition-all relative" onClick={handleClick}>
                   <div className="relative w-full h-full">
-                    <img 
-                      src={story.media_type === 'video' && story.thumbnail_url ? story.thumbnail_url : story.media_url} 
-                      alt={story.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
-                    />
-                    {story.media_type === 'video' && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <Play className="w-8 h-8 text-white" />
-                      </div>
-                    )}
+                    <img src={story.media_type === 'video' && story.thumbnail_url ? story.thumbnail_url : story.media_url} alt={story.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    {story.media_type === 'video' && <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                        <Play className="w-8 h-8 bg-[#f04b0a] text-[#fc4604]" />
+                      </div>}
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
                       <p className="text-white text-xs font-medium truncate">{story.title}</p>
                       <p className="text-white/70 text-[10px]">
@@ -129,8 +109,7 @@ const StoriesSection = () => {
                       </p>
                     </div>
                   </div>
-                </Card>
-              );
+                </Card>;
             })}
           </div>
           </div>
