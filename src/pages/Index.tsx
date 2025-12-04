@@ -20,7 +20,6 @@ import SectionScrollIndicator from "@/components/SectionScrollIndicator";
 import NotificationPrompt from "@/components/NotificationPrompt";
 import { useEffect } from "react";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
-
 const Index = () => {
   useEffect(() => {
     // Set up notification listeners
@@ -48,7 +47,7 @@ const Index = () => {
         <SectionScrollIndicator />
         <BlogSection />
         <SectionScrollIndicator />
-        <PodcastSection />
+        <PodcastSection className="py-[10px]" />
         <SectionScrollIndicator />
         <FAQSection />
         <SectionScrollIndicator />
