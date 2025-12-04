@@ -44,7 +44,7 @@ const Index = () => {
         <SectionScrollIndicator />
         <HomeLineupCard className="py-[10px]" />
         <MetsNewsTracker />
-        <SectionScrollIndicator className="py-[10px]" />
+        <SectionScrollIndicator className="py-[30px]" />
         <BlogSection />
         <SectionScrollIndicator />
         <PodcastSection className="py-[10px]" />
