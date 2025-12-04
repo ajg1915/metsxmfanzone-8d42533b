@@ -50,7 +50,7 @@ const Index = () => {
         <PodcastSection className="py-[10px]" />
         <SectionScrollIndicator />
         <FAQSection />
-        <SectionScrollIndicator />
+        <SectionScrollIndicator className="py-[10px]" />
         <FeedbackSection />
         <SectionScrollIndicator />
         <AppInstallSection />
