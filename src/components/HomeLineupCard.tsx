@@ -31,13 +31,7 @@ interface MLBLeader {
   };
   value: string;
 }
-import { cn } from "@/lib/utils";
-
-interface HomeLineupCardProps {
-  className?: string;
-}
-
-export default function HomeLineupCard({ className }: HomeLineupCardProps) {
+export default function HomeLineupCard() {
   const {
     data: lineupCard
   } = useQuery({

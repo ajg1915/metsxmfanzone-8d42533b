@@ -52,13 +52,7 @@ const platforms = [
   },
 ];
 
-import { cn } from "@/lib/utils";
-
-interface PodcastSectionProps {
-  className?: string;
-}
-
-const PodcastSection = ({ className }: PodcastSectionProps) => {
+const PodcastSection = () => {
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
 
   useEffect(() => {
