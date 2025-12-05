@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Upload, Activity, Radio, ClipboardList, HelpCircle, ArrowRight, UserCog } from "lucide-react";
+import { Users, FileText, Activity, Radio, ClipboardList, HelpCircle, ArrowRight, UserCog } from "lucide-react";
+import { AdminAIChat } from "@/components/AdminAIChat";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -196,9 +197,10 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      <div className="mt-6">
-        <h3 className="text-base font-semibold mb-3">Quick Access</h3>
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 lg:grid-cols-3 mt-6">
+        <div className="lg:col-span-2">
+          <h3 className="text-base font-semibold mb-3">Quick Access</h3>
+          <div className="grid gap-3 md:grid-cols-2">
           {quickAccessItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -223,6 +225,11 @@ export default function AdminDashboard() {
               </Card>
             );
           })}
+          </div>
+        </div>
+        <div>
+          <h3 className="text-base font-semibold mb-3">AI Assistant</h3>
+          <AdminAIChat />
         </div>
       </div>
     </div>
