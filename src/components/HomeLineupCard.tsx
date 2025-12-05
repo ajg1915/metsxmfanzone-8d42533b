@@ -31,7 +31,11 @@ interface MLBLeader {
   };
   value: string;
 }
-export default function HomeLineupCard() {
+interface HomeLineupCardProps {
+  className?: string;
+}
+
+export default function HomeLineupCard({ className }: HomeLineupCardProps) {
   const {
     data: lineupCard
   } = useQuery({
@@ -129,7 +133,7 @@ export default function HomeLineupCard() {
         <ChevronDown className="w-4 h-4" />
       </div>
     </div>;
-  return <div className="container mx-auto px-4 py-6">
+  return <div className={`container mx-auto px-4 py-6 ${className || ''}`}>
       {/* Top Scroll Indicator */}
       <ScrollIndicator />
 

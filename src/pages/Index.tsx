@@ -2,6 +2,7 @@ import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import LiveNotificationBar from "@/components/LiveNotificationBar";
+import LiveGameTicker from "@/components/LiveGameTicker";
 import LiveNetworks from "@/components/LiveNetworks";
 import LiveStreamsSection from "@/components/LiveStreamsSection";
 import SpringTraining from "@/components/SpringTraining";
@@ -34,6 +35,7 @@ const Index = () => {
         <link rel="canonical" href="https://www.metsxmfanzone.com/" />
       </Helmet>
       <Navigation />
+      <LiveGameTicker />
       <main className="pt-12 sm:pt-14">
         <Hero />
         <LiveNotificationBar />
