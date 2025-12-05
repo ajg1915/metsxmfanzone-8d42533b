@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import Index from "./pages/Index";
@@ -107,6 +107,8 @@ const App = () => {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-error" element={<PaymentError />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/register" element={<Navigate to="/auth" replace />} />
+          <Route path="/login" element={<Navigate to="/auth" replace />} />
           <Route path="/confirm-account" element={<ConfirmAccount />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/blog" element={<Blog />} />
