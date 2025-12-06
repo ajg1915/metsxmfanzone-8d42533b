@@ -12,7 +12,11 @@ interface NewsItem {
   time_ago: string;
   image_url: string;
 }
-const MetsNewsTracker = () => {
+interface MetsNewsTrackerProps {
+  className?: string;
+}
+
+const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {

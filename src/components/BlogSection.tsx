@@ -14,7 +14,11 @@ interface BlogPost {
   category: string;
   published_at: string;
 }
-const BlogSection = () => {
+interface BlogSectionProps {
+  className?: string;
+}
+
+const BlogSection = ({ className }: BlogSectionProps) => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
