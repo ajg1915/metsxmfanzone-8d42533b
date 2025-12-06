@@ -984,7 +984,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      business_ads_public: {
+        Row: {
+          ad_description: string | null
+          ad_image_url: string | null
+          ad_title: string | null
+          business_name: string | null
+          created_at: string | null
+          id: string | null
+          published_at: string | null
+          status: string | null
+          website_url: string | null
+        }
+        Insert: {
+          ad_description?: string | null
+          ad_image_url?: string | null
+          ad_title?: string | null
+          business_name?: string | null
+          created_at?: string | null
+          id?: string | null
+          published_at?: string | null
+          status?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          ad_description?: string | null
+          ad_image_url?: string | null
+          ad_title?: string | null
+          business_name?: string | null
+          created_at?: string | null
+          id?: string | null
+          published_at?: string | null
+          status?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
