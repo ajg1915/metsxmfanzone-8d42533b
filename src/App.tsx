@@ -84,6 +84,7 @@ import SubscriptionPlans from "./pages/help/SubscriptionPlans";
 import PaymentMethods from "./pages/help/PaymentMethods";
 import CancelSubscription from "./pages/help/CancelSubscription";
 import ReturnPolicy from "./pages/help/ReturnPolicy";
+import Logout from "./pages/Logout";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,7 @@ const App = () => {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-error" element={<PaymentError />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/logout" element={<Logout />} />
           <Route path="/confirm-account" element={<ConfirmAccount />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/blog" element={<Blog />} />
