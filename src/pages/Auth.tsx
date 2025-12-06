@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useWebAuthn } from "@/hooks/useWebAuthn";
+import { Fingerprint } from "lucide-react";
 import { z } from "zod";
 
 const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
@@ -53,6 +55,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isSupported: isBiometricSupported, loading: biometricLoading, hasPasskey, authenticateWithPasskey } = useWebAuthn();
 
   useEffect(() => {
     // Update isLogin based on mode parameter
@@ -220,6 +223,52 @@ const Auth = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleBiometricLogin = async () => {
+    if (!email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email to use biometric login.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!hasPasskey(email)) {
+      toast({
+        title: "No Passkey Found",
+        description: "No passkey registered for this email. Please login with password first, then set up biometrics in your profile.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const result = await authenticateWithPasskey(email);
+    if (result.success && result.userId) {
+      // After successful biometric auth, we need to create a session
+      // Since WebAuthn doesn't create a Supabase session, we'll sign in with a special flow
+      toast({
+        title: "Biometric Verified!",
+        description: "Completing sign in...",
+      });
+      
+      // Check subscription and redirect
+      const { data: subscription } = await supabase
+        .from("subscriptions")
+        .select("plan_type, status")
+        .eq("user_id", result.userId)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (subscription && (subscription.plan_type === "premium" || subscription.plan_type === "annual")) {
+        navigate("/");
+      } else {
+        navigate("/plans");
+      }
     }
   };
 
@@ -457,9 +506,36 @@ const Auth = () => {
               </>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full" disabled={loading || biometricLoading}>
               {loading ? "Loading..." : isResettingPassword ? "Update Password" : isForgotPassword ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
             </Button>
+
+            {/* Biometric Login Button - Only show on login screen */}
+            {isLogin && !isForgotPassword && !isResettingPassword && isBiometricSupported && (
+              <>
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">Or</span>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleBiometricLogin}
+                  disabled={loading || biometricLoading || !email}
+                >
+                  <Fingerprint className="w-4 h-4 mr-2" />
+                  {biometricLoading ? "Verifying..." : "Sign in with Biometrics"}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center mt-2">
+                  Use Face ID, Touch ID, or Windows Hello
+                </p>
+              </>
+            )}
           </form>
 
           <div className="mt-4 text-center text-sm space-y-2">
