@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 interface Story {
   id: string;
   title: string;
@@ -100,7 +100,7 @@ const StoriesSection = () => {
                   <div className="relative w-full h-full">
                     <img src={story.media_type === 'video' && story.thumbnail_url ? story.thumbnail_url : story.media_url} alt={story.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                     {story.media_type === 'video' && <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <Play className="w-8 h-8 bg-[#f04b0a] text-[#fc4604]" />
+                        
                       </div>}
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
                       <p className="text-white text-xs font-medium truncate">{story.title}</p>
