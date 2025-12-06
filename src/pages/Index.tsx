@@ -45,14 +45,14 @@ const Index = () => {
         <SpringTraining className="py-px" />
         <SectionScrollIndicator />
         <HomeLineupCard className="py-[10px]" />
-        <MetsNewsTracker />
-        <SectionScrollIndicator className="py-[30px]" />
-        <BlogSection />
-        <SectionScrollIndicator />
-        <PodcastSection className="py-[10px]" />
-        <SectionScrollIndicator />
-        <FAQSection />
+        <MetsNewsTracker className="py-[3px]" />
+        <SectionScrollIndicator className="py-[3px]" />
+        <BlogSection className="py-[3px]" />
         <SectionScrollIndicator className="py-[10px]" />
+        <PodcastSection className="py-[3px]" />
+        <SectionScrollIndicator className="py-[3px]" />
+        <FAQSection />
+        <SectionScrollIndicator className="py-[3px]" />
         <FeedbackSection />
         <SectionScrollIndicator />
         <AppInstallSection />
