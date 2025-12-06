@@ -152,7 +152,7 @@ export default function HomeLineupCard({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Today's Lineup Card - Compact */}
         <Card className="lg:col-span-2 overflow-hidden border-primary/20">
-          <div className="bg-gradient-to-r from-primary to-primary/80 p-3 text-primary-foreground">
+          <div className="bg-gradient-to-r from-orange-500 to-orange-400 p-3 text-primary-foreground">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">

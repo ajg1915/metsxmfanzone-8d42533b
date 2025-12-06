@@ -3,7 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
 import { Calendar } from "lucide-react";
-export default function SpringTraining() {
+interface SpringTrainingProps {
+  className?: string;
+}
+
+export default function SpringTraining({ className }: SpringTrainingProps) {
   const {
     data: games,
     isLoading
