@@ -42,7 +42,7 @@ const Index = () => {
         <LiveNetworks className="py-[10px]" />
         <LiveStreamsSection />
         <SectionScrollIndicator className="py-[10px]" />
-        <SpringTraining className="py-[10px]" />
+        <SpringTraining className="py-px" />
         <SectionScrollIndicator />
         <HomeLineupCard className="py-[10px]" />
         <MetsNewsTracker />

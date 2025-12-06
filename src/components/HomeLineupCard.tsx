@@ -34,8 +34,9 @@ interface MLBLeader {
 interface HomeLineupCardProps {
   className?: string;
 }
-
-export default function HomeLineupCard({ className }: HomeLineupCardProps) {
+export default function HomeLineupCard({
+  className
+}: HomeLineupCardProps) {
   const {
     data: lineupCard
   } = useQuery({
@@ -126,15 +127,13 @@ export default function HomeLineupCard({ className }: HomeLineupCardProps) {
   const lineup = lineupCard?.lineup_data as unknown as LineupPlayer[] | undefined;
   const pitcher = lineupCard?.starting_pitcher as unknown as StartingPitcher | null;
   const metsStanding = standings?.find((s: any) => s.team_name === "Mets");
-  const ScrollIndicator = () => (
-    <div className="flex justify-center py-2">
+  const ScrollIndicator = () => <div className="flex justify-center py-2">
       <div className="flex items-center gap-1.5 text-muted-foreground animate-gentle-bounce">
         <ChevronDown className="w-4 h-4" />
         <span className="text-[10px] uppercase tracking-wider font-medium">Scroll</span>
         <ChevronDown className="w-4 h-4" />
       </div>
-    </div>
-  );
+    </div>;
   return <div className={`container mx-auto px-4 py-6 ${className || ''}`}>
       {/* Top Scroll Indicator */}
       <ScrollIndicator />
@@ -386,6 +385,6 @@ export default function HomeLineupCard({ className }: HomeLineupCardProps) {
       </div>
 
       {/* Bottom Scroll Indicator */}
-      <ScrollIndicator />
+      
     </div>;
 }
