@@ -1,4 +1,4 @@
-import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, ClipboardList, UserCog } from "lucide-react";
+import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, ClipboardList, UserCog, Bot } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -17,6 +17,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 const mainItems = [
   { title: "Home", url: "/admin", icon: Home },
   { title: "Tutorial", url: "/admin/tutorial", icon: BookOpen },
+  { title: "AI Assistant", url: "/admin/ai-assistant", icon: Bot },
 ];
 
 const mediaItems = [
