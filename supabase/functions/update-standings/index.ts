@@ -20,7 +20,51 @@ serve(async (req) => {
       throw new Error("Missing required environment variables");
     }
 
+    // Get the JWT from the Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      console.error("No authorization header provided");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized - No token provided" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Create a client with the user's JWT to verify their identity
+    const supabaseAuth = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY") || "");
+    const token = authHeader.replace("Bearer ", "");
+    
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error("Authentication failed:", authError?.message);
+      return new Response(
+        JSON.stringify({ error: "Unauthorized - Invalid token" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Create service role client for admin check and database updates
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Check if user has admin role
+    const { data: roleData, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .single();
+
+    if (roleError || !roleData) {
+      console.error("Admin role check failed:", roleError?.message);
+      return new Response(
+        JSON.stringify({ error: "Forbidden - Admin access required" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`Admin user ${user.id} triggering standings update`);
+
     const today = new Date().toLocaleDateString("en-US", { 
       year: "numeric", 
       month: "long", 
@@ -163,7 +207,7 @@ serve(async (req) => {
       }
     }
 
-    console.log("Standings updated successfully");
+    console.log("Standings updated successfully by admin:", user.id);
 
     return new Response(
       JSON.stringify({ success: true, message: "Standings updated", data }),
