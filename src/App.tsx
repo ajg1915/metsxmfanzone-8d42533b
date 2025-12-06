@@ -23,7 +23,6 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import BlogManagement from "./pages/admin/BlogManagement";
 import VideoGalleryManagement from "./pages/admin/VideoGalleryManagement";
 import PodcastManagement from "./pages/admin/PodcastManagement";
-import PodcastAIVoiceGenerator from "./pages/admin/PodcastAIVoiceGenerator";
 import PodcastLiveStreamManagement from "./pages/admin/PodcastLiveStreamManagement";
 import QRCodeGenerator from "./pages/admin/QRCodeGenerator";
 import LiveStreamManagement from "./pages/admin/LiveStreamManagement";
@@ -144,7 +143,6 @@ const App = () => {
             <Route path="blog" element={<BlogManagement />} />
             <Route path="video-gallery-management" element={<VideoGalleryManagement />} />
             <Route path="podcasts" element={<PodcastManagement />} />
-            <Route path="podcast-ai" element={<PodcastAIVoiceGenerator />} />
             <Route path="qr-generator" element={<QRCodeGenerator />} />
             <Route path="live-streams" element={<LiveStreamManagement />} />
             <Route path="podcast-live-stream" element={<PodcastLiveStreamManagement />} />
