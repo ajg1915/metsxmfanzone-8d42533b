@@ -7,12 +7,12 @@ interface SectionScrollIndicatorProps {
 
 const SectionScrollIndicator = ({ className }: SectionScrollIndicatorProps) => {
   return (
-    <div className={cn("flex justify-center py-2 md:hidden", className)}>
-      <div className="flex flex-col items-center gap-1 animate-bounce">
-        <div className="rounded-full bg-primary/10 border border-primary/40 p-2 shadow-md shadow-primary/30">
-          <ChevronDown className="w-10 h-10 text-primary" />
+    <div className={cn("flex justify-center py-3", className)}>
+      <div className="flex flex-col items-center gap-1.5 animate-gentle-bounce">
+        <div className="rounded-full bg-primary/10 border border-primary/30 p-1.5 shadow-sm">
+          <ChevronDown className="w-5 h-5 text-primary" />
         </div>
-        <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
           Scroll
         </span>
       </div>
