@@ -66,6 +66,7 @@ import LineupCardManagement from "./pages/admin/LineupCardManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
 import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
 import UserManagement from "./pages/admin/UserManagement";
+import AIAssistant from "./pages/admin/AIAssistant";
 import CreateAccount from "./pages/help/CreateAccount";
 import NavigatePlatform from "./pages/help/NavigatePlatform";
 import WatchStreams from "./pages/help/WatchStreams";
@@ -151,6 +152,7 @@ const App = () => {
             <Route path="stories" element={<StoriesManagement />} />
             <Route path="mets-news" element={<MetsNewsTrackerManagement />} />
             <Route path="tutorial" element={<TutorialManagement />} />
+            <Route path="ai-assistant" element={<AIAssistant />} />
             <Route path="tv-schedule" element={<TVScheduleManagement />} />
             <Route path="newsletter" element={<NewsletterGenerator />} />
             <Route path="feedbacks" element={<FeedbackManagement />} />
