@@ -47,7 +47,7 @@ const LiveStreamsSection = () => {
         error
       } = await supabase.from("live_streams").select("*").eq("published", true).in("status", ["live", "scheduled"]).order("scheduled_start", {
         ascending: true
-      }).limit(3);
+      }).limit(4);
       if (error) throw error;
 
       // Sort to put MetsXMFanZone first
@@ -120,7 +120,7 @@ const LiveStreamsSection = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
             {streams.map((stream, index) => (
               <Card 
                 key={stream.id} 
@@ -133,31 +133,29 @@ const LiveStreamsSection = () => {
                     <img 
                       src={stream.thumbnail_url} 
                       alt={stream.title} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center animate-pulse-glow">
-                        <Play className="w-6 h-6 text-primary-foreground ml-1" />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/90 flex items-center justify-center">
+                        <Play className="w-3 h-3 sm:w-4 sm:h-4 text-primary-foreground ml-0.5" />
                       </div>
                     </div>
-                    <div className="absolute top-3 right-3">
-                      <Badge className={`text-[10px] sm:text-xs font-semibold ${stream.status === 'live' ? 'bg-red-600 text-white shadow-lg shadow-red-600/50' : 'bg-secondary text-secondary-foreground'}`}>
-                        {stream.status === 'live' && <Radio className="w-3 h-3 mr-1 animate-pulse" />}
+                    <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2">
+                      <Badge className={`text-[8px] sm:text-[10px] px-1.5 py-0.5 font-semibold ${stream.status === 'live' ? 'bg-red-600 text-white shadow-lg shadow-red-600/50' : 'bg-secondary text-secondary-foreground'}`}>
+                        {stream.status === 'live' && <Radio className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5 animate-pulse" />}
                         {stream.status === 'live' ? 'LIVE' : 'UPCOMING'}
                       </Badge>
                     </div>
                   </div>
                 )}
-                <CardHeader className="p-3 sm:p-4">
-                  <CardTitle className="line-clamp-2 text-sm sm:text-base group-hover:text-primary transition-colors">{stream.title}</CardTitle>
+                <CardHeader className="p-2 sm:p-2.5">
+                  <CardTitle className="line-clamp-1 text-xs sm:text-sm group-hover:text-primary transition-colors">{stream.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="p-3 sm:p-4 pt-0">
-                  <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1.5">
-                      <Users className="w-3 h-3 sm:w-4 sm:h-4 text-secondary" />
-                      {stream.viewers_count > 0 ? `${stream.viewers_count} watching` : 'Starting soon'}
-                    </span>
+                <CardContent className="p-2 sm:p-2.5 pt-0">
+                  <div className="flex items-center text-[10px] sm:text-xs text-muted-foreground">
+                    <Users className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-secondary mr-1" />
+                    {stream.viewers_count > 0 ? `${stream.viewers_count}` : 'Soon'}
                   </div>
                 </CardContent>
               </Card>
