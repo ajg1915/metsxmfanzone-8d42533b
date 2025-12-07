@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Play, Music2, Facebook, Headphones, Music, Podcast, Radio } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
-
 interface Podcast {
   id: string;
   title: string;
@@ -12,72 +11,58 @@ interface Podcast {
   audio_url: string;
   published_at: string;
 }
-
-const platforms = [
-  {
-    name: "TikTok",
-    icon: Music2,
-    url: "https://www.tiktok.com/@metsxmfanzone",
-    color: "bg-black hover:bg-black/80",
-  },
-  {
-    name: "Facebook",
-    icon: Facebook,
-    url: "https://www.facebook.com/metsxmfanzone",
-    color: "bg-blue-600 hover:bg-blue-700",
-  },
-  {
-    name: "iHeartRadio",
-    icon: Radio,
-    url: "https://www.iheart.com",
-    color: "bg-red-600 hover:bg-red-700",
-  },
-  {
-    name: "Amazon Music",
-    icon: Headphones,
-    url: "https://music.amazon.com",
-    color: "bg-orange-500 hover:bg-orange-600",
-  },
-  {
-    name: "Spotify",
-    icon: Music,
-    url: "https://open.spotify.com",
-    color: "bg-green-600 hover:bg-green-700",
-  },
-  {
-    name: "Apple Podcasts",
-    icon: Podcast,
-    url: "https://podcasts.apple.com",
-    color: "bg-purple-600 hover:bg-purple-700",
-  },
-];
-
+const platforms = [{
+  name: "TikTok",
+  icon: Music2,
+  url: "https://www.tiktok.com/@metsxmfanzone",
+  color: "bg-black hover:bg-black/80"
+}, {
+  name: "Facebook",
+  icon: Facebook,
+  url: "https://www.facebook.com/metsxmfanzone",
+  color: "bg-blue-600 hover:bg-blue-700"
+}, {
+  name: "iHeartRadio",
+  icon: Radio,
+  url: "https://www.iheart.com",
+  color: "bg-red-600 hover:bg-red-700"
+}, {
+  name: "Amazon Music",
+  icon: Headphones,
+  url: "https://music.amazon.com",
+  color: "bg-orange-500 hover:bg-orange-600"
+}, {
+  name: "Spotify",
+  icon: Music,
+  url: "https://open.spotify.com",
+  color: "bg-green-600 hover:bg-green-700"
+}, {
+  name: "Apple Podcasts",
+  icon: Podcast,
+  url: "https://podcasts.apple.com",
+  color: "bg-purple-600 hover:bg-purple-700"
+}];
 interface PodcastSectionProps {
   className?: string;
 }
-
-const PodcastSection = ({ className }: PodcastSectionProps) => {
+const PodcastSection = ({
+  className
+}: PodcastSectionProps) => {
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
-
   useEffect(() => {
     fetchPodcasts();
   }, []);
-
   const fetchPodcasts = async () => {
-    const { data } = await supabase
-      .from("podcasts")
-      .select("*")
-      .eq("published", true)
-      .order("published_at", { ascending: false })
-      .limit(3);
-
+    const {
+      data
+    } = await supabase.from("podcasts").select("*").eq("published", true).order("published_at", {
+      ascending: false
+    }).limit(3);
     if (data) {
       setPodcasts(data);
     }
   };
-
-  return (
-    <section className={`py-8 sm:py-10 md:py-12 bg-gradient-to-b from-background to-muted/20 ${className || ''}`}>
+  return <section className={`py-8 sm:py-10 md:py-12 bg-gradient-to-b from-background to-muted/20 ${className || ''}`}>
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
         <div className="text-center mb-6 sm:mb-10">
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
@@ -86,25 +71,17 @@ const PodcastSection = ({ className }: PodcastSectionProps) => {
               MetsXMFanZone Podcast
             </h2>
           </div>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
-            Listen to exclusive Mets content, game analysis, and fan discussions
-          </p>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">Listen to exclusive Mets content, 
+game analysis, and fan discussions</p>
         </div>
 
         {/* Listen Live Section */}
         <div className="mb-8 sm:mb-10">
           <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">Listen Live On</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5 sm:gap-2 max-w-5xl mx-auto">
-            {platforms.map((platform) => {
-              const IconComponent = platform.icon;
-              return (
-                <a
-                  key={platform.name}
-                  href={platform.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group"
-                >
+            {platforms.map(platform => {
+            const IconComponent = platform.icon;
+            return <a key={platform.name} href={platform.url} target="_blank" rel="noopener noreferrer" className="group">
                   <Card className="hover:shadow-lg transition-all duration-300 border hover:border-primary">
                     <CardContent className="p-2 sm:p-2.5 text-center">
                       <div className="flex justify-center mb-0.5 sm:mb-1">
@@ -113,19 +90,16 @@ const PodcastSection = ({ className }: PodcastSectionProps) => {
                       <p className="font-semibold text-[10px] sm:text-xs">{platform.name}</p>
                     </CardContent>
                   </Card>
-                </a>
-              );
-            })}
+                </a>;
+          })}
           </div>
         </div>
 
         {/* Recent Episodes */}
-        {podcasts.length > 0 && (
-          <div>
+        {podcasts.length > 0 && <div>
             <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">Recent Episodes</h3>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-              {podcasts.map((podcast) => (
-                <Card key={podcast.id} className="hover:shadow-lg transition-shadow">
+              {podcasts.map(podcast => <Card key={podcast.id} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-3 mb-4">
                       <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -145,8 +119,7 @@ const PodcastSection = ({ className }: PodcastSectionProps) => {
                       Your browser does not support the audio element.
                     </audio>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
             </div>
             <div className="text-center mt-8">
               <Button size="lg" asChild>
@@ -155,11 +128,8 @@ const PodcastSection = ({ className }: PodcastSectionProps) => {
                 </a>
               </Button>
             </div>
-          </div>
-        )}
+          </div>}
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default PodcastSection;
