@@ -92,20 +92,6 @@ const Hero = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => scrollTo(index)}
-            className={`h-2 rounded-full transition-all duration-300 touch-target ${
-              selectedIndex === index 
-                ? "bg-primary w-6 sm:w-8" 
-                : "bg-muted hover:bg-muted-foreground w-2"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
     </section>
   );
 };
