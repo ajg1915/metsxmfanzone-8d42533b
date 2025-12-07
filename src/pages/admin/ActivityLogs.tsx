@@ -14,6 +14,18 @@ import { toast } from "sonner";
 
 type LogType = 'all' | 'admin' | 'user' | 'system' | 'error';
 
+interface ActivityLog {
+  id: string;
+  user_id: string | null;
+  log_type: string;
+  action: string;
+  resource_type: string | null;
+  resource_id: string | null;
+  details: Record<string, unknown> | null;
+  created_at: string;
+  user_email?: string;
+}
+
 const ActivityLogs = () => {
   const [logTypeFilter, setLogTypeFilter] = useState<LogType>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,22 +34,37 @@ const ActivityLogs = () => {
   const { data: logs, isLoading, refetch } = useQuery({
     queryKey: ['activity-logs', logTypeFilter, limit],
     queryFn: async () => {
-      let query = supabase
-        .from('activity_logs')
-        .select(`
-          *,
-          profiles:user_id(email, full_name)
-        `)
+      let queryBuilder = supabase
+        .from('activity_logs' as any)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(limit);
 
       if (logTypeFilter !== 'all') {
-        query = query.eq('log_type', logTypeFilter);
+        queryBuilder = queryBuilder.eq('log_type', logTypeFilter);
       }
 
-      const { data, error } = await query;
+      const { data, error } = await queryBuilder;
       if (error) throw error;
-      return data;
+      
+      const rawData = data as unknown as ActivityLog[];
+      
+      // Fetch user emails separately
+      const logsWithEmails: ActivityLog[] = [];
+      for (const log of (rawData || [])) {
+        let userEmail = 'System';
+        if (log.user_id) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('id', log.user_id)
+            .single();
+          userEmail = profile?.email || 'Unknown';
+        }
+        logsWithEmails.push({ ...log, user_email: userEmail });
+      }
+      
+      return logsWithEmails;
     },
   });
 
@@ -46,7 +73,7 @@ const ActivityLogs = () => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const { error } = await supabase
-      .from('activity_logs')
+      .from('activity_logs' as any)
       .delete()
       .lt('created_at', thirtyDaysAgo.toISOString());
 
@@ -68,7 +95,7 @@ const ActivityLogs = () => {
     }
   };
 
-  const getLogTypeBadgeVariant = (logType: string) => {
+  const getLogTypeBadgeVariant = (logType: string): "default" | "secondary" | "outline" | "destructive" => {
     switch (logType) {
       case 'admin': return 'default';
       case 'user': return 'secondary';
@@ -85,8 +112,7 @@ const ActivityLogs = () => {
       log.action?.toLowerCase().includes(searchLower) ||
       log.resource_type?.toLowerCase().includes(searchLower) ||
       log.resource_id?.toLowerCase().includes(searchLower) ||
-      (log.profiles as { email?: string; full_name?: string })?.email?.toLowerCase().includes(searchLower) ||
-      (log.profiles as { email?: string; full_name?: string })?.full_name?.toLowerCase().includes(searchLower)
+      log.user_email?.toLowerCase().includes(searchLower)
     );
   });
 
@@ -234,7 +260,7 @@ const ActivityLogs = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="max-w-28 truncate">
-                          {(log.profiles as { email?: string })?.email || 'System'}
+                          {log.user_email || 'System'}
                         </TableCell>
                         <TableCell className="font-medium">{log.action}</TableCell>
                         <TableCell className="text-muted-foreground">
@@ -248,7 +274,7 @@ const ActivityLogs = () => {
                           )}
                         </TableCell>
                         <TableCell className="max-w-40 truncate text-muted-foreground">
-                          {log.details && Object.keys(log.details as object).length > 0 
+                          {log.details && Object.keys(log.details).length > 0 
                             ? JSON.stringify(log.details).slice(0, 50) 
                             : '-'}
                         </TableCell>
