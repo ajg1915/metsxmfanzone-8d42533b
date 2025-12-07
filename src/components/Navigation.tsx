@@ -67,7 +67,7 @@ const Navigation = () => {
     if (user) {
       setMobileMenuOpen(false);
       await signOut();
-      navigate("/");
+      navigate("/logout");
     } else {
       navigate("/auth");
     }
