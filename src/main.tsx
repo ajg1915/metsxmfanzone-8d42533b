@@ -7,8 +7,11 @@ import "./index.css";
 const rootElement = document.getElementById("root")!;
 
 // Check if we're in production and the HTML has been prerendered
-const isPrerendered = rootElement.innerHTML.trim().length > 0 && 
-                      !rootElement.innerHTML.includes('<!--app-html-->');
+// The placeholder <!--app-html--> should be replaced with actual content during prerendering
+const htmlContent = rootElement.innerHTML.trim();
+const isPrerendered = htmlContent.length > 0 && 
+                      htmlContent !== '<!--app-html-->' &&
+                      !htmlContent.includes('<!--app-html-->');
 
 if (isPrerendered && import.meta.env.PROD) {
   // Hydrate prerendered content in production
