@@ -6,7 +6,6 @@ import LiveGameTicker from "@/components/LiveGameTicker";
 import LiveNetworks from "@/components/LiveNetworks";
 import LiveStreamsSection from "@/components/LiveStreamsSection";
 import SpringTraining from "@/components/SpringTraining";
-
 import MetsNewsTracker from "@/components/MetsNewsTracker";
 import BlogSection from "@/components/BlogSection";
 import HomeLineupCard from "@/components/HomeLineupCard";
@@ -22,15 +21,12 @@ import NotificationPrompt from "@/components/NotificationPrompt";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useEffect } from "react";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
-
 const Index = () => {
   useEffect(() => {
     const cleanup = setupNotificationListeners();
     return cleanup;
   }, []);
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Helmet>
         <title>MetsXMFanZone - Watch Mets Live Streams, Highlights & Exclusive Coverage</title>
         <meta name="description" content="The ultimate Mets fan community. Watch live game streams, highlights, podcasts, and exclusive Mets coverage. Join thousands of passionate New York Mets fans." />
@@ -64,7 +60,7 @@ const Index = () => {
         <div className="section-divider my-6 sm:my-8" />
         
         <ScrollReveal>
-          <MetsNewsTracker className="py-4 sm:py-6" />
+          <MetsNewsTracker className="py-4 sm:py-px" />
         </ScrollReveal>
         
         <div className="section-divider my-6 sm:my-8" />
@@ -101,8 +97,6 @@ const Index = () => {
       <InstallPrompt />
       <NotificationPrompt />
       <OnboardingWalkthrough onComplete={() => {}} />
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
