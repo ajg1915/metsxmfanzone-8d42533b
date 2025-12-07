@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: string | null
+          log_type: string
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          log_type: string
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          log_type?: string
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       blog_comments: {
         Row: {
           blog_post_id: string
@@ -984,7 +1023,42 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      business_ads_public: {
+        Row: {
+          ad_description: string | null
+          ad_image_url: string | null
+          ad_title: string | null
+          business_name: string | null
+          created_at: string | null
+          id: string | null
+          published_at: string | null
+          status: string | null
+          website_url: string | null
+        }
+        Insert: {
+          ad_description?: string | null
+          ad_image_url?: string | null
+          ad_title?: string | null
+          business_name?: string | null
+          created_at?: string | null
+          id?: string | null
+          published_at?: string | null
+          status?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          ad_description?: string | null
+          ad_image_url?: string | null
+          ad_title?: string | null
+          business_name?: string | null
+          created_at?: string | null
+          id?: string | null
+          published_at?: string | null
+          status?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
