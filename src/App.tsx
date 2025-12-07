@@ -35,6 +35,7 @@ import TutorialManagement from "./pages/admin/TutorialManagement";
 import FeedbackManagement from "./pages/admin/FeedbackManagement";
 import TVScheduleManagement from "./pages/admin/TVScheduleManagement";
 import NewsletterGenerator from "./pages/admin/NewsletterGenerator";
+import EmailEditor from "./pages/admin/EmailEditor";
 import StreamReplayEditor from "./pages/admin/StreamReplayEditor";
 import BusinessAdsManagement from "./pages/admin/BusinessAdsManagement";
 import MetsXMFanZone from "./pages/MetsXMFanZone";
@@ -167,6 +168,7 @@ const App = () => {
             <Route path="tutorial" element={<TutorialManagement />} />
             <Route path="tv-schedule" element={<TVScheduleManagement />} />
             <Route path="newsletter" element={<NewsletterGenerator />} />
+            <Route path="email-editor" element={<EmailEditor />} />
             <Route path="feedbacks" element={<FeedbackManagement />} />
             <Route path="posts" element={<PostsManagement />} />
             <Route path="business-ads" element={<BusinessAdsManagement />} />

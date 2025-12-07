@@ -1,4 +1,4 @@
-import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, ClipboardList, UserCog } from "lucide-react";
+import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, ClipboardList, UserCog, Send } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -24,6 +24,7 @@ const mediaItems = [
   { title: "Video Gallery Management", url: "/admin/video-gallery-management", icon: Video },
   { title: "Podcast Management", url: "/admin/podcasts", icon: Mic },
   { title: "Newsletter Editor", url: "/admin/newsletter", icon: Mail },
+  { title: "Email Editor", url: "/admin/email-editor", icon: Send },
   { title: "QR Code Generator", url: "/admin/qr-generator", icon: QrCode },
 ];
 
