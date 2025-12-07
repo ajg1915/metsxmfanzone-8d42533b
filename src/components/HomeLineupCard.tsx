@@ -175,22 +175,23 @@ export default function HomeLineupCard({
             </div>
           </div>
 
-          <CardContent className="p-3">
-            {lineupCard && lineup ? <div className="grid grid-cols-2 gap-3">
+          <CardContent className="p-3 lg:p-5">
+            {lineupCard && lineup ? <div className="grid grid-cols-2 gap-3 lg:gap-5">
                 {/* Batting Order - Compact Grid */}
                 <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                  <p className="text-xs lg:text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2 lg:mb-3">
                     Batting Order
                   </p>
-                  <div className="grid grid-cols-1 gap-1">
-                    {lineup.slice(0, 9).map(player => <div key={player.position} className="flex items-center gap-2 py-1 px-2 rounded bg-muted/30 hover:bg-muted/50 transition-colors">
-                        <span className="text-xs font-bold text-primary w-4">
+                  <div className="grid grid-cols-1 gap-1 lg:gap-2">
+                    {lineup.slice(0, 9).map(player => <div key={player.position} className="flex items-center gap-2 lg:gap-3 py-1 lg:py-2.5 px-2 lg:px-4 rounded bg-muted/30 hover:bg-muted/50 transition-colors">
+                        <span className="text-xs lg:text-base font-bold text-primary w-4 lg:w-6">
                           {player.position}
                         </span>
+                        {player.imageUrl && <img src={player.imageUrl} alt={player.name} className="hidden lg:block w-10 h-10 rounded-full object-cover border-2 border-primary/30" />}
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-xs truncate">{player.name}</p>
+                          <p className="font-medium text-xs lg:text-base truncate">{player.name}</p>
                         </div>
-                        <span className="text-[10px] text-muted-foreground font-mono">
+                        <span className="text-[10px] lg:text-sm text-muted-foreground font-mono">
                           {player.fieldPosition}
                         </span>
                       </div>)}
@@ -198,22 +199,22 @@ export default function HomeLineupCard({
                 </div>
 
                 {/* Right Column */}
-                <div className="space-y-3">
+                <div className="space-y-3 lg:space-y-4">
                   {/* Starting Pitcher */}
                   {pitcher && <div>
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                      <p className="text-xs lg:text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2 lg:mb-3">
                         Starting Pitcher
                       </p>
-                      <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-3 border border-primary/20">
-                        <p className="font-bold text-sm">{pitcher.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded font-medium">
+                      <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-3 lg:p-4 border border-primary/20">
+                        <p className="font-bold text-sm lg:text-lg">{pitcher.name}</p>
+                        <div className="flex items-center gap-2 lg:gap-3 mt-1 lg:mt-2">
+                          <span className="text-xs lg:text-sm bg-primary/20 text-primary px-1.5 lg:px-2.5 py-0.5 lg:py-1 rounded font-medium">
                             {pitcher.hand}
                           </span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs lg:text-sm text-muted-foreground">
                             {pitcher.era} ERA
                           </span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs lg:text-sm text-muted-foreground">
                             {pitcher.strikeouts} K
                           </span>
                         </div>
@@ -222,28 +223,28 @@ export default function HomeLineupCard({
 
                   {/* Quick Stats from MLB API */}
                   <div>
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                    <p className="text-xs lg:text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2 lg:mb-3">
                       2025 Season Stats
                     </p>
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="bg-muted/50 rounded p-2 text-center">
-                        <p className="text-lg font-bold text-primary">
+                    <div className="grid grid-cols-3 gap-2 lg:gap-3">
+                      <div className="bg-muted/50 rounded p-2 lg:p-3 text-center">
+                        <p className="text-lg lg:text-2xl font-bold text-primary">
                           {metsStanding?.wins || "-"}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">Wins</p>
+                        <p className="text-[10px] lg:text-xs text-muted-foreground">Wins</p>
                       </div>
-                      <div className="bg-muted/50 rounded p-2 text-center">
-                        <p className="text-lg font-bold text-primary">
+                      <div className="bg-muted/50 rounded p-2 lg:p-3 text-center">
+                        <p className="text-lg lg:text-2xl font-bold text-primary">
                           {metsStanding?.losses || "-"}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">Losses</p>
+                        <p className="text-[10px] lg:text-xs text-muted-foreground">Losses</p>
                       </div>
-                      <div className="bg-muted/50 rounded p-2 text-center">
-                        <p className="text-lg font-bold text-primary">
+                      <div className="bg-muted/50 rounded p-2 lg:p-3 text-center">
+                        <p className="text-lg lg:text-2xl font-bold text-primary">
                           {metsStanding?.position || "-"}
                           {metsStanding?.position === 1 ? "st" : metsStanding?.position === 2 ? "nd" : metsStanding?.position === 3 ? "rd" : "th"}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">NL East</p>
+                        <p className="text-[10px] lg:text-xs text-muted-foreground">NL East</p>
                       </div>
                     </div>
                   </div>
