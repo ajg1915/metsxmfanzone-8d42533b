@@ -15,8 +15,9 @@ interface NewsItem {
 interface MetsNewsTrackerProps {
   className?: string;
 }
-
-const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
+const MetsNewsTracker = ({
+  className
+}: MetsNewsTrackerProps) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -36,7 +37,7 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
   }, []);
   if (loading) {
     return <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background">
-        <div className="container mx-auto px-[3px] py-[10px]">
+        <div className="container mx-auto px-[3px] py-px">
           <div className="text-center">Loading news...</div>
         </div>
       </section>;
