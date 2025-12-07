@@ -8,80 +8,93 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Navy Blue and Orange Sports Theme */
-    --background: 215 100% 12%;
+    /* Mets Blue and Orange Sports Theme */
+    --background: 220 70% 8%;
     --foreground: 0 0% 100%;
 
-    --card: 215 85% 16%;
+    --card: 220 60% 12%;
     --card-foreground: 0 0% 100%;
 
-    --popover: 215 85% 16%;
+    --popover: 220 60% 12%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 14 100% 57%;
+    /* Mets Orange - Primary */
+    --primary: 24 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 70% 20%;
+    /* Mets Blue - Secondary */
+    --secondary: 220 80% 25%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 215 50% 25%;
-    --muted-foreground: 215 20% 70%;
+    --muted: 220 40% 20%;
+    --muted-foreground: 220 20% 65%;
 
-    --accent: 14 100% 57%;
+    --accent: 24 100% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 14 100% 57%;
-    --input: 215 50% 30%;
-    --ring: 14 100% 57%;
+    /* Mets Blue border accents */
+    --border: 220 80% 35%;
+    --input: 220 50% 25%;
+    --ring: 24 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    /* Custom design tokens */
-    --hero-overlay: 215 100% 8% / 0.7;
-    --card-border: 14 100% 57%;
-    --gradient-hero: linear-gradient(135deg, hsl(215 100% 12%), hsl(215 80% 18%));
+    /* Custom design tokens - Mets Theme */
+    --mets-blue: 220 80% 30%;
+    --mets-blue-light: 220 70% 45%;
+    --mets-blue-dark: 220 85% 15%;
+    --mets-orange: 24 100% 50%;
+    --mets-orange-light: 24 100% 60%;
     
-    --sidebar-background: 215 85% 16%;
+    --hero-overlay: 220 80% 6% / 0.8;
+    --card-border: 220 80% 35%;
+    --gradient-hero: linear-gradient(135deg, hsl(220 80% 8%), hsl(220 70% 15%));
+    --gradient-card: linear-gradient(180deg, hsl(220 60% 14%), hsl(220 70% 10%));
+    --gradient-blue: linear-gradient(135deg, hsl(220 80% 25%), hsl(220 70% 35%));
+    --glow-blue: 0 0 30px hsl(220 80% 40% / 0.4);
+    --glow-orange: 0 0 30px hsl(24 100% 50% / 0.3);
+    
+    --sidebar-background: 220 70% 10%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 14 100% 57%;
+    --sidebar-primary: 24 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 70% 20%;
+    --sidebar-accent: 220 80% 25%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 14 100% 57%;
-    --sidebar-ring: 14 100% 57%;
+    --sidebar-border: 220 80% 30%;
+    --sidebar-ring: 24 100% 50%;
   }
 
   .dark {
-    --background: 215 100% 12%;
+    --background: 220 70% 8%;
     --foreground: 0 0% 100%;
-    --card: 215 85% 16%;
+    --card: 220 60% 12%;
     --card-foreground: 0 0% 100%;
-    --popover: 215 85% 16%;
+    --popover: 220 60% 12%;
     --popover-foreground: 0 0% 100%;
-    --primary: 14 100% 57%;
+    --primary: 24 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 215 70% 20%;
+    --secondary: 220 80% 25%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 215 50% 25%;
-    --muted-foreground: 215 20% 70%;
-    --accent: 14 100% 57%;
+    --muted: 220 40% 20%;
+    --muted-foreground: 220 20% 65%;
+    --accent: 24 100% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 14 100% 57%;
-    --input: 215 50% 30%;
-    --ring: 14 100% 57%;
-    --sidebar-background: 215 85% 16%;
+    --border: 220 80% 35%;
+    --input: 220 50% 25%;
+    --ring: 24 100% 50%;
+    --sidebar-background: 220 70% 10%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 14 100% 57%;
+    --sidebar-primary: 24 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 70% 20%;
+    --sidebar-accent: 220 80% 25%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 14 100% 57%;
-    --sidebar-ring: 14 100% 57%;
+    --sidebar-border: 220 80% 30%;
+    --sidebar-ring: 24 100% 50%;
   }
 }
 
@@ -91,7 +104,7 @@ All colors MUST be HSL.
   }
 
   html {
-    @apply overflow-x-hidden;
+    @apply overflow-x-hidden scroll-smooth;
     width: 100%;
   }
 
@@ -104,27 +117,80 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
+  /* Scroll-triggered reveal animations */
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .scroll-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scroll-reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .scroll-reveal-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .scroll-reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .scroll-reveal-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .scroll-reveal-scale {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .scroll-reveal-scale.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
   /* Page transition animations */
   .animate-fade-in {
-    animation: fadeIn 0.5s ease-out;
+    animation: fadeIn 0.6s ease-out;
   }
 
   .animate-slide-up {
-    animation: slideUp 0.4s ease-out;
+    animation: slideUp 0.5s ease-out;
   }
 
   .animate-slide-in-right {
-    animation: slideInRight 0.3s ease-out;
+    animation: slideInRight 0.4s ease-out;
   }
 
   .animate-scale-in {
-    animation: scaleIn 0.3s ease-out;
+    animation: scaleIn 0.4s ease-out;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
   }
 
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(15px);
     }
     to {
       opacity: 1;
@@ -135,7 +201,7 @@ All colors MUST be HSL.
   @keyframes slideUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(30px);
     }
     to {
       opacity: 1;
@@ -146,7 +212,7 @@ All colors MUST be HSL.
   @keyframes slideInRight {
     from {
       opacity: 0;
-      transform: translateX(20px);
+      transform: translateX(30px);
     }
     to {
       opacity: 1;
@@ -157,11 +223,29 @@ All colors MUST be HSL.
   @keyframes scaleIn {
     from {
       opacity: 0;
-      transform: scale(0.95);
+      transform: scale(0.92);
     }
     to {
       opacity: 1;
       transform: scale(1);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(220 80% 40% / 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(220 80% 50% / 0.5);
     }
   }
 
@@ -176,28 +260,44 @@ All colors MUST be HSL.
       opacity: 0.7;
     }
     50% {
-      transform: translateY(4px);
+      transform: translateY(6px);
       opacity: 1;
     }
   }
 
   /* Stagger children animation helper */
   .stagger-children > * {
-    animation: fadeIn 0.4s ease-out backwards;
+    animation: fadeIn 0.5s ease-out backwards;
   }
-  .stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
-  .stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
-  .stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
-  .stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
-  .stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
-  .stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+  .stagger-children > *:nth-child(1) { animation-delay: 0.08s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.16s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.24s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.32s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.4s; }
+  .stagger-children > *:nth-child(6) { animation-delay: 0.48s; }
 
   /* Smooth hover transitions */
   .hover-lift {
-    @apply transition-all duration-200;
+    @apply transition-all duration-300;
   }
   .hover-lift:hover {
-    @apply -translate-y-1 shadow-lg;
+    @apply -translate-y-2;
+    box-shadow: 0 12px 40px hsl(220 80% 30% / 0.3);
+  }
+
+  /* Card hover with blue glow */
+  .hover-glow {
+    @apply transition-all duration-300;
+  }
+  .hover-glow:hover {
+    box-shadow: 0 0 30px hsl(220 80% 40% / 0.4), 0 8px 30px hsl(0 0% 0% / 0.3);
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    background: hsl(220 60% 12% / 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(220 80% 35% / 0.3);
   }
 
   .scrollbar-hide {
@@ -221,5 +321,24 @@ All colors MUST be HSL.
 
   .safe-area-top {
     padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(24 100% 55%), hsl(24 100% 65%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Blue accent border */
+  .border-blue-accent {
+    border-color: hsl(220 80% 40%);
+  }
+
+  /* Section divider with gradient */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(220 80% 35%), transparent);
   }
 }

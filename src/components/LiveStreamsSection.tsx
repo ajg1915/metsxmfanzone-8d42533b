@@ -106,25 +106,26 @@ const LiveStreamsSection = () => {
   return (
     <>
       <UpgradePrompt open={showUpgradePrompt} />
-      <section className="py-6 sm:py-8 md:py-10 bg-secondary/20">
+      <section className="py-6 sm:py-8 md:py-10 bg-gradient-to-b from-secondary/30 to-background">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
-            <h2 className="font-bold text-lg sm:text-xl md:text-2xl">Live & Upcoming Streams</h2>
+            <h2 className="font-bold text-lg sm:text-xl md:text-2xl gradient-text">Live & Upcoming Streams</h2>
             <Button 
               variant="outline" 
               onClick={handleViewAllClick}
               size="sm"
-              className="text-xs sm:text-sm"
+              className="text-xs sm:text-sm border-secondary hover:bg-secondary hover:border-mets-blue-light"
             >
               View All Streams
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 stagger-children">
-            {streams.map(stream => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+            {streams.map((stream, index) => (
               <Card 
                 key={stream.id} 
-                className="border-2 border-primary/50 bg-card overflow-hidden hover-lift cursor-pointer group" 
+                className="border border-border/50 bg-gradient-to-br from-card to-secondary/30 overflow-hidden hover-glow cursor-pointer group transition-all duration-300"
+                style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => handleStreamClick(stream)}
               >
                 {stream.thumbnail_url && (
@@ -132,13 +133,16 @@ const LiveStreamsSection = () => {
                     <img 
                       src={stream.thumbnail_url} 
                       alt={stream.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
                     />
-                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Play className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center animate-pulse-glow">
+                        <Play className="w-6 h-6 text-primary-foreground ml-1" />
+                      </div>
                     </div>
-                    <div className="absolute top-2 right-2">
-                      <Badge className={`text-[10px] sm:text-xs ${stream.status === 'live' ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'}`}>
+                    <div className="absolute top-3 right-3">
+                      <Badge className={`text-[10px] sm:text-xs font-semibold ${stream.status === 'live' ? 'bg-red-600 text-white shadow-lg shadow-red-600/50' : 'bg-secondary text-secondary-foreground'}`}>
                         {stream.status === 'live' && <Radio className="w-3 h-3 mr-1 animate-pulse" />}
                         {stream.status === 'live' ? 'LIVE' : 'UPCOMING'}
                       </Badge>
@@ -146,13 +150,13 @@ const LiveStreamsSection = () => {
                   </div>
                 )}
                 <CardHeader className="p-3 sm:p-4">
-                  <CardTitle className="line-clamp-2 text-sm sm:text-base">{stream.title}</CardTitle>
+                  <CardTitle className="line-clamp-2 text-sm sm:text-base group-hover:text-primary transition-colors">{stream.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-3 sm:p-4 pt-0">
                   <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-                      {stream.viewers_count > 0 ? stream.viewers_count : 'Starting soon'}
+                    <span className="flex items-center gap-1.5">
+                      <Users className="w-3 h-3 sm:w-4 sm:h-4 text-secondary" />
+                      {stream.viewers_count > 0 ? `${stream.viewers_count} watching` : 'Starting soon'}
                     </span>
                   </div>
                 </CardContent>
