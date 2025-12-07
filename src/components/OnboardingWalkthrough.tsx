@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X, Sparkles, Zap, Trophy, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-stadium.jpg";
+import logoIcon from "@/assets/metsxmfanzone-logo.png";
 import { Progress } from "@/components/ui/progress";
 
 interface OnboardingStep {
@@ -20,7 +21,7 @@ interface OnboardingWalkthroughProps {
   previewSteps?: OnboardingStep[];
 }
 
-const stepIcons = [Sparkles, Zap, Trophy, Play];
+
 
 const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps = [] }: OnboardingWalkthroughProps) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -110,7 +111,6 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   }
 
   const step = steps[currentStep];
-  const StepIcon = stepIcons[currentStep % stepIcons.length];
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
@@ -141,9 +141,9 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
             
-            {/* Icon badge */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-md">
-              <StepIcon className="w-4 h-4 text-primary-foreground" />
+            {/* Logo badge */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-background border-2 border-primary flex items-center justify-center shadow-md overflow-hidden">
+              <img src={logoIcon} alt="MetsXMFanZone" className="w-7 h-7 object-contain" />
             </div>
           </div>
 
