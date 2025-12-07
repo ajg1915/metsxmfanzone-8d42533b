@@ -37,7 +37,7 @@ const MetsNewsTracker = ({
   }, []);
   if (loading) {
     return <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background">
-        <div className="container mx-auto px-[3px] py-px">
+        <div className="container mx-auto py-px px-px">
           <div className="text-center">Loading news...</div>
         </div>
       </section>;
