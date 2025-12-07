@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit, Trash2, FileText, Sparkles, Upload } from "lucide-react";
+import { Plus, Edit, Trash2, FileText, Sparkles, Upload, Music } from "lucide-react";
 import { z } from "zod";
 
 const blogPostSchema = z.object({
@@ -30,6 +30,7 @@ interface BlogPost {
   content: string;
   excerpt: string;
   featured_image_url?: string;
+  audio_url?: string;
   category: string;
   tags: string[];
   published: boolean;
@@ -50,12 +51,14 @@ export default function BlogManagement() {
     content: "",
     excerpt: "",
     featured_image_url: "",
+    audio_url: "",
     category: "General",
     tags: "",
     published: false,
   });
   const [generatingContent, setGeneratingContent] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -175,6 +178,7 @@ export default function BlogManagement() {
       content: post.content,
       excerpt: post.excerpt || "",
       featured_image_url: post.featured_image_url || "",
+      audio_url: post.audio_url || "",
       category: post.category,
       tags: post.tags.join(", "),
       published: post.published,
@@ -307,6 +311,63 @@ export default function BlogManagement() {
     }
   };
 
+  const handleAudioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('audio/')) {
+      toast({
+        title: "Error",
+        description: "Please upload an audio file (MP3, WAV, etc.)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 50MB for audio)
+    if (file.size > 50 * 1024 * 1024) {
+      toast({
+        title: "Error",
+        description: "Audio must be less than 50MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingAudio(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `blog-audio/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('podcasts')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('podcasts')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, audio_url: publicUrl });
+      toast({
+        title: "Success",
+        description: "Audio uploaded successfully!",
+      });
+    } catch (error: any) {
+      console.error("Error uploading audio:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload audio",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingAudio(false);
+    }
+  };
+
   const resetForm = () => {
     setEditingPost(null);
     setFormData({
@@ -315,6 +376,7 @@ export default function BlogManagement() {
       content: "",
       excerpt: "",
       featured_image_url: "",
+      audio_url: "",
       category: "General",
       tags: "",
       published: false,
@@ -427,8 +489,44 @@ export default function BlogManagement() {
                       {uploadingImage && (
                         <Upload className="w-3 h-3 animate-pulse" />
                       )}
+                  </div>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <Label htmlFor="audio_url" className="text-sm">Article Audio (Listen Version)</Label>
+                  <Input
+                    id="audio_url"
+                    value={formData.audio_url}
+                    onChange={(e) => setFormData({ ...formData, audio_url: e.target.value })}
+                    placeholder="https://... or upload below"
+                    className="mt-1 text-sm"
+                  />
+                  
+                  <div className="mt-2">
+                    <Label htmlFor="audio_upload" className="text-xs text-muted-foreground">Or Upload Audio (MP3, WAV)</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Input
+                        id="audio_upload"
+                        type="file"
+                        accept="audio/*"
+                        onChange={handleAudioUpload}
+                        disabled={uploadingAudio}
+                        className="cursor-pointer text-xs"
+                      />
+                      {uploadingAudio && (
+                        <Music className="w-3 h-3 animate-pulse" />
+                      )}
                     </div>
                   </div>
+                  
+                  {formData.audio_url && (
+                    <div className="mt-2">
+                      <audio controls className="w-full h-8">
+                        <source src={formData.audio_url} type="audio/mpeg" />
+                      </audio>
+                    </div>
+                  )}
+                </div>
                 </div>
 
                 <div className="sm:col-span-2">

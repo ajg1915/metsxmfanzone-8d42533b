@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Tag, ArrowLeft } from "lucide-react";
+import { Calendar, Tag, ArrowLeft, Headphones } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
@@ -16,6 +16,7 @@ interface BlogPost {
   content: string;
   excerpt: string;
   featured_image_url?: string;
+  audio_url?: string;
   category: string;
   tags: string[];
   published_at: string;
@@ -225,6 +226,21 @@ export default function BlogPost() {
                 </div>
               )}
             </header>
+
+            {post.audio_url && (
+              <Card className="mb-6">
+                <CardContent className="py-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Headphones className="w-5 h-5 text-primary" />
+                    <span className="font-medium">Listen to this article</span>
+                  </div>
+                  <audio controls className="w-full">
+                    <source src={post.audio_url} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
+                </CardContent>
+              </Card>
+            )}
 
             <Card>
               <CardContent className="prose prose-lg max-w-none dark:prose-invert py-8">
