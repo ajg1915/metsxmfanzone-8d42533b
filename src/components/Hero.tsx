@@ -68,7 +68,7 @@ const Hero = () => {
                     <img 
                       src={logo} 
                       alt="MetsXMFanZone" 
-                      className="w-14 h-14 sm:w-18 sm:h-18 md:w-22 md:h-22 lg:w-24 lg:h-24 object-contain animate-scale-in" 
+                      className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain animate-scale-in" 
                     />
                   </div>
                   <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-primary mb-2 sm:mb-3 animate-fade-in px-2 leading-tight">
