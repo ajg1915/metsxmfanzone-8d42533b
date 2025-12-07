@@ -27,7 +27,7 @@ export const useAuth = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signOut = async (redirectToLogout = true) => {
+  const signOut = async () => {
     try {
       // Sign out from Supabase first
       const { error } = await supabase.auth.signOut();
@@ -41,21 +41,11 @@ export const useAuth = () => {
       // Clear local state after successful sign out
       setSession(null);
       setUser(null);
-      
-      // Redirect to logout page
-      if (redirectToLogout && typeof window !== 'undefined') {
-        window.location.href = '/logout';
-      }
     } catch (error) {
       // Still clear local state even if there's an error
       setSession(null);
       setUser(null);
       console.error('Unexpected sign out error:', error);
-      
-      // Still redirect even on error
-      if (redirectToLogout && typeof window !== 'undefined') {
-        window.location.href = '/logout';
-      }
     }
   };
 

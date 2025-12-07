@@ -66,8 +66,6 @@ import LineupCardManagement from "./pages/admin/LineupCardManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
 import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
 import UserManagement from "./pages/admin/UserManagement";
-import AIAssistant from "./pages/admin/AIAssistant";
-import ActivityLogs from "./pages/admin/ActivityLogs";
 import CreateAccount from "./pages/help/CreateAccount";
 import NavigatePlatform from "./pages/help/NavigatePlatform";
 import WatchStreams from "./pages/help/WatchStreams";
@@ -85,7 +83,6 @@ import SubscriptionPlans from "./pages/help/SubscriptionPlans";
 import PaymentMethods from "./pages/help/PaymentMethods";
 import CancelSubscription from "./pages/help/CancelSubscription";
 import ReturnPolicy from "./pages/help/ReturnPolicy";
-import Logout from "./pages/Logout";
 
 const queryClient = new QueryClient();
 
@@ -109,7 +106,6 @@ const App = () => {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-error" element={<PaymentError />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/logout" element={<Logout />} />
           <Route path="/confirm-account" element={<ConfirmAccount />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/blog" element={<Blog />} />
@@ -155,8 +151,6 @@ const App = () => {
             <Route path="stories" element={<StoriesManagement />} />
             <Route path="mets-news" element={<MetsNewsTrackerManagement />} />
             <Route path="tutorial" element={<TutorialManagement />} />
-            <Route path="ai-assistant" element={<AIAssistant />} />
-            <Route path="logs" element={<ActivityLogs />} />
             <Route path="tv-schedule" element={<TVScheduleManagement />} />
             <Route path="newsletter" element={<NewsletterGenerator />} />
             <Route path="feedbacks" element={<FeedbackManagement />} />
