@@ -71,6 +71,10 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
         preload: 'auto',
         fluid: true,
         liveui: true,
+        fullscreenToggle: true,
+        controlBar: {
+          fullscreenToggle: true
+        },
         html5: {
           vhs: {
             overrideNative: true
