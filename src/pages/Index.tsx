@@ -11,7 +11,7 @@ import MetsNewsTracker from "@/components/MetsNewsTracker";
 import BlogSection from "@/components/BlogSection";
 import HomeLineupCard from "@/components/HomeLineupCard";
 import PodcastSection from "@/components/PodcastSection";
-import NewsletterSection from "@/components/NewsletterSection";
+import HotStoveGuide from "@/components/HotStoveGuide";
 import FeedbackSection from "@/components/FeedbackSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
@@ -94,7 +94,7 @@ const Index = () => {
         </ScrollReveal>
         
         <ScrollReveal delay={100}>
-          <NewsletterSection />
+          <HotStoveGuide />
         </ScrollReveal>
       </main>
       <Footer />
