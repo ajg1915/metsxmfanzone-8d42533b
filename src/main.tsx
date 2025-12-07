@@ -4,12 +4,7 @@ import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 
-const rootElement = document.getElementById("root")!;
-
-// Clear any placeholder content
-rootElement.innerHTML = '';
-
-createRoot(rootElement).render(
+createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
     <BrowserRouter>
       <App />
