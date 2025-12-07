@@ -189,23 +189,24 @@ const Navigation = () => {
             {/* Single mobile menu for all users */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden h-8 w-8">
-                  <Menu className="w-4 h-4" />
+                <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 touch-target">
+                  <Menu className="w-5 h-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] bg-background">
-                <SheetHeader>
-                  <SheetTitle className="text-lg font-bold">MetsXMFanZone.com</SheetTitle>
-                  <SheetDescription className="text-sm">
-                    Ultimate Destination where the fans go
+              <SheetContent side="right" className="w-[280px] sm:w-[320px] bg-background p-0 safe-area-bottom">
+                <SheetHeader className="p-4 border-b border-border">
+                  <SheetTitle className="text-lg font-bold text-primary">MetsXMFanZone</SheetTitle>
+                  <SheetDescription className="text-xs">
+                    Your Home for Mets Coverage
                   </SheetDescription>
                 </SheetHeader>
-                <div className="flex flex-col gap-4 mt-6">
+                <div className="flex flex-col p-4 stagger-children">
                   <NavLink 
                     to="/" 
-                    className="text-foreground hover:text-primary transition-colors py-2"
+                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg touch-target"
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <Trophy className="w-4 h-4" />
                     Home
                   </NavLink>
                   <button
@@ -213,8 +214,9 @@ const Navigation = () => {
                       setMobileMenuOpen(false);
                       handleProtectedNavigation("/spring-training-live");
                     }}
-                    className="text-foreground hover:text-primary transition-colors py-2 text-left"
+                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
+                    <Play className="w-4 h-4" />
                     Spring Training
                   </button>
                   <button
@@ -222,8 +224,9 @@ const Navigation = () => {
                       setMobileMenuOpen(false);
                       handleProtectedNavigation("/community");
                     }}
-                    className="text-foreground hover:text-primary transition-colors py-2 text-left"
+                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
+                    <Users className="w-4 h-4" />
                     Community
                   </button>
                   <button
@@ -231,8 +234,9 @@ const Navigation = () => {
                       setMobileMenuOpen(false);
                       handleProtectedNavigation("/blog");
                     }}
-                    className="text-foreground hover:text-primary transition-colors py-2 text-left"
+                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
+                    <Menu className="w-4 h-4" />
                     Blog
                   </button>
                   <button
@@ -240,29 +244,34 @@ const Navigation = () => {
                       setMobileMenuOpen(false);
                       handleProtectedNavigation("/live");
                     }}
-                    className="text-foreground hover:text-primary transition-colors py-2 text-left"
+                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
+                    <Play className="w-4 h-4" />
                     Guide
                   </button>
                   <NavLink 
                     to="/plans" 
-                    className="text-foreground hover:text-primary transition-colors py-2"
+                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg touch-target"
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <Shield className="w-4 h-4" />
                     Plans
                   </NavLink>
                   
-                  <div className="border-t border-border pt-4 mt-2">
+                  <div className="border-t border-border pt-4 mt-4">
                     {user ? (
-                      <>
-                        <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarFallback className="text-xs">
+                      <div className="space-y-2">
+                        <div className="p-3 bg-muted/30 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10">
+                              <AvatarFallback className="text-sm bg-primary text-primary-foreground">
                                 {user.email?.charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="text-sm truncate">{user.email}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{user.email}</p>
+                              <p className="text-xs text-muted-foreground">Logged in</p>
+                            </div>
                           </div>
                         </div>
                         <Button 
@@ -271,9 +280,9 @@ const Navigation = () => {
                             setMobileMenuOpen(false);
                           }}
                           variant="ghost"
-                          className="w-full justify-start mb-2"
+                          className="w-full justify-start gap-3 h-11"
                         >
-                          <LayoutDashboard className="w-4 h-4 mr-2" />
+                          <LayoutDashboard className="w-4 h-4" />
                           Dashboard
                         </Button>
                         {isAdmin && (
@@ -283,9 +292,9 @@ const Navigation = () => {
                               setMobileMenuOpen(false);
                             }}
                             variant="ghost"
-                            className="w-full justify-start mb-2"
+                            className="w-full justify-start gap-3 h-11"
                           >
-                            <Shield className="w-4 h-4 mr-2" />
+                            <Shield className="w-4 h-4" />
                             Admin Portal
                           </Button>
                         )}
@@ -294,21 +303,21 @@ const Navigation = () => {
                             await handleAuthClick();
                           }}
                           variant="ghost"
-                          className="w-full justify-start"
+                          className="w-full justify-start gap-3 h-11 text-destructive hover:text-destructive"
                         >
-                          <LogOut className="w-4 h-4 mr-2" />
+                          <LogOut className="w-4 h-4" />
                           Sign Out
                         </Button>
-                      </>
+                      </div>
                     ) : (
-                      <>
+                      <div className="space-y-2">
                         <Button 
                           onClick={() => {
                             navigate("/auth?mode=login");
                             setMobileMenuOpen(false);
                           }}
-                          variant="ghost"
-                          className="w-full justify-start mb-2"
+                          variant="outline"
+                          className="w-full h-11"
                         >
                           Login
                         </Button>
@@ -317,11 +326,11 @@ const Navigation = () => {
                             navigate("/auth?mode=signup");
                             setMobileMenuOpen(false);
                           }}
-                          className="w-full justify-start"
+                          className="w-full h-11"
                         >
-                          Sign Up
+                          Sign Up Free
                         </Button>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>

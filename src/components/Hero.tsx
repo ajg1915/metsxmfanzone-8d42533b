@@ -47,34 +47,41 @@ const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[300px] sm:min-h-[350px] md:min-h-[400px] overflow-hidden">
+    <section className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] overflow-hidden">
       <div ref={emblaRef} className="overflow-hidden h-full">
         <div className="flex h-full">
           {slides.map((slide, index) => (
             <div key={index} className="flex-[0_0_100%] min-w-0 relative">
-              <div className="relative min-h-[300px] sm:min-h-[350px] md:min-h-[400px] flex items-center justify-center">
+              <div className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] flex items-center justify-center">
                 <div 
-                  className="absolute inset-0 bg-cover bg-center z-0"
-                  style={{ backgroundImage: `url(${slide.image})` }}
+                  className="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700"
+                  style={{ 
+                    backgroundImage: `url(${slide.image})`,
+                    transform: selectedIndex === index ? 'scale(1)' : 'scale(1.05)'
+                  }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/80 to-background"></div>
+                  <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/75 to-background"></div>
                 </div>
                 
-                <div className="container mx-auto px-3 sm:px-6 lg:px-8 relative z-10 text-center py-6 sm:py-10 md:py-14 max-w-7xl">
-                  <div className="flex justify-center mb-3 sm:mb-4">
-                    <img src={logo} alt="MetsXMFanZone" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain" />
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-8 sm:py-10 md:py-14 max-w-6xl">
+                  <div className="flex justify-center mb-4 sm:mb-5">
+                    <img 
+                      src={logo} 
+                      alt="MetsXMFanZone" 
+                      className="w-14 h-14 sm:w-18 sm:h-18 md:w-22 md:h-22 lg:w-24 lg:h-24 object-contain animate-scale-in" 
+                    />
                   </div>
-                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-2 sm:mb-3 animate-fade-in px-2">
+                  <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-primary mb-2 sm:mb-3 animate-fade-in px-2 leading-tight">
                     {slide.title}
                   </h1>
-                  <p className="text-xs sm:text-sm md:text-base text-foreground mb-3 sm:mb-5 max-w-2xl mx-auto px-2">
+                  <p className="text-xs sm:text-sm md:text-base text-foreground/90 mb-4 sm:mb-5 max-w-lg md:max-w-xl lg:max-w-2xl mx-auto px-4 leading-relaxed">
                     {slide.description}
                   </p>
                   
-                  <div className="flex items-center justify-center px-2">
-                    <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 border-2 border-primary rounded-md bg-background/50 backdrop-blur-sm max-w-full">
-                      <span className="text-[10px] sm:text-xs text-foreground text-center leading-tight">
-                        ⚡ Start your <span className="text-primary font-semibold">7-day FREE trial</span> for unlimited access. Then $12.99/month
+                  <div className="flex items-center justify-center px-4">
+                    <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-primary/80 rounded-lg bg-background/60 backdrop-blur-md hover-lift">
+                      <span className="text-[11px] sm:text-xs md:text-sm text-foreground text-center leading-snug">
+                        ⚡ Start your <span className="text-primary font-bold">7-day FREE trial</span> for unlimited access
                       </span>
                     </div>
                   </div>
@@ -85,13 +92,15 @@ const Hero = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+      <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => scrollTo(index)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              selectedIndex === index ? "bg-primary w-6" : "bg-muted hover:bg-muted-foreground"
+            className={`h-2 rounded-full transition-all duration-300 touch-target ${
+              selectedIndex === index 
+                ? "bg-primary w-6 sm:w-8" 
+                : "bg-muted hover:bg-muted-foreground w-2"
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
