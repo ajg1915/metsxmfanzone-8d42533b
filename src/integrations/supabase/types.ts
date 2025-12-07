@@ -1061,6 +1061,23 @@ export type Database = {
       }
     }
     Functions: {
+      get_user_subscription_safe: {
+        Args: { p_user_id: string }
+        Returns: {
+          amount: number
+          created_at: string
+          currency: string
+          end_date: string
+          id: string
+          paypal_order_id_masked: string
+          paypal_subscription_id_masked: string
+          plan_type: string
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
