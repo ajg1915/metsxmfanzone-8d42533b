@@ -214,10 +214,16 @@ const Live = () => {
                       </Badge>
                       <h2 className="font-bold text-primary text-lg text-center font-serif">{podcastStream.title}</h2>
                     </div>
-                    <Card className="border-2 border-primary">
+                    <Card className="border-2 border-primary max-w-3xl mx-auto">
                       <CardContent className="p-0">
                         <div className="aspect-video w-full">
-                          <iframe src={podcastStream.vdo_ninja_url} allow="camera;microphone;display-capture;autoplay;clipboard-write" className="w-full h-full rounded-lg" title={podcastStream.title} />
+                          <iframe 
+                            src={podcastStream.vdo_ninja_url} 
+                            allow="camera;microphone;display-capture;autoplay;clipboard-write;fullscreen" 
+                            allowFullScreen
+                            className="w-full h-full rounded-lg" 
+                            title={podcastStream.title} 
+                          />
                         </div>
                         {podcastStream.description && <div className="p-4">
                             <p className="text-muted-foreground">{podcastStream.description}</p>
