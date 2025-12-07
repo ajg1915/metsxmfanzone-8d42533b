@@ -66,7 +66,8 @@ const Navigation = () => {
   const handleAuthClick = async () => {
     if (user) {
       setMobileMenuOpen(false);
-      await signOut(); // signOut handles the redirect to /logout
+      await signOut();
+      navigate("/");
     } else {
       navigate("/auth");
     }

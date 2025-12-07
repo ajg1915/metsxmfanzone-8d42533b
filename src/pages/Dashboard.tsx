@@ -8,14 +8,13 @@ import { Button } from "@/components/ui/button";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 import NotificationSettings from "@/components/NotificationSettings";
 import { Badge } from "@/components/ui/badge";
-import { User, CreditCard, Calendar, ArrowUpCircle, Fingerprint, Trash2 } from "lucide-react";
+import { User, CreditCard, Calendar, ArrowUpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
-import { useWebAuthn } from "@/hooks/useWebAuthn";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -111,84 +110,6 @@ const Dashboard = () => {
     } finally {
       setSavingProfile(false);
     }
-  };
-
-  // Biometric Settings Component
-  const BiometricSettings = ({ userId, email }: { userId: string; email: string }) => {
-    const { isSupported, loading: biometricLoading, hasPasskey, registerPasskey, removePasskey } = useWebAuthn();
-    const [hasRegistered, setHasRegistered] = useState(false);
-
-    useEffect(() => {
-      setHasRegistered(hasPasskey(email));
-    }, [email, hasPasskey]);
-
-    const handleRegister = async () => {
-      const success = await registerPasskey(userId, email);
-      if (success) {
-        setHasRegistered(true);
-      }
-    };
-
-    const handleRemove = () => {
-      removePasskey(email);
-      setHasRegistered(false);
-    };
-
-    if (!isSupported) {
-      return null;
-    }
-
-    return (
-      <Card className="border-2 border-primary mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-primary">
-            <Fingerprint className="w-5 h-5" />
-            Biometric Login
-          </CardTitle>
-          <CardDescription>
-            Use Face ID, Touch ID, or Windows Hello to sign in quickly and securely
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-foreground font-medium">Passkey Status</p>
-              <p className="text-sm text-muted-foreground">
-                {hasRegistered ? "Passkey registered on this device" : "No passkey registered"}
-              </p>
-            </div>
-            <Badge variant={hasRegistered ? "default" : "secondary"}>
-              {hasRegistered ? "Active" : "Not Set Up"}
-            </Badge>
-          </div>
-
-          {hasRegistered ? (
-            <Button
-              variant="outline"
-              className="w-full text-destructive hover:text-destructive"
-              onClick={handleRemove}
-              disabled={biometricLoading}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Remove Passkey
-            </Button>
-          ) : (
-            <Button
-              className="w-full"
-              onClick={handleRegister}
-              disabled={biometricLoading}
-            >
-              <Fingerprint className="w-4 h-4 mr-2" />
-              {biometricLoading ? "Setting up..." : "Set Up Biometric Login"}
-            </Button>
-          )}
-
-          <p className="text-xs text-muted-foreground">
-            Your biometric data never leaves your device. We only store a secure credential ID.
-          </p>
-        </CardContent>
-      </Card>
-    );
   };
 
   if (loading) {
@@ -419,9 +340,6 @@ const Dashboard = () => {
             </div>
 
             <NotificationSettings />
-
-            {/* Biometric Login Settings */}
-            <BiometricSettings userId={user.id} email={user.email || ""} />
 
             {/* Features Access Card */}
             <Card className="border-2 border-primary">
