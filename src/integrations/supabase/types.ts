@@ -90,6 +90,7 @@ export type Database = {
       }
       blog_posts: {
         Row: {
+          audio_url: string | null
           category: string
           content: string
           created_at: string
@@ -105,6 +106,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          audio_url?: string | null
           category?: string
           content: string
           created_at?: string
@@ -120,6 +122,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          audio_url?: string | null
           category?: string
           content?: string
           created_at?: string
