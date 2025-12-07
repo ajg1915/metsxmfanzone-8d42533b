@@ -81,23 +81,7 @@ const StoriesSection = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4 md:mb-6">MetsXMFanZone Stories</h2>
           <div className="relative">
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-background/90 backdrop-blur-sm hidden sm:flex" 
-              onClick={() => scroll('left')}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-background/90 backdrop-blur-sm hidden sm:flex" 
-              onClick={() => scroll('right')}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          <div ref={scrollContainerRef} className="flex gap-2.5 sm:gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide px-0 sm:px-8">
+          <div ref={scrollContainerRef} className="flex gap-2.5 sm:gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide">
             {stories.map(story => {
               const handleClick = () => {
                 if (story.link_url) {
