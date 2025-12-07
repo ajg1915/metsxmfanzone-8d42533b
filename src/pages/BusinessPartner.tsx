@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Users, TrendingUp, Target, Upload as UploadIcon } from "lucide-react";
+import { Users, TrendingUp, Target, Upload as UploadIcon } from "lucide-react";
+import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
 const BusinessPartner = () => {
   const { user } = useAuth();
@@ -156,9 +157,7 @@ const BusinessPartner = () => {
       <main className="pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
-              <Building2 className="w-10 h-10 text-primary" />
-            </div>
+            <img src={metsLogo} alt="MetsXMFanZone" className="w-20 h-20 object-contain mb-6" />
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">
               Business Advertisement
             </h1>
