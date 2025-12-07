@@ -181,179 +181,173 @@ export default function TutorialManagement() {
   };
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-8 space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="w-full max-w-4xl mx-auto px-3 py-4 space-y-4">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tutorial Management</h1>
-          <p className="text-muted-foreground">Manage the onboarding steps shown on the main page.</p>
+          <h1 className="text-xl font-bold">Tutorial Management</h1>
+          <p className="text-xs text-muted-foreground">Manage onboarding steps</p>
         </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
+            size="sm"
             onClick={() => setShowPreview(true)}
             disabled={steps.length === 0}
           >
-            <Eye className="w-4 h-4 mr-2" />
-            Preview Tutorial
+            <Eye className="w-3 h-3 mr-1" />
+            Preview
           </Button>
           <Button
+            size="sm"
             onClick={() => {
               resetForm();
               setShowForm(!showForm);
             }}
           >
-            {showForm ? <X className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-            {showForm ? "Cancel" : "Add New Step"}
+            {showForm ? <X className="w-3 h-3 mr-1" /> : <Plus className="w-3 h-3 mr-1" />}
+            {showForm ? "Cancel" : "Add Step"}
           </Button>
         </div>
       </div>
 
       {/* Form Section */}
       {showForm && (
-        <Card className="border-2 border-primary/10">
-          <CardHeader>
-            <CardTitle>{editingId ? "Edit Step" : "Create New Step"}</CardTitle>
+        <Card className="border border-primary/20">
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="text-sm">{editingId ? "Edit Step" : "Create New Step"}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Title</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="e.g., Welcome to the Fan Zone"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Explain this feature..."
-                      required
-                      className="h-32"
-                    />
-                  </div>
+          <CardContent className="p-4 pt-0">
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-xs">Title</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Welcome to the Fan Zone"
+                    required
+                    className="h-8 text-sm"
+                  />
                 </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="step_number">Step Sequence Number</Label>
-                    <Input
-                      id="step_number"
-                      type="number"
-                      min="1"
-                      value={formData.step_number}
-                      onChange={(e) => setFormData({ ...formData, step_number: parseInt(e.target.value) })}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="image_url">Image URL (Optional)</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="image_url"
-                        value={formData.image_url}
-                        onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                        placeholder="https://..."
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 pt-4">
-                    <Switch
-                      id="is_active"
-                      checked={formData.is_active}
-                      onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                    />
-                    <Label htmlFor="is_active">Visible to Users</Label>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="step_number" className="text-xs">Step #</Label>
+                  <Input
+                    id="step_number"
+                    type="number"
+                    min="1"
+                    value={formData.step_number}
+                    onChange={(e) => setFormData({ ...formData, step_number: parseInt(e.target.value) })}
+                    required
+                    className="h-8 text-sm"
+                  />
                 </div>
               </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button type="submit" disabled={loading}>
-                  {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  <Save className="w-4 h-4 mr-2" />
-                  {editingId ? "Update Step" : "Create Step"}
-                </Button>
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-xs">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Explain this feature..."
+                  required
+                  className="h-16 text-sm resize-none"
+                />
               </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="image_url" className="text-xs">Image URL (Optional)</Label>
+                  <Input
+                    id="image_url"
+                    value={formData.image_url}
+                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                    placeholder="https://..."
+                    className="h-8 text-sm"
+                  />
+                </div>
+                <div className="flex items-center space-x-2 pt-5">
+                  <Switch
+                    id="is_active"
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  />
+                  <Label htmlFor="is_active" className="text-xs">Visible</Label>
+                </div>
+              </div>
+              <Button type="submit" size="sm" disabled={loading}>
+                {loading && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
+                <Save className="w-3 h-3 mr-1" />
+                {editingId ? "Update" : "Create"}
+              </Button>
             </form>
           </CardContent>
         </Card>
       )}
 
       {/* List Section */}
-      <div className="grid gap-4">
+      <div className="space-y-2">
         {steps.length === 0 && !loading && (
-          <div className="text-center py-12 text-muted-foreground">
-            No tutorial steps found. Create one to get started.
+          <div className="text-center py-8 text-muted-foreground text-sm">
+            No tutorial steps. Create one to get started.
           </div>
         )}
 
         {steps.map((step, index) => (
           <Card
             key={step.id}
-            className={`transition-all ${!step.is_active ? "opacity-60 bg-muted/50" : "hover:shadow-md"}`}
+            className={`${!step.is_active ? "opacity-60 bg-muted/50" : ""}`}
           >
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row gap-6 items-start">
-                {/* Reorder Controls */}
-                <div className="flex flex-row md:flex-col border rounded-lg p-1 bg-background shrink-0">
+            <CardContent className="p-3">
+              <div className="flex gap-3 items-center">
+                {/* Reorder & Number */}
+                <div className="flex flex-col items-center gap-0.5 shrink-0">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-5 w-5"
                     onClick={() => handleReorder(step.id, "up")}
                     disabled={index === 0}
                   >
-                    <MoveUp className="w-4 h-4" />
+                    <MoveUp className="w-3 h-3" />
                   </Button>
-                  <div className="text-center text-xs font-bold py-1">{step.step_number}</div>
+                  <span className="text-xs font-bold text-muted-foreground">{step.step_number}</span>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-5 w-5"
                     onClick={() => handleReorder(step.id, "down")}
                     disabled={index === steps.length - 1}
                   >
-                    <MoveDown className="w-4 h-4" />
+                    <MoveDown className="w-3 h-3" />
                   </Button>
                 </div>
 
-                {/* Image Preview */}
-                <div className="w-full md:w-48 h-32 bg-muted rounded-md shrink-0 flex items-center justify-center overflow-hidden border">
+                {/* Image */}
+                <div className="w-16 h-12 bg-muted rounded shrink-0 flex items-center justify-center overflow-hidden border">
                   {step.image_url ? (
                     <img src={step.image_url} alt={step.title} className="w-full h-full object-cover" />
                   ) : (
-                    <ImageIcon className="w-8 h-8 text-muted-foreground/50" />
+                    <ImageIcon className="w-4 h-4 text-muted-foreground/50" />
                   )}
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 space-y-1">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-lg flex items-center gap-2">
-                        {step.title}
-                        {!step.is_active && <Badge variant="secondary">Hidden</Badge>}
-                      </h3>
-                      <p className="text-muted-foreground mt-1">{step.description}</p>
-                    </div>
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-sm truncate flex items-center gap-1">
+                    {step.title}
+                    {!step.is_active && <Badge variant="secondary" className="text-[10px] px-1 py-0">Hidden</Badge>}
+                  </h3>
+                  <p className="text-xs text-muted-foreground line-clamp-1">{step.description}</p>
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 shrink-0">
-                  <Button variant="outline" size="icon" onClick={() => handleEdit(step)}>
-                    <Edit2 className="w-4 h-4" />
+                <div className="flex gap-1 shrink-0">
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit(step)}>
+                    <Edit2 className="w-3 h-3" />
                   </Button>
-                  <Button variant="destructive" size="icon" onClick={() => handleDelete(step.id)}>
-                    <Trash2 className="w-4 h-4" />
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(step.id)}>
+                    <Trash2 className="w-3 h-3" />
                   </Button>
                 </div>
               </div>
