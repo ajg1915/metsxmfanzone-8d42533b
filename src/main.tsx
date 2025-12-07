@@ -6,14 +6,11 @@ import "./index.css";
 
 const rootElement = document.getElementById("root")!;
 
-// Check if there's actual rendered content (not just comments or whitespace)
-// Comments are stripped by the browser, so we check for actual element content
-const hasRenderedContent = rootElement.children.length > 0 || 
-  (rootElement.innerHTML.trim().length > 0 && rootElement.textContent?.trim().length !== 0);
+// Check if we're in production and the HTML has been prerendered
+const isPrerendered = rootElement.innerHTML.trim().length > 0 && 
+                      !rootElement.innerHTML.includes('<!--app-html-->');
 
-const isPrerendered = hasRenderedContent && import.meta.env.PROD;
-
-if (isPrerendered) {
+if (isPrerendered && import.meta.env.PROD) {
   // Hydrate prerendered content in production
   hydrateRoot(
     rootElement,
