@@ -6,6 +6,7 @@ import LiveGameTicker from "@/components/LiveGameTicker";
 import LiveNetworks from "@/components/LiveNetworks";
 import LiveStreamsSection from "@/components/LiveStreamsSection";
 import SpringTraining from "@/components/SpringTraining";
+import HighlightsSection from "@/components/HighlightsSection";
 import MetsNewsTracker from "@/components/MetsNewsTracker";
 import BlogSection from "@/components/BlogSection";
 import HomeLineupCard from "@/components/HomeLineupCard";
@@ -52,12 +53,16 @@ const Index = () => {
         
         <div className="section-divider my-6 sm:my-8" />
         
-        <ScrollReveal>
-          <SpringTraining className="py-4 sm:py-6" />
-        </ScrollReveal>
-        
         <ScrollReveal delay={100}>
           <HomeLineupCard className="py-4 sm:py-6" />
+        </ScrollReveal>
+        
+        <ScrollReveal>
+          <HighlightsSection className="py-4 sm:py-6" />
+        </ScrollReveal>
+        
+        <ScrollReveal>
+          <SpringTraining className="py-4 sm:py-6" />
         </ScrollReveal>
         
         <div className="section-divider my-6 sm:my-8" />
