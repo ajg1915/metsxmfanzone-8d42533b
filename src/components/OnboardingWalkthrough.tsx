@@ -115,115 +115,114 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-[95vw] sm:max-w-md md:max-w-lg p-0 gap-0 overflow-hidden border-2 border-primary/50">
+      <DialogContent className="max-w-[90vw] sm:max-w-sm p-0 gap-0 overflow-hidden border border-primary/30 rounded-lg">
         <div className="relative">
-          {/* Progress bar at top */}
+          {/* Progress bar */}
           <div className="absolute top-0 left-0 right-0 z-20">
-            <Progress value={progress} className="h-1 rounded-none bg-muted" />
+            <Progress value={progress} className="h-0.5 rounded-none bg-muted" />
           </div>
 
           {/* Close button */}
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-4 z-10 bg-background/80 hover:bg-background h-8 w-8"
+            className="absolute right-1 top-2 z-10 bg-background/80 hover:bg-background h-6 w-6"
             onClick={handleSkip}
           >
-            <X className="w-4 h-4" />
+            <X className="w-3 h-3" />
           </Button>
 
-          {/* Image section with overlay */}
-          <div className="relative aspect-[16/10] sm:aspect-video overflow-hidden">
+          {/* Image section */}
+          <div className="relative aspect-[16/9] overflow-hidden">
             <img 
               src={step.image_url || heroImage} 
               alt={step.title}
-              className={`w-full h-full object-cover transition-all duration-300 ${isAnimating ? 'scale-105 opacity-80' : 'scale-100 opacity-100'}`}
+              className={`w-full h-full object-cover transition-all duration-200 ${isAnimating ? 'scale-105 opacity-80' : 'scale-100 opacity-100'}`}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
             
-            {/* Floating icon badge */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary flex items-center justify-center shadow-lg animate-fade-in">
-              <StepIcon className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground" />
+            {/* Icon badge */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-md">
+              <StepIcon className="w-4 h-4 text-primary-foreground" />
             </div>
           </div>
 
-          {/* Content section */}
-          <div className="p-4 sm:p-6 space-y-4">
+          {/* Content */}
+          <div className="p-3 space-y-2">
             {/* Step indicator */}
-            <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
               <span className="font-medium text-primary">{currentStep + 1}</span>
               <span>/</span>
               <span>{steps.length}</span>
             </div>
 
             {/* Title and description */}
-            <div className={`text-center space-y-2 transition-all duration-300 ${isAnimating ? 'opacity-50 translate-y-2' : 'opacity-100 translate-y-0'}`}>
-              <h2 className="text-lg sm:text-xl font-bold text-primary">
+            <div className={`text-center space-y-1 transition-all duration-200 ${isAnimating ? 'opacity-50' : 'opacity-100'}`}>
+              <h2 className="text-sm font-semibold text-primary">
                 {step.title}
               </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
+              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                 {step.description}
               </p>
             </div>
 
             {/* Step dots */}
-            <div className="flex items-center justify-center gap-2 py-2">
+            <div className="flex items-center justify-center gap-1.5 py-1">
               {steps.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => !isAnimating && setCurrentStep(index)}
-                  className={`transition-all duration-300 rounded-full ${
+                  className={`transition-all duration-200 rounded-full ${
                     index === currentStep 
-                      ? 'w-6 h-2 bg-primary' 
+                      ? 'w-4 h-1.5 bg-primary' 
                       : index < currentStep
-                        ? 'w-2 h-2 bg-primary/60'
-                        : 'w-2 h-2 bg-muted hover:bg-muted-foreground'
+                        ? 'w-1.5 h-1.5 bg-primary/60'
+                        : 'w-1.5 h-1.5 bg-muted hover:bg-muted-foreground'
                   }`}
                   aria-label={`Go to step ${index + 1}`}
                 />
               ))}
             </div>
 
-            {/* Navigation buttons */}
-            <div className="flex items-center gap-3 pt-2">
+            {/* Navigation */}
+            <div className="flex items-center gap-2 pt-1">
               <Button
                 variant="ghost"
                 onClick={handlePrevious}
                 disabled={currentStep === 0 || isAnimating}
-                className="flex-1 gap-2"
+                className="flex-1 h-7 text-xs"
                 size="sm"
               >
-                <ChevronLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Back</span>
+                <ChevronLeft className="w-3 h-3 mr-1" />
+                Back
               </Button>
 
               <Button
                 onClick={handleNext}
                 disabled={isAnimating}
-                className="flex-1 gap-2"
+                className="flex-1 h-7 text-xs"
                 size="sm"
               >
                 {currentStep === steps.length - 1 ? (
                   <>
                     <span>Get Started</span>
-                    <Sparkles className="w-4 h-4" />
+                    <Sparkles className="w-3 h-3 ml-1" />
                   </>
                 ) : (
                   <>
                     <span>Next</span>
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-3 h-3 ml-1" />
                   </>
                 )}
               </Button>
             </div>
 
-            {/* Skip link */}
+            {/* Skip */}
             <div className="text-center">
               <Button
                 variant="link"
                 onClick={handleSkip}
-                className="text-xs text-muted-foreground hover:text-foreground"
-                size="sm"
+                className="text-[10px] text-muted-foreground hover:text-foreground h-auto p-0"
               >
                 Skip tutorial
               </Button>
