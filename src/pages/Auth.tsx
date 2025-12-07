@@ -510,8 +510,8 @@ const Auth = () => {
               {loading ? "Loading..." : isResettingPassword ? "Update Password" : isForgotPassword ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
             </Button>
 
-            {/* Biometric Login Button - Only show on login screen when passkey exists */}
-            {isLogin && !isForgotPassword && !isResettingPassword && isBiometricSupported && email && hasPasskey(email) && (
+            {/* Biometric Login Button - Only show on login screen */}
+            {isLogin && !isForgotPassword && !isResettingPassword && isBiometricSupported && (
               <>
                 <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
@@ -526,7 +526,7 @@ const Auth = () => {
                   variant="outline"
                   className="w-full"
                   onClick={handleBiometricLogin}
-                  disabled={loading || biometricLoading}
+                  disabled={loading || biometricLoading || !email}
                 >
                   <Fingerprint className="w-4 h-4 mr-2" />
                   {biometricLoading ? "Verifying..." : "Sign in with Biometrics"}
