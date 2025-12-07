@@ -34,54 +34,74 @@ const ActivityLogs = () => {
   const { data: logs, isLoading, refetch } = useQuery({
     queryKey: ['activity-logs', logTypeFilter, limit],
     queryFn: async () => {
-      let queryBuilder = supabase
-        .from('activity_logs' as any)
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(limit);
+      try {
+        let query = supabase
+          .from('activity_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(limit);
 
-      if (logTypeFilter !== 'all') {
-        queryBuilder = queryBuilder.eq('log_type', logTypeFilter);
-      }
-
-      const { data, error } = await queryBuilder;
-      if (error) throw error;
-      
-      const rawData = data as unknown as ActivityLog[];
-      
-      // Fetch user emails separately
-      const logsWithEmails: ActivityLog[] = [];
-      for (const log of (rawData || [])) {
-        let userEmail = 'System';
-        if (log.user_id) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('email')
-            .eq('id', log.user_id)
-            .single();
-          userEmail = profile?.email || 'Unknown';
+        if (logTypeFilter !== 'all') {
+          query = query.eq('log_type', logTypeFilter);
         }
-        logsWithEmails.push({ ...log, user_email: userEmail });
+
+        const { data, error } = await query;
+        if (error) {
+          console.error('Error fetching logs:', error);
+          return [];
+        }
+        
+        if (!data || data.length === 0) {
+          return [];
+        }
+        
+        // Fetch user emails in batch
+        const userIds = [...new Set(data.filter(log => log.user_id).map(log => log.user_id))];
+        const emailMap = new Map<string, string>();
+        
+        if (userIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, email')
+            .in('id', userIds as string[]);
+          
+          profiles?.forEach(p => {
+            if (p.id && p.email) {
+              emailMap.set(p.id, p.email);
+            }
+          });
+        }
+        
+        return data.map(log => ({
+          ...log,
+          user_email: log.user_id ? (emailMap.get(log.user_id) || 'Unknown') : 'System'
+        })) as ActivityLog[];
+      } catch (err) {
+        console.error('Query error:', err);
+        return [];
       }
-      
-      return logsWithEmails;
     },
   });
 
   const handleClearOldLogs = async () => {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    try {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const { error } = await supabase
-      .from('activity_logs' as any)
-      .delete()
-      .lt('created_at', thirtyDaysAgo.toISOString());
+      const { error } = await supabase
+        .from('activity_logs')
+        .delete()
+        .lt('created_at', thirtyDaysAgo.toISOString());
 
-    if (error) {
+      if (error) {
+        toast.error('Failed to clear old logs');
+      } else {
+        toast.success('Cleared logs older than 30 days');
+        refetch();
+      }
+    } catch (err) {
+      console.error('Clear logs error:', err);
       toast.error('Failed to clear old logs');
-    } else {
-      toast.success('Cleared logs older than 30 days');
-      refetch();
     }
   };
 

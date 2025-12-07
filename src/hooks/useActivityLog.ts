@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 
 type LogType = 'admin' | 'user' | 'system' | 'error';
 
@@ -14,14 +15,14 @@ export const logActivity = async (options: LogOptions) => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     
-    const { error } = await supabase.from('activity_logs' as any).insert([{
-      user_id: user?.id,
+    const { error } = await supabase.from('activity_logs').insert([{
+      user_id: user?.id || null,
       log_type: options.logType,
       action: options.action,
-      resource_type: options.resourceType,
-      resource_id: options.resourceId,
-      details: options.details || {},
-      user_agent: navigator.userAgent,
+      resource_type: options.resourceType || null,
+      resource_id: options.resourceId || null,
+      details: (options.details || {}) as Json,
+      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
     }]);
 
     if (error) {
