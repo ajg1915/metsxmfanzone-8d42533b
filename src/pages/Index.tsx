@@ -17,9 +17,8 @@ import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
 import AppInstallSection from "@/components/AppInstallSection";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
-import SectionScrollIndicator from "@/components/SectionScrollIndicator";
 import NotificationPrompt from "@/components/NotificationPrompt";
-import PageTransition from "@/components/PageTransition";
+import ScrollReveal from "@/components/ScrollReveal";
 import { useEffect } from "react";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
 
@@ -39,37 +38,64 @@ const Index = () => {
       </Helmet>
       <Navigation />
       <LiveGameTicker />
-      <PageTransition>
-        <main className="pt-12 sm:pt-14">
-          <Hero />
-          <LiveNotificationBar />
-          <section className="stagger-children">
-            <LiveNetworks className="py-2 sm:py-3" />
-            <LiveStreamsSection />
-          </section>
-          <SectionScrollIndicator className="py-2" />
-          <section className="stagger-children">
-            <SpringTraining className="py-1" />
-            <SectionScrollIndicator />
-            <HomeLineupCard className="py-2 sm:py-3" />
-          </section>
-          <MetsNewsTracker className="py-1" />
-          <SectionScrollIndicator className="py-1" />
-          <section className="stagger-children">
-            <BlogSection className="py-1" />
-            <SectionScrollIndicator className="py-2" />
-            <PodcastSection className="py-1" />
-          </section>
-          <SectionScrollIndicator className="py-1" />
+      <main className="pt-12 sm:pt-14">
+        <Hero />
+        <LiveNotificationBar />
+        
+        <ScrollReveal>
+          <LiveNetworks className="py-2 sm:py-3" />
+        </ScrollReveal>
+        
+        <ScrollReveal delay={100}>
+          <LiveStreamsSection />
+        </ScrollReveal>
+        
+        <div className="section-divider my-6 sm:my-8" />
+        
+        <ScrollReveal>
+          <SpringTraining className="py-4 sm:py-6" />
+        </ScrollReveal>
+        
+        <ScrollReveal delay={100}>
+          <HomeLineupCard className="py-4 sm:py-6" />
+        </ScrollReveal>
+        
+        <div className="section-divider my-6 sm:my-8" />
+        
+        <ScrollReveal>
+          <MetsNewsTracker className="py-4 sm:py-6" />
+        </ScrollReveal>
+        
+        <div className="section-divider my-6 sm:my-8" />
+        
+        <ScrollReveal direction="left">
+          <BlogSection className="py-4 sm:py-6" />
+        </ScrollReveal>
+        
+        <ScrollReveal direction="right" delay={100}>
+          <PodcastSection className="py-4 sm:py-6" />
+        </ScrollReveal>
+        
+        <div className="section-divider my-6 sm:my-8" />
+        
+        <ScrollReveal direction="scale">
           <FAQSection />
-          <SectionScrollIndicator className="py-1" />
+        </ScrollReveal>
+        
+        <ScrollReveal>
           <FeedbackSection />
-          <SectionScrollIndicator />
+        </ScrollReveal>
+        
+        <div className="section-divider my-6 sm:my-8" />
+        
+        <ScrollReveal>
           <AppInstallSection />
-          <SectionScrollIndicator className="py-2" />
+        </ScrollReveal>
+        
+        <ScrollReveal delay={100}>
           <NewsletterSection />
-        </main>
-      </PageTransition>
+        </ScrollReveal>
+      </main>
       <Footer />
       <InstallPrompt />
       <NotificationPrompt />
