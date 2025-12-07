@@ -22,8 +22,8 @@ const HotStoveGuide = () => {
             <img src={logo} alt="MetsXMFanZone" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-3 md:text-xl">MetsXMFanZone Hot Stove </h2>
-          <p className="text-muted-foreground mb-8 text-sm max-w-xl mx-auto">Your source for the latest MetsXMFanZone
- offseason news, trades, and free agent signings.</p>
+          <p className="text-muted-foreground mb-8 max-w-xl mx-auto text-xs">Your source for the latest MetsXMFanZone  
+offseason news, trades, and free agent signings.</p>
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {hotStoveItems.map((item, index) => <Card key={index} className="bg-card/50 border-orange-500/20 hover:border-orange-500/40 transition-colors">
