@@ -68,7 +68,8 @@ serve(async (req) => {
     const helcimResponse = await fetch('https://api.helcim.com/v2/helcim-pay/initialize', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'accept': 'application/json',
+        'content-type': 'application/json',
         'api-token': helcimApiToken,
       },
       body: JSON.stringify({
