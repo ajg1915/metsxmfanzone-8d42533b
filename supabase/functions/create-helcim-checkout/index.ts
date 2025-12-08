@@ -7,8 +7,8 @@ const corsHeaders = {
 };
 
 const PLAN_PRICES = {
-  premium: 9.99,
-  annual: 99.99
+  premium: 12.99,
+  annual: 129.99
 };
 
 serve(async (req) => {
@@ -24,18 +24,18 @@ serve(async (req) => {
       throw new Error('No authorization header');
     }
 
+    // Extract the JWT token from the header
+    const token = authHeader.replace('Bearer ', '');
+    
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: {
-        headers: {
-          Authorization: authHeader,
-        },
-      },
-    });
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    // Use service role key to verify the user
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    console.log('getUser result:', { user: user?.id, error: userError?.message });
+    // Get user from the JWT token
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    console.log('getUser result:', { userId: user?.id, error: userError?.message });
     
     if (userError || !user) {
       console.error('Auth error:', userError);
