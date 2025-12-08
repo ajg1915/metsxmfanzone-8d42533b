@@ -20,21 +20,21 @@ const mainItems = [
 ];
 
 const mediaItems = [
-  { title: "Blog Management", url: "/admin/blog", icon: FileText },
-  { title: "Video Gallery Management", url: "/admin/video-gallery-management", icon: Video },
-  { title: "Podcast Management", url: "/admin/podcasts", icon: Mic },
-  { title: "Newsletter Editor", url: "/admin/newsletter", icon: Mail },
-  { title: "Email Editor", url: "/admin/email-editor", icon: Send },
-  { title: "QR Code Generator", url: "/admin/qr-generator", icon: QrCode },
+  { title: "Blog", url: "/admin/blog", icon: FileText },
+  { title: "Videos", url: "/admin/video-gallery-management", icon: Video },
+  { title: "Podcasts", url: "/admin/podcasts", icon: Mic },
+  { title: "Newsletter", url: "/admin/newsletter", icon: Mail },
+  { title: "Email", url: "/admin/email-editor", icon: Send },
+  { title: "QR Codes", url: "/admin/qr-generator", icon: QrCode },
 ];
 
 const liveManagementItems = [
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
-  { title: "Podcast Live Stream", url: "/admin/podcast-live-stream", icon: Mic },
-  { title: "Stream Replays", url: "/admin/stream-replays", icon: PlaySquare },
-  { title: "Live Notifications", url: "/admin/live-notifications", icon: Bell },
+  { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
+  { title: "Replays", url: "/admin/stream-replays", icon: PlaySquare },
+  { title: "Notifications", url: "/admin/live-notifications", icon: Bell },
   { title: "Stories", url: "/admin/stories", icon: Image },
-  { title: "Mets Live Tracker", url: "/admin/mets-news", icon: TrendingUp },
+  { title: "News Tracker", url: "/admin/mets-news", icon: TrendingUp },
   { title: "TV Schedule", url: "/admin/tv-schedule", icon: Calendar },
   { title: "Events", url: "/admin/events", icon: CalendarDays },
   { title: "Spring Training", url: "/admin/spring-training", icon: Trophy },
@@ -46,7 +46,7 @@ const userItems = [
   { title: "Posts", url: "/admin/posts", icon: FileText },
   { title: "Business Ads", url: "/admin/business-ads", icon: Megaphone },
   { title: "User Roles", url: "/admin/roles", icon: Shield },
-  { title: "User Management", url: "/admin/user-management", icon: UserCog },
+  { title: "Users", url: "/admin/user-management", icon: UserCog },
   { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
 ];
 
@@ -67,25 +67,25 @@ export function AdminSidebar() {
   };
 
   return (
-    <Sidebar className={open ? "w-56 sm:w-60" : "w-0 sm:w-14"} collapsible="icon">
-      <SidebarContent className="gap-1 sm:gap-2 text-sm">
+    <Sidebar collapsible="icon">
+      <SidebarContent className="gap-1 py-2">
         {/* Main Items */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild tooltip={item.title}>
                     <NavLink
                       to={item.url}
                       className={({ isActive: active }) =>
-                        active || isActive(item.url)
+                        `flex items-center gap-2 ${active || isActive(item.url)
                           ? "bg-primary text-primary-foreground font-medium"
-                          : "hover:bg-muted/50"
+                          : "hover:bg-muted/50"}`
                       }
                     >
-                      <item.icon className="h-4 w-4" />
-                      {open && <span>{item.title}</span>}
+                      <item.icon className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -98,16 +98,14 @@ export function AdminSidebar() {
         <SidebarGroup>
           <Collapsible open={mediaOpen} onOpenChange={setMediaOpen}>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1">
+              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1.5">
                 <div className="flex items-center gap-2">
-                  <Film className="h-4 w-4" />
-                  {open && <span>Media</span>}
+                  <Film className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-xs font-medium">Media</span>
                 </div>
-                {open && (
-                  <ChevronDown 
-                    className={`h-4 w-4 transition-transform ${mediaOpen ? "rotate-180" : ""}`}
-                  />
-                )}
+                <ChevronDown 
+                  className={`h-3 w-3 transition-transform flex-shrink-0 ${mediaOpen ? "rotate-180" : ""}`}
+                />
               </CollapsibleTrigger>
             </SidebarGroupLabel>
             <CollapsibleContent>
@@ -115,17 +113,17 @@ export function AdminSidebar() {
                 <SidebarMenu>
                   {mediaItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
+                      <SidebarMenuButton asChild tooltip={item.title}>
                         <NavLink
                           to={item.url}
                           className={({ isActive: active }) =>
-                            active || isActive(item.url)
-                              ? "bg-primary text-primary-foreground font-medium pl-6"
-                              : "hover:bg-muted/50 pl-6"
+                            `flex items-center gap-2 pl-4 ${active || isActive(item.url)
+                              ? "bg-primary text-primary-foreground font-medium"
+                              : "hover:bg-muted/50"}`
                           }
                         >
-                          <item.icon className="h-4 w-4" />
-                          {open && <span className="text-sm">{item.title}</span>}
+                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" />
+                          <span className="text-xs truncate">{item.title}</span>
                         </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -140,16 +138,14 @@ export function AdminSidebar() {
         <SidebarGroup>
           <Collapsible open={liveManagementOpen} onOpenChange={setLiveManagementOpen}>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1">
+              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1.5">
                 <div className="flex items-center gap-2">
-                  <Radio className="h-4 w-4" />
-                  {open && <span>Live Management</span>}
+                  <Radio className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-xs font-medium">Live</span>
                 </div>
-                {open && (
-                  <ChevronDown 
-                    className={`h-4 w-4 transition-transform ${liveManagementOpen ? "rotate-180" : ""}`}
-                  />
-                )}
+                <ChevronDown 
+                  className={`h-3 w-3 transition-transform flex-shrink-0 ${liveManagementOpen ? "rotate-180" : ""}`}
+                />
               </CollapsibleTrigger>
             </SidebarGroupLabel>
             <CollapsibleContent>
@@ -157,17 +153,17 @@ export function AdminSidebar() {
                 <SidebarMenu>
                   {liveManagementItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
+                      <SidebarMenuButton asChild tooltip={item.title}>
                         <NavLink
                           to={item.url}
                           className={({ isActive: active }) =>
-                            active || isActive(item.url)
-                              ? "bg-primary text-primary-foreground font-medium pl-6"
-                              : "hover:bg-muted/50 pl-6"
+                            `flex items-center gap-2 pl-4 ${active || isActive(item.url)
+                              ? "bg-primary text-primary-foreground font-medium"
+                              : "hover:bg-muted/50"}`
                           }
                         >
-                          <item.icon className="h-4 w-4" />
-                          {open && <span className="text-sm">{item.title}</span>}
+                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" />
+                          <span className="text-xs truncate">{item.title}</span>
                         </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -182,16 +178,14 @@ export function AdminSidebar() {
         <SidebarGroup>
           <Collapsible open={userOpen} onOpenChange={setUserOpen}>
             <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1">
+              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1.5">
                 <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  {open && <span>User</span>}
+                  <Users className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-xs font-medium">Users</span>
                 </div>
-                {open && (
-                  <ChevronDown 
-                    className={`h-4 w-4 transition-transform ${userOpen ? "rotate-180" : ""}`}
-                  />
-                )}
+                <ChevronDown 
+                  className={`h-3 w-3 transition-transform flex-shrink-0 ${userOpen ? "rotate-180" : ""}`}
+                />
               </CollapsibleTrigger>
             </SidebarGroupLabel>
             <CollapsibleContent>
@@ -199,17 +193,17 @@ export function AdminSidebar() {
                 <SidebarMenu>
                   {userItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
+                      <SidebarMenuButton asChild tooltip={item.title}>
                         <NavLink
                           to={item.url}
                           className={({ isActive: active }) =>
-                            active || isActive(item.url)
-                              ? "bg-primary text-primary-foreground font-medium pl-6"
-                              : "hover:bg-muted/50 pl-6"
+                            `flex items-center gap-2 pl-4 ${active || isActive(item.url)
+                              ? "bg-primary text-primary-foreground font-medium"
+                              : "hover:bg-muted/50"}`
                           }
                         >
-                          <item.icon className="h-4 w-4" />
-                          {open && <span className="text-sm">{item.title}</span>}
+                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" />
+                          <span className="text-xs truncate">{item.title}</span>
                         </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
