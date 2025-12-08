@@ -57,15 +57,33 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
       return;
     }
 
-    if (plan.id === "free") {
-      onOpenChange(false);
-      navigate("/auth");
-      return;
-    }
-
     setIsProcessing(true);
 
     try {
+      // Handle free plan - create subscription directly
+      if (plan.id === "free") {
+        const { error } = await supabase
+          .from("subscriptions")
+          .insert({
+            user_id: user.id,
+            plan_type: "free",
+            status: "active",
+            amount: 0,
+            currency: "USD",
+            start_date: new Date().toISOString(),
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Welcome!",
+          description: "Your free plan has been activated",
+        });
+        onOpenChange(false);
+        navigate("/");
+        return;
+      }
+
       toast({
         title: "Processing...",
         description: "Creating your payment session",
@@ -250,37 +268,39 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
 
           <Separator />
 
-          {/* Payment Method */}
-          <div>
-            <Label className="text-sm font-medium text-foreground mb-3 block">
-              Payment Method
-            </Label>
-            <RadioGroup
-              value={paymentMethod}
-              onValueChange={(value) => setPaymentMethod(value as "paypal" | "helcim")}
-              className="space-y-2"
-            >
-              <label
-                htmlFor="paypal"
-                className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
+          {/* Payment Method - Only show for paid plans */}
+          {plan.priceValue > 0 && (
+            <div>
+              <Label className="text-sm font-medium text-foreground mb-3 block">
+                Payment Method
+              </Label>
+              <RadioGroup
+                value={paymentMethod}
+                onValueChange={(value) => setPaymentMethod(value as "paypal" | "helcim")}
+                className="space-y-2"
               >
-                <RadioGroupItem value="paypal" id="paypal" />
-                <div className="flex items-center gap-2 flex-1">
-                  <span className="text-sm font-medium">PayPal</span>
-                </div>
-              </label>
-              <label
-                htmlFor="helcim"
-                className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
-              >
-                <RadioGroupItem value="helcim" id="helcim" />
-                <div className="flex items-center gap-2 flex-1">
-                  <CreditCard className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Credit/Debit Card</span>
-                </div>
-              </label>
-            </RadioGroup>
-          </div>
+                <label
+                  htmlFor="paypal"
+                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
+                >
+                  <RadioGroupItem value="paypal" id="paypal" />
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="text-sm font-medium">PayPal</span>
+                  </div>
+                </label>
+                <label
+                  htmlFor="helcim"
+                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
+                >
+                  <RadioGroupItem value="helcim" id="helcim" />
+                  <div className="flex items-center gap-2 flex-1">
+                    <CreditCard className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Credit/Debit Card</span>
+                  </div>
+                </label>
+              </RadioGroup>
+            </div>
+          )}
 
           {/* Subscribe Button */}
           <Button
@@ -289,7 +309,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
             onClick={handleSubscribe}
             disabled={isProcessing}
           >
-            {isProcessing ? "Processing..." : `Pay ${plan.price}`}
+            {isProcessing ? "Processing..." : plan.priceValue === 0 ? "Activate Free Plan" : `Pay ${plan.price}`}
           </Button>
 
           {/* Security Badge */}

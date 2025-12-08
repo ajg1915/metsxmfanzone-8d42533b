@@ -21,10 +21,6 @@ const Plans = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   const handleSelectPlan = (planId: string) => {
-    if (planId === "free") {
-      navigate("/auth");
-      return;
-    }
     setSelectedPlan(planId);
     setCheckoutOpen(true);
   };
