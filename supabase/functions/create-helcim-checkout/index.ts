@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { jwtDecode } from "https://esm.sh/jwt-decode@4.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,27 +21,32 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization');
     console.log('Auth header received:', authHeader ? 'present' : 'missing');
     
-    if (!authHeader) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new Error('No authorization header');
     }
 
-    // Extract the JWT token from the header
+    // Extract and decode the JWT token
     const token = authHeader.replace('Bearer ', '');
+    let userId: string;
     
+    try {
+      const decoded = jwtDecode<{ sub: string }>(token);
+      userId = decoded.sub;
+      console.log('Decoded user ID:', userId);
+    } catch (decodeError) {
+      console.error('JWT decode error:', decodeError);
+      throw new Error('Invalid token');
+    }
+
+    if (!userId) {
+      throw new Error('No user ID in token');
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
-    // Use service role key to verify the user
+    // Use service role key for database operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Get user from the JWT token
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    console.log('getUser result:', { userId: user?.id, error: userError?.message });
-    
-    if (userError || !user) {
-      console.error('Auth error:', userError);
-      throw new Error(`Unauthorized: ${userError?.message || 'No user found'}`);
-    }
 
     const { planType } = await req.json();
     
@@ -56,6 +62,8 @@ serve(async (req) => {
     if (!helcimApiToken) {
       throw new Error('Helcim credentials not configured');
     }
+
+    console.log('Creating Helcim checkout for amount:', amount);
 
     const helcimResponse = await fetch('https://api.helcim.com/v2/helcim-pay/initialize', {
       method: 'POST',
@@ -77,24 +85,26 @@ serve(async (req) => {
     }
 
     const helcimData = await helcimResponse.json();
-    console.log('Helcim response:', helcimData);
+    console.log('Helcim response received');
     
     // Store pending subscription
     const { error: insertError } = await supabase
       .from('subscriptions')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         plan_type: planType,
         status: 'pending',
         amount: amount,
         currency: 'USD',
-        paypal_order_id: helcimData.checkoutToken, // Reusing this field for Helcim checkout token
+        paypal_order_id: helcimData.checkoutToken,
       });
 
     if (insertError) {
       console.error('Error inserting subscription:', insertError);
       throw insertError;
     }
+
+    console.log('Subscription created successfully');
 
     return new Response(
       JSON.stringify({
