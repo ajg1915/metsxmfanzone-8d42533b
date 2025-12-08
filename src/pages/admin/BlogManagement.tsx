@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit, Trash2, FileText, Sparkles, Upload, Music } from "lucide-react";
+import { Plus, Edit, Trash2, FileText, Sparkles, Upload, Music, Copy } from "lucide-react";
 import { z } from "zod";
 
 const blogPostSchema = z.object({
@@ -383,6 +383,32 @@ export default function BlogManagement() {
     });
   };
 
+  const handleCopyForSharing = async (post: BlogPost) => {
+    // Format content for sharing on other platforms
+    const shareContent = `${post.title}
+
+${post.excerpt || ""}
+
+${post.content}
+
+${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
+`.trim();
+
+    try {
+      await navigator.clipboard.writeText(shareContent);
+      toast({
+        title: "Copied!",
+        description: "Article copied to clipboard - ready to paste on other platforms",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -613,6 +639,9 @@ export default function BlogManagement() {
                     )}
                   </div>
                   <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handleCopyForSharing(post)} title="Copy for sharing">
+                      <Copy className="w-4 h-4" />
+                    </Button>
                     <Button variant="outline" size="sm" onClick={() => handleEdit(post)}>
                       <Edit className="w-4 h-4" />
                     </Button>
