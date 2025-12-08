@@ -202,68 +202,48 @@ const UserManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
       <Card>
-        <CardHeader>
-          <CardTitle className="text-primary">User Management</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">User Management</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
+        <CardContent className="px-2 sm:px-6">
+          <div className="overflow-x-auto -mx-2 sm:mx-0">
+            <Table className="text-xs sm:text-sm">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Current Plan</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>End Date</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-xs">Email</TableHead>
+                  <TableHead className="text-xs hidden sm:table-cell">Plan</TableHead>
+                  <TableHead className="text-xs hidden sm:table-cell">Status</TableHead>
+                  <TableHead className="text-xs hidden md:table-cell">End</TableHead>
+                  <TableHead className="text-xs">Plan</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {users.map((userRow) => (
                   <TableRow key={userRow.user_id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium max-w-[120px] sm:max-w-none truncate text-xs">
                       {userRow.email || "No email"}
                     </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          userRow.plan_type === "free"
-                            ? "outline"
-                            : userRow.plan_type === "annual"
-                            ? "default"
-                            : "secondary"
-                        }
-                      >
+                    <TableCell className="hidden sm:table-cell">
+                      <Badge variant={userRow.plan_type === "free" ? "outline" : "secondary"} className="text-xs">
                         {userRow.plan_type}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          userRow.status === "active"
-                            ? "default"
-                            : userRow.status === "cancelled"
-                            ? "destructive"
-                            : "outline"
-                        }
-                      >
+                    <TableCell className="hidden sm:table-cell">
+                      <Badge variant={userRow.status === "active" ? "default" : "outline"} className="text-xs">
                         {userRow.status || "none"}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      {userRow.end_date
-                        ? new Date(userRow.end_date).toLocaleDateString()
-                        : "N/A"}
+                    <TableCell className="hidden md:table-cell text-xs">
+                      {userRow.end_date ? new Date(userRow.end_date).toLocaleDateString() : "-"}
                     </TableCell>
                     <TableCell>
                       <Select
                         value={userRow.plan_type}
-                        onValueChange={(value) =>
-                          updateUserPlan(userRow.user_id, value)
-                        }
+                        onValueChange={(value) => updateUserPlan(userRow.user_id, value)}
                       >
-                        <SelectTrigger className="w-32">
+                        <SelectTrigger className="w-20 sm:w-24 h-7 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>

@@ -102,106 +102,58 @@ const PodcastLiveStreamManagement = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-primary mb-2">Podcast Live Stream Management</h1>
-        <p className="text-muted-foreground">
-          Configure your VDO.Ninja live stream for the Live page
-        </p>
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
+      <div>
+        <h1 className="text-lg sm:text-xl font-bold">Podcast Stream</h1>
+        <p className="text-xs text-muted-foreground">VDO.Ninja configuration</p>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Radio className="w-5 h-5" />
-            VDO.Ninja Stream Configuration
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-1.5">
+            <Radio className="w-3.5 h-3.5" />
+            Stream Settings
           </CardTitle>
-          <CardDescription>
-            Set up your live podcast stream using VDO.Ninja. The stream will appear on the Live page when enabled.
-          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="title">Stream Title</Label>
+        <CardContent className="space-y-3 px-3">
+          <div className="space-y-1">
+            <Label className="text-xs">Stream Title</Label>
             <Input
-              id="title"
               value={stream.title}
               onChange={(e) => setStream({ ...stream, title: e.target.value })}
-              placeholder="Enter stream title"
+              className="h-8 text-xs"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={stream.description || ""}
-              onChange={(e) => setStream({ ...stream, description: e.target.value })}
-              placeholder="Enter stream description"
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="vdo_ninja_url">VDO.Ninja Stream URL</Label>
+          <div className="space-y-1">
+            <Label className="text-xs">VDO.Ninja URL</Label>
             <Input
-              id="vdo_ninja_url"
               value={stream.vdo_ninja_url || ""}
               onChange={(e) => setStream({ ...stream, vdo_ninja_url: e.target.value })}
-              placeholder="https://vdo.ninja/?view=XXXXX or ?push=XXXXX&room=XXXXX"
+              placeholder="https://vdo.ninja/?view=XXXXX"
+              className="h-8 text-xs"
             />
-            <p className="text-sm text-muted-foreground">
-              Enter your VDO.Ninja viewer URL (e.g., https://vdo.ninja/?view=XXXXX)
-            </p>
           </div>
 
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div className="space-y-0.5">
-              <Label htmlFor="is_live">Live Status</Label>
-              <p className="text-sm text-muted-foreground">
-                Enable this to show the stream on the Live page
-              </p>
+          <div className="flex items-center justify-between p-2 border rounded-lg">
+            <div>
+              <Label className="text-xs">Live Status</Label>
+              <p className="text-[10px] text-muted-foreground">Show on Live page</p>
             </div>
             <Switch
-              id="is_live"
               checked={stream.is_live}
               onCheckedChange={(checked) => setStream({ ...stream, is_live: checked })}
             />
           </div>
 
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={fetchStream} disabled={saving}>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={fetchStream} disabled={saving} className="h-8 text-xs">
               Reset
             </Button>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Save Changes
+            <Button onClick={handleSave} disabled={saving} size="sm" className="h-8 text-xs">
+              {saving && <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />}
+              Save
             </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>How to Use VDO.Ninja</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h4 className="font-semibold mb-2">Broadcasting Steps:</h4>
-            <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Go to <a href="https://vdo.ninja" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">vdo.ninja</a></li>
-              <li>Create a room or use an existing room ID</li>
-              <li>Share your camera/screen using the push link</li>
-              <li>Copy the viewer URL (e.g., https://vdo.ninja/?view=XXXXX)</li>
-              <li>Paste the viewer URL in the field above</li>
-              <li>Enable "Live Status" to show the stream</li>
-            </ol>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-2">Viewer Experience:</h4>
-            <p className="text-sm text-muted-foreground">
-              When live, viewers will see the embedded VDO.Ninja stream on the Live page with low latency via WebRTC.
-            </p>
           </div>
         </CardContent>
       </Card>

@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2, Plus, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -141,158 +142,102 @@ const TVScheduleManagement = () => {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
       <div>
-        <h1 className="text-3xl font-bold text-primary mb-2">TV Schedule Management</h1>
-        <p className="text-muted-foreground">
-          Manage TV schedules for ESPN Network and MLB Network
-        </p>
+        <h1 className="text-lg sm:text-xl font-bold">TV Schedule</h1>
+        <p className="text-xs text-muted-foreground">ESPN & MLB Networks</p>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="w-5 h-5" />
-            Add New Schedule
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-1.5">
+            <Plus className="w-3.5 h-3.5" />
+            Add Schedule
           </CardTitle>
-          <CardDescription>Add a new show to the TV schedule</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="network">Network</Label>
-              <Select
-                value={formData.network}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, network: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select network" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ESPN Network">ESPN Network</SelectItem>
-                  <SelectItem value="MLB Network">MLB Network</SelectItem>
-                </SelectContent>
-              </Select>
+        <CardContent className="px-3">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Network</Label>
+                <Select
+                  value={formData.network}
+                  onValueChange={(value) => setFormData({ ...formData, network: value })}
+                >
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ESPN Network">ESPN</SelectItem>
+                    <SelectItem value="MLB Network">MLB</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Time Slot</Label>
+                <Input
+                  placeholder="7:00 PM ET"
+                  value={formData.time_slot}
+                  onChange={(e) => setFormData({ ...formData, time_slot: e.target.value })}
+                  className="h-8 text-xs"
+                  required
+                />
+              </div>
             </div>
-
             <div>
-              <Label htmlFor="show_title">Show Title</Label>
+              <Label className="text-xs">Show Title</Label>
               <Input
-                id="show_title"
                 value={formData.show_title}
-                onChange={(e) =>
-                  setFormData({ ...formData, show_title: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, show_title: e.target.value })}
+                className="h-8 text-xs"
                 required
               />
             </div>
-
-            <div>
-              <Label htmlFor="time_slot">Time Slot</Label>
-              <Input
-                id="time_slot"
-                placeholder="e.g., 7:00 PM ET"
-                value={formData.time_slot}
-                onChange={(e) =>
-                  setFormData({ ...formData, time_slot: e.target.value })
-                }
-                required
-              />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={formData.is_live}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_live: checked })}
+                />
+                <Label className="text-xs">Live</Label>
+              </div>
+              <Button type="submit" size="sm" className="h-8 text-xs">
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                Add
+              </Button>
             </div>
-
-            <div>
-              <Label htmlFor="description">Description (Optional)</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                rows={3}
-              />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_live"
-                checked={formData.is_live}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, is_live: checked })
-                }
-              />
-              <Label htmlFor="is_live">Currently Live</Label>
-            </div>
-
-            <Button type="submit" className="w-full">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Schedule
-            </Button>
           </form>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            Current Schedules
-          </CardTitle>
-          <CardDescription>
-            {schedules.length} schedule{schedules.length !== 1 ? "s" : ""} total
-          </CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">{schedules.length} Schedules</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-3">
           {schedules.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              No schedules found. Add your first TV schedule above.
-            </p>
+            <p className="text-center text-muted-foreground text-xs py-6">No schedules</p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-2">
               {schedules.map((schedule) => (
-                <Card key={schedule.id}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-lg">
-                            {schedule.show_title}
-                          </h3>
-                          <span className="text-sm text-muted-foreground">
-                            ({schedule.network})
-                          </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Time: {schedule.time_slot}
-                        </p>
-                        {schedule.description && (
-                          <p className="text-sm">{schedule.description}</p>
-                        )}
-                        <div className="flex items-center gap-4 mt-4">
-                          <div className="flex items-center space-x-2">
-                            <Switch
-                              checked={schedule.is_live}
-                              onCheckedChange={() =>
-                                toggleLiveStatus(schedule.id, schedule.is_live)
-                              }
-                            />
-                            <Label>
-                              {schedule.is_live ? "Live Now" : "Not Live"}
-                            </Label>
-                          </div>
-                        </div>
-                      </div>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => handleDelete(schedule.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                <div key={schedule.id} className="flex items-center justify-between p-2 border rounded-lg">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="font-medium text-sm truncate">{schedule.show_title}</span>
+                      <Badge variant="outline" className="text-[10px] px-1">{schedule.network.replace(" Network", "")}</Badge>
                     </div>
-                  </CardContent>
-                </Card>
+                    <p className="text-xs text-muted-foreground">{schedule.time_slot}</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Switch
+                      checked={schedule.is_live}
+                      onCheckedChange={() => toggleLiveStatus(schedule.id, schedule.is_live)}
+                    />
+                    <Button variant="destructive" size="sm" className="h-7 w-7 p-0" onClick={() => handleDelete(schedule.id)}>
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
               ))}
             </div>
           )}

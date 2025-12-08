@@ -298,14 +298,14 @@ export default function VideoGalleryManagement() {
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-7xl">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Video Gallery Management</h1>
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
+      <div className="flex justify-between items-center">
+        <h1 className="text-lg sm:text-xl font-bold">Video Gallery</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Video
+            <Button onClick={resetForm} size="sm" className="h-8 text-xs">
+              <Plus className="mr-1 h-3.5 w-3.5" />
+              Add
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -492,7 +492,7 @@ export default function VideoGalleryManagement() {
         </Dialog>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {videos.map((video) => (
           <Card key={video.id}>
             <CardHeader>

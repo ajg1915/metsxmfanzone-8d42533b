@@ -143,11 +143,11 @@ const LiveNotificationManagement = () => {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
       <div>
-        <h2 className="text-3xl font-bold">Live Notification Management</h2>
-        <p className="text-muted-foreground">
-          Manage live notifications that appear at the top of the site
+        <h2 className="text-lg sm:text-xl font-bold">Live Notifications</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground">
+          Manage live notifications
         </p>
       </div>
 
@@ -208,31 +208,28 @@ const LiveNotificationManagement = () => {
           notifications.map((notification) => (
             <Card key={notification.id}>
               <CardContent className="pt-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 space-y-2">
-                    <p className="font-medium">{notification.message}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Link: {notification.link_url}
+              <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <p className="text-sm font-medium break-words">{notification.message}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {notification.link_url}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        checked={notification.is_active}
-                        onCheckedChange={() =>
-                          toggleActive(notification.id, notification.is_active)
-                        }
-                      />
-                      <Label className="text-sm">
-                        {notification.is_active ? "Active" : "Inactive"}
-                      </Label>
-                    </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Switch
+                      checked={notification.is_active}
+                      onCheckedChange={() =>
+                        toggleActive(notification.id, notification.is_active)
+                      }
+                    />
+                    <span className="text-xs w-12">{notification.is_active ? "On" : "Off"}</span>
                     <Button
                       variant="destructive"
-                      size="icon"
+                      size="sm"
+                      className="h-7 w-7 p-0"
                       onClick={() => deleteNotification(notification.id)}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </Button>
                   </div>
                 </div>

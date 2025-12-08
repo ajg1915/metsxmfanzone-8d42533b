@@ -386,21 +386,21 @@ export default function MetsNewsTrackerManagement() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
-      <h1 className="text-3xl font-bold">Content Management</h1>
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
+      <h1 className="text-lg sm:text-xl font-bold">Content</h1>
       
-      <Tabs defaultValue="news" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="news">News Tracker</TabsTrigger>
-          <TabsTrigger value="blog">Blog Posts</TabsTrigger>
+      <Tabs defaultValue="news" className="space-y-4">
+        <TabsList className="h-8">
+          <TabsTrigger value="news" className="text-xs h-7">News</TabsTrigger>
+          <TabsTrigger value="blog" className="text-xs h-7">Blog</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="news" className="space-y-6">
+        <TabsContent value="news" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">Mets Live Tracker</h2>
-            <Button onClick={() => setShowForm(!showForm)}>
-              {showForm ? <X className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-              {showForm ? "Cancel" : "Add News Item"}
+            <h2 className="text-base font-semibold">Live Tracker</h2>
+            <Button onClick={() => setShowForm(!showForm)} size="sm" className="h-8 text-xs">
+              {showForm ? <X className="w-3.5 h-3.5 mr-1" /> : <Plus className="w-3.5 h-3.5 mr-1" />}
+              {showForm ? "Cancel" : "Add"}
             </Button>
           </div>
 

@@ -122,15 +122,13 @@ export default function BusinessAdsManagement() {
   }
 
   return (
-    <div className="container mx-auto max-w-6xl px-3 sm:px-4 py-4 sm:py-6">
-      <div className="mb-4 sm:mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold mb-1">Business Advertisement Management</h2>
-        <p className="text-xs sm:text-sm text-muted-foreground">
-          Review and approve business ad submissions
-        </p>
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
+      <div>
+        <h2 className="text-lg sm:text-xl font-bold">Business Ads</h2>
+        <p className="text-xs text-muted-foreground">Review submissions</p>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {ads.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">

@@ -171,12 +171,10 @@ export default function PodcastManagement() {
 
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
       <div>
-        <h1 className="text-3xl font-bold">Podcast Management</h1>
-        <p className="text-muted-foreground mt-2">
-          Upload and manage MetsXMFanZone podcast episodes
-        </p>
+        <h1 className="text-lg sm:text-xl font-bold">Podcasts</h1>
+        <p className="text-xs text-muted-foreground">Manage episodes</p>
       </div>
 
       <Card>
@@ -244,38 +242,30 @@ export default function PodcastManagement() {
         <CardContent>
           <div className="space-y-4">
             {podcasts.map((podcast) => (
-              <div
-                key={podcast.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
-              >
-                <div className="flex-1">
-                  <h3 className="font-semibold">{podcast.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {podcast.description}
-                  </p>
-                  <audio controls className="mt-2 w-full max-w-md">
-                    <source src={podcast.audio_url} type="audio/mpeg" />
-                  </audio>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor={`published-${podcast.id}`}>Published</Label>
-                    <Switch
-                      id={`published-${podcast.id}`}
-                      checked={podcast.published}
-                      onCheckedChange={() =>
-                        togglePublished(podcast.id, podcast.published)
-                      }
-                    />
+              <div key={podcast.id} className="p-3 border rounded-lg space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-sm truncate">{podcast.title}</h3>
+                    <p className="text-xs text-muted-foreground line-clamp-2">{podcast.description}</p>
                   </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => deletePodcast(podcast.id, podcast.audio_url)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Switch
+                      checked={podcast.published}
+                      onCheckedChange={() => togglePublished(podcast.id, podcast.published)}
+                    />
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="h-7 w-7 p-0"
+                      onClick={() => deletePodcast(podcast.id, podcast.audio_url)}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
                 </div>
+                <audio controls className="w-full h-8">
+                  <source src={podcast.audio_url} type="audio/mpeg" />
+                </audio>
               </div>
             ))}
           </div>
