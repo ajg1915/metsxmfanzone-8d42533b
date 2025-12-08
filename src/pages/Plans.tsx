@@ -1,113 +1,32 @@
 import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, ChevronDown, ChevronUp, Tag, X } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import CheckoutModal from "@/components/CheckoutModal";
 
 const Plans = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "helcim">("paypal");
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [showPromoCode, setShowPromoCode] = useState(false);
-  const [promoCode, setPromoCode] = useState("");
-  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
-  const handleSubscribe = async (planType: string) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to subscribe",
-        variant: "destructive",
-      });
+  const handleSelectPlan = (planId: string) => {
+    if (planId === "free") {
       navigate("/auth");
       return;
     }
-
-    try {
-      toast({
-        title: "Processing...",
-        description: "Creating your payment session",
-      });
-
-      if (paymentMethod === "paypal") {
-        const { data, error } = await supabase.functions.invoke("create-paypal-order", {
-          body: { planType, promoCode: appliedPromo },
-        });
-
-        if (error) throw error;
-
-        if (data?.orderId && data?.approvalUrl) {
-          window.location.href = data.approvalUrl;
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to create payment session. Please try again.",
-            variant: "destructive",
-          });
-        }
-      } else {
-        const { data, error } = await supabase.functions.invoke("create-helcim-checkout", {
-          body: { planType, promoCode: appliedPromo },
-        });
-
-        if (error) throw error;
-
-        if (data?.checkoutToken && data?.secretToken) {
-          sessionStorage.setItem("helcim_checkout_token", data.checkoutToken);
-          sessionStorage.setItem("helcim_secret_token", data.secretToken);
-          navigate(`/helcim-checkout?token=${data.checkoutToken}`);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to get payment tokens. Please try again.",
-            variant: "destructive",
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error creating payment:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to initiate payment. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleApplyPromo = () => {
-    if (promoCode.trim()) {
-      setAppliedPromo(promoCode.trim().toUpperCase());
-      toast({
-        title: "Promo Code Applied",
-        description: `Code "${promoCode.toUpperCase()}" has been applied`,
-      });
-      setShowPromoCode(false);
-    }
-  };
-
-  const handleRemovePromo = () => {
-    setAppliedPromo(null);
-    setPromoCode("");
+    setSelectedPlan(planId);
+    setCheckoutOpen(true);
   };
 
   const plans = [
@@ -218,274 +137,99 @@ const Plans = () => {
       </Helmet>
       <Navigation />
       <main className="pt-16">
-        <section className="py-8 sm:py-12">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+        <section className="py-8 sm:py-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
             {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
+            <div className="text-center mb-10">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
                 Choose Your Plan
               </h1>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
                 Get unlimited access to live games, replays, highlights, and exclusive Mets content
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-5 gap-6 lg:gap-8">
-              {/* Plans Selection - Left Side */}
-              <div className="lg:col-span-3 space-y-4">
-                {plans.map((plan) => (
-                  <Card
-                    key={plan.id}
-                    className={`cursor-pointer transition-all ${
-                      selectedPlan === plan.id
-                        ? "border-primary ring-2 ring-primary/20"
-                        : "border-border hover:border-primary/50"
-                    } ${plan.popular ? "relative" : ""}`}
-                    onClick={() => setSelectedPlan(plan.id)}
-                  >
-                    {plan.popular && (
-                      <Badge className="absolute -top-2 left-4 bg-primary text-primary-foreground text-xs">
-                        MOST POPULAR
-                      </Badge>
-                    )}
-                    <CardContent className="p-4 sm:p-5">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-start gap-3">
-                          <div
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 flex-shrink-0 ${
-                              selectedPlan === plan.id
-                                ? "border-primary bg-primary"
-                                : "border-muted-foreground"
-                            }`}
-                          >
-                            {selectedPlan === plan.id && (
-                              <Check className="w-3 h-3 text-primary-foreground" />
-                            )}
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-foreground text-base sm:text-lg">
-                              {plan.name}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">{plan.description}</p>
-                            {plan.billingNote && (
-                              <p className="text-xs text-muted-foreground mt-1">{plan.billingNote}</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <p className="text-lg sm:text-xl font-bold text-foreground">{plan.price}</p>
-                          <p className="text-xs text-muted-foreground">{plan.period}</p>
-                        </div>
+            {/* Plans Grid */}
+            <div className="grid md:grid-cols-3 gap-6 mb-16">
+              {plans.map((plan) => (
+                <Card
+                  key={plan.id}
+                  className={`relative transition-all hover:shadow-lg ${
+                    plan.popular ? "border-primary ring-2 ring-primary/20" : "border-border"
+                  }`}
+                >
+                  {plan.popular && (
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
+                      MOST POPULAR
+                    </Badge>
+                  )}
+                  <CardContent className="p-6 pt-8">
+                    <div className="text-center mb-6">
+                      <h3 className="text-xl font-semibold text-foreground mb-2">{plan.name}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
+                      <div className="mb-2">
+                        <span className="text-4xl font-bold text-foreground">{plan.price}</span>
+                        <span className="text-muted-foreground ml-1">/{plan.period === "forever" ? "forever" : plan.period.replace("per ", "")}</span>
                       </div>
-
-                      {/* Expandable Features */}
-                      {selectedPlan === plan.id && (
-                        <div className="mt-4 pt-4 border-t border-border">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {plan.features.map((feature, idx) => (
-                              <div key={idx} className="flex items-center gap-2">
-                                <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                                <span className="text-sm text-foreground">{feature}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                      {plan.billingNote && (
+                        <p className="text-xs text-muted-foreground">{plan.billingNote}</p>
                       )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Checkout Summary - Right Side */}
-              <div className="lg:col-span-2">
-                <Card className="sticky top-24 border-border bg-card">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg text-foreground">MetsXMFanZone</CardTitle>
-                      <Collapsible open={showDetails} onOpenChange={setShowDetails}>
-                        <CollapsibleTrigger className="text-sm text-primary flex items-center gap-1 hover:underline">
-                          Details
-                          {showDetails ? (
-                            <ChevronUp className="w-4 h-4" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4" />
-                          )}
-                        </CollapsibleTrigger>
-                      </Collapsible>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {selectedPlanData ? (
-                      <>
-                        {/* Plan Summary */}
-                        <div className="text-center py-2">
-                          <p className="text-sm text-muted-foreground">Subscribe to {selectedPlanData.name}</p>
-                          <p className="text-3xl font-bold text-foreground mt-1">
-                            {selectedPlanData.price}
-                            <span className="text-base font-normal text-muted-foreground ml-1">
-                              {selectedPlanData.period}
-                            </span>
-                          </p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {selectedPlanData.name} Plan ({selectedPlanData.billingNote || "One-time"})
-                          </p>
+
+                    <Button
+                      className="w-full mb-6"
+                      variant={plan.popular ? "default" : "outline"}
+                      onClick={() => handleSelectPlan(plan.id)}
+                    >
+                      {plan.cta}
+                    </Button>
+
+                    <div className="space-y-3">
+                      {plan.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-foreground">{feature}</span>
                         </div>
-
-                        {/* Expandable Details */}
-                        <Collapsible open={showDetails} onOpenChange={setShowDetails}>
-                          <CollapsibleContent className="space-y-3">
-                            <div className="border-t border-border pt-3 space-y-2">
-                              <div className="flex justify-between text-sm">
-                                <span className="text-foreground">{selectedPlanData.name}</span>
-                                <span className="text-foreground">{selectedPlanData.price}</span>
-                              </div>
-                              <p className="text-xs text-muted-foreground">
-                                {selectedPlanData.billingNote || "Free forever"}
-                              </p>
-                            </div>
-                          </CollapsibleContent>
-                        </Collapsible>
-
-                        {/* Promo Code Section */}
-                        <div className="border-t border-border pt-3">
-                          {appliedPromo ? (
-                            <div className="flex items-center justify-between bg-primary/10 p-2 rounded-lg">
-                              <div className="flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-primary" />
-                                <span className="text-sm font-medium text-primary">{appliedPromo}</span>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleRemovePromo}
-                                className="h-6 w-6 p-0"
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          ) : showPromoCode ? (
-                            <div className="space-y-2">
-                              <div className="flex gap-2">
-                                <Input
-                                  placeholder="Enter code"
-                                  value={promoCode}
-                                  onChange={(e) => setPromoCode(e.target.value)}
-                                  className="h-9 text-sm"
-                                />
-                                <Button size="sm" onClick={handleApplyPromo} className="h-9 px-3">
-                                  Apply
-                                </Button>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setShowPromoCode(false)}
-                                className="text-xs text-muted-foreground"
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setShowPromoCode(true)}
-                              className="w-full justify-start text-sm"
-                            >
-                              <Tag className="w-4 h-4 mr-2" />
-                              Add promotion code
-                            </Button>
-                          )}
-                        </div>
-
-                        {/* Subtotal */}
-                        <div className="border-t border-border pt-3 space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Subtotal</span>
-                            <span className="text-foreground">{selectedPlanData.price}</span>
-                          </div>
-                          <div className="flex justify-between font-semibold text-base">
-                            <span className="text-foreground">Total due today</span>
-                            <span className="text-foreground">{selectedPlanData.price}</span>
-                          </div>
-                        </div>
-
-                        {/* Payment Method */}
-                        <div className="border-t border-border pt-3">
-                          <p className="text-sm font-medium text-foreground mb-3">Payment Method</p>
-                          <RadioGroup
-                            value={paymentMethod}
-                            onValueChange={(value) => setPaymentMethod(value as "paypal" | "helcim")}
-                            className="space-y-2"
-                          >
-                            <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer">
-                              <RadioGroupItem value="paypal" id="paypal" />
-                              <Label htmlFor="paypal" className="text-sm cursor-pointer flex-1">
-                                PayPal
-                              </Label>
-                            </div>
-                            <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer">
-                              <RadioGroupItem value="helcim" id="helcim" />
-                              <Label htmlFor="helcim" className="text-sm cursor-pointer flex-1">
-                                Credit/Debit Card
-                              </Label>
-                            </div>
-                          </RadioGroup>
-                        </div>
-
-                        {/* Subscribe Button */}
-                        <Button
-                          className="w-full"
-                          size="lg"
-                          onClick={() => {
-                            if (selectedPlanData.id === "free") {
-                              navigate("/auth");
-                            } else {
-                              handleSubscribe(selectedPlanData.id);
-                            }
-                          }}
-                        >
-                          {selectedPlanData.cta}
-                        </Button>
-                      </>
-                    ) : (
-                      <div className="text-center py-8">
-                        <p className="text-muted-foreground">Select a plan to continue</p>
-                      </div>
-                    )}
+                      ))}
+                    </div>
                   </CardContent>
                 </Card>
-              </div>
+              ))}
             </div>
 
-            {/* FAQs Section - Clean accordion style like the screenshot */}
-            <div className="mt-12 sm:mt-16">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground text-center mb-6 sm:mb-8">
+            {/* FAQs Section */}
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground text-center mb-8">
                 Frequently Asked Questions
               </h2>
-              <div className="max-w-3xl mx-auto">
-                <Accordion type="single" collapsible className="w-full space-y-0">
-                  {faqs.map((faq, index) => (
-                    <AccordionItem
-                      key={index}
-                      value={`item-${index}`}
-                      className="border-b border-border py-1"
-                    >
-                      <AccordionTrigger className="text-left text-base sm:text-lg font-medium text-foreground hover:no-underline py-4">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground text-sm sm:text-base pb-4">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </div>
+              <Accordion type="single" collapsible className="w-full">
+                {faqs.map((faq, index) => (
+                  <AccordionItem
+                    key={index}
+                    value={`item-${index}`}
+                    className="border-b border-border"
+                  >
+                    <AccordionTrigger className="text-left text-base sm:text-lg font-medium text-foreground hover:no-underline py-4">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground text-sm sm:text-base pb-4">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           </div>
         </section>
       </main>
       <Footer />
+
+      {/* Checkout Modal */}
+      <CheckoutModal
+        open={checkoutOpen}
+        onOpenChange={setCheckoutOpen}
+        plan={selectedPlanData || null}
+      />
     </div>
   );
 };
