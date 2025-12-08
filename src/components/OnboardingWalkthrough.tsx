@@ -96,14 +96,14 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
 
   const handleComplete = () => {
     sessionStorage.setItem('tutorialDismissed', 'true');
-    setOpen(false);
     onComplete();
+    setOpen(false);
   };
 
   const handleSkip = () => {
     sessionStorage.setItem('tutorialDismissed', 'true');
-    setOpen(false);
     onComplete();
+    setOpen(false);
   };
 
   if (loading || steps.length === 0) {
