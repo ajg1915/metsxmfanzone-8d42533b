@@ -61,26 +61,26 @@ export function AdminLayout() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+    <SidebarProvider defaultOpen={false}>
+      <div className="min-h-screen flex w-full overflow-x-hidden">
         <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          <header className="h-11 border-b flex items-center justify-between px-3 bg-background/95 backdrop-blur-sm">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="h-7 w-7" />
-              <h1 className="text-sm font-semibold">Admin Portal</h1>
+        <div className="flex-1 flex flex-col min-w-0 w-full">
+          <header className="h-11 border-b flex items-center justify-between px-2 sm:px-3 bg-background/95 backdrop-blur-sm sticky top-0 z-10">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <SidebarTrigger className="h-7 w-7 flex-shrink-0" />
+              <h1 className="text-xs sm:text-sm font-semibold truncate">Admin</h1>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigate("/")}
-              className="h-7 text-xs px-2.5"
+              className="h-7 text-xs px-2 flex-shrink-0"
             >
-              <Home className="w-3.5 h-3.5 mr-1" />
-              Back to Site
+              <Home className="w-3.5 h-3.5 sm:mr-1" />
+              <span className="hidden sm:inline">Back to Site</span>
             </Button>
           </header>
-          <main className="flex-1 overflow-auto p-3 [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base [&_.container]:px-2 [&_.container]:py-3 [&_.container]:max-w-full">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto p-2 sm:p-3 [&_h1]:text-lg [&_h1]:sm:text-xl [&_h2]:text-base [&_h2]:sm:text-lg [&_h3]:text-sm [&_h3]:sm:text-base [&_.container]:px-0 [&_.container]:sm:px-2 [&_.container]:py-2 [&_.container]:sm:py-3 [&_.container]:max-w-full">
             <Outlet />
           </main>
         </div>

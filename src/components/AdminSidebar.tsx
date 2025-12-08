@@ -67,8 +67,8 @@ export function AdminSidebar() {
   };
 
   return (
-    <Sidebar className={open ? "w-60" : "w-14"} collapsible="icon">
-      <SidebarContent className="gap-2">
+    <Sidebar className={open ? "w-56 sm:w-60" : "w-0 sm:w-14"} collapsible="icon">
+      <SidebarContent className="gap-1 sm:gap-2 text-sm">
         {/* Main Items */}
         <SidebarGroup>
           <SidebarGroupContent>
