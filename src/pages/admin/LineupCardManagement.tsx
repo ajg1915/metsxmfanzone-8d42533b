@@ -149,12 +149,12 @@ export default function LineupCardManagement() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Lineup Card Management</h1>
-        <Button onClick={resetForm} variant="outline">
-          <Plus className="w-4 h-4 mr-2" />
-          New Lineup Card
+        <h1 className="text-lg sm:text-xl font-bold">Lineup Cards</h1>
+        <Button onClick={resetForm} variant="outline" size="sm" className="h-8 text-xs">
+          <Plus className="w-3.5 h-3.5 mr-1" />
+          New
         </Button>
       </div>
 
@@ -162,8 +162,8 @@ export default function LineupCardManagement() {
         <CardHeader>
           <CardTitle>{editingId ? "Edit" : "Create"} Lineup Card</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
+        <CardContent className="space-y-3 px-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <Label>Game Date</Label>
               <Input
@@ -186,9 +186,9 @@ export default function LineupCardManagement() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <Label>Opponent</Label>
+              <Label className="text-xs">Opponent</Label>
               <Input
                 placeholder="Atlanta Braves"
                 value={formData.opponent}
@@ -224,43 +224,28 @@ export default function LineupCardManagement() {
             <h3 className="font-semibold mb-4">Batting Order</h3>
             <div className="space-y-3">
               {lineup.map((player, index) => (
-                <div key={index} className="space-y-2 p-3 border rounded-lg">
-                  <div className="grid grid-cols-12 gap-2">
-                    <div className="col-span-1 flex items-center justify-center font-bold text-primary">
-                      {player.position}
-                    </div>
-                    <div className="col-span-6">
-                      <Input
-                        placeholder="Player Name"
-                        value={player.name}
-                        onChange={(e) => {
-                          const newLineup = [...lineup];
-                          newLineup[index].name = e.target.value;
-                          setLineup(newLineup);
-                        }}
-                      />
-                    </div>
-                    <div className="col-span-5">
-                      <Input
-                        placeholder="Position (e.g., CF)"
-                        value={player.fieldPosition}
-                        onChange={(e) => {
-                          const newLineup = [...lineup];
-                          newLineup[index].fieldPosition = e.target.value;
-                          setLineup(newLineup);
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="pl-7">
+                <div key={index} className="p-2 border rounded-lg space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 text-center font-bold text-primary text-sm">{player.position}</span>
                     <Input
-                      placeholder="Player Image URL"
-                      value={player.imageUrl || ""}
+                      placeholder="Player"
+                      value={player.name}
                       onChange={(e) => {
                         const newLineup = [...lineup];
-                        newLineup[index].imageUrl = e.target.value;
+                        newLineup[index].name = e.target.value;
                         setLineup(newLineup);
                       }}
+                      className="flex-1 h-8 text-xs"
+                    />
+                    <Input
+                      placeholder="Pos"
+                      value={player.fieldPosition}
+                      onChange={(e) => {
+                        const newLineup = [...lineup];
+                        newLineup[index].fieldPosition = e.target.value;
+                        setLineup(newLineup);
+                      }}
+                      className="w-16 h-8 text-xs"
                     />
                   </div>
                 </div>
@@ -268,9 +253,9 @@ export default function LineupCardManagement() {
             </div>
           </div>
 
-          <div className="border-t pt-4">
-            <h3 className="font-semibold mb-4">Starting Pitcher</h3>
-            <div className="grid md:grid-cols-4 gap-4">
+          <div className="border-t pt-3">
+            <h3 className="font-semibold mb-2 text-sm">Starting Pitcher</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <div className="md:col-span-2">
                 <Label>Pitcher Name</Label>
                 <Input

@@ -121,12 +121,12 @@ export default function EventsManagement() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold">Events Management</h2>
-        <Button onClick={() => setIsAdding(!isAdding)} size="sm">
-          <Plus className="w-4 h-4 mr-2" />
-          {isAdding ? "Cancel" : "Add Event"}
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg sm:text-xl font-bold">Events</h2>
+        <Button onClick={() => setIsAdding(!isAdding)} size="sm" className="h-8 text-xs">
+          <Plus className="w-3.5 h-3.5 mr-1" />
+          {isAdding ? "Cancel" : "Add"}
         </Button>
       </div>
 
@@ -136,8 +136,8 @@ export default function EventsManagement() {
             <CardTitle>{editingId ? "Edit Event" : "Create New Event"}</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>Title *</Label>
                   <Input
@@ -212,7 +212,7 @@ export default function EventsManagement() {
       {isLoading ? (
         <p className="text-center text-muted-foreground">Loading events...</p>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
           {events?.map((event) => (
             <Card key={event.id}>
               <CardHeader>

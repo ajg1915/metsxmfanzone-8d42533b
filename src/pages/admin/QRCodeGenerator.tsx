@@ -76,125 +76,79 @@ export default function QRCodeGenerator() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">QR Code Generator</h1>
-        <p className="text-muted-foreground">
-          Generate branded QR codes for your links
-        </p>
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
+      <div>
+        <h1 className="text-lg sm:text-xl font-bold">QR Code Generator</h1>
+        <p className="text-xs text-muted-foreground">Generate branded QR codes</p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle>QR Code Settings</CardTitle>
-            <CardDescription>
-              Configure your QR code with custom branding
-            </CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Settings</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="url">
-                <LinkIcon className="w-4 h-4 inline mr-2" />
-                Link URL *
-              </Label>
+          <CardContent className="space-y-3 px-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Link URL *</Label>
               <Input
-                id="url"
                 type="url"
                 placeholder="https://metsxmfanzone.com"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
+                className="h-8 text-xs"
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="logo">Brand Logo URL (Optional)</Label>
+            <div className="space-y-1">
+              <Label className="text-xs">Logo URL</Label>
               <Input
-                id="logo"
                 type="url"
                 placeholder="https://example.com/logo.png"
                 value={logoUrl}
                 onChange={(e) => setLogoUrl(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Add your logo in the center of the QR code
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="size">QR Code Size (px)</Label>
-              <Input
-                id="size"
-                type="number"
-                min="200"
-                max="1000"
-                value={qrSize}
-                onChange={(e) => setQrSize(Number(e.target.value))}
+                className="h-8 text-xs"
               />
             </div>
-
-            <Button 
-              onClick={handleDownload} 
-              className="w-full"
-              disabled={!url}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Download QR Code
+            <Button onClick={handleDownload} className="w-full h-8 text-xs" disabled={!url}>
+              <Download className="w-3.5 h-3.5 mr-1" />
+              Download
             </Button>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Preview</CardTitle>
-            <CardDescription>
-              Your QR code preview
-            </CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Preview</CardTitle>
           </CardHeader>
-          <CardContent className="flex items-center justify-center min-h-[300px]">
+          <CardContent className="flex items-center justify-center min-h-[200px] px-3">
             {url ? (
-              <div ref={qrRef} className="bg-white p-4 rounded-lg">
-                <QRCodeSVG
-                  value={url}
-                  size={qrSize / 1.5}
-                  level="H"
-                  includeMargin={true}
-                />
+              <div ref={qrRef} className="bg-white p-3 rounded-lg">
+                <QRCodeSVG value={url} size={180} level="H" includeMargin />
               </div>
             ) : (
-              <p className="text-muted-foreground text-center">
-                Enter a URL to generate QR code
-              </p>
+              <p className="text-muted-foreground text-xs">Enter a URL</p>
             )}
           </CardContent>
         </Card>
       </div>
 
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>Quick Links</CardTitle>
-          <CardDescription>
-            Generate QR codes for common MetsXMFanZone pages
-          </CardDescription>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">Quick Links</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <CardContent className="px-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
               { label: "Home", url: "https://metsxmfanzone.com" },
               { label: "Live", url: "https://metsxmfanzone.com/live" },
               { label: "Merch", url: "https://metsxmfanzone.com/merch" },
-              { label: "Community", url: "https://metsxmfanzone.com/community" },
-              { label: "Podcast", url: "https://metsxmfanzone.com/podcast" },
               { label: "Blog", url: "https://metsxmfanzone.com/blog" },
-              { label: "Spring Training", url: "https://metsxmfanzone.com/spring-training-live" },
-              { label: "Plans", url: "https://metsxmfanzone.com/plans" },
             ].map((link) => (
               <Button
                 key={link.url}
                 variant="outline"
                 size="sm"
                 onClick={() => setUrl(link.url)}
-                className="w-full"
+                className="w-full h-7 text-xs"
               >
                 {link.label}
               </Button>

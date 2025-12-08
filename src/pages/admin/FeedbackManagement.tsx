@@ -87,10 +87,8 @@ const FeedbackManagement = () => {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Feedback Management</h1>
-      </div>
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
+      <h1 className="text-lg sm:text-xl font-bold">Feedback</h1>
 
       {feedbacks.length === 0 ? (
         <Card>
@@ -99,7 +97,7 @@ const FeedbackManagement = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {feedbacks.map((feedback) => (
             <Card key={feedback.id}>
               <CardHeader>

@@ -476,17 +476,17 @@ const StoriesManagement = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
+    <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Stories Management</h1>
+        <h1 className="text-lg sm:text-xl font-bold">Stories</h1>
         <Dialog open={isDialogOpen} onOpenChange={(open) => {
           setIsDialogOpen(open);
           if (!open) resetForm();
         }}>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Story
+            <Button size="sm" className="h-8 text-xs">
+              <Plus className="w-3.5 h-3.5 mr-1" />
+              Add
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
