@@ -71,15 +71,17 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   };
 
   const handleNext = () => {
+    if (currentStep === steps.length - 1) {
+      // Last step - close immediately
+      handleComplete();
+      return;
+    }
+    
     if (isAnimating) return;
     setIsAnimating(true);
     
     setTimeout(() => {
-      if (currentStep < steps.length - 1) {
-        setCurrentStep(currentStep + 1);
-      } else {
-        handleComplete();
-      }
+      setCurrentStep(currentStep + 1);
       setIsAnimating(false);
     }, 150);
   };
