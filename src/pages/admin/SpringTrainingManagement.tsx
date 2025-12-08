@@ -143,10 +143,10 @@ export default function SpringTrainingManagement() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold">Spring Training Games</h2>
-        <Button onClick={() => setIsAdding(!isAdding)} size="sm">
+    <div className="w-full max-w-full px-2 sm:px-4 py-4 sm:py-6 overflow-x-hidden">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Spring Training Games</h2>
+        <Button onClick={() => setIsAdding(!isAdding)} size="sm" className="w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
           {isAdding ? "Cancel" : "Add Game"}
         </Button>
@@ -158,9 +158,9 @@ export default function SpringTrainingManagement() {
             <CardTitle>{editingId ? "Edit Game" : "Add New Game"}</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-1.5 sm:space-y-2">
                   <Label>Opponent Team *</Label>
                   <Input
                     value={formData.opponent}
@@ -169,7 +169,7 @@ export default function SpringTrainingManagement() {
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <Label>Game Date *</Label>
                   <Input
                     type="date"
@@ -178,7 +178,7 @@ export default function SpringTrainingManagement() {
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <Label>Display Order</Label>
                   <Input
                     type="number"
@@ -187,7 +187,7 @@ export default function SpringTrainingManagement() {
                   />
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <Label>Preview Image</Label>
                 <div className="flex gap-2">
                   <Input
@@ -225,7 +225,7 @@ export default function SpringTrainingManagement() {
       {isLoading ? (
         <p className="text-center text-muted-foreground">Loading games...</p>
       ) : (
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {games?.map((game) => (
             <Card key={game.id}>
               <CardHeader>

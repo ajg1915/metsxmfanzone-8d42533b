@@ -83,9 +83,9 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-2 py-3">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-bold">Dashboard Overview</h2>
+    <div className="w-full max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+        <h2 className="text-base sm:text-lg font-bold">Dashboard</h2>
         <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2">
@@ -153,72 +153,72 @@ export default function AdminDashboard() {
         </Dialog>
       </div>
       
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 pt-4 px-4">
-            <CardTitle className="text-xs font-medium">Total Users</CardTitle>
-            <Users className="h-3.5 w-3.5 text-muted-foreground" />
+      <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
+        <Card className="min-w-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium truncate">Users</CardTitle>
+            <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-xl font-bold">{stats.totalUsers}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-xl font-bold">{stats.totalUsers}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 pt-4 px-4">
-            <CardTitle className="text-xs font-medium">Total Posts</CardTitle>
-            <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+        <Card className="min-w-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium truncate">Posts</CardTitle>
+            <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-xl font-bold">{stats.totalPosts}</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-xl font-bold">{stats.totalPosts}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 pt-4 px-4">
-            <CardTitle className="text-xs font-medium">Live Streams</CardTitle>
-            <Activity className="h-3.5 w-3.5 text-muted-foreground" />
+        <Card className="min-w-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium truncate">Streams</CardTitle>
+            <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-xl font-bold">{stats.activeStreams} / {stats.totalStreams}</div>
-            <p className="text-xs text-muted-foreground mt-0.5">Active / Total</p>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-xl font-bold">{stats.activeStreams}/{stats.totalStreams}</div>
+            <p className="text-[10px] text-muted-foreground">Active/Total</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 pt-4 px-4">
-            <CardTitle className="text-xs font-medium">System Status</CardTitle>
-            <Activity className="h-3.5 w-3.5 text-muted-foreground" />
+        <Card className="min-w-0">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium truncate">Status</CardTitle>
+            <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground flex-shrink-0" />
           </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <div className="text-xl font-bold text-green-500">Online</div>
+          <CardContent className="px-3 pb-3">
+            <div className="text-lg sm:text-xl font-bold text-green-500">Online</div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="mt-6">
-        <h3 className="text-base font-semibold mb-3">Quick Access</h3>
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-4 sm:mt-6">
+        <h3 className="text-sm sm:text-base font-semibold mb-2 sm:mb-3">Quick Access</h3>
+        <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
           {quickAccessItems.map((item) => {
             const Icon = item.icon;
             return (
               <Card 
                 key={item.title}
-                className="cursor-pointer hover:border-primary transition-colors"
+                className="cursor-pointer hover:border-primary transition-colors min-w-0"
                 onClick={() => navigate(item.url)}
               >
-                <CardHeader className="pb-2 pt-4 px-4">
+                <CardHeader className="pb-1 pt-3 px-3">
                   <div className="flex items-center justify-between">
-                    <Icon className="h-5 w-5 text-primary" />
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                    <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                   </div>
                 </CardHeader>
-                <CardContent className="px-4 pb-4">
-                  <CardTitle className="text-sm mb-1">{item.title}</CardTitle>
-                  <CardDescription className="text-xs mb-2">
+                <CardContent className="px-3 pb-3">
+                  <CardTitle className="text-xs sm:text-sm mb-0.5 sm:mb-1 truncate">{item.title}</CardTitle>
+                  <CardDescription className="text-[10px] sm:text-xs mb-1 sm:mb-2 line-clamp-1">
                     {item.description}
                   </CardDescription>
-                  <p className="text-xs font-semibold text-primary">{item.stat}</p>
+                  <p className="text-[10px] sm:text-xs font-semibold text-primary">{item.stat}</p>
                 </CardContent>
               </Card>
             );
