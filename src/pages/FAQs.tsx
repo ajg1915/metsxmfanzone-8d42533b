@@ -19,8 +19,16 @@ const FAQs = () => {
       answer: "Navigate to the Live section from the main menu or click on any live stream card on the homepage. Premium subscribers get access to all live content.",
     },
     {
-      question: "What subscription plans are available?",
-      answer: "We offer three plans: Free (basic access), Fan ($9.99/month with ad-free viewing and HD streams), and Super Fan ($19.99/month with all features plus exclusive content).",
+      question: "What's the difference between Free and Premium plans?",
+      answer: "Free plan gives you basic access to highlights and community features. Premium ($12.99/month) unlocks all live streams, full game replays, HD quality, ad-free experience, and exclusive content. Annual plan ($129.99/year) includes everything in Premium plus 2 months free savings.",
+    },
+    {
+      question: "Can I switch between monthly and yearly billing?",
+      answer: "Yes! You can switch between monthly and annual billing anytime from your account settings. When you switch to annual, you'll save the equivalent of 2 months compared to monthly billing.",
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept PayPal and all major credit/debit cards through our secure payment processing partners.",
     },
     {
       question: "Can I cancel my subscription anytime?",
@@ -32,23 +40,23 @@ const FAQs = () => {
     },
     {
       question: "Is there a mobile app?",
-      answer: "Yes! Our website is fully responsive and works great on mobile browsers. You can also add it to your home screen for an app-like experience.",
+      answer: "Yes! Our website is fully responsive and works great on mobile browsers. You can also add it to your home screen for an app-like experience using PWA technology.",
     },
     {
       question: "How often is new content added?",
       answer: "We add new content daily, including game highlights, analysis videos, blog posts, and live streams during the baseball season.",
     },
     {
-      question: "Can I download videos for offline viewing?",
-      answer: "Super Fan subscribers can download select content for offline viewing through our mobile app.",
+      question: "Can I watch on multiple devices?",
+      answer: "Premium and Annual plans allow streaming on up to 2 devices simultaneously. Accounts found accessing from more than 2 devices may face restrictions.",
+    },
+    {
+      question: "What happens to my unused access?",
+      answer: "Your subscription access remains valid until the end of your billing period. If you cancel, you can continue using premium features until that date.",
     },
     {
       question: "How do I report inappropriate content?",
       answer: "Use the report button on any post or comment. Our moderation team reviews all reports within 24 hours.",
-    },
-    {
-      question: "Do you offer student or military discounts?",
-      answer: "Yes! Contact our support team with valid student or military ID for a 25% discount on any paid plan.",
     },
   ];
 
@@ -62,9 +70,9 @@ const FAQs = () => {
       </Helmet>
       <Navigation />
       <main className="pt-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-7xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-4xl">
           <div className="text-center mb-8 sm:mb-12">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-3 sm:mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
               Frequently Asked Questions
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
@@ -72,14 +80,18 @@ const FAQs = () => {
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto">
-            <Accordion type="single" collapsible className="w-full">
+          <div className="w-full">
+            <Accordion type="single" collapsible className="w-full space-y-0">
               {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left text-sm sm:text-base">
+                <AccordionItem 
+                  key={index} 
+                  value={`item-${index}`}
+                  className="border-b border-border py-1"
+                >
+                  <AccordionTrigger className="text-left text-base sm:text-lg font-medium text-foreground hover:no-underline py-4">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground text-sm sm:text-base">
+                  <AccordionContent className="text-muted-foreground text-sm sm:text-base pb-4">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
