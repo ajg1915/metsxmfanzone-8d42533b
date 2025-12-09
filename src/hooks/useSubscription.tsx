@@ -17,14 +17,22 @@ export const useSubscription = () => {
         return;
       }
 
-      // Check if user is admin - give full access
-      if (user.email === "ajg1915@gmail.com") {
-        setTier("annual");
-        setLoading(false);
-        return;
-      }
-
       try {
+        // Check if user is admin - give full access via proper role check
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .single();
+
+        if (roleData) {
+          setTier("annual");
+          setLoading(false);
+          return;
+        }
+
+        // Check subscription status
         const { data, error } = await supabase
           .from("subscriptions")
           .select("plan_type, status, end_date")
