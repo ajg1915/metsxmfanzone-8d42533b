@@ -72,6 +72,7 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
         fluid: true,
         liveui: true,
         fullscreenToggle: true,
+        playsinline: false,
         controlBar: {
           fullscreenToggle: true
         },
@@ -87,6 +88,17 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
           src: stream.stream_url,
           type: 'application/x-mpegURL'
         }]
+      });
+
+      // Handle fullscreen orientation on mobile
+      playerRef.current.on('fullscreenchange', () => {
+        if (playerRef.current?.isFullscreen() && 'orientation' in screen) {
+          try {
+            (screen.orientation as any).lock?.('landscape');
+          } catch {
+            // Orientation lock not supported or failed
+          }
+        }
       });
 
       playerRef.current.ready(() => {
