@@ -20,7 +20,7 @@ interface LiveStream {
 }
 const LiveStreamsSection = () => {
   const navigate = useNavigate();
-  const { tier } = useSubscription();
+  const { tier, isAdmin, loading: subscriptionLoading } = useSubscription();
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
@@ -77,18 +77,18 @@ const LiveStreamsSection = () => {
   };
 
   const handleStreamClick = (stream: LiveStream) => {
-    if (tier === "free" || !tier) {
-      setShowUpgradePrompt(true);
-    } else {
+    if (isAdmin || tier === "premium" || tier === "annual") {
       navigate(getStreamPageUrl(stream));
+    } else {
+      setShowUpgradePrompt(true);
     }
   };
 
   const handleViewAllClick = () => {
-    if (tier === "free" || !tier) {
-      setShowUpgradePrompt(true);
-    } else {
+    if (isAdmin || tier === "premium" || tier === "annual") {
       navigate("/live");
+    } else {
+      setShowUpgradePrompt(true);
     }
   };
 

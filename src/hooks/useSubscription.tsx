@@ -8,11 +8,13 @@ export const useSubscription = () => {
   const { user } = useAuth();
   const [tier, setTier] = useState<SubscriptionTier>("free");
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const fetchSubscription = async () => {
       if (!user) {
         setTier("free");
+        setIsAdmin(false);
         setLoading(false);
         return;
       }
@@ -27,10 +29,13 @@ export const useSubscription = () => {
           .single();
 
         if (roleData) {
-          setTier("annual");
+          setIsAdmin(true);
+          setTier("annual"); // Give admins full access
           setLoading(false);
           return;
         }
+
+        setIsAdmin(false);
 
         // Check subscription status
         const { data, error } = await supabase
@@ -67,17 +72,19 @@ export const useSubscription = () => {
   }, [user]);
 
   const hasAccess = (requiredTier: "free" | "premium") => {
+    if (isAdmin) return true; // Admins always have full access
     if (requiredTier === "free") return true;
     if (tier === "premium" || tier === "annual") return true;
     return false;
   };
 
-  const isPremium = tier === "premium" || tier === "annual";
+  const isPremium = isAdmin || tier === "premium" || tier === "annual";
 
   return {
     tier,
     loading,
     hasAccess,
     isPremium,
+    isAdmin,
   };
 };
