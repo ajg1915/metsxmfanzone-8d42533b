@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Calendar, Clock, MapPin, Trophy, Circle } from 'lucide-react';
+import { Calendar, Clock, MapPin, Trophy, Circle, Timer } from 'lucide-react';
 
 interface GameData {
   gamePk: number;
@@ -285,6 +285,42 @@ const MetsScores = () => {
 
   const isMetsHome = (game: GameData) => game.teams.home.team.id === 121;
 
+  const getCountdown = (gameDate: string) => {
+    const now = new Date().getTime();
+    const gameTime = new Date(gameDate).getTime();
+    const diff = gameTime - now;
+
+    if (diff <= 0) return null;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) {
+      return { days, hours, minutes, label: `${days}d ${hours}h` };
+    } else if (hours > 0) {
+      return { days: 0, hours, minutes, label: `${hours}h ${minutes}m` };
+    } else {
+      return { days: 0, hours: 0, minutes, label: `${minutes}m` };
+    }
+  };
+
+  const [countdowns, setCountdowns] = useState<Record<number, ReturnType<typeof getCountdown>>>({});
+
+  useEffect(() => {
+    const updateCountdowns = () => {
+      const newCountdowns: Record<number, ReturnType<typeof getCountdown>> = {};
+      upcomingGames.forEach((game) => {
+        newCountdowns[game.gamePk] = getCountdown(game.gameDate);
+      });
+      setCountdowns(newCountdowns);
+    };
+
+    updateCountdowns();
+    const interval = setInterval(updateCountdowns, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, [upcomingGames]);
+
   const getMetsResult = (game: GameData) => {
     const metsHome = isMetsHome(game);
     const metsScore = metsHome ? game.teams.home.score : game.teams.away.score;
@@ -296,7 +332,7 @@ const MetsScores = () => {
     return 'T';
   };
 
-  const GameCard = ({ game, showLive = false }: { game: GameData; showLive?: boolean }) => {
+  const GameCard = ({ game, showLive = false, showCountdown = false }: { game: GameData; showLive?: boolean; showCountdown?: boolean }) => {
     const metsHome = isMetsHome(game);
     const opponent = metsHome ? game.teams.away.team.name : game.teams.home.team.name;
     const metsScore = metsHome ? game.teams.home.score : game.teams.away.score;
@@ -363,6 +399,31 @@ const MetsScores = () => {
             <div className="mt-2 pt-2 border-t border-border/50 flex items-center gap-1 text-xs text-muted-foreground">
               <MapPin className="h-3 w-3" />
               <span className="truncate">{game.venue.name}</span>
+            </div>
+          )}
+
+          {showCountdown && countdowns[game.gamePk] && (
+            <div className="mt-3 pt-3 border-t border-border/50">
+              <div className="flex items-center justify-center gap-2 text-primary">
+                <Timer className="h-4 w-4" />
+                <span className="text-sm font-semibold">First Pitch In:</span>
+              </div>
+              <div className="flex justify-center gap-3 mt-2">
+                {countdowns[game.gamePk]!.days > 0 && (
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-foreground">{countdowns[game.gamePk]!.days}</div>
+                    <div className="text-[10px] text-muted-foreground uppercase">Days</div>
+                  </div>
+                )}
+                <div className="text-center">
+                  <div className="text-xl font-bold text-foreground">{countdowns[game.gamePk]!.hours}</div>
+                  <div className="text-[10px] text-muted-foreground uppercase">Hours</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-foreground">{countdowns[game.gamePk]!.minutes}</div>
+                  <div className="text-[10px] text-muted-foreground uppercase">Min</div>
+                </div>
+              </div>
             </div>
           )}
         </CardContent>
@@ -521,7 +582,7 @@ const MetsScores = () => {
               <h2 className="text-xl font-bold mb-4">Upcoming Games</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {upcomingGames.map((game) => (
-                  <GameCard key={game.gamePk} game={game} />
+                  <GameCard key={game.gamePk} game={game} showCountdown />
                 ))}
               </div>
             </section>
