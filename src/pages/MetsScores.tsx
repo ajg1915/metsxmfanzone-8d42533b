@@ -38,6 +38,120 @@ const MetsScores = () => {
   const [currentGames, setCurrentGames] = useState<GameData[]>([]);
   const [upcomingGames, setUpcomingGames] = useState<GameData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOffSeason, setIsOffSeason] = useState(false);
+
+  // Sample games to show during off-season
+  const getSampleGames = (): { previous: GameData[]; upcoming: GameData[] } => {
+    const baseDate = new Date();
+    
+    const previousSample: GameData[] = [
+      {
+        gamePk: 1001,
+        gameDate: new Date(2025, 9, 5, 19, 10).toISOString(),
+        status: { abstractGameState: 'Final', detailedState: 'Final' },
+        teams: {
+          home: { team: { name: 'New York Mets', id: 121 }, score: 7 },
+          away: { team: { name: 'Atlanta Braves', id: 144 }, score: 4 }
+        },
+        venue: { name: 'Citi Field' }
+      },
+      {
+        gamePk: 1002,
+        gameDate: new Date(2025, 9, 4, 19, 10).toISOString(),
+        status: { abstractGameState: 'Final', detailedState: 'Final' },
+        teams: {
+          home: { team: { name: 'Atlanta Braves', id: 144 }, score: 5 },
+          away: { team: { name: 'New York Mets', id: 121 }, score: 3 }
+        },
+        venue: { name: 'Truist Park' }
+      },
+      {
+        gamePk: 1003,
+        gameDate: new Date(2025, 9, 3, 19, 10).toISOString(),
+        status: { abstractGameState: 'Final', detailedState: 'Final' },
+        teams: {
+          home: { team: { name: 'New York Mets', id: 121 }, score: 6 },
+          away: { team: { name: 'Philadelphia Phillies', id: 143 }, score: 2 }
+        },
+        venue: { name: 'Citi Field' }
+      },
+      {
+        gamePk: 1004,
+        gameDate: new Date(2025, 9, 2, 19, 10).toISOString(),
+        status: { abstractGameState: 'Final', detailedState: 'Final' },
+        teams: {
+          home: { team: { name: 'New York Mets', id: 121 }, score: 4 },
+          away: { team: { name: 'Philadelphia Phillies', id: 143 }, score: 5 }
+        },
+        venue: { name: 'Citi Field' }
+      },
+      {
+        gamePk: 1005,
+        gameDate: new Date(2025, 9, 1, 13, 10).toISOString(),
+        status: { abstractGameState: 'Final', detailedState: 'Final' },
+        teams: {
+          home: { team: { name: 'Miami Marlins', id: 146 }, score: 2 },
+          away: { team: { name: 'New York Mets', id: 121 }, score: 8 }
+        },
+        venue: { name: 'loanDepot Park' }
+      },
+      {
+        gamePk: 1006,
+        gameDate: new Date(2025, 8, 30, 19, 10).toISOString(),
+        status: { abstractGameState: 'Final', detailedState: 'Final' },
+        teams: {
+          home: { team: { name: 'New York Mets', id: 121 }, score: 5 },
+          away: { team: { name: 'Washington Nationals', id: 120 }, score: 1 }
+        },
+        venue: { name: 'Citi Field' }
+      },
+    ];
+
+    const upcomingSample: GameData[] = [
+      {
+        gamePk: 2001,
+        gameDate: new Date(2026, 1, 21, 13, 10).toISOString(),
+        status: { abstractGameState: 'Preview', detailedState: 'Scheduled' },
+        teams: {
+          home: { team: { name: 'New York Mets', id: 121 } },
+          away: { team: { name: 'Houston Astros', id: 117 } }
+        },
+        venue: { name: 'Clover Park' }
+      },
+      {
+        gamePk: 2002,
+        gameDate: new Date(2026, 1, 23, 13, 10).toISOString(),
+        status: { abstractGameState: 'Preview', detailedState: 'Scheduled' },
+        teams: {
+          home: { team: { name: 'New York Mets', id: 121 } },
+          away: { team: { name: 'St. Louis Cardinals', id: 138 } }
+        },
+        venue: { name: 'Clover Park' }
+      },
+      {
+        gamePk: 2003,
+        gameDate: new Date(2026, 1, 25, 13, 10).toISOString(),
+        status: { abstractGameState: 'Preview', detailedState: 'Scheduled' },
+        teams: {
+          home: { team: { name: 'Boston Red Sox', id: 111 } },
+          away: { team: { name: 'New York Mets', id: 121 } }
+        },
+        venue: { name: 'JetBlue Park' }
+      },
+      {
+        gamePk: 2004,
+        gameDate: new Date(2026, 2, 26, 19, 10).toISOString(),
+        status: { abstractGameState: 'Preview', detailedState: 'Scheduled' },
+        teams: {
+          home: { team: { name: 'New York Mets', id: 121 } },
+          away: { team: { name: 'Atlanta Braves', id: 144 } }
+        },
+        venue: { name: 'Citi Field' }
+      },
+    ];
+
+    return { previous: previousSample, upcoming: upcomingSample };
+  };
 
   useEffect(() => {
     fetchMetsGames();
@@ -70,6 +184,18 @@ const MetsScores = () => {
         });
       }
 
+      // If no games found, we're in off-season - use sample data
+      if (allGames.length === 0) {
+        setIsOffSeason(true);
+        const sampleData = getSampleGames();
+        setPreviousGames(sampleData.previous);
+        setUpcomingGames(sampleData.upcoming);
+        setCurrentGames([]);
+        setLoading(false);
+        return;
+      }
+
+      setIsOffSeason(false);
       const todayStr = formatDate(today);
       
       const previous = allGames.filter(
@@ -95,6 +221,11 @@ const MetsScores = () => {
       setUpcomingGames(upcoming.slice(0, 5));
     } catch (error) {
       console.error('Error fetching Mets games:', error);
+      // On error, show sample data
+      setIsOffSeason(true);
+      const sampleData = getSampleGames();
+      setPreviousGames(sampleData.previous);
+      setUpcomingGames(sampleData.upcoming);
     } finally {
       setLoading(false);
     }
@@ -269,6 +400,23 @@ const MetsScores = () => {
               Live updates and game results for the New York Mets
             </p>
           </div>
+
+          {isOffSeason && (
+            <Card className="mb-6 border-primary/30 bg-primary/5">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">Off-Season Mode</p>
+                  <p className="text-sm text-muted-foreground">
+                    Showing sample games from the 2025 season and upcoming 2026 Spring Training schedule.
+                    Live scores will appear when the season begins.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Current/Live Games */}
           {(currentGames.length > 0 || loading) && (
