@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
+import "videojs-landscape-fullscreen";
 
 interface LiveStream {
   id: string;
@@ -69,7 +70,7 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
         preload: 'auto',
         fluid: true,
         liveui: true,
-        fullscreenToggle: true,
+        playsinline: true,
         controlBar: {
           fullscreenToggle: true
         },
@@ -85,6 +86,16 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
           src: stream.stream_url,
           type: 'application/x-mpegURL'
         }]
+      });
+
+      // Enable landscape fullscreen plugin - auto fullscreen on rotate, auto rotate on fullscreen
+      playerRef.current.landscapeFullscreen({
+        fullscreen: {
+          enterOnRotate: true,       // Enter fullscreen when device rotates to landscape
+          exitOnRotate: true,        // Exit fullscreen when device rotates to portrait
+          lockOnRotate: true,        // Lock orientation when in fullscreen
+          lockToLandscapeOnEnter: true // Force landscape when entering fullscreen
+        }
       });
 
       playerRef.current.ready(() => {
