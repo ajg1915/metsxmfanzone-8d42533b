@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play, Music2, Facebook, Headphones, Music, Podcast, Radio } from "lucide-react";
@@ -123,9 +124,9 @@ game analysis, and fan discussions</p>
             </div>
             <div className="text-center mt-8">
               <Button size="lg" asChild>
-                <a href="/podcast">
+                <Link to="/podcast">
                   View All Episodes
-                </a>
+                </Link>
               </Button>
             </div>
           </div>}
