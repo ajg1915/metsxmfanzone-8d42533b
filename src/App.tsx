@@ -63,6 +63,7 @@ import Merch from "./pages/Merch";
 import Product from "./pages/Product";
 import MetsSchedule2026 from "./pages/MetsSchedule2026";
 import MetsLineupCard from "./pages/MetsLineupCard";
+import MetsScores from "./pages/MetsScores";
 import VideoGallery from "./pages/VideoGallery";
 import LineupCardManagement from "./pages/admin/LineupCardManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
@@ -184,6 +185,7 @@ const App = () => {
             <Route path="/product/:handle" element={<Product />} />
           <Route path="/mets-schedule-2026" element={<MetsSchedule2026 />} />
           <Route path="/mets-lineup-card" element={<MetsLineupCard />} />
+          <Route path="/mets-scores" element={<MetsScores />} />
           <Route path="/video-gallery" element={<VideoGallery />} />
           <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
           <Route path="/mlb-network" element={<MLBNetwork />} />

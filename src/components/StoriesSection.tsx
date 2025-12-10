@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Play } from "lucide-react";
+import { Play, BarChart3 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Story {
   id: string;
@@ -76,9 +77,19 @@ const StoriesSection = () => {
     <>
       <section className="py-4 sm:py-6 md:py-8">
         <div className="container mx-auto px-4">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4 md:mb-6 gradient-text">
-            MetsXMFanZone Stories
-          </h2>
+          <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold gradient-text">
+              MetsXMFanZone Stories
+            </h2>
+            <Link 
+              to="/mets-scores" 
+              className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Mets Scores</span>
+              <span className="sm:hidden">Scores</span>
+            </Link>
+          </div>
           <div className="relative">
             <div 
               ref={scrollContainerRef} 
