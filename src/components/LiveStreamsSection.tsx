@@ -77,6 +77,11 @@ const LiveStreamsSection = () => {
   };
 
   const handleStreamClick = (stream: LiveStream) => {
+    // Don't show upgrade prompt while subscription is still loading
+    if (subscriptionLoading) {
+      navigate(getStreamPageUrl(stream));
+      return;
+    }
     if (isAdmin || tier === "premium" || tier === "annual") {
       navigate(getStreamPageUrl(stream));
     } else {
@@ -85,6 +90,11 @@ const LiveStreamsSection = () => {
   };
 
   const handleViewAllClick = () => {
+    // Don't show upgrade prompt while subscription is still loading
+    if (subscriptionLoading) {
+      navigate("/live");
+      return;
+    }
     if (isAdmin || tier === "premium" || tier === "annual") {
       navigate("/live");
     } else {
