@@ -50,7 +50,9 @@ interface BlogPost {
 const Live = () => {
   const navigate = useNavigate();
   const {
-    tier
+    tier,
+    isAdmin,
+    loading: subscriptionLoading
   } = useSubscription();
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [tvSchedules, setTvSchedules] = useState<TVSchedule[]>([]);
@@ -58,8 +60,14 @@ const Live = () => {
   const [podcastStream, setPodcastStream] = useState<PodcastLiveStream | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+
+  const hasAccess = isAdmin || tier === "premium" || tier === "annual";
+
   useEffect(() => {
-    if (tier === "free" || !tier) {
+    // Wait for subscription check to complete before deciding access
+    if (subscriptionLoading) return;
+    
+    if (!hasAccess) {
       setShowUpgradePrompt(true);
       return;
     }
@@ -91,7 +99,7 @@ const Live = () => {
       supabase.removeChannel(channel);
       supabase.removeChannel(podcastChannel);
     };
-  }, [tier]);
+  }, [tier, isAdmin, subscriptionLoading, hasAccess]);
   const fetchStreams = async () => {
     try {
       const {
@@ -167,7 +175,24 @@ const Live = () => {
     route: "/espn-network",
     logo: "https://wallpapers.com/images/hd/incredible-espn-logo-lbluyg5qlvhnplyr.jpg"
   }];
-  if (tier === "free" || !tier) {
+  // Show loading while checking subscription
+  if (subscriptionLoading) {
+    return <div className="min-h-screen bg-background">
+        <Helmet>
+          <title>Watch Mets Live Streams - Live Game Coverage & Analysis | MetsXMFanZone</title>
+          <meta name="description" content="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7." />
+        </Helmet>
+        <Navigation />
+        <main className="pt-16 flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background">
+          <div className="text-center">
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>;
+  }
+
+  if (!hasAccess) {
     return <>
         <UpgradePrompt open={true} />
         <div className="min-h-screen bg-background">
