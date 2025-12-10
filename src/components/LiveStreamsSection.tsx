@@ -112,11 +112,11 @@ const LiveStreamsSection = () => {
             <h2 className="font-bold text-lg sm:text-xl md:text-2xl gradient-text">Live & Upcoming Streams</h2>
             <Button 
               variant="outline" 
-              onClick={handleViewAllClick}
+              onClick={() => navigate("/mets-gamecast")}
               size="sm"
               className="text-xs sm:text-sm border-secondary hover:bg-secondary hover:border-mets-blue-light"
             >
-              View All Streams
+              View Mets Gamecast
             </Button>
           </div>
 
@@ -160,6 +160,17 @@ const LiveStreamsSection = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+          
+          <div className="flex justify-center mt-4 sm:mt-6">
+            <Button 
+              variant="outline" 
+              onClick={handleViewAllClick}
+              size="sm"
+              className="text-xs sm:text-sm border-secondary hover:bg-secondary hover:border-mets-blue-light"
+            >
+              View All Streams
+            </Button>
           </div>
         </div>
       </section>
