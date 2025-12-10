@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -332,11 +333,21 @@ const MetsGamecast = () => {
                       <div className="text-lg font-bold">{gameData?.teams.home.team.name}</div>
                       <div className="text-4xl font-bold">{gameData?.teams.home.score ?? 0}</div>
                     </div>
-                    <img 
-                      src={`https://www.mlbstatic.com/team-logos/${gameData?.teams.home.team.id}.svg`}
-                      alt={gameData?.teams.home.team.name}
-                      className="w-16 h-16"
-                    />
+                    <div className="flex flex-col items-center">
+                      <img 
+                        src={`https://www.mlbstatic.com/team-logos/${gameData?.teams.home.team.id}.svg`}
+                        alt={gameData?.teams.home.team.name}
+                        className="w-16 h-16"
+                      />
+                      {gameData?.teams.home.team.id === 121 && (
+                        <Link 
+                          to="/metsxmfanzone-tv" 
+                          className="text-xs font-semibold text-primary hover:text-primary/80 mt-1 animate-pulse"
+                        >
+                          WATCH Live
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
               </CardContent>
