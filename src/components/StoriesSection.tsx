@@ -1,10 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Play, BarChart3 } from "lucide-react";
+import { Play, BarChart3, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import ScrollReveal from "@/components/ScrollReveal";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+
 interface Story {
   id: string;
   title: string;
@@ -20,7 +28,6 @@ const StoriesSection = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchStories();
@@ -93,11 +100,15 @@ const StoriesSection = () => {
                 </Link>
               </div>
             </ScrollReveal>
-            <div className="relative">
-              <div 
-                ref={scrollContainerRef} 
-                className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory"
-              >
+            
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-2 md:-ml-4">
                 {stories.map((story, index) => {
                   const handleClick = () => {
                     if (story.link_url) {
@@ -108,42 +119,49 @@ const StoriesSection = () => {
                   };
 
                   return (
-                    <ScrollReveal key={story.id} direction="scale" delay={index * 100}>
-                      <Card 
-                        className="flex-shrink-0 w-32 h-44 sm:w-36 sm:h-52 md:w-44 md:h-64 cursor-pointer overflow-hidden group border border-border/50 hover:border-primary transition-all duration-300 relative snap-start hover-glow"
-                        onClick={handleClick}
-                      >
-                        <div className="relative w-full h-full">
-                          <img 
-                            src={story.media_type === 'video' && story.thumbnail_url ? story.thumbnail_url : story.media_url} 
-                            alt={story.title} 
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                          
-                          {story.media_type === 'video' && (
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <div className="w-10 h-10 rounded-full bg-primary/90 flex items-center justify-center">
-                                <Play className="w-4 h-4 text-primary-foreground ml-0.5" />
+                    <CarouselItem 
+                      key={story.id} 
+                      className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4"
+                    >
+                      <ScrollReveal direction="scale" delay={index * 100}>
+                        <Card 
+                          className="h-44 sm:h-52 md:h-64 cursor-pointer overflow-hidden group border border-border/50 hover:border-primary transition-all duration-300 relative hover-glow"
+                          onClick={handleClick}
+                        >
+                          <div className="relative w-full h-full">
+                            <img 
+                              src={story.media_type === 'video' && story.thumbnail_url ? story.thumbnail_url : story.media_url} 
+                              alt={story.title} 
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                            
+                            {story.media_type === 'video' && (
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div className="w-10 h-10 rounded-full bg-primary/90 flex items-center justify-center">
+                                  <Play className="w-4 h-4 text-primary-foreground ml-0.5" />
+                                </div>
                               </div>
+                            )}
+                            
+                            <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
+                              <p className="text-foreground text-[10px] sm:text-xs font-semibold truncate">
+                                {story.title}
+                              </p>
+                              <p className="text-muted-foreground text-[9px] sm:text-[10px]">
+                                {new Date(story.created_at).toLocaleDateString()}
+                              </p>
                             </div>
-                          )}
-                          
-                          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
-                            <p className="text-foreground text-[10px] sm:text-xs font-semibold truncate">
-                              {story.title}
-                            </p>
-                            <p className="text-muted-foreground text-[9px] sm:text-[10px]">
-                              {new Date(story.created_at).toLocaleDateString()}
-                            </p>
                           </div>
-                        </div>
-                      </Card>
-                    </ScrollReveal>
+                        </Card>
+                      </ScrollReveal>
+                    </CarouselItem>
                   );
                 })}
-              </div>
-            </div>
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex -left-4 h-8 w-8 border-border/50 bg-background/80 hover:bg-background" />
+              <CarouselNext className="hidden md:flex -right-4 h-8 w-8 border-border/50 bg-background/80 hover:bg-background" />
+            </Carousel>
           </div>
         </section>
       </ScrollReveal>
