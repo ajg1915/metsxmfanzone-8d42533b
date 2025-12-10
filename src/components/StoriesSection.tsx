@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Play, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import ScrollReveal from "@/components/ScrollReveal";
 interface Story {
   id: string;
   title: string;
@@ -75,74 +75,78 @@ const StoriesSection = () => {
 
   return (
     <>
-      <section className="py-4 sm:py-6 md:py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold gradient-text">
-              MetsXMFanZone Stories
-            </h2>
-            <Link 
-              to="/mets-scores" 
-              className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-            >
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Mets Scores</span>
-              <span className="sm:hidden">Scores</span>
-            </Link>
-          </div>
-          <div className="relative">
-            <div 
-              ref={scrollContainerRef} 
-              className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory"
-            >
-              {stories.map((story, index) => {
-                const handleClick = () => {
-                  if (story.link_url) {
-                    window.open(story.link_url, '_blank', 'noopener,noreferrer');
-                  } else {
-                    setSelectedStory(story);
-                  }
-                };
+      <ScrollReveal direction="up">
+        <section className="py-4 sm:py-6 md:py-8">
+          <div className="container mx-auto px-4">
+            <ScrollReveal direction="left" delay={100}>
+              <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold gradient-text">
+                  MetsXMFanZone Stories
+                </h2>
+                <Link 
+                  to="/mets-scores" 
+                  className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Mets Scores</span>
+                  <span className="sm:hidden">Scores</span>
+                </Link>
+              </div>
+            </ScrollReveal>
+            <div className="relative">
+              <div 
+                ref={scrollContainerRef} 
+                className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory"
+              >
+                {stories.map((story, index) => {
+                  const handleClick = () => {
+                    if (story.link_url) {
+                      window.open(story.link_url, '_blank', 'noopener,noreferrer');
+                    } else {
+                      setSelectedStory(story);
+                    }
+                  };
 
-                return (
-                  <Card 
-                    key={story.id} 
-                    className="flex-shrink-0 w-32 h-44 sm:w-36 sm:h-52 md:w-44 md:h-64 cursor-pointer overflow-hidden group border border-border/50 hover:border-primary transition-all duration-300 relative snap-start hover-glow"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                    onClick={handleClick}
-                  >
-                    <div className="relative w-full h-full">
-                      <img 
-                        src={story.media_type === 'video' && story.thumbnail_url ? story.thumbnail_url : story.media_url} 
-                        alt={story.title} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                      
-                      {story.media_type === 'video' && (
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="w-10 h-10 rounded-full bg-primary/90 flex items-center justify-center">
-                            <Play className="w-4 h-4 text-primary-foreground ml-0.5" />
+                  return (
+                    <ScrollReveal key={story.id} direction="scale" delay={index * 100}>
+                      <Card 
+                        className="flex-shrink-0 w-32 h-44 sm:w-36 sm:h-52 md:w-44 md:h-64 cursor-pointer overflow-hidden group border border-border/50 hover:border-primary transition-all duration-300 relative snap-start hover-glow"
+                        onClick={handleClick}
+                      >
+                        <div className="relative w-full h-full">
+                          <img 
+                            src={story.media_type === 'video' && story.thumbnail_url ? story.thumbnail_url : story.media_url} 
+                            alt={story.title} 
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                          
+                          {story.media_type === 'video' && (
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <div className="w-10 h-10 rounded-full bg-primary/90 flex items-center justify-center">
+                                <Play className="w-4 h-4 text-primary-foreground ml-0.5" />
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
+                            <p className="text-foreground text-[10px] sm:text-xs font-semibold truncate">
+                              {story.title}
+                            </p>
+                            <p className="text-muted-foreground text-[9px] sm:text-[10px]">
+                              {new Date(story.created_at).toLocaleDateString()}
+                            </p>
                           </div>
                         </div>
-                      )}
-                      
-                      <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
-                        <p className="text-foreground text-[10px] sm:text-xs font-semibold truncate">
-                          {story.title}
-                        </p>
-                        <p className="text-muted-foreground text-[9px] sm:text-[10px]">
-                          {new Date(story.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                );
-              })}
+                      </Card>
+                    </ScrollReveal>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       <Dialog open={!!selectedStory} onOpenChange={() => setSelectedStory(null)}>
         <DialogContent className="max-w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl p-0 overflow-hidden border-border/50 glass">
