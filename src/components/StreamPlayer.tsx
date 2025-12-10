@@ -144,7 +144,7 @@ export function StreamPlayer({
   }
   return <Card className="mb-8">
       <CardHeader>
-        <CardTitle className="text-2xl">{pageTitle}</CardTitle>
+        <CardTitle className="text-lg">{pageTitle}</CardTitle>
         <CardDescription>{pageDescription}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -161,7 +161,7 @@ export function StreamPlayer({
           }} />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">{stream.title}</h3>
+              
               {stream.description && <p className="text-muted-foreground">{stream.description}</p>}
             </div>
           </div> : null}
