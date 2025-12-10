@@ -346,34 +346,34 @@ const MetsGamecast = () => {
             </div>
 
             {/* Scoreboard */}
-            <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 mb-4">
-              <CardContent className="p-4 py-px">
-                <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center mx-0 my-[4px] px-0 py-0">
+            <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 mb-3">
+              <CardContent className="p-2 sm:p-3">
+                <div className="grid grid-cols-[1fr_auto_1fr] gap-1 sm:gap-3 items-center">
                   {/* Away Team */}
-                  <div className="flex items-center gap-3">
-                    <img src={`https://www.mlbstatic.com/team-logos/${gameData?.teams.away.team.id}.svg`} alt={gameData?.teams.away.team.name} className="w-16 h-16" />
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <img src={`https://www.mlbstatic.com/team-logos/${gameData?.teams.away.team.id}.svg`} alt={gameData?.teams.away.team.name} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                     <div>
-                      <div className="text-lg font-bold">{gameData?.teams.away.team.name}</div>
-                      <div className="text-4xl font-bold">{gameData?.teams.away.score ?? 0}</div>
+                      <div className="text-xs sm:text-sm font-bold truncate max-w-[70px] sm:max-w-[100px] md:max-w-none">{gameData?.teams.away.team.name}</div>
+                      <div className="text-xl sm:text-2xl md:text-3xl font-bold">{gameData?.teams.away.score ?? 0}</div>
                     </div>
                   </div>
 
                   {/* Center Info */}
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-0.5 sm:gap-1 scale-75 sm:scale-90 md:scale-100">
                     {renderBaseDiamond()}
                     {renderCount()}
                     {renderOuts()}
                   </div>
 
                   {/* Home Team */}
-                  <div className="flex items-center gap-3 justify-end">
+                  <div className="flex items-center gap-1.5 sm:gap-2 justify-end">
                     <div className="text-right">
-                      <div className="text-lg font-bold">{gameData?.teams.home.team.name}</div>
-                      <div className="text-4xl font-bold">{gameData?.teams.home.score ?? 0}</div>
+                      <div className="text-xs sm:text-sm font-bold truncate max-w-[70px] sm:max-w-[100px] md:max-w-none">{gameData?.teams.home.team.name}</div>
+                      <div className="text-xl sm:text-2xl md:text-3xl font-bold">{gameData?.teams.home.score ?? 0}</div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <img src={`https://www.mlbstatic.com/team-logos/${gameData?.teams.home.team.id}.svg`} alt={gameData?.teams.home.team.name} className="w-16 h-16" />
-                      {gameData?.teams.home.team.id === 121 && <Link to="/metsxmfanzone-tv" className="text-xs font-semibold text-primary hover:text-primary/80 mt-1 animate-pulse">
+                      <img src={`https://www.mlbstatic.com/team-logos/${gameData?.teams.home.team.id}.svg`} alt={gameData?.teams.home.team.name} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
+                      {gameData?.teams.home.team.id === 121 && <Link to="/metsxmfanzone-tv" className="text-[10px] sm:text-xs font-semibold text-primary hover:text-primary/80 mt-0.5 animate-pulse">
                           WATCH Live
                         </Link>}
                     </div>
