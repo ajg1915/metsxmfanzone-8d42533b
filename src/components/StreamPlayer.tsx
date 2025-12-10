@@ -150,9 +150,8 @@ export function StreamPlayer({
       <CardContent>
         {stream ? <div className="space-y-4">
             {isMuted && showUnmuteBanner && <div className="bg-primary/20 border-2 border-primary rounded-lg p-4 text-center animate-pulse">
-                <p className="sm:text-base font-semibold mb-2 text-xs">🔊 Tap the speaker icon  
-in the player to hear audio 
-  in the player to hear audio</p>
+                <p className="sm:text-base font-semibold mb-2 text-xs">🔊 Tap the speaker icon   
+in the player to hear audio  </p>
                 <p className="text-xs sm:text-sm text-muted-foreground">Stream is muted by default for autoplay</p>
               </div>}
             <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
