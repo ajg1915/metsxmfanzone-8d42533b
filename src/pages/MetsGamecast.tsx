@@ -373,7 +373,7 @@ const MetsGamecast = () => {
                     </div>
                     <div className="flex flex-col items-center">
                       <img src={`https://www.mlbstatic.com/team-logos/${gameData?.teams.home.team.id}.svg`} alt={gameData?.teams.home.team.name} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
-                      {gameData?.teams.home.team.id === 121 && <Link to="/metsxmfanzone-tv" className="text-[10px] sm:text-xs font-semibold text-primary hover:text-primary/80 mt-0.5 animate-pulse">
+                      {gameData?.teams.home.team.id === 121 && <Link to="/metsxmfanzone-tv" className="sm:text-xs font-semibold text-primary hover:text-primary/80 mt-0.5 animate-pulse text-xs font-sans text-center">
                           WATCH Live
                         </Link>}
                     </div>
