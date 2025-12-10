@@ -173,15 +173,6 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
                 className="video-js vjs-big-play-centered vjs-theme-fantasy"
                 style={{ width: '100%', height: '100%' }}
               />
-              <Button
-                onClick={toggleMute}
-                variant="secondary"
-                size="icon"
-                className="absolute top-4 right-4 z-50 bg-primary/90 hover:bg-primary shadow-lg"
-                title={isMuted ? "Unmute to hear audio" : "Mute audio"}
-              >
-                {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-              </Button>
             </div>
             <div>
               <h3 className="text-lg font-semibold">{stream.title}</h3>
