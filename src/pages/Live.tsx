@@ -60,7 +60,6 @@ const Live = () => {
   const [podcastStream, setPodcastStream] = useState<PodcastLiveStream | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
-
   const hasAccess = isAdmin || tier === "premium" || tier === "annual";
 
   useEffect(() => {
@@ -71,6 +70,10 @@ const Live = () => {
       setShowUpgradePrompt(true);
       return;
     }
+    
+    // Reset upgrade prompt when access is granted (e.g., admin loaded)
+    setShowUpgradePrompt(false);
+    
     fetchStreams();
     fetchTVSchedules();
     fetchBlogPosts();

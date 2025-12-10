@@ -5,12 +5,18 @@ import { supabase } from "@/integrations/supabase/client";
 export type SubscriptionTier = "free" | "premium" | "annual";
 
 export const useSubscription = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [tier, setTier] = useState<SubscriptionTier>("free");
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    // Wait for auth to complete first
+    if (authLoading) {
+      setLoading(true);
+      return;
+    }
+
     const fetchSubscription = async () => {
       if (!user) {
         setTier("free");
@@ -69,7 +75,7 @@ export const useSubscription = () => {
     };
 
     fetchSubscription();
-  }, [user]);
+  }, [user, authLoading]);
 
   const hasAccess = (requiredTier: "free" | "premium") => {
     if (isAdmin) return true; // Admins always have full access
