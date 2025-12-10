@@ -106,9 +106,9 @@ const StoriesSection = () => {
                 align: "start",
                 loop: true,
               }}
-              className="w-full"
+              className="w-full max-w-7xl mx-auto"
             >
-              <CarouselContent className="-ml-2 md:-ml-4">
+              <CarouselContent className="-ml-3 md:-ml-6">
                 {stories.map((story, index) => {
                   const handleClick = () => {
                     if (story.link_url) {
@@ -121,11 +121,11 @@ const StoriesSection = () => {
                   return (
                     <CarouselItem 
                       key={story.id} 
-                      className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4"
+                      className="pl-3 md:pl-6 basis-1/2 sm:basis-1/3 lg:basis-1/4"
                     >
                       <ScrollReveal direction="scale" delay={index * 100}>
                         <Card 
-                          className="h-44 sm:h-52 md:h-64 cursor-pointer overflow-hidden group border border-border/50 hover:border-primary transition-all duration-300 relative hover-glow"
+                          className="h-56 sm:h-72 md:h-80 lg:h-96 cursor-pointer overflow-hidden group border border-border/50 hover:border-primary transition-all duration-300 relative hover-glow"
                           onClick={handleClick}
                         >
                           <div className="relative w-full h-full">
