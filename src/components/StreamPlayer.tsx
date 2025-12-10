@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "videojs-landscape-fullscreen";
-
 interface LiveStream {
   id: string;
   title: string;
@@ -13,41 +12,34 @@ interface LiveStream {
   thumbnail_url: string;
   status: 'live' | 'scheduled' | 'ended';
 }
-
 interface StreamPlayerProps {
   pageName: string;
   pageTitle: string;
   pageDescription: string;
 }
-
-export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPlayerProps) {
+export function StreamPlayer({
+  pageName,
+  pageTitle,
+  pageDescription
+}: StreamPlayerProps) {
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [loading, setLoading] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [showUnmuteBanner, setShowUnmuteBanner] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
-
   useEffect(() => {
     fetchStream();
 
     // Set up realtime subscription
-    const channel = supabase
-      .channel(`${pageName}-stream-changes`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'live_streams'
-        },
-        () => {
-          console.log('Stream updated, refetching...');
-          fetchStream();
-        }
-      )
-      .subscribe();
-
+    const channel = supabase.channel(`${pageName}-stream-changes`).on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'live_streams'
+    }, () => {
+      console.log('Stream updated, refetching...');
+      fetchStream();
+    }).subscribe();
     return () => {
       supabase.removeChannel(channel);
       // Dispose player on cleanup
@@ -62,7 +54,6 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
   useEffect(() => {
     if (stream && videoRef.current && !playerRef.current) {
       console.log('Initializing Video.js player for:', stream.stream_url);
-      
       playerRef.current = videojs(videoRef.current, {
         controls: true,
         autoplay: true,
@@ -91,17 +82,18 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       // Enable landscape fullscreen plugin - auto fullscreen on rotate, auto rotate on fullscreen
       playerRef.current.landscapeFullscreen({
         fullscreen: {
-          enterOnRotate: true,       // Enter fullscreen when device rotates to landscape
-          exitOnRotate: true,        // Exit fullscreen when device rotates to portrait
-          lockOnRotate: true,        // Lock orientation when in fullscreen
+          enterOnRotate: true,
+          // Enter fullscreen when device rotates to landscape
+          exitOnRotate: true,
+          // Exit fullscreen when device rotates to portrait
+          lockOnRotate: true,
+          // Lock orientation when in fullscreen
           lockToLandscapeOnEnter: true // Force landscape when entering fullscreen
         }
       });
-
       playerRef.current.ready(() => {
         console.log('Video.js player is ready');
       });
-
       playerRef.current.on('error', (e: any) => {
         console.error('Video.js error:', e);
         const error = playerRef.current.error();
@@ -110,7 +102,6 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
         }
       });
     }
-
     return () => {
       if (playerRef.current) {
         playerRef.current.dispose();
@@ -118,7 +109,6 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       }
     };
   }, [stream]);
-
   const toggleMute = () => {
     if (playerRef.current) {
       const newMutedState = !isMuted;
@@ -129,19 +119,14 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       }
     }
   };
-
   const fetchStream = async () => {
     try {
-      const { data, error } = await supabase
-        .from("live_streams")
-        .select("*")
-        .eq("published", true)
-        .eq("status", "live")
-        .contains("assigned_pages", [pageName])
-        .order("scheduled_start", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
+      const {
+        data,
+        error
+      } = await supabase.from("live_streams").select("*").eq("published", true).eq("status", "live").contains("assigned_pages", [pageName]).order("scheduled_start", {
+        ascending: false
+      }).limit(1).maybeSingle();
       if (error) throw error;
       setStream(data as LiveStream | null);
     } catch (error) {
@@ -150,48 +135,36 @@ export function StreamPlayer({ pageName, pageTitle, pageDescription }: StreamPla
       setLoading(false);
     }
   };
-
   if (loading) {
-    return (
-      <Card className="mb-8">
+    return <Card className="mb-8">
         <CardContent className="py-12 text-center">
           Loading stream...
         </CardContent>
-      </Card>
-    );
+      </Card>;
   }
-
-  return (
-    <Card className="mb-8">
+  return <Card className="mb-8">
       <CardHeader>
         <CardTitle className="text-2xl">{pageTitle}</CardTitle>
         <CardDescription>{pageDescription}</CardDescription>
       </CardHeader>
       <CardContent>
-        {stream ? (
-          <div className="space-y-4">
-            {isMuted && showUnmuteBanner && (
-              <div className="bg-primary/20 border-2 border-primary rounded-lg p-4 text-center animate-pulse">
-                <p className="text-sm sm:text-base font-semibold mb-2">🔊 Tap the speaker icon in the player to hear audio</p>
+        {stream ? <div className="space-y-4">
+            {isMuted && showUnmuteBanner && <div className="bg-primary/20 border-2 border-primary rounded-lg p-4 text-center animate-pulse">
+                <p className="sm:text-base font-semibold mb-2 text-xs">🔊 Tap the speaker icon 
+in the player to hear audio</p>
                 <p className="text-xs sm:text-sm text-muted-foreground">Stream is muted by default for autoplay</p>
-              </div>
-            )}
+              </div>}
             <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-              <video
-                ref={videoRef}
-                className="video-js vjs-big-play-centered vjs-theme-fantasy"
-                style={{ width: '100%', height: '100%' }}
-              />
+              <video ref={videoRef} className="video-js vjs-big-play-centered vjs-theme-fantasy" style={{
+            width: '100%',
+            height: '100%'
+          }} />
             </div>
             <div>
               <h3 className="text-lg font-semibold">{stream.title}</h3>
-              {stream.description && (
-                <p className="text-muted-foreground">{stream.description}</p>
-              )}
+              {stream.description && <p className="text-muted-foreground">{stream.description}</p>}
             </div>
-          </div>
-        ) : null}
+          </div> : null}
       </CardContent>
-    </Card>
-  );
+    </Card>;
 }
