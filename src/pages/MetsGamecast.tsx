@@ -353,7 +353,7 @@ const MetsGamecast = () => {
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <img src={`https://www.mlbstatic.com/team-logos/${gameData?.teams.away.team.id}.svg`} alt={gameData?.teams.away.team.name} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
                     <div>
-                      <div className="text-xs sm:text-sm font-bold truncate max-w-[70px] sm:max-w-[100px] md:max-w-none">{gameData?.teams.away.team.name}</div>
+                      <div className="text-[10px] sm:text-xs font-bold truncate max-w-[60px] sm:max-w-[80px] md:max-w-none">{gameData?.teams.away.team.name}</div>
                       <div className="text-xl sm:text-2xl md:text-3xl font-bold">{gameData?.teams.away.score ?? 0}</div>
                     </div>
                   </div>
@@ -368,7 +368,7 @@ const MetsGamecast = () => {
                   {/* Home Team */}
                   <div className="flex items-center gap-1.5 sm:gap-2 justify-end">
                     <div className="text-right">
-                      <div className="text-xs sm:text-sm font-bold truncate max-w-[70px] sm:max-w-[100px] md:max-w-none">{gameData?.teams.home.team.name}</div>
+                      <div className="text-[10px] sm:text-xs font-bold truncate max-w-[60px] sm:max-w-[80px] md:max-w-none">{gameData?.teams.home.team.name}</div>
                       <div className="text-xl sm:text-2xl md:text-3xl font-bold">{gameData?.teams.home.score ?? 0}</div>
                     </div>
                     <div className="flex flex-col items-center">
