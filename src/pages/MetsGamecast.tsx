@@ -359,7 +359,7 @@ const MetsGamecast = () => {
                   </div>
 
                   {/* Center Info */}
-                  <div className="flex flex-col items-center gap-0.5 sm:gap-1 scale-75 sm:scale-90 md:scale-100">
+                  <div className="flex flex-col items-center justify-center gap-0.5 sm:gap-1 scale-75 sm:scale-90 md:scale-100 mx-auto">
                     {renderBaseDiamond()}
                     {renderCount()}
                     {renderOuts()}
