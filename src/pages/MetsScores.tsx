@@ -332,9 +332,13 @@ const MetsScores = () => {
     return 'T';
   };
 
+  const getTeamLogo = (teamId: number) => {
+    return `https://www.mlbstatic.com/team-logos/${teamId}.svg`;
+  };
+
   const GameCard = ({ game, showLive = false, showCountdown = false }: { game: GameData; showLive?: boolean; showCountdown?: boolean }) => {
     const metsHome = isMetsHome(game);
-    const opponent = metsHome ? game.teams.away.team.name : game.teams.home.team.name;
+    const opponent = metsHome ? game.teams.away.team : game.teams.home.team;
     const metsScore = metsHome ? game.teams.home.score : game.teams.away.score;
     const oppScore = metsHome ? game.teams.away.score : game.teams.home.score;
     const result = getMetsResult(game);
@@ -368,18 +372,36 @@ const MetsScores = () => {
             )}
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* Team logos matchup */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <img 
+                src={getTeamLogo(121)} 
+                alt="NYM" 
+                className="w-8 h-8 object-contain"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+              <span className="text-xs text-muted-foreground font-medium">vs</span>
+              <img 
+                src={getTeamLogo(opponent.id)} 
+                alt={getTeamAbbrev(opponent.name)} 
+                className="w-8 h-8 object-contain"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            </div>
+
+            {/* Score display */}
             <div className="flex-1">
-              <div className={`flex items-center justify-between py-2 ${metsHome ? 'border-l-2 border-primary pl-2' : ''}`}>
-                <span className="font-bold text-foreground">NYM</span>
+              <div className={`flex items-center justify-between py-1.5 ${metsHome ? 'border-l-2 border-primary pl-2' : ''}`}>
+                <span className="font-bold text-foreground text-sm">NYM</span>
                 {(isFinal || isLive) && (
                   <span className={`text-lg font-bold ${result === 'W' ? 'text-green-500' : ''}`}>
                     {metsScore ?? '-'}
                   </span>
                 )}
               </div>
-              <div className={`flex items-center justify-between py-2 ${!metsHome ? 'border-l-2 border-muted-foreground/30 pl-2' : ''}`}>
-                <span className="text-muted-foreground">{getTeamAbbrev(opponent)}</span>
+              <div className={`flex items-center justify-between py-1.5 ${!metsHome ? 'border-l-2 border-muted-foreground/30 pl-2' : ''}`}>
+                <span className="text-muted-foreground text-sm">{getTeamAbbrev(opponent.name)}</span>
                 {(isFinal || isLive) && (
                   <span className={`text-lg font-bold ${result === 'L' ? 'text-red-500' : 'text-muted-foreground'}`}>
                     {oppScore ?? '-'}
