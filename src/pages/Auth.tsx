@@ -324,7 +324,7 @@ const Auth = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat animate-slowZoom"
         style={{ backgroundImage: `url(${citiFieldBg})` }}
       />
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-mets-blue/50" />
       <Card className="w-full max-w-md relative z-10">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
