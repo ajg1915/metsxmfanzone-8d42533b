@@ -319,10 +319,11 @@ const Auth = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative"
-      style={{ backgroundImage: `url(${citiFieldBg})` }}
-    >
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat animate-slowZoom"
+        style={{ backgroundImage: `url(${citiFieldBg})` }}
+      />
       <div className="absolute inset-0 bg-black/60" />
       <Card className="w-full max-w-md relative z-10">
         <CardHeader className="space-y-1">
