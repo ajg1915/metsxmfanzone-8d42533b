@@ -116,7 +116,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleSkip()}>
       <DialogContent className="max-w-[90vw] sm:max-w-sm p-0 gap-0 overflow-hidden border border-primary/30 rounded-lg">
         <div className="relative">
           {/* Progress bar */}
@@ -124,14 +124,17 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
             <Progress value={progress} className="h-0.5 rounded-none bg-muted" />
           </div>
 
-          {/* Close button */}
+          {/* Close button - larger touch target */}
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-1 top-2 z-10 bg-background/80 hover:bg-background h-6 w-6"
-            onClick={handleSkip}
+            className="absolute right-2 top-3 z-20 bg-background/90 hover:bg-background h-8 w-8 rounded-full shadow-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSkip();
+            }}
           >
-            <X className="w-3 h-3" />
+            <X className="w-4 h-4" />
           </Button>
 
           {/* Image section */}
