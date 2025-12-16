@@ -259,21 +259,48 @@ export default function TutorialManagement() {
                   className="h-16 text-sm resize-none"
                 />
               </div>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="target_selector" className="text-xs flex items-center gap-1">
-                    <Target className="w-3 h-3" />
-                    Target Selector (CSS)
-                  </Label>
-                  <Input
-                    id="target_selector"
-                    value={formData.target_selector}
-                    onChange={(e) => setFormData({ ...formData, target_selector: e.target.value })}
-                    placeholder="#stories-section or .hero-section"
-                    className="h-8 text-sm"
-                  />
-                  <p className="text-[10px] text-muted-foreground">Element to spotlight (e.g., #hero, .live-section)</p>
+              <div className="space-y-2">
+                <Label htmlFor="target_selector" className="text-xs flex items-center gap-1">
+                  <Target className="w-3 h-3" />
+                  Target Selector (CSS) - Section to Highlight
+                </Label>
+                <Input
+                  id="target_selector"
+                  value={formData.target_selector}
+                  onChange={(e) => setFormData({ ...formData, target_selector: e.target.value })}
+                  placeholder="#live-streams"
+                  className="h-8 text-sm"
+                />
+                <div className="p-2 bg-muted/50 rounded-md">
+                  <p className="text-[10px] font-medium text-muted-foreground mb-1">Available Homepage Sections:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {[
+                      '#hero-section',
+                      '#live-networks', 
+                      '#live-streams',
+                      '#lineup-card',
+                      '#spring-training',
+                      '#news-tracker',
+                      '#blog-section',
+                      '#podcast-section',
+                      '#faq-section',
+                      '#feedback-section',
+                      '#app-install',
+                      '#hot-stove'
+                    ].map((selector) => (
+                      <button
+                        key={selector}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, target_selector: selector })}
+                        className="text-[10px] px-1.5 py-0.5 bg-primary/10 hover:bg-primary/20 text-primary rounded font-mono transition-colors"
+                      >
+                        {selector}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="image_url" className="text-xs">Image URL (Optional fallback)</Label>
                   <Input
