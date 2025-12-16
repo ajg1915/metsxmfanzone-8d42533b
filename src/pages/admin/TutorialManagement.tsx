@@ -8,16 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit2, Save, X, MoveUp, MoveDown, ImageIcon, Loader2, Eye, Target } from "lucide-react";
-import SpotlightTour from "@/components/SpotlightTour";
+import { Plus, Trash2, Edit2, Save, X, MoveUp, MoveDown, ImageIcon, Loader2, Eye } from "lucide-react";
+import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 
 interface TutorialStep {
   id: string;
   step_number: number;
   title: string;
   description: string;
-  image_url?: string | null;
-  target_selector?: string | null;
+  image_url?: string;
   is_active: boolean;
   created_at: string;
 }
@@ -35,7 +34,6 @@ export default function TutorialManagement() {
     title: "",
     description: "",
     image_url: "",
-    target_selector: "",
     is_active: true,
   });
 
@@ -104,7 +102,6 @@ export default function TutorialManagement() {
       title: step.title,
       description: step.description,
       image_url: step.image_url || "",
-      target_selector: step.target_selector || "",
       is_active: step.is_active,
     });
     setEditingId(step.id);
@@ -177,7 +174,6 @@ export default function TutorialManagement() {
       title: "",
       description: "",
       image_url: "",
-      target_selector: "",
       is_active: true,
     });
     setEditingId(null);
@@ -259,50 +255,9 @@ export default function TutorialManagement() {
                   className="h-16 text-sm resize-none"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="target_selector" className="text-xs flex items-center gap-1">
-                  <Target className="w-3 h-3" />
-                  Target Selector (CSS) - Section to Highlight
-                </Label>
-                <Input
-                  id="target_selector"
-                  value={formData.target_selector}
-                  onChange={(e) => setFormData({ ...formData, target_selector: e.target.value })}
-                  placeholder="#live-streams"
-                  className="h-8 text-sm"
-                />
-                <div className="p-2 bg-muted/50 rounded-md">
-                  <p className="text-[10px] font-medium text-muted-foreground mb-1">Available Homepage Sections:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {[
-                      '#hero-section',
-                      '#live-networks', 
-                      '#live-streams',
-                      '#lineup-card',
-                      '#spring-training',
-                      '#news-tracker',
-                      '#blog-section',
-                      '#podcast-section',
-                      '#faq-section',
-                      '#feedback-section',
-                      '#app-install',
-                      '#hot-stove'
-                    ].map((selector) => (
-                      <button
-                        key={selector}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, target_selector: selector })}
-                        className="text-[10px] px-1.5 py-0.5 bg-primary/10 hover:bg-primary/20 text-primary rounded font-mono transition-colors"
-                      >
-                        {selector}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="image_url" className="text-xs">Image URL (Optional fallback)</Label>
+                  <Label htmlFor="image_url" className="text-xs">Image URL (Optional)</Label>
                   <Input
                     id="image_url"
                     value={formData.image_url}
@@ -311,14 +266,14 @@ export default function TutorialManagement() {
                     className="h-8 text-sm"
                   />
                 </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_active"
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                />
-                <Label htmlFor="is_active" className="text-xs">Visible</Label>
+                <div className="flex items-center space-x-2 pt-5">
+                  <Switch
+                    id="is_active"
+                    checked={formData.is_active}
+                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                  />
+                  <Label htmlFor="is_active" className="text-xs">Visible</Label>
+                </div>
               </div>
               <Button type="submit" size="sm" disabled={loading}>
                 {loading && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
@@ -381,13 +336,9 @@ export default function TutorialManagement() {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-sm truncate flex items-center gap-1">
                     {step.title}
-                    {step.target_selector && <Target className="w-3 h-3 text-primary" />}
                     {!step.is_active && <Badge variant="secondary" className="text-[10px] px-1 py-0">Hidden</Badge>}
                   </h3>
                   <p className="text-xs text-muted-foreground line-clamp-1">{step.description}</p>
-                  {step.target_selector && (
-                    <code className="text-[10px] text-primary/70 font-mono">{step.target_selector}</code>
-                  )}
                 </div>
 
                 {/* Actions */}
@@ -406,7 +357,7 @@ export default function TutorialManagement() {
       </div>
 
       {showPreview && (
-        <SpotlightTour 
+        <OnboardingWalkthrough 
           onComplete={() => setShowPreview(false)}
           previewMode={true}
           previewSteps={steps}
