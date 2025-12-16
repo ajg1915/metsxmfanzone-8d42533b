@@ -23,6 +23,7 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
   const [currentStep, setCurrentStep] = useState(0);
   const [steps, setSteps] = useState<TourStep[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number; placement: string }>({ 
     top: 0, 
@@ -40,6 +41,7 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
 
     if (previewMode && previewSteps.length > 0) {
       setSteps(previewSteps);
+      setIsOpen(true);
       setLoading(false);
     } else {
       fetchSteps();
@@ -58,6 +60,7 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
       
       if (data && data.length > 0) {
         setSteps(data as TourStep[]);
+        setIsOpen(true);
       }
     } catch (error) {
       console.error("Error fetching tour steps:", error);
@@ -147,10 +150,11 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
 
   const handleComplete = () => {
     sessionStorage.setItem('spotlightTourDismissed', 'true');
+    setIsOpen(false);
     onComplete();
   };
 
-  if (loading || steps.length === 0) {
+  if (loading || steps.length === 0 || !isOpen) {
     return null;
   }
 
