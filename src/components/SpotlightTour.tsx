@@ -27,13 +27,6 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    const sessionDismissed = sessionStorage.getItem('spotlightTourDismissed');
-    
-    if (sessionDismissed === 'true' && !previewMode) {
-      setLoading(false);
-      return;
-    }
-
     if (previewMode && previewSteps.length > 0) {
       setSteps(previewSteps);
       setIsOpen(true);
@@ -105,7 +98,6 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
   };
 
   const handleComplete = () => {
-    sessionStorage.setItem('spotlightTourDismissed', 'true');
     setIsOpen(false);
     onComplete();
   };
