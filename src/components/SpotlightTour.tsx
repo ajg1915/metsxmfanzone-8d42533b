@@ -26,11 +26,17 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
   const [isOpen, setIsOpen] = useState(false);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number; placement: string }>({ 
-    top: 0, 
-    left: 0, 
-    placement: 'bottom' 
-  });
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+  // Track window size
+  useEffect(() => {
+    const updateSize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
 
   useEffect(() => {
     const sessionDismissed = sessionStorage.getItem('spotlightTourDismissed');
@@ -70,64 +76,6 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
     }
   };
 
-  const updateTargetPosition = useCallback(() => {
-    if (steps.length === 0 || isTransitioning) return;
-    
-    const step = steps[currentStep];
-    if (!step?.target_selector) {
-      setTargetRect(null);
-      // Center tooltip when no target
-      setTooltipPosition({
-        top: window.innerHeight / 2,
-        left: window.innerWidth / 2,
-        placement: 'center'
-      });
-      return;
-    }
-
-    const element = document.querySelector(step.target_selector);
-    if (element) {
-      const rect = element.getBoundingClientRect();
-      setTargetRect(rect);
-      
-      // Calculate tooltip position - responsive for all screen sizes
-      const isMobile = window.innerWidth < 640;
-      const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
-      const padding = isMobile ? 12 : 16;
-      const tooltipHeight = isMobile ? 280 : 220;
-      const tooltipWidth = isMobile ? window.innerWidth - 24 : Math.min(340, window.innerWidth - 32);
-      
-      let top = rect.bottom + padding;
-      let left = isMobile ? 12 : rect.left + rect.width / 2 - tooltipWidth / 2;
-      let placement = 'bottom';
-      
-      // Check if tooltip would go off screen bottom
-      if (top + tooltipHeight > window.innerHeight - padding) {
-        top = rect.top - tooltipHeight - padding;
-        placement = 'top';
-      }
-      
-      // On mobile, always position at bottom of viewport if target is near top
-      if (isMobile && rect.top < window.innerHeight / 3) {
-        top = Math.min(rect.bottom + padding, window.innerHeight - tooltipHeight - padding);
-        placement = 'bottom';
-      }
-      
-      // Keep tooltip within horizontal bounds
-      left = Math.max(padding, Math.min(left, window.innerWidth - tooltipWidth - padding));
-      
-      setTooltipPosition({ top, left, placement });
-    } else {
-      setTargetRect(null);
-      setTooltipPosition({
-        top: window.innerHeight / 2,
-        left: window.innerWidth / 2,
-        placement: 'center'
-      });
-    }
-  }, [currentStep, steps, isTransitioning]);
-
-  // Smooth scroll to target element
   const scrollToTarget = useCallback((step: TourStep) => {
     if (!step?.target_selector) return;
     
@@ -141,39 +89,46 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
     }
   }, []);
 
+  const updateTargetPosition = useCallback(() => {
+    if (steps.length === 0) return;
+    
+    const step = steps[currentStep];
+    if (!step?.target_selector) {
+      setTargetRect(null);
+      return;
+    }
+
+    const element = document.querySelector(step.target_selector);
+    if (element) {
+      setTargetRect(element.getBoundingClientRect());
+    } else {
+      setTargetRect(null);
+    }
+  }, [currentStep, steps]);
+
   useEffect(() => {
     if (steps.length > 0 && isOpen) {
       setIsTransitioning(true);
-      
-      // Scroll to target
       scrollToTarget(steps[currentStep]);
       
-      // Wait for scroll to complete before updating position
-      const scrollTimeout = setTimeout(() => {
+      const timeout = setTimeout(() => {
         updateTargetPosition();
         setIsTransitioning(false);
-      }, 600);
+      }, 500);
       
-      return () => clearTimeout(scrollTimeout);
+      return () => clearTimeout(timeout);
     }
   }, [currentStep, steps, isOpen, scrollToTarget, updateTargetPosition]);
 
   useEffect(() => {
-    if (!isTransitioning) {
-      // Update on resize/scroll
-      window.addEventListener('resize', updateTargetPosition);
+    if (!isTransitioning && isOpen) {
       window.addEventListener('scroll', updateTargetPosition, { passive: true });
-      
-      return () => {
-        window.removeEventListener('resize', updateTargetPosition);
-        window.removeEventListener('scroll', updateTargetPosition);
-      };
+      return () => window.removeEventListener('scroll', updateTargetPosition);
     }
-  }, [updateTargetPosition, isTransitioning]);
+  }, [updateTargetPosition, isTransitioning, isOpen]);
 
   const handleNext = () => {
     if (isTransitioning) return;
-    
     if (currentStep === steps.length - 1) {
       handleComplete();
     } else {
@@ -192,211 +147,171 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
     onComplete();
   };
 
-  if (loading || steps.length === 0 || !isOpen) {
+  if (loading || steps.length === 0 || !isOpen || windowSize.width === 0) {
     return null;
   }
 
   const step = steps[currentStep];
-  const spotlightPadding = 12;
+  const isMobile = windowSize.width < 640;
+  const spotlightPadding = isMobile ? 8 : 12;
 
   return (
-    <div className="fixed inset-0 z-[100]">
-      {/* Animated overlay with spotlight cutout */}
-      <svg className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
-        <defs>
-          <mask id="spotlight-mask">
-            <rect x="0" y="0" width="100%" height="100%" fill="white" />
-            {targetRect && !isTransitioning && (
-              <rect
-                x={targetRect.left - spotlightPadding}
-                y={targetRect.top - spotlightPadding}
-                width={targetRect.width + spotlightPadding * 2}
-                height={targetRect.height + spotlightPadding * 2}
-                rx="12"
-                fill="black"
-                className="transition-all duration-500 ease-out"
-              />
-            )}
-          </mask>
-          {/* Gradient for more dramatic effect */}
-          <radialGradient id="spotlight-gradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(0,0,0,0.6)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.85)" />
-          </radialGradient>
-        </defs>
-        <rect
-          x="0"
-          y="0"
-          width="100%"
-          height="100%"
-          fill="url(#spotlight-gradient)"
-          mask="url(#spotlight-mask)"
-          style={{ pointerEvents: 'auto' }}
-          onClick={handleComplete}
-          className="transition-opacity duration-300"
-        />
-      </svg>
+    <div className="fixed inset-0 z-[9999]">
+      {/* Dark overlay */}
+      <div 
+        className="absolute inset-0 bg-black/80 transition-opacity duration-300"
+        onClick={handleComplete}
+      />
 
-      {/* Animated spotlight border with glow */}
+      {/* Spotlight highlight on target */}
       {targetRect && !isTransitioning && (
-        <div
-          className="absolute border-2 border-primary rounded-xl pointer-events-none transition-all duration-500 ease-out"
-          style={{
-            left: targetRect.left - spotlightPadding,
-            top: targetRect.top - spotlightPadding,
-            width: targetRect.width + spotlightPadding * 2,
-            height: targetRect.height + spotlightPadding * 2,
-            boxShadow: `
-              0 0 0 4px hsl(var(--primary) / 0.2),
-              0 0 20px 8px hsl(var(--primary) / 0.3),
-              inset 0 0 20px hsl(var(--primary) / 0.1)
-            `,
-          }}
-        >
-          {/* Animated pulse ring */}
-          <div className="absolute inset-0 rounded-xl border-2 border-primary/50 animate-ping" style={{ animationDuration: '2s' }} />
-        </div>
+        <>
+          {/* Glowing border around target */}
+          <div
+            className="absolute pointer-events-none transition-all duration-500 ease-out rounded-lg"
+            style={{
+              left: targetRect.left - spotlightPadding,
+              top: targetRect.top - spotlightPadding,
+              width: targetRect.width + spotlightPadding * 2,
+              height: targetRect.height + spotlightPadding * 2,
+              boxShadow: `
+                0 0 0 3px hsl(var(--primary)),
+                0 0 0 6px hsl(var(--primary) / 0.3),
+                0 0 30px 10px hsl(var(--primary) / 0.4),
+                inset 0 0 0 9999px transparent
+              `,
+              background: 'transparent',
+            }}
+          />
+          
+          {/* "NEW" badge */}
+          <div 
+            className="absolute flex items-center gap-1 bg-mets-orange text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg z-10 animate-bounce"
+            style={{
+              left: Math.min(targetRect.right - 30, windowSize.width - 60),
+              top: targetRect.top - 20,
+              animationDuration: '2s'
+            }}
+          >
+            <Star className="w-3 h-3 fill-current" />
+            NEW
+          </div>
+        </>
       )}
 
-      {/* "NEW" badge indicator */}
-      {targetRect && !isTransitioning && (
-        <div 
-          className="absolute flex items-center gap-1 bg-mets-orange text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg transition-all duration-500 ease-out animate-bounce"
-          style={{
-            left: targetRect.left + targetRect.width - 20,
-            top: targetRect.top - spotlightPadding - 12,
-            animationDuration: '2s'
-          }}
-        >
-          <Star className="w-3 h-3 fill-current" />
-          NEW
-        </div>
-      )}
-
-      {/* Tooltip with smooth transitions */}
+      {/* Tooltip Card - Fixed position at bottom on mobile, floating on desktop */}
       <div
         className={cn(
-          "absolute bg-card/95 backdrop-blur-md border border-primary/30 rounded-xl shadow-2xl p-5 z-10 transition-all duration-500 ease-out",
-          tooltipPosition.placement === 'center' && "-translate-x-1/2 -translate-y-1/2",
-          isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"
+          "fixed bg-card border-2 border-primary/50 rounded-2xl shadow-2xl transition-all duration-500 ease-out z-10",
+          isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100",
+          isMobile 
+            ? "left-3 right-3 bottom-3" 
+            : "left-1/2 -translate-x-1/2 bottom-6 w-full max-w-md"
         )}
         style={{
-          top: tooltipPosition.top,
-          left: tooltipPosition.left,
-          width: window.innerWidth < 640 ? 'calc(100vw - 24px)' : Math.min(340, window.innerWidth - 32),
-          maxWidth: window.innerWidth < 640 ? 'calc(100vw - 24px)' : '90vw',
+          boxShadow: '0 0 40px hsl(var(--primary) / 0.3), 0 25px 50px -12px rgba(0, 0, 0, 0.5)'
         }}
       >
-        {/* Close button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute -right-2 -top-2 h-8 w-8 rounded-full bg-background border border-border shadow-md hover:bg-destructive hover:text-destructive-foreground transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleComplete();
-          }}
-        >
-          <X className="w-4 h-4" />
-        </Button>
+        {/* Gradient top border */}
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-mets-orange to-primary rounded-t-2xl" />
+        
+        <div className="p-4 sm:p-5">
+          {/* Close button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-2 h-8 w-8 rounded-full bg-background/80 border border-border hover:bg-destructive hover:text-destructive-foreground transition-colors z-20"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleComplete();
+            }}
+          >
+            <X className="w-4 h-4" />
+          </Button>
 
-        {/* Arrow pointer */}
-        {targetRect && !isTransitioning && tooltipPosition.placement === 'bottom' && (
-          <div 
-            className="absolute -top-2 w-4 h-4 bg-card/95 border-l border-t border-primary/30 rotate-45 transition-all duration-500"
-            style={{ left: 'calc(50% - 8px)' }}
-          />
-        )}
-        {targetRect && !isTransitioning && tooltipPosition.placement === 'top' && (
-          <div 
-            className="absolute -bottom-2 w-4 h-4 bg-card/95 border-r border-b border-primary/30 rotate-45 transition-all duration-500"
-            style={{ left: 'calc(50% - 8px)' }}
-          />
-        )}
-
-        {/* Step counter with animated progress */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="text-sm font-bold text-primary">{currentStep + 1}</span>
+          {/* Step counter and progress */}
+          <div className="flex items-center justify-between mb-4 pr-8">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg">
+                <span className="text-lg font-bold text-primary-foreground">{currentStep + 1}</span>
+              </div>
+              <span className="text-sm text-muted-foreground font-medium">
+                of {steps.length}
+              </span>
             </div>
-            <span className="text-xs text-muted-foreground">
-              of {steps.length} features
-            </span>
+            
+            {/* Progress dots */}
+            <div className="flex gap-1.5">
+              {steps.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => !isTransitioning && setCurrentStep(index)}
+                  className={cn(
+                    "h-2.5 rounded-full transition-all duration-300",
+                    index === currentStep 
+                      ? "bg-primary w-8" 
+                      : index < currentStep 
+                        ? "bg-primary/60 w-2.5 hover:bg-primary/80" 
+                        : "bg-muted w-2.5 hover:bg-muted-foreground/50"
+                  )}
+                />
+              ))}
+            </div>
           </div>
-          <div className="flex gap-1.5">
-            {steps.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => !isTransitioning && setCurrentStep(index)}
-                className={cn(
-                  "h-2 rounded-full transition-all duration-300",
-                  index === currentStep 
-                    ? "bg-primary w-6" 
-                    : index < currentStep 
-                      ? "bg-primary/60 w-2 hover:bg-primary/80" 
-                      : "bg-muted w-2 hover:bg-muted-foreground"
-                )}
-              />
-            ))}
+
+          {/* Content */}
+          <div className={cn(
+            "transition-all duration-300 mb-4",
+            isTransitioning ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
+          )}>
+            <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-mets-orange flex-shrink-0" />
+              <span className="line-clamp-2">{step.title}</span>
+            </h3>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              {step.description}
+            </p>
           </div>
-        </div>
 
-        {/* Content with fade animation */}
-        <div className={cn(
-          "transition-all duration-300",
-          isTransitioning ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
-        )}>
-          <h3 className="text-lg font-bold text-primary mb-2 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-mets-orange" />
-            {step.title}
-          </h3>
-          <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-            {step.description}
-          </p>
-        </div>
+          {/* Navigation buttons */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
+              disabled={currentStep === 0 || isTransitioning}
+              className="flex-1 h-11 text-sm font-medium"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Back
+            </Button>
+            <Button
+              onClick={handleNext}
+              disabled={isTransitioning}
+              className="flex-1 h-11 text-sm font-medium bg-primary hover:bg-primary/90"
+            >
+              {currentStep === steps.length - 1 ? (
+                <>
+                  <span>Let's Go!</span>
+                  <Sparkles className="w-4 h-4 ml-1" />
+                </>
+              ) : (
+                <>
+                  <span>Next</span>
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </>
+              )}
+            </Button>
+          </div>
 
-        {/* Navigation buttons */}
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePrevious}
-            disabled={currentStep === 0 || isTransitioning}
-            className="flex-1 h-10"
-          >
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            Back
-          </Button>
-          <Button
-            size="sm"
-            onClick={handleNext}
-            disabled={isTransitioning}
-            className="flex-1 h-10 bg-primary hover:bg-primary/90"
-          >
-            {currentStep === steps.length - 1 ? (
-              <>
-                <span>Let's Go!</span>
-                <Sparkles className="w-4 h-4 ml-1" />
-              </>
-            ) : (
-              <>
-                <span>Next</span>
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </>
-            )}
-          </Button>
-        </div>
-
-        {/* Skip link */}
-        <div className="text-center mt-3">
-          <Button
-            variant="link"
-            onClick={handleComplete}
-            className="text-xs text-muted-foreground hover:text-foreground h-auto p-0"
-          >
-            Skip tour
-          </Button>
+          {/* Skip link */}
+          <div className="text-center mt-3">
+            <button
+              onClick={handleComplete}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors underline-offset-2 hover:underline"
+            >
+              Skip tour
+            </button>
+          </div>
         </div>
       </div>
     </div>
