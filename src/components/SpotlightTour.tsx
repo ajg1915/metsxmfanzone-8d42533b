@@ -90,19 +90,27 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
       const rect = element.getBoundingClientRect();
       setTargetRect(rect);
       
-      // Calculate tooltip position
-      const padding = 16;
-      const tooltipHeight = 220;
-      const tooltipWidth = Math.min(340, window.innerWidth - 32);
+      // Calculate tooltip position - responsive for all screen sizes
+      const isMobile = window.innerWidth < 640;
+      const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
+      const padding = isMobile ? 12 : 16;
+      const tooltipHeight = isMobile ? 280 : 220;
+      const tooltipWidth = isMobile ? window.innerWidth - 24 : Math.min(340, window.innerWidth - 32);
       
       let top = rect.bottom + padding;
-      let left = rect.left + rect.width / 2 - tooltipWidth / 2;
+      let left = isMobile ? 12 : rect.left + rect.width / 2 - tooltipWidth / 2;
       let placement = 'bottom';
       
       // Check if tooltip would go off screen bottom
       if (top + tooltipHeight > window.innerHeight - padding) {
         top = rect.top - tooltipHeight - padding;
         placement = 'top';
+      }
+      
+      // On mobile, always position at bottom of viewport if target is near top
+      if (isMobile && rect.top < window.innerHeight / 3) {
+        top = Math.min(rect.bottom + padding, window.innerHeight - tooltipHeight - padding);
+        placement = 'bottom';
       }
       
       // Keep tooltip within horizontal bounds
@@ -275,8 +283,8 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
         style={{
           top: tooltipPosition.top,
           left: tooltipPosition.left,
-          width: Math.min(340, window.innerWidth - 32),
-          maxWidth: '90vw',
+          width: window.innerWidth < 640 ? 'calc(100vw - 24px)' : Math.min(340, window.innerWidth - 32),
+          maxWidth: window.innerWidth < 640 ? 'calc(100vw - 24px)' : '90vw',
         }}
       >
         {/* Close button */}
