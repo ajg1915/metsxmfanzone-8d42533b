@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X, Sparkles, Rocket, PartyPopper } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -77,7 +77,7 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
       
       const timeout = setTimeout(() => {
         setIsAnimating(false);
-      }, 400);
+      }, 300);
       
       return () => clearTimeout(timeout);
     }
@@ -108,50 +108,27 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
 
   const step = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
-  const isLastStep = currentStep === steps.length - 1;
-  const isFirstStep = currentStep === 0;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-      {/* Animated gradient background */}
+    <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-3 sm:p-4">
+      {/* Clickable backdrop to close */}
       <div 
-        className="absolute inset-0 bg-gradient-to-br from-black/90 via-primary/20 to-black/90 backdrop-blur-sm animate-fade-in"
+        className="absolute inset-0 bg-black/70 cursor-pointer"
         onClick={handleComplete}
       />
-      
-      {/* Floating particles effect */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-primary/30 rounded-full animate-pulse"
-            style={{
-              left: `${15 + i * 15}%`,
-              top: `${20 + (i % 3) * 25}%`,
-              animationDelay: `${i * 0.3}s`,
-              animationDuration: '3s'
-            }}
-          />
-        ))}
-      </div>
 
-      {/* Main card */}
+      {/* Compact card */}
       <div
         className={cn(
-          "relative w-full max-w-lg bg-gradient-to-b from-card to-card/95 rounded-3xl shadow-2xl overflow-hidden transition-all duration-500",
+          "relative w-full max-w-sm bg-card rounded-2xl shadow-xl overflow-hidden transition-all duration-300 mb-safe",
           isAnimating ? "scale-95 opacity-80" : "scale-100 opacity-100"
         )}
-        style={{
-          boxShadow: '0 0 60px hsl(var(--primary) / 0.3), 0 25px 50px -12px rgba(0, 0, 0, 0.6)'
-        }}
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Top gradient accent */}
-        <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-mets-blue via-primary to-mets-orange" />
-        
         {/* Progress bar */}
-        <div className="absolute inset-x-0 top-1.5 h-1 bg-muted/30">
+        <div className="h-1 bg-muted">
           <div 
-            className="h-full bg-gradient-to-r from-primary to-mets-orange transition-all duration-500 ease-out"
+            className="h-full bg-primary transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -159,132 +136,77 @@ const SpotlightTour = ({ onComplete, previewMode = false, previewSteps = [] }: S
         {/* Close button */}
         <button
           onClick={handleComplete}
-          className="absolute right-4 top-4 w-10 h-10 rounded-full bg-muted/50 hover:bg-destructive hover:text-destructive-foreground flex items-center justify-center transition-all duration-200 z-20 backdrop-blur-sm"
+          className="absolute right-2 top-2 w-8 h-8 rounded-full bg-muted/80 hover:bg-destructive hover:text-white flex items-center justify-center transition-colors z-10"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
-        {/* Content area */}
-        <div className="pt-8 pb-6 px-6">
-          {/* Step indicator */}
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <div className="flex items-center gap-1 bg-primary/10 px-4 py-2 rounded-full">
-              <Sparkles className="w-4 h-4 text-mets-orange" />
-              <span className="text-sm font-bold text-primary">
-                Step {currentStep + 1} of {steps.length}
-              </span>
-            </div>
+        <div className="p-4">
+          {/* Step counter */}
+          <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <span className="font-medium">{currentStep + 1} / {steps.length}</span>
           </div>
 
-          {/* Image area */}
-          {step.image_url && (
-            <div className={cn(
-              "relative mb-6 rounded-2xl overflow-hidden bg-muted/20 aspect-video transition-all duration-400",
-              isAnimating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
-            )}>
-              <img 
-                src={step.image_url} 
-                alt={step.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-            </div>
-          )}
-
-          {/* Title with icon */}
-          <div className={cn(
-            "flex items-start gap-3 mb-4 transition-all duration-400",
-            isAnimating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
-          )}
-          style={{ transitionDelay: '100ms' }}
+          {/* Title */}
+          <h3 
+            className={cn(
+              "text-base font-bold text-foreground mb-2 pr-6 transition-all duration-200",
+              isAnimating ? "opacity-0" : "opacity-100"
+            )}
           >
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-mets-orange flex items-center justify-center flex-shrink-0 shadow-lg">
-              {isFirstStep ? (
-                <Rocket className="w-6 h-6 text-white" />
-              ) : isLastStep ? (
-                <PartyPopper className="w-6 h-6 text-white" />
-              ) : (
-                <span className="text-xl font-bold text-white">{currentStep + 1}</span>
-              )}
-            </div>
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">
-                {step.title}
-              </h2>
-            </div>
-          </div>
+            {step.title}
+          </h3>
 
           {/* Description */}
           <p 
             className={cn(
-              "text-muted-foreground text-base sm:text-lg leading-relaxed mb-8 transition-all duration-400",
-              isAnimating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
+              "text-sm text-muted-foreground leading-relaxed mb-4 transition-all duration-200",
+              isAnimating ? "opacity-0" : "opacity-100"
             )}
-            style={{ transitionDelay: '200ms' }}
           >
             {step.description}
           </p>
 
-          {/* Step dots */}
-          <div className="flex justify-center gap-2 mb-6">
+          {/* Dots */}
+          <div className="flex justify-center gap-1.5 mb-4">
             {steps.map((_, index) => (
               <button
                 key={index}
                 onClick={() => !isAnimating && setCurrentStep(index)}
                 className={cn(
-                  "h-2.5 rounded-full transition-all duration-300 hover:scale-110",
+                  "h-1.5 rounded-full transition-all duration-200",
                   index === currentStep 
-                    ? "bg-primary w-10" 
-                    : index < currentStep 
-                      ? "bg-primary/50 w-2.5" 
-                      : "bg-muted w-2.5 hover:bg-muted-foreground/40"
+                    ? "bg-primary w-6" 
+                    : "bg-muted w-1.5 hover:bg-muted-foreground/50"
                 )}
               />
             ))}
           </div>
 
-          {/* Navigation buttons */}
-          <div className="flex gap-3">
+          {/* Buttons */}
+          <div className="flex gap-2">
+            {currentStep > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrevious}
+                disabled={isAnimating}
+                className="h-9 px-3"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+            )}
             <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={isFirstStep || isAnimating}
-              className="flex-1 h-12 text-base font-semibold rounded-xl border-2 disabled:opacity-30"
-            >
-              <ChevronLeft className="w-5 h-5 mr-1" />
-              Back
-            </Button>
-            <Button
+              size="sm"
               onClick={handleNext}
               disabled={isAnimating}
-              className={cn(
-                "flex-1 h-12 text-base font-semibold rounded-xl transition-all",
-                isLastStep 
-                  ? "bg-gradient-to-r from-mets-orange to-primary hover:opacity-90" 
-                  : "bg-primary hover:bg-primary/90"
-              )}
+              className="flex-1 h-9"
             >
-              {isLastStep ? (
-                <>
-                  Get Started
-                  <PartyPopper className="w-5 h-5 ml-2" />
-                </>
-              ) : (
-                <>
-                  Continue
-                  <ChevronRight className="w-5 h-5 ml-1" />
-                </>
-              )}
+              {currentStep === steps.length - 1 ? "Done" : "Next"}
+              {currentStep < steps.length - 1 && <ChevronRight className="w-4 h-4 ml-1" />}
             </Button>
           </div>
-
-          {/* Skip option */}
-          <button
-            onClick={handleComplete}
-            className="w-full mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
-          >
-            Skip tour
-          </button>
         </div>
       </div>
     </div>
