@@ -116,8 +116,12 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleSkip()}>
-      <DialogContent className="max-w-[90vw] sm:max-w-sm p-0 gap-0 overflow-hidden border border-primary/30 rounded-lg">
+    <Dialog open={open} onOpenChange={() => handleSkip()}>
+      <DialogContent 
+        className="max-w-[90vw] sm:max-w-sm p-0 gap-0 overflow-hidden border border-primary/30 rounded-lg [&>button]:hidden"
+        onPointerDownOutside={() => handleSkip()}
+        onEscapeKeyDown={() => handleSkip()}
+      >
         <div className="relative">
           {/* Progress bar */}
           <div className="absolute top-0 left-0 right-0 z-20">
@@ -128,13 +132,10 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-3 z-20 bg-background/90 hover:bg-background h-8 w-8 rounded-full shadow-sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSkip();
-            }}
+            className="absolute right-3 top-3 z-30 bg-background hover:bg-destructive hover:text-destructive-foreground h-10 w-10 rounded-full shadow-md border border-border"
+            onClick={() => handleSkip()}
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </Button>
 
           {/* Image section */}
@@ -210,7 +211,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
               >
                 {currentStep === steps.length - 1 ? (
                   <>
-                    <span>Get Started</span>
+                    <span>View Site</span>
                     <Sparkles className="w-3 h-3 ml-1" />
                   </>
                 ) : (
