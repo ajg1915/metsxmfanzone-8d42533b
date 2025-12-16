@@ -118,7 +118,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   return (
     <Dialog open={open} onOpenChange={() => handleSkip()}>
       <DialogContent 
-        className="max-w-[90vw] sm:max-w-sm p-0 gap-0 overflow-hidden border border-primary/30 rounded-lg [&>button]:hidden"
+        className="max-w-[75vw] sm:max-w-[280px] p-0 gap-0 overflow-hidden border border-primary/30 rounded-lg [&>button]:hidden"
         onPointerDownOutside={() => handleSkip()}
         onEscapeKeyDown={() => handleSkip()}
       >
@@ -132,14 +132,14 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-3 top-3 z-30 bg-background hover:bg-destructive hover:text-destructive-foreground h-10 w-10 rounded-full shadow-md border border-border"
+            className="absolute right-2 top-2 z-30 bg-background hover:bg-destructive hover:text-destructive-foreground h-8 w-8 rounded-full shadow-md border border-border"
             onClick={() => handleSkip()}
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </Button>
 
           {/* Image section */}
-          <div className="relative aspect-[16/9] overflow-hidden">
+          <div className="relative aspect-[16/10] overflow-hidden">
             <img 
               src={step.image_url || heroImage} 
               alt={step.title}
@@ -148,42 +148,35 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
             
             {/* Logo badge */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-background border-2 border-primary flex items-center justify-center shadow-md overflow-hidden">
-              <img src={logoIcon} alt="MetsXMFanZone" className="w-7 h-7 object-contain" />
+            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-background border-2 border-primary flex items-center justify-center shadow-md overflow-hidden">
+              <img src={logoIcon} alt="MetsXMFanZone" className="w-5 h-5 object-contain" />
             </div>
           </div>
 
           {/* Content */}
-          <div className="p-3 space-y-2">
-            {/* Step indicator */}
-            <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
-              <span className="font-medium text-primary">{currentStep + 1}</span>
-              <span>/</span>
-              <span>{steps.length}</span>
-            </div>
-
+          <div className="p-2.5 space-y-1.5">
             {/* Title and description */}
-            <div className={`text-center space-y-1 transition-all duration-200 ${isAnimating ? 'opacity-50' : 'opacity-100'}`}>
-              <h2 className="text-sm font-semibold text-primary">
+            <div className={`text-center space-y-0.5 transition-all duration-200 ${isAnimating ? 'opacity-50' : 'opacity-100'}`}>
+              <h2 className="text-xs font-semibold text-primary">
                 {step.title}
               </h2>
-              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+              <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2">
                 {step.description}
               </p>
             </div>
 
             {/* Step dots */}
-            <div className="flex items-center justify-center gap-1.5 py-1">
+            <div className="flex items-center justify-center gap-1 py-0.5">
               {steps.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => !isAnimating && setCurrentStep(index)}
                   className={`transition-all duration-200 rounded-full ${
                     index === currentStep 
-                      ? 'w-4 h-1.5 bg-primary' 
+                      ? 'w-3 h-1 bg-primary' 
                       : index < currentStep
-                        ? 'w-1.5 h-1.5 bg-primary/60'
-                        : 'w-1.5 h-1.5 bg-muted hover:bg-muted-foreground'
+                        ? 'w-1 h-1 bg-primary/60'
+                        : 'w-1 h-1 bg-muted hover:bg-muted-foreground'
                   }`}
                   aria-label={`Go to step ${index + 1}`}
                 />
@@ -191,33 +184,33 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
             </div>
 
             {/* Navigation */}
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-1.5">
               <Button
                 variant="ghost"
                 onClick={handlePrevious}
                 disabled={currentStep === 0 || isAnimating}
-                className="flex-1 h-7 text-xs"
+                className="flex-1 h-6 text-[10px]"
                 size="sm"
               >
-                <ChevronLeft className="w-3 h-3 mr-1" />
+                <ChevronLeft className="w-2.5 h-2.5 mr-0.5" />
                 Back
               </Button>
 
               <Button
                 onClick={handleNext}
                 disabled={isAnimating}
-                className="flex-1 h-7 text-xs"
+                className="flex-1 h-6 text-[10px]"
                 size="sm"
               >
                 {currentStep === steps.length - 1 ? (
                   <>
                     <span>View Site</span>
-                    <Sparkles className="w-3 h-3 ml-1" />
+                    <Sparkles className="w-2.5 h-2.5 ml-0.5" />
                   </>
                 ) : (
                   <>
                     <span>Next</span>
-                    <ChevronRight className="w-3 h-3 ml-1" />
+                    <ChevronRight className="w-2.5 h-2.5 ml-0.5" />
                   </>
                 )}
               </Button>
@@ -228,7 +221,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
               <Button
                 variant="link"
                 onClick={handleSkip}
-                className="text-[10px] text-muted-foreground hover:text-foreground h-auto p-0"
+                className="text-[9px] text-muted-foreground hover:text-foreground h-auto p-0"
               >
                 Skip tutorial
               </Button>
