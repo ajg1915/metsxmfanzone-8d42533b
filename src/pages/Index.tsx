@@ -16,17 +16,20 @@ import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
 import AppInstallSection from "@/components/AppInstallSection";
-import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
+import SpotlightTour from "@/components/SpotlightTour";
 import NotificationPrompt from "@/components/NotificationPrompt";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useEffect } from "react";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
+
 const Index = () => {
   useEffect(() => {
     const cleanup = setupNotificationListeners();
     return cleanup;
   }, []);
-  return <div className="min-h-screen bg-background">
+
+  return (
+    <div className="min-h-screen bg-background">
       <Helmet>
         <title>MetsXMFanZone - Watch Mets Live Streams, Highlights & Exclusive Coverage</title>
         <meta name="description" content="The ultimate Mets fan community. Watch live game streams, highlights, podcasts, and exclusive Mets coverage. Join thousands of passionate New York Mets fans." />
@@ -36,67 +39,93 @@ const Index = () => {
       <Navigation />
       <LiveGameTicker />
       <main className="pt-12 sm:pt-14">
-        <Hero />
+        <section id="hero-section">
+          <Hero />
+        </section>
         <LiveNotificationBar />
         
         <ScrollReveal>
-          <LiveNetworks className="py-2 sm:py-3" />
+          <section id="live-networks">
+            <LiveNetworks className="py-2 sm:py-3" />
+          </section>
         </ScrollReveal>
         
         <ScrollReveal delay={100}>
-          <LiveStreamsSection />
+          <section id="live-streams">
+            <LiveStreamsSection />
+          </section>
         </ScrollReveal>
         
         <div className="section-divider my-6 sm:my-8" />
         
         <ScrollReveal delay={100}>
-          <HomeLineupCard className="py-4 sm:py-6" />
+          <section id="lineup-card">
+            <HomeLineupCard className="py-4 sm:py-6" />
+          </section>
         </ScrollReveal>
         
         <ScrollReveal>
-          <SpringTraining className="py-4 sm:py-6" />
+          <section id="spring-training">
+            <SpringTraining className="py-4 sm:py-6" />
+          </section>
         </ScrollReveal>
         
         <div className="section-divider my-6 sm:my-8" />
         
         <ScrollReveal>
-          <MetsNewsTracker className="py-4 sm:py-px" />
+          <section id="news-tracker">
+            <MetsNewsTracker className="py-4 sm:py-px" />
+          </section>
         </ScrollReveal>
         
         <div className="section-divider my-6 sm:my-8" />
         
         <ScrollReveal direction="left">
-          <BlogSection className="py-4 sm:py-6" />
+          <section id="blog-section">
+            <BlogSection className="py-4 sm:py-6" />
+          </section>
         </ScrollReveal>
         
         <ScrollReveal direction="right" delay={100}>
-          <PodcastSection className="py-4 sm:py-6" />
+          <section id="podcast-section">
+            <PodcastSection className="py-4 sm:py-6" />
+          </section>
         </ScrollReveal>
         
         <div className="section-divider my-6 sm:my-8" />
         
         <ScrollReveal direction="scale">
-          <FAQSection />
+          <section id="faq-section">
+            <FAQSection />
+          </section>
         </ScrollReveal>
         
         <ScrollReveal>
-          <FeedbackSection />
+          <section id="feedback-section">
+            <FeedbackSection />
+          </section>
         </ScrollReveal>
         
         <div className="section-divider my-6 sm:my-8" />
         
         <ScrollReveal>
-          <AppInstallSection />
+          <section id="app-install">
+            <AppInstallSection />
+          </section>
         </ScrollReveal>
         
         <ScrollReveal delay={100}>
-          <HotStoveGuide />
+          <section id="hot-stove">
+            <HotStoveGuide />
+          </section>
         </ScrollReveal>
       </main>
       <Footer />
       <InstallPrompt />
       <NotificationPrompt />
-      <OnboardingWalkthrough onComplete={() => {}} />
-    </div>;
+      <SpotlightTour onComplete={() => {}} />
+    </div>
+  );
 };
+
 export default Index;
