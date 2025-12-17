@@ -325,6 +325,26 @@ const Community = () => {
             </CardContent>
           </Card>
 
+          <Card className="mb-6 bg-primary/5 border-primary">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                <Megaphone className="w-5 h-5 text-primary" />
+                Community Podcast
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Join our fan-driven podcast with discussions, stories, and Mets coverage
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={() => navigate("/community-podcast")} 
+                className="w-full"
+              >
+                Listen Now
+              </Button>
+            </CardContent>
+          </Card>
+
           {user && (
             <Card className="mb-6">
               <CardHeader className="pb-3">
