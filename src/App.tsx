@@ -52,6 +52,7 @@ import FAQs from "./pages/FAQs";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Podcast from "./pages/Podcast";
+import CommunityPodcast from "./pages/CommunityPodcast";
 import BusinessPartner from "./pages/BusinessPartner";
 import Dashboard from "./pages/Dashboard";
 import Feedback from "./pages/Feedback";
@@ -153,6 +154,7 @@ const App = () => {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/podcast" element={<Podcast />} />
+          <Route path="/community-podcast" element={<CommunityPodcast />} />
           <Route path="/business-partner" element={<BusinessPartner />} />
           <Route path="/legal/admin-setup" element={<AdminSetup />} />
           <Route path="/admin" element={<AdminLayout />}>
