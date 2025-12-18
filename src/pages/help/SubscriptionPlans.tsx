@@ -37,7 +37,7 @@ const SubscriptionPlans = () => {
               </div>
 
               <div className="grid gap-6">
-                <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-lg border-2 border-gray-300">
+                <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-lg border-2 border-border">
                   <h3 className="text-2xl font-bold text-primary mb-2">Free Plan</h3>
                   <p className="text-3xl font-bold text-primary mb-4">
                     $0<span className="text-lg text-muted-foreground">/month</span>
