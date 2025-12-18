@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import StoriesSection from "@/components/StoriesSection";
 import Events from "./Events";
+import { CommunityAIChat } from "@/components/CommunityAIChat";
 import { z } from "zod";
 
 interface Post {
@@ -441,6 +442,7 @@ const Community = () => {
       </main>
 
       <Footer />
+      <CommunityAIChat />
     </div>
   );
 };
