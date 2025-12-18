@@ -292,19 +292,15 @@ export default function HomeLineupCard({
 
           {/* NL East Standings - Real-time from MLB API */}
           <Card className="border-primary/20">
-            <Link to="/nl-scores" className="block bg-gradient-to-r from-orange-500 to-orange-400 p-2 text-white hover:from-orange-600 hover:to-orange-500 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-sm">📊 View All NL Scores</span>
-                <span className="text-xs">→</span>
-              </div>
-            </Link>
             <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-2.5 text-white bg-primary">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Trophy className="w-4 h-4" />
                   <span className="font-bold text-sm">NL East Standings</span>
                 </div>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary">LIVE</span>
+                <Link to="/nl-scores" className="text-xs underline hover:text-white/80">
+                  NL Scores
+                </Link>
               </div>
             </div>
             <CardContent className="p-2.5">
