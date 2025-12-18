@@ -146,50 +146,106 @@ export default function Blog() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPosts.map((post) => (
-                <Card 
-                  key={post.id} 
-                  className="hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/blog/${post.slug}`)}
-                >
-                  {post.featured_image_url && (
-                    <div className="aspect-video overflow-hidden rounded-t-lg">
-                      <img 
-                        src={post.featured_image_url} 
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <CardHeader>
-                    <CardTitle className="line-clamp-2">{post.title}</CardTitle>
-                    <CardDescription className="flex items-center gap-2">
-                      <Calendar className="w-3 h-3" />
-                      {new Date(post.published_at).toLocaleDateString()}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground line-clamp-3 mb-4">
-                      {post.excerpt || post.content.substring(0, 150)}...
-                    </p>
-                    {post.tags.length > 0 && (
-                      <div className="flex gap-1 flex-wrap">
-                        {post.tags.slice(0, 3).map((tag) => (
-                          <span 
-                            key={tag} 
-                            className="text-xs bg-muted px-2 py-1 rounded flex items-center gap-1"
-                          >
-                            <Tag className="w-3 h-3" />
-                            {tag}
+            <>
+              {/* Featured Blog Post */}
+              {filteredPosts.length > 0 && (
+                <div className="mb-8">
+                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <span className="bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs">FEATURED</span>
+                    Latest Article
+                  </h2>
+                  <Card 
+                    className="hover:shadow-xl transition-shadow cursor-pointer overflow-hidden"
+                    onClick={() => navigate(`/blog/${filteredPosts[0].slug}`)}
+                  >
+                    <div className="grid md:grid-cols-2 gap-0">
+                      {filteredPosts[0].featured_image_url && (
+                        <div className="aspect-video md:aspect-auto md:h-full overflow-hidden">
+                          <img 
+                            src={filteredPosts[0].featured_image_url} 
+                            alt={filteredPosts[0].title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className={`p-6 flex flex-col justify-center ${!filteredPosts[0].featured_image_url ? 'md:col-span-2' : ''}`}>
+                        <span className="text-xs text-primary font-medium mb-2">{filteredPosts[0].category}</span>
+                        <h3 className="text-xl md:text-2xl font-bold mb-3 line-clamp-2">{filteredPosts[0].title}</h3>
+                        <p className="text-muted-foreground line-clamp-3 mb-4">
+                          {filteredPosts[0].excerpt || filteredPosts[0].content.substring(0, 200)}...
+                        </p>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {new Date(filteredPosts[0].published_at).toLocaleDateString()}
                           </span>
-                        ))}
+                          {filteredPosts[0].tags.length > 0 && (
+                            <div className="flex gap-1">
+                              {filteredPosts[0].tags.slice(0, 2).map((tag) => (
+                                <span key={tag} className="bg-muted px-2 py-0.5 rounded text-xs">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </div>
+                  </Card>
+                </div>
+              )}
+
+              {/* Rest of Blog Posts */}
+              {filteredPosts.length > 1 && (
+                <>
+                  <h2 className="text-lg font-semibold mb-4">More Articles</h2>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredPosts.slice(1).map((post) => (
+                      <Card 
+                        key={post.id} 
+                        className="hover:shadow-lg transition-shadow cursor-pointer"
+                        onClick={() => navigate(`/blog/${post.slug}`)}
+                      >
+                        {post.featured_image_url && (
+                          <div className="aspect-video overflow-hidden rounded-t-lg">
+                            <img 
+                              src={post.featured_image_url} 
+                              alt={post.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <CardHeader>
+                          <CardTitle className="line-clamp-2">{post.title}</CardTitle>
+                          <CardDescription className="flex items-center gap-2">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(post.published_at).toLocaleDateString()}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-muted-foreground line-clamp-3 mb-4">
+                            {post.excerpt || post.content.substring(0, 150)}...
+                          </p>
+                          {post.tags.length > 0 && (
+                            <div className="flex gap-1 flex-wrap">
+                              {post.tags.slice(0, 3).map((tag) => (
+                                <span 
+                                  key={tag} 
+                                  className="text-xs bg-muted px-2 py-1 rounded flex items-center gap-1"
+                                >
+                                  <Tag className="w-3 h-3" />
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
           )}
         </div>
       </main>
