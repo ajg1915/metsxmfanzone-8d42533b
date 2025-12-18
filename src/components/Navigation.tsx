@@ -118,10 +118,10 @@ const Navigation = () => {
               Blog
             </button>
             <button
-              onClick={() => handleProtectedNavigation("/mets-gamecast")}
+              onClick={() => handleProtectedNavigation("/podcast")}
               className="text-foreground hover:text-primary transition-colors"
             >
-              Gamecast
+              Podcast
             </button>
             <NavLink 
               to="/plans" 
@@ -242,12 +242,12 @@ const Navigation = () => {
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      handleProtectedNavigation("/mets-gamecast");
+                      handleProtectedNavigation("/podcast");
                     }}
                     className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
                     <Play className="w-4 h-4" />
-                    Gamecast
+                    Podcast
                   </button>
                   <NavLink 
                     to="/plans" 
