@@ -240,34 +240,32 @@ const NLScores = () => {
       <div className="min-h-screen bg-background">
         <Navigation />
         
-        <main className="container mx-auto px-4 py-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <main className="container mx-auto px-4 py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-                MLB National League Scores
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                MLB NL Scores
               </h1>
-              <p className="text-muted-foreground text-sm mt-1">
-                Live scores • Updates every 30 seconds
+              <p className="text-muted-foreground text-xs">
+                Live • 30s refresh
               </p>
             </div>
             
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="bg-secondary text-foreground border border-border rounded px-3 py-1.5 text-sm"
-                />
-              </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="bg-secondary text-foreground border border-border rounded px-2 py-1 text-xs"
+              />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => fetchNLGames(selectedDate)}
                 disabled={loading}
+                className="h-7 w-7 p-0"
               >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
               </Button>
             </div>
           </div>
