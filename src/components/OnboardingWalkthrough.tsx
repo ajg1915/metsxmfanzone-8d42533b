@@ -121,7 +121,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   return (
     <Dialog open={open} onOpenChange={() => handleSkip()}>
       <DialogContent 
-        className="max-w-[75vw] sm:max-w-[280px] p-0 gap-0 overflow-hidden border border-primary/30 rounded-lg [&>button]:hidden"
+        className="max-w-[75vw] sm:max-w-[280px] p-0 gap-0 overflow-hidden border-2 border-primary rounded-lg [&>button]:hidden"
         onPointerDownOutside={() => handleSkip()}
         onEscapeKeyDown={() => handleSkip()}
       >
