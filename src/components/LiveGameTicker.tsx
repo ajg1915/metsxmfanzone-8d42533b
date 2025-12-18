@@ -118,7 +118,7 @@ const LiveGameTicker = () => {
             <span className="bg-white/10 px-2 py-0.5 rounded text-lg">{opponentScore}</span>
           </div>
           
-          <span className="text-white/70 text-xs md:text-sm ml-2 border-l border-white/20 pl-3">
+          <span className="text-white/70 text-xs md:text-sm ml-2 border-l border-border/40 pl-3">
             {gameData.gameStatus}
           </span>
         </div>

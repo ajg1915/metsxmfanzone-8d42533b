@@ -299,7 +299,7 @@ export default function LiveStreamManagement() {
                               : formData.assigned_pages.filter(p => p !== page);
                             setFormData({ ...formData, assigned_pages: newPages });
                           }}
-                          className="rounded border-gray-300"
+                          className="rounded border-border"
                         />
                         <Label htmlFor={page} className="cursor-pointer font-normal">
                           {page === 'guide' ? 'Guide Page' : page === 'live' ? 'Live Page' : page === 'metsxmfanzone' ? 'MetsXMFanZone TV' : page === 'mlb-network' ? 'MLB Network' : page === 'espn-network' ? 'ESPN Network' : 'Spring Training Live'}
