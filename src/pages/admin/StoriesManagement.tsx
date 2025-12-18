@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Edit, Eye, EyeOff, Image as ImageIcon, Video } from "lucide-react";
+import { Plus, Trash2, Edit, Eye, EyeOff, Image as ImageIcon, Video, Sparkles, Download } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,11 @@ const StoriesManagement = () => {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [videoFrames, setVideoFrames] = useState<string[]>([]);
   const [selectedFrameIndex, setSelectedFrameIndex] = useState<number>(0);
+
+  // AI Image Generation states
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStories();
@@ -307,7 +313,6 @@ const StoriesManagement = () => {
     setSelectedFrameIndex(index);
     setMediaPreview(videoFrames[index]);
     
-    // Convert selected frame to blob/file for upload
     const response = await fetch(videoFrames[index]);
     const blob = await response.blob();
     const file = new File([blob], `thumbnail_${Date.now()}.jpg`, { type: 'image/jpeg' });
@@ -340,6 +345,94 @@ const StoriesManagement = () => {
     setVideoFrames([]);
     setSelectedFrameIndex(0);
     setEditingStory(null);
+  };
+
+  const handleGenerateImage = async () => {
+    if (!aiPrompt.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a prompt",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingImage(true);
+    setGeneratedImageUrl(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-story-image", {
+        body: { prompt: aiPrompt },
+      });
+
+      if (error) throw error;
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setGeneratedImageUrl(data.imageUrl);
+      toast({
+        title: "Success",
+        description: "Image generated! Click 'Use Image' to add it as a story.",
+      });
+    } catch (error: any) {
+      console.error("Error generating image:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate image",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
+
+  const handleUseGeneratedImage = async () => {
+    if (!generatedImageUrl) return;
+
+    try {
+      // Convert base64 to blob
+      const response = await fetch(generatedImageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], `ai_generated_${Date.now()}.png`, { type: 'image/png' });
+
+      // Upload to Supabase storage
+      const fileName = `ai_${Date.now()}.png`;
+      const { error: uploadError } = await supabase.storage
+        .from("stories")
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // Create story with the generated image
+      const storyData = {
+        title: aiPrompt.slice(0, 50) + (aiPrompt.length > 50 ? "..." : ""),
+        media_url: fileName,
+        media_type: "image",
+        thumbnail_url: null,
+        display_order: 0,
+        published: false,
+        link_url: null,
+      };
+
+      const { error } = await supabase.from("stories").insert(storyData);
+      if (error) throw error;
+
+      toast({ title: "Success", description: "AI-generated story created!" });
+      
+      // Reset AI generator
+      setAiPrompt("");
+      setGeneratedImageUrl(null);
+      fetchStories();
+    } catch (error: any) {
+      console.error("Error saving generated image:", error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -454,6 +547,71 @@ const StoriesManagement = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* AI Image Generator Section */}
+      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Sparkles className="w-4 h-4 text-primary" />
+            AI Image Generator
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Create unique story images using AI. Describe what you want to see!
+          </p>
+          
+          <div className="space-y-3">
+            <Textarea
+              placeholder="e.g., A dramatic baseball scene with the New York Mets celebrating a home run at Citi Field under stadium lights..."
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              disabled={isGeneratingImage}
+              className="min-h-[80px] text-sm"
+            />
+            
+            <Button
+              onClick={handleGenerateImage}
+              disabled={!aiPrompt.trim() || isGeneratingImage}
+              className="w-full sm:w-auto"
+              size="sm"
+            >
+              {isGeneratingImage ? (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate Image
+                </>
+              )}
+            </Button>
+          </div>
+          
+          {generatedImageUrl && (
+            <div className="space-y-3 pt-2">
+              <div className="rounded-lg overflow-hidden border-2 border-primary/30">
+                <img
+                  src={generatedImageUrl}
+                  alt="AI generated"
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+              <Button
+                onClick={handleUseGeneratedImage}
+                variant="default"
+                size="sm"
+                className="w-full"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Use Image as Story
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {loading ? (
         <div className="text-center py-8">Loading stories...</div>
