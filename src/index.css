@@ -35,8 +35,8 @@ All colors MUST be HSL.
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Mets Blue border accents */
-    --border: 220 80% 35%;
+    /* Mets Orange border accents */
+    --border: 24 100% 50%;
     --input: 220 50% 25%;
     --ring: 24 100% 50%;
 
@@ -63,7 +63,7 @@ All colors MUST be HSL.
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 80% 25%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 80% 30%;
+    --sidebar-border: 24 100% 50%;
     --sidebar-ring: 24 100% 50%;
   }
 
@@ -84,7 +84,7 @@ All colors MUST be HSL.
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 80% 35%;
+    --border: 24 100% 50%;
     --input: 220 50% 25%;
     --ring: 24 100% 50%;
     --sidebar-background: 220 70% 10%;
@@ -93,7 +93,7 @@ All colors MUST be HSL.
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 80% 25%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 80% 30%;
+    --sidebar-border: 24 100% 50%;
     --sidebar-ring: 24 100% 50%;
   }
 }
