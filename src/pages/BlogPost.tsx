@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Tag, ArrowLeft, Headphones } from "lucide-react";
+import { Calendar, Tag, ArrowLeft, Headphones, Volume2, Loader2, Pause, Play } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
+import { useToast } from "@/hooks/use-toast";
 
 interface BlogPost {
   id: string;
@@ -25,14 +26,30 @@ interface BlogPost {
 export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // TTS states
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
+  const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (slug) {
       fetchPost();
     }
   }, [slug]);
+
+  // Cleanup audio URL on unmount
+  useEffect(() => {
+    return () => {
+      if (generatedAudioUrl) {
+        URL.revokeObjectURL(generatedAudioUrl);
+      }
+    };
+  }, [generatedAudioUrl]);
 
   const fetchPost = async () => {
     try {
@@ -45,13 +62,10 @@ export default function BlogPost() {
 
       if (error) throw error;
       
-      // Ensure featured_image_url is absolute for social sharing
       if (data && data.featured_image_url) {
-        // If it's a relative URL, make it absolute
         if (!data.featured_image_url.startsWith('http') && !data.featured_image_url.startsWith('data:')) {
           data.featured_image_url = `${window.location.origin}${data.featured_image_url}`;
         }
-        // If it's a Supabase storage URL without protocol, add https
         if (data.featured_image_url.includes('supabase.co') && !data.featured_image_url.startsWith('http')) {
           data.featured_image_url = `https://${data.featured_image_url}`;
         }
@@ -62,6 +76,77 @@ export default function BlogPost() {
       console.error("Error fetching post:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateAudio = async () => {
+    if (!post) return;
+
+    setIsGeneratingAudio(true);
+
+    try {
+      // Combine title and content for TTS, limit to reasonable length
+      const textToSpeak = `${post.title}. ${post.content}`.slice(0, 5000);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text: textToSpeak }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to generate audio");
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      // Clean up previous URL if exists
+      if (generatedAudioUrl) {
+        URL.revokeObjectURL(generatedAudioUrl);
+      }
+      
+      setGeneratedAudioUrl(audioUrl);
+      
+      // Auto-play the generated audio
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.play();
+        setIsPlaying(true);
+      }
+
+      toast({
+        title: "Audio Ready",
+        description: "Article audio has been generated",
+      });
+    } catch (error: any) {
+      console.error("Error generating audio:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate audio",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingAudio(false);
+    }
+  };
+
+  const togglePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
     }
   };
 
@@ -100,16 +185,13 @@ export default function BlogPost() {
   const currentUrl = window.location.href;
   const siteUrl = window.location.origin;
   
-  // Ensure we have a proper image for social sharing (not base64)
   let socialImage = post.featured_image_url || `${siteUrl}/logo-512.png`;
   
-  // Check if image is base64 (won't work for social media)
   if (socialImage.startsWith('data:')) {
     console.warn('Blog post has base64 image which won\'t work for social sharing:', post.slug);
-    socialImage = `${siteUrl}/logo-512.png`; // Fallback to site logo
+    socialImage = `${siteUrl}/logo-512.png`;
   }
   
-  // Ensure absolute URL for social media
   if (!socialImage.startsWith('http')) {
     socialImage = `${siteUrl}${socialImage}`;
   }
@@ -125,10 +207,8 @@ export default function BlogPost() {
         <title>{socialTitle}</title>
         <meta name="description" content={socialDescription} />
         
-        {/* Facebook App ID */}
         <meta property="fb:app_id" content="1151558476948104" />
         
-        {/* Essential Open Graph tags for Facebook */}
         <meta property="og:type" content="article" />
         <meta property="og:url" content={currentUrl} />
         <meta property="og:site_name" content="MetsXMFanZone" />
@@ -141,7 +221,6 @@ export default function BlogPost() {
         <meta property="og:image:alt" content={post.title} />
         <meta property="og:locale" content="en_US" />
         
-        {/* Article specific tags */}
         <meta property="article:published_time" content={post.published_at} />
         <meta property="article:modified_time" content={post.published_at} />
         <meta property="article:section" content={post.category} />
@@ -150,7 +229,6 @@ export default function BlogPost() {
           <meta key={tag} property="article:tag" content={tag} />
         ))}
         
-        {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@metsxmfanzone" />
         <meta name="twitter:creator" content="@metsxmfanzone" />
@@ -160,18 +238,24 @@ export default function BlogPost() {
         <meta name="twitter:image" content={socialImage} />
         <meta name="twitter:image:alt" content={post.title} />
         
-        {/* Facebook Instant Articles */}
         <meta property="ia:markup_url" content={currentUrl} />
         <meta property="ia:markup_url_dev" content={currentUrl} />
         <meta property="ia:rules_url" content={`${siteUrl}/rules.json`} />
         <meta property="ia:rules_url_dev" content={`${siteUrl}/rules.json`} />
         
-        {/* Additional Meta Tags */}
         <meta name="author" content="MetsXMFanZone" />
         <link rel="canonical" href={currentUrl} />
       </Helmet>
       
       <Navigation />
+      
+      {/* Hidden audio element for TTS playback */}
+      <audio
+        ref={audioRef}
+        onEnded={() => setIsPlaying(false)}
+        onPause={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+      />
       
       <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pt-20 sm:pt-24">
         <div className="max-w-4xl mx-auto w-full">
@@ -198,7 +282,7 @@ export default function BlogPost() {
             <header className="mb-6 sm:mb-8">
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">{post.title}</h1>
               
-              <div className="flex items-center gap-4 text-muted-foreground mb-4">
+              <div className="flex flex-wrap items-center gap-3 text-muted-foreground mb-4">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   {new Date(post.published_at).toLocaleDateString('en-US', {
@@ -210,6 +294,52 @@ export default function BlogPost() {
                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
                   {post.category}
                 </span>
+                
+                {/* Listen Button - Only show if no pre-uploaded audio */}
+                {!post.audio_url && (
+                  <>
+                    {generatedAudioUrl ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={togglePlayPause}
+                        className="gap-2"
+                      >
+                        {isPlaying ? (
+                          <>
+                            <Pause className="w-4 h-4" />
+                            Pause
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4" />
+                            Play
+                          </>
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGenerateAudio}
+                        disabled={isGeneratingAudio}
+                        className="gap-2"
+                      >
+                        {isGeneratingAudio ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-4 h-4" />
+                            Listen
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </>
+                )}
               </div>
 
               {post.tags.length > 0 && (
@@ -227,6 +357,7 @@ export default function BlogPost() {
               )}
             </header>
 
+            {/* Pre-uploaded audio player */}
             {post.audio_url && (
               <Card className="mb-6">
                 <CardContent className="py-4">
@@ -236,6 +367,21 @@ export default function BlogPost() {
                   </div>
                   <audio controls className="w-full">
                     <source src={post.audio_url} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* TTS Audio Player (when generated) */}
+            {generatedAudioUrl && !post.audio_url && (
+              <Card className="mb-6 border-primary/20">
+                <CardContent className="py-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Volume2 className="w-5 h-5 text-primary" />
+                    <span className="font-medium">AI-Generated Audio</span>
+                  </div>
+                  <audio controls className="w-full" src={generatedAudioUrl}>
                     Your browser does not support the audio element.
                   </audio>
                 </CardContent>
