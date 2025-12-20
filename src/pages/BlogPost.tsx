@@ -89,7 +89,7 @@ export default function BlogPost() {
       const textToSpeak = `${post.title}. ${post.content}`.slice(0, 5000);
 
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/openai-tts`,
         {
           method: "POST",
           headers: {
@@ -102,8 +102,13 @@ export default function BlogPost() {
       );
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to generate audio");
+        const errorText = await response.text();
+        try {
+          const parsed = JSON.parse(errorText);
+          throw new Error(parsed.error || "Failed to generate audio");
+        } catch {
+          throw new Error(errorText || "Failed to generate audio");
+        }
       }
 
       const audioBlob = await response.blob();
