@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Calendar, MapPin, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+import { Helmet } from "react-helmet-async";
 
 export default function Events() {
   const { data: events, isLoading } = useQuery({
@@ -20,77 +23,114 @@ export default function Events() {
     },
   });
 
-  if (isLoading) {
-    return (
-      <div className="py-8">
-        <p className="text-center text-muted-foreground">Loading events...</p>
-      </div>
-    );
-  }
-
-  if (!events || events.length === 0) {
-    return (
-      <div className="py-8">
-        <p className="text-center text-muted-foreground">No upcoming events at this time.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold mb-2">Upcoming Events</h2>
-        <p className="text-muted-foreground">
-          Join us for exciting Mets fan events and community gatherings
-        </p>
-      </div>
+    <>
+      <Helmet>
+        <title>Events | MetsXMFanZone</title>
+        <meta name="description" content="Join us for exciting Mets fan events and community gatherings. Stay updated on upcoming meetups, watch parties, and special events." />
+      </Helmet>
+      
+      <Navigation />
+      
+      <main className="min-h-screen bg-background pt-16">
+        {/* Hero Section */}
+        <section className="relative bg-gradient-to-br from-primary/20 via-background to-background py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl">
+              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+                Upcoming <span className="text-primary">Events</span>
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Join us for exciting Mets fan events and community gatherings. 
+                Connect with fellow fans, enjoy watch parties, and be part of special events!
+              </p>
+            </div>
+          </div>
+        </section>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {events.map((event) => (
-          <Card key={event.id} className="hover:shadow-lg transition-shadow">
-            {event.image_url && (
-              <div className="w-full h-48 overflow-hidden">
-                <img
-                  src={event.image_url}
-                  alt={event.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-            <CardHeader>
-              <CardTitle className="text-xl">{event.title}</CardTitle>
-              <CardDescription className="flex flex-col gap-2 mt-2">
-                <span className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  {format(new Date(event.event_date), "PPP 'at' p")}
-                </span>
-                {event.location && (
-                  <span className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4" />
-                    {event.location}
-                  </span>
-                )}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">{event.description}</p>
-              {event.external_link && (
-                <Button asChild variant="outline" size="sm">
-                  <a
-                    href={event.external_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
-                  >
-                    Learn More
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+        {/* Events Grid */}
+        <section className="container mx-auto px-4 py-12">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : !events || events.length === 0 ? (
+            <Card className="max-w-2xl mx-auto">
+              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                <Calendar className="w-16 h-16 text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No Upcoming Events</h3>
+                <p className="text-muted-foreground">
+                  Check back soon for exciting events and community gatherings!
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {events.map((event) => (
+                <Card 
+                  key={event.id} 
+                  className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border"
+                >
+                  {event.image_url && (
+                    <div className="relative w-full h-48 overflow-hidden">
+                      <img
+                        src={event.image_url}
+                        alt={event.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                    </div>
+                  )}
+                  <CardHeader className={event.image_url ? "-mt-8 relative z-10" : ""}>
+                    <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                      {event.title}
+                    </CardTitle>
+                    <CardDescription className="flex flex-col gap-2 mt-2">
+                      <span className="flex items-center gap-2 text-primary font-medium">
+                        <Calendar className="w-4 h-4" />
+                        {format(new Date(event.event_date), "EEEE, MMMM do, yyyy")}
+                      </span>
+                      <span className="flex items-center gap-2 text-muted-foreground">
+                        <span className="text-sm">
+                          {format(new Date(event.event_date), "h:mm a")}
+                        </span>
+                      </span>
+                      {event.location && (
+                        <span className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-muted-foreground">{event.location}</span>
+                        </span>
+                      )}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {event.description && (
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                        {event.description}
+                      </p>
+                    )}
+                    {event.external_link && (
+                      <Button asChild variant="default" size="sm" className="w-full">
+                        <a
+                          href={event.external_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2"
+                        >
+                          Learn More & Register
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
+      
+      <Footer />
+    </>
   );
 }

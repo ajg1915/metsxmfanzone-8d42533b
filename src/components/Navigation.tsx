@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Play, Users, Menu, Shield, User, LogOut, LayoutDashboard, X, Trophy } from "lucide-react";
+import { Play, Users, Menu, Shield, User, LogOut, LayoutDashboard, X, Trophy, CalendarDays } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -122,6 +122,12 @@ const Navigation = () => {
               className="text-foreground hover:text-primary transition-colors"
             >
               Podcast
+            </button>
+            <button
+              onClick={() => handleProtectedNavigation("/events")}
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              Events
             </button>
             <NavLink 
               to="/plans" 
@@ -248,6 +254,16 @@ const Navigation = () => {
                   >
                     <Play className="w-4 h-4" />
                     Podcast
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleProtectedNavigation("/events");
+                    }}
+                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
+                  >
+                    <CalendarDays className="w-4 h-4" />
+                    Events
                   </button>
                   <NavLink 
                     to="/plans" 
