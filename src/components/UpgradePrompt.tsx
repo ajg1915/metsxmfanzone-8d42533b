@@ -1,37 +1,38 @@
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 interface UpgradePromptProps {
   open: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function UpgradePrompt({ open }: UpgradePromptProps) {
+export function UpgradePrompt({ open, onOpenChange }: UpgradePromptProps) {
   const navigate = useNavigate();
 
-  const handleGoBack = () => {
-    navigate(-1);
+  const handleClose = () => {
+    onOpenChange?.(false);
   };
 
   return (
-    <AlertDialog open={open}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Upgrade Required</AlertDialogTitle>
-          <AlertDialogDescription>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Upgrade Required</DialogTitle>
+          <DialogDescription>
             Access to live streams and upcoming stream sections requires a Monthly or Annual membership. 
             Upgrade your plan to enjoy exclusive live content and premium features.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <Button variant="outline" onClick={handleGoBack}>
-            Go Back
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex-col sm:flex-row gap-2">
+          <Button variant="outline" onClick={handleClose}>
+            Maybe Later
           </Button>
           <Button onClick={() => navigate("/plans")}>
             View Plans
           </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
