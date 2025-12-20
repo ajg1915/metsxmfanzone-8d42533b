@@ -197,7 +197,7 @@ const Live = () => {
 
   if (!hasAccess) {
     return <>
-        <UpgradePrompt open={true} />
+        <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
         <div className="min-h-screen bg-background">
           <Helmet>
             <title>Watch Mets Live Streams - Live Game Coverage & Analysis | MetsXMFanZone</title>
@@ -207,8 +207,10 @@ const Live = () => {
           </Helmet>
           <Navigation />
           <main className="pt-16 flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background">
-            <div className="text-center">
-              <p className="text-muted-foreground">Loading...</p>
+            <div className="text-center space-y-4">
+              <Lock className="w-12 h-12 mx-auto text-muted-foreground" />
+              <p className="text-muted-foreground">Premium content requires a subscription</p>
+              <Button onClick={() => setShowUpgradePrompt(true)}>View Upgrade Options</Button>
             </div>
           </main>
           <Footer />
