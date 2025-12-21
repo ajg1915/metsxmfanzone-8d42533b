@@ -103,21 +103,10 @@ const Auth = () => {
 
   const sendOtpEmail = async (userEmail: string, otp: string) => {
     try {
-      const { error } = await supabase.functions.invoke('send-user-email', {
+      const { data, error } = await supabase.functions.invoke('send-otp-email', {
         body: {
           to: userEmail,
-          subject: 'Your MetsXMFanZone Verification Code',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #002D72;">Two-Factor Authentication</h2>
-              <p>Your verification code is:</p>
-              <div style="background: #f4f4f4; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 20px 0;">
-                ${otp}
-              </div>
-              <p style="color: #666;">This code expires in 5 minutes.</p>
-              <p style="color: #666; font-size: 12px;">If you didn't request this code, please ignore this email.</p>
-            </div>
-          `,
+          otp: otp,
         },
       });
       
@@ -125,6 +114,8 @@ const Auth = () => {
         console.error('Failed to send OTP email:', error);
         return false;
       }
+      
+      console.log('OTP email response:', data);
       return true;
     } catch (err) {
       console.error('Error sending OTP:', err);
