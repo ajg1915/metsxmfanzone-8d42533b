@@ -449,7 +449,7 @@ const StoriesManagement = () => {
               Add
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-[92vw] max-w-sm sm:max-w-md max-h-[85vh] overflow-y-auto overflow-x-hidden p-4 sm:p-5 gap-3">
+          <DialogContent className="w-[90vw] max-w-xs sm:max-w-sm p-3 gap-2">
             <DialogHeader>
               <DialogTitle>{editingStory ? "Edit Story" : "Add New Story"}</DialogTitle>
             </DialogHeader>
