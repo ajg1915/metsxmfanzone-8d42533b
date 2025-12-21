@@ -167,7 +167,7 @@ const StoriesSection = () => {
       </ScrollReveal>
 
       <Dialog open={!!selectedStory} onOpenChange={() => setSelectedStory(null)}>
-        <DialogContent className="max-w-[90vw] max-h-[85vh] sm:max-w-md md:max-w-lg p-0 overflow-hidden border-border/50 glass">
+        <DialogContent className="w-[92vw] max-w-sm sm:max-w-md max-h-[80vh] p-0 overflow-hidden border-border/50 glass">
           {selectedStory && (
             <div className="relative bg-background w-full animate-scale-in">
               {selectedStory.media_type === 'video' ? (
@@ -177,13 +177,13 @@ const StoriesSection = () => {
                   autoPlay 
                   playsInline 
                   muted={false} 
-                  className="w-full h-auto max-h-[60vh] object-contain" 
+                  className="w-full h-auto max-h-[50vh] object-contain"
                 />
               ) : (
                 <img 
                   src={selectedStory.media_url} 
                   alt={selectedStory.title} 
-                  className="w-full h-auto max-h-[60vh] object-contain" 
+                  className="w-full h-auto max-h-[50vh] object-contain" 
                 />
               )}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent p-2 sm:p-3">

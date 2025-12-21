@@ -449,7 +449,7 @@ const StoriesManagement = () => {
               Add
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="w-[92vw] max-w-sm sm:max-w-md max-h-[85vh] overflow-y-auto overflow-x-hidden p-4 sm:p-5 gap-3">
             <DialogHeader>
               <DialogTitle>{editingStory ? "Edit Story" : "Add New Story"}</DialogTitle>
             </DialogHeader>
@@ -478,7 +478,7 @@ const StoriesManagement = () => {
                     <img 
                       src={mediaPreview} 
                       alt="Media preview" 
-                      className="w-full h-48 object-cover"
+                       className="w-full h-36 sm:h-40 max-h-[30vh] object-cover"
                     />
                   </div>
                 )}
