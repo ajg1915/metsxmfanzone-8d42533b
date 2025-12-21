@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { Shield, ArrowLeft } from "lucide-react";
 
 const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
@@ -51,11 +53,19 @@ const Auth = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [smsOptIn, setSmsOptIn] = useState(false);
   const [loading, setLoading] = useState(false);
+  
+  // 2FA states
+  const [show2FA, setShow2FA] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
+  const [pendingUserData, setPendingUserData] = useState<{ userId: string; isSignup: boolean } | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Update isLogin based on mode parameter
     if (mode === "login") {
       setIsLogin(true);
       setIsResettingPassword(false);
@@ -70,13 +80,57 @@ const Auth = () => {
   }, [mode]);
 
   useEffect(() => {
-    // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+      if (session && !show2FA) {
         navigate("/");
       }
     });
-  }, [navigate]);
+  }, [navigate, show2FA]);
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  const generateOtp = () => {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    return { otp, expiry };
+  };
+
+  const sendOtpEmail = async (userEmail: string, otp: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('send-user-email', {
+        body: {
+          to: userEmail,
+          subject: 'Your MetsXMFanZone Verification Code',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #002D72;">Two-Factor Authentication</h2>
+              <p>Your verification code is:</p>
+              <div style="background: #f4f4f4; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 20px 0;">
+                ${otp}
+              </div>
+              <p style="color: #666;">This code expires in 5 minutes.</p>
+              <p style="color: #666; font-size: 12px;">If you didn't request this code, please ignore this email.</p>
+            </div>
+          `,
+        },
+      });
+      
+      if (error) {
+        console.error('Failed to send OTP email:', error);
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('Error sending OTP:', err);
+      return false;
+    }
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,11 +181,28 @@ const Auth = () => {
             .eq("id", data.user.id);
         }
 
-        toast({
-          title: "Success!",
-          description: "Please check your email to confirm your account.",
-        });
-        navigate(`/confirm-account?email=${encodeURIComponent(validated.email)}`);
+        // Generate and send OTP for 2FA
+        const { otp, expiry } = generateOtp();
+        setGeneratedOtp(otp);
+        setOtpExpiry(expiry);
+        setPendingUserData({ userId: data.user.id, isSignup: true });
+        
+        const emailSent = await sendOtpEmail(validated.email, otp);
+        if (emailSent) {
+          setShow2FA(true);
+          setResendCooldown(60);
+          toast({
+            title: "Verification code sent",
+            description: "Please check your email for the 6-digit code.",
+          });
+        } else {
+          // If email fails, still allow signup but warn user
+          toast({
+            title: "Account created",
+            description: "Please check your email to confirm your account.",
+          });
+          navigate(`/confirm-account?email=${encodeURIComponent(validated.email)}`);
+        }
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -182,26 +253,23 @@ const Auth = () => {
       }
 
       if (data.user) {
-        toast({
-          title: "Welcome back!",
-          description: "You've successfully logged in.",
-        });
+        // Generate and send OTP for 2FA
+        const { otp, expiry } = generateOtp();
+        setGeneratedOtp(otp);
+        setOtpExpiry(expiry);
+        setPendingUserData({ userId: data.user.id, isSignup: false });
         
-        // Check subscription plan to determine redirect
-        const { data: subscription } = await supabase
-          .from("subscriptions")
-          .select("plan_type, status")
-          .eq("user_id", data.user.id)
-          .eq("status", "active")
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .single();
-
-        // Redirect based on plan: if premium or annual go home, otherwise go to plans
-        if (subscription && (subscription.plan_type === "premium" || subscription.plan_type === "annual")) {
-          navigate("/");
+        const emailSent = await sendOtpEmail(validated.email, otp);
+        if (emailSent) {
+          setShow2FA(true);
+          setResendCooldown(60);
+          toast({
+            title: "Verification code sent",
+            description: "Please check your email for the 6-digit code.",
+          });
         } else {
-          navigate("/plans");
+          // If email fails, proceed without 2FA
+          completeAuthentication(data.user.id, false);
         }
       }
     } catch (error) {
@@ -221,6 +289,106 @@ const Auth = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const completeAuthentication = async (userId: string, isSignup: boolean) => {
+    if (isSignup) {
+      toast({
+        title: "Success!",
+        description: "Your account has been verified.",
+      });
+      navigate(`/confirm-account?email=${encodeURIComponent(email)}`);
+    } else {
+      toast({
+        title: "Welcome back!",
+        description: "You've successfully logged in.",
+      });
+      
+      // Check subscription plan to determine redirect
+      const { data: subscription } = await supabase
+        .from("subscriptions")
+        .select("plan_type, status")
+        .eq("user_id", userId)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (subscription && (subscription.plan_type === "premium" || subscription.plan_type === "annual")) {
+        navigate("/");
+      } else {
+        navigate("/plans");
+      }
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otpCode || otpCode.length !== 6) {
+      toast({
+        title: "Invalid code",
+        description: "Please enter the 6-digit verification code.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if OTP has expired
+    if (otpExpiry && new Date() > otpExpiry) {
+      toast({
+        title: "Code expired",
+        description: "Your verification code has expired. Please request a new one.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (otpCode === generatedOtp && pendingUserData) {
+      setLoading(true);
+      await completeAuthentication(pendingUserData.userId, pendingUserData.isSignup);
+      setLoading(false);
+    } else {
+      toast({
+        title: "Invalid code",
+        description: "The verification code is incorrect. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    
+    setLoading(true);
+    const { otp, expiry } = generateOtp();
+    setGeneratedOtp(otp);
+    setOtpExpiry(expiry);
+    setOtpCode("");
+    
+    const emailSent = await sendOtpEmail(email, otp);
+    if (emailSent) {
+      setResendCooldown(60);
+      toast({
+        title: "Code resent",
+        description: "A new verification code has been sent to your email.",
+      });
+    } else {
+      toast({
+        title: "Failed to resend",
+        description: "Unable to send verification code. Please try again.",
+        variant: "destructive",
+      });
+    }
+    setLoading(false);
+  };
+
+  const handleBack2FA = async () => {
+    // Sign out and reset 2FA state
+    await supabase.auth.signOut();
+    setShow2FA(false);
+    setOtpCode("");
+    setGeneratedOtp("");
+    setOtpExpiry(null);
+    setPendingUserData(null);
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -248,7 +416,6 @@ const Auth = () => {
         description: "We've sent you a password reset link. Please check your inbox.",
       });
       
-      // Return to login after successful request
       setTimeout(() => {
         setIsForgotPassword(false);
         setEmail("");
@@ -316,6 +483,75 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  // 2FA Verification Screen
+  if (show2FA) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="h-6 w-6 text-primary" />
+              <CardTitle className="text-2xl font-bold">Two-Factor Authentication</CardTitle>
+            </div>
+            <CardDescription>
+              Enter the 6-digit code sent to <span className="font-medium text-foreground">{email}</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex justify-center">
+              <InputOTP
+                maxLength={6}
+                value={otpCode}
+                onChange={setOtpCode}
+                disabled={loading}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+
+            <Button 
+              onClick={handleVerifyOtp} 
+              className="w-full" 
+              disabled={loading || otpCode.length !== 6}
+            >
+              {loading ? "Verifying..." : "Verify Code"}
+            </Button>
+
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Didn't receive the code?{" "}
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={resendCooldown > 0 || loading}
+                  className="text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
+                </button>
+              </p>
+              <button
+                type="button"
+                onClick={handleBack2FA}
+                className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mx-auto"
+                disabled={loading}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to login
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
