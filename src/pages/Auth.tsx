@@ -295,15 +295,11 @@ const Auth = () => {
         description: "You've successfully logged in.",
       });
       
-      // Check subscription plan to determine redirect
-      const { data: subscription } = await supabase
-        .from("subscriptions")
-        .select("plan_type, status")
-        .eq("user_id", userId)
-        .eq("status", "active")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
+      // Check subscription plan to determine redirect using safe function
+      const { data: subscriptions } = await supabase
+        .rpc("get_user_subscription_safe", { p_user_id: userId });
+      
+      const subscription = subscriptions?.find(s => s.status === "active");
 
       if (subscription && (subscription.plan_type === "premium" || subscription.plan_type === "annual")) {
         navigate("/");
