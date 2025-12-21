@@ -167,7 +167,7 @@ const StoriesSection = () => {
       </ScrollReveal>
 
       <Dialog open={!!selectedStory} onOpenChange={() => setSelectedStory(null)}>
-        <DialogContent className="max-w-[95vw] sm:max-w-xl md:max-w-2xl lg:max-w-3xl p-0 overflow-hidden border-border/50 glass">
+        <DialogContent className="max-w-[90vw] max-h-[85vh] sm:max-w-md md:max-w-lg p-0 overflow-hidden border-border/50 glass">
           {selectedStory && (
             <div className="relative bg-background w-full animate-scale-in">
               {selectedStory.media_type === 'video' ? (
@@ -177,17 +177,17 @@ const StoriesSection = () => {
                   autoPlay 
                   playsInline 
                   muted={false} 
-                  className="w-full h-auto max-h-[80vh] sm:max-h-[85vh] object-contain" 
+                  className="w-full h-auto max-h-[60vh] object-contain" 
                 />
               ) : (
                 <img 
                   src={selectedStory.media_url} 
                   alt={selectedStory.title} 
-                  className="w-full h-auto max-h-[80vh] sm:max-h-[85vh] object-contain" 
+                  className="w-full h-auto max-h-[60vh] object-contain" 
                 />
               )}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent p-3 sm:p-4">
-                <h3 className="text-foreground text-sm sm:text-base md:text-lg font-bold">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent p-2 sm:p-3">
+                <h3 className="text-foreground text-xs sm:text-sm font-bold truncate">
                   {selectedStory.title}
                 </h3>
               </div>
