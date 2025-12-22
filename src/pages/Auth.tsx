@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { Shield, ArrowLeft } from "lucide-react";
 import AuthBackground from "@/components/AuthBackground";
+import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 
 const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
@@ -484,11 +485,11 @@ const Auth = () => {
           <CardHeader className="space-y-1">
             <div className="flex flex-col items-center gap-3 mb-4">
               <img 
-                src="/lovable-uploads/c3090947-0cd0-4d19-89d1-ab61eb4e92d5.png" 
+                src={authLogo} 
                 alt="MetsXMFanZone" 
-                className="h-16 w-auto object-contain"
+                className="h-20 w-auto object-contain"
               />
-              <span className="text-lg font-bold text-primary">MetsXMFanZone</span>
+              <span className="text-lg font-bold text-[#FF5910]">MetsXMFanZone.com</span>
             </div>
             <div className="flex items-center justify-center gap-2 mb-2">
               <Shield className="h-5 w-5 text-primary" />
@@ -560,11 +561,11 @@ const Auth = () => {
         <CardHeader className="space-y-1">
           <div className="flex flex-col items-center gap-3 mb-4">
             <img 
-              src="/lovable-uploads/c3090947-0cd0-4d19-89d1-ab61eb4e92d5.png" 
+              src={authLogo} 
               alt="MetsXMFanZone" 
-              className="h-16 w-auto object-contain"
+              className="h-20 w-auto object-contain"
             />
-            <span className="text-lg font-bold text-primary">MetsXMFanZone</span>
+            <span className="text-lg font-bold text-[#FF5910]">MetsXMFanZone.com</span>
           </div>
           <CardTitle className="text-2xl font-bold text-center">
             {isResettingPassword ? "Set New Password" : isForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Create Account"}
