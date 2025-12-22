@@ -53,6 +53,39 @@ export type Database = {
         }
         Relationships: []
       }
+      background_settings: {
+        Row: {
+          background_type: string
+          background_value: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          page_type: string
+          updated_at: string
+        }
+        Insert: {
+          background_type: string
+          background_value: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          page_type: string
+          updated_at?: string
+        }
+        Update: {
+          background_type?: string
+          background_value?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          page_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_comments: {
         Row: {
           blog_post_id: string

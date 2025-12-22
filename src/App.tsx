@@ -74,6 +74,7 @@ import LineupCardManagement from "./pages/admin/LineupCardManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
 import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
 import UserManagement from "./pages/admin/UserManagement";
+import BackgroundManagement from "./pages/admin/BackgroundManagement";
 import CreateAccount from "./pages/help/CreateAccount";
 import NavigatePlatform from "./pages/help/NavigatePlatform";
 import WatchStreams from "./pages/help/WatchStreams";
@@ -185,6 +186,7 @@ const App = () => {
             <Route path="events" element={<EventsManagement />} />
             <Route path="spring-training" element={<SpringTrainingManagement />} />
             <Route path="lineup-card-management" element={<LineupCardManagement />} />
+            <Route path="backgrounds" element={<BackgroundManagement />} />
           </Route>
           <Route path="/spring-training-live" element={<SpringTrainingLive />} />
             <Route path="/merch" element={<Merch />} />
