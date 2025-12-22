@@ -48,6 +48,7 @@ const BackgroundManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["background-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["active-background"] });
       toast.success("Background created successfully");
       setNewBackground({
         page_type: "auth",
@@ -68,6 +69,7 @@ const BackgroundManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["background-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["active-background"] });
       toast.success("Background deleted");
     },
     onError: (error) => {
@@ -93,6 +95,7 @@ const BackgroundManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["background-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["active-background"] });
       toast.success("Background activated");
     },
     onError: (error) => {
@@ -102,7 +105,14 @@ const BackgroundManagement = () => {
 
   const getBackgroundPreview = (type: string, value: string) => {
     if (type === "image") {
-      return { backgroundImage: `url(${value})`, backgroundSize: "cover", backgroundPosition: "center" };
+      const v = value.trim();
+      const backgroundImage = v.startsWith("url(") ? v : `url(${v})`;
+      return {
+        backgroundImage,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      };
     }
     if (type === "gradient") {
       return { background: value };
