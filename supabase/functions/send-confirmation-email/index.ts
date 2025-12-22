@@ -28,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
     let subject = "";
 
     if (type === "welcome") {
-      subject = "Welcome to MetsXMFanZone!";
+      subject = "Welcome to MetsXMFanZone.com";
       emailContent = `
         <!DOCTYPE html>
         <html>
@@ -130,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "MetsXMFanZone <onboarding@resend.dev>",
+      from: "MetsXMFanZone.com <onboarding@resend.dev>",
       to: [email],
       subject: subject,
       html: emailContent,
@@ -147,13 +147,10 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: any) {
     console.error("Error sending email:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
 };
 
