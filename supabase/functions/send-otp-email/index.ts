@@ -40,40 +40,32 @@ serve(async (req) => {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
         </head>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
-          <div style="background-color: #ffffff; border-radius: 8px; padding: 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #002D72; margin: 0; font-size: 28px;">MetsXMFanZone</h1>
-              <p style="color: #FF5910; margin: 5px 0 0; font-size: 14px;">Two-Factor Authentication</p>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
+          <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
+            <div style="text-align: center; margin-bottom: 16px;">
+              <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
             </div>
             
-            <h2 style="color: #333; text-align: center; margin-bottom: 20px;">Verify Your Identity</h2>
-            
-            <p style="color: #555; text-align: center; margin-bottom: 30px;">
-              Enter the following code to complete your sign-in:
+            <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 12px;">
+              Your verification code:
             </p>
             
-            <div style="background: linear-gradient(135deg, #002D72 0%, #003087 100%); padding: 25px; text-align: center; border-radius: 8px; margin: 20px 0;">
-              <span style="font-size: 36px; font-weight: bold; letter-spacing: 12px; color: #ffffff; font-family: 'Courier New', monospace;">
+            <div style="background: #002D72; padding: 12px 16px; text-align: center; border-radius: 6px; margin-bottom: 12px;">
+              <span style="font-size: 24px; font-weight: bold; letter-spacing: 6px; color: #ffffff; font-family: 'Courier New', monospace;">
                 ${otp}
               </span>
             </div>
             
-            <p style="color: #888; text-align: center; font-size: 14px; margin-top: 30px;">
-              This code expires in <strong>5 minutes</strong>.
+            <p style="color: #666; text-align: center; font-size: 11px; margin: 0 0 12px;">
+              Expires in <strong style="color: #FF5910;">5 min</strong>
             </p>
             
-            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-            
-            <p style="color: #999; font-size: 12px; text-align: center;">
-              If you didn't request this code, you can safely ignore this email.<br>
-              Someone may have entered your email address by mistake.
-            </p>
+            <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
+              <p style="color: #555; font-size: 10px; text-align: center; margin: 0;">
+                Didn't request this? Ignore this email.
+              </p>
+            </div>
           </div>
-          
-          <p style="color: #aaa; font-size: 11px; text-align: center; margin-top: 20px;">
-            © ${new Date().getFullYear()} MetsXMFanZone. All rights reserved.
-          </p>
         </body>
         </html>
       `,
