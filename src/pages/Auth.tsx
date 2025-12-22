@@ -482,11 +482,19 @@ const Auth = () => {
         <AuthBackground />
         <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl">
           <CardHeader className="space-y-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Shield className="h-6 w-6 text-primary" />
-              <CardTitle className="text-2xl font-bold">Two-Factor Authentication</CardTitle>
+            <div className="flex flex-col items-center gap-3 mb-4">
+              <img 
+                src="/lovable-uploads/c3090947-0cd0-4d19-89d1-ab61eb4e92d5.png" 
+                alt="MetsXMFanZone" 
+                className="h-16 w-auto object-contain"
+              />
+              <span className="text-lg font-bold text-primary">MetsXMFanZone</span>
             </div>
-            <CardDescription>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Shield className="h-5 w-5 text-primary" />
+              <CardTitle className="text-xl font-bold">Two-Factor Authentication</CardTitle>
+            </div>
+            <CardDescription className="text-center">
               Enter the 6-digit code sent to <span className="font-medium text-foreground">{email}</span>
             </CardDescription>
           </CardHeader>
@@ -550,6 +558,14 @@ const Auth = () => {
       <AuthBackground />
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl">
         <CardHeader className="space-y-1">
+          <div className="flex flex-col items-center gap-3 mb-4">
+            <img 
+              src="/lovable-uploads/c3090947-0cd0-4d19-89d1-ab61eb4e92d5.png" 
+              alt="MetsXMFanZone" 
+              className="h-16 w-auto object-contain"
+            />
+            <span className="text-lg font-bold text-primary">MetsXMFanZone</span>
+          </div>
           <CardTitle className="text-2xl font-bold text-center">
             {isResettingPassword ? "Set New Password" : isForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Create Account"}
           </CardTitle>
