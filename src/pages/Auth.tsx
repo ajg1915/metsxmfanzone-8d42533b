@@ -15,10 +15,84 @@ import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 
 const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
+// Common disposable email domains to block
+const disposableEmailDomains = [
+  "tempmail.com", "temp-mail.org", "guerrillamail.com", "guerrillamail.org",
+  "mailinator.com", "maildrop.cc", "10minutemail.com", "10minutemail.net",
+  "throwaway.email", "fakeinbox.com", "trashmail.com", "tempail.com",
+  "getnada.com", "mohmal.com", "emailondeck.com", "dispostable.com",
+  "yopmail.com", "yopmail.fr", "sharklasers.com", "guerrillamailblock.com",
+  "pokemail.net", "spam4.me", "grr.la", "binkmail.com", "getairmail.com",
+  "dropmail.me", "mailnesia.com", "spambox.us", "tempr.email", "discard.email",
+  "throwawaymail.com", "mailforspam.com", "armyspy.com", "cuvox.de",
+  "dayrep.com", "einrot.com", "fleckens.hu", "gustr.com", "jourrapide.com",
+  "rhyta.com", "superrito.com", "teleworm.us", "tmail.com", "tmails.net",
+  "tmpmail.org", "tmpmail.net", "mailcatch.com", "mytemp.email"
+];
+
+// Common email typos to suggest corrections
+const emailTypoSuggestions: Record<string, string> = {
+  "gmial.com": "gmail.com",
+  "gmal.com": "gmail.com", 
+  "gmai.com": "gmail.com",
+  "gmail.co": "gmail.com",
+  "gamil.com": "gmail.com",
+  "gnail.com": "gmail.com",
+  "hotmal.com": "hotmail.com",
+  "hotmai.com": "hotmail.com",
+  "hotamil.com": "hotmail.com",
+  "hotmial.com": "hotmail.com",
+  "outloo.com": "outlook.com",
+  "outlok.com": "outlook.com",
+  "outllok.com": "outlook.com",
+  "yaho.com": "yahoo.com",
+  "yahooo.com": "yahoo.com",
+  "yhaoo.com": "yahoo.com",
+  "iclod.com": "icloud.com",
+  "icoud.com": "icloud.com",
+};
+
+// Validate email is not disposable and check for typos
+const validateEmailDomain = (email: string): { valid: boolean; message?: string; suggestion?: string } => {
+  const domain = email.toLowerCase().split("@")[1];
+  
+  if (!domain) {
+    return { valid: false, message: "Invalid email format" };
+  }
+  
+  // Check for disposable email
+  if (disposableEmailDomains.includes(domain)) {
+    return { valid: false, message: "Temporary or disposable email addresses are not allowed. Please use a permanent email." };
+  }
+  
+  // Check for common typos
+  if (emailTypoSuggestions[domain]) {
+    return { 
+      valid: false, 
+      message: `Did you mean ${email.split("@")[0]}@${emailTypoSuggestions[domain]}?`,
+      suggestion: `${email.split("@")[0]}@${emailTypoSuggestions[domain]}`
+    };
+  }
+  
+  // Check for very short domains (likely invalid)
+  if (domain.length < 4 || !domain.includes(".")) {
+    return { valid: false, message: "Please enter a valid email domain" };
+  }
+  
+  return { valid: true };
+};
+
 const signupSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.string()
+    .email("Invalid email address")
+    .refine((email) => {
+      const result = validateEmailDomain(email);
+      return result.valid;
+    }, {
+      message: "Please use a valid, permanent email address",
+    }),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  fullName: z.string().min(2, "Name must be at least 2 characters"),
+  fullName: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
   phoneNumber: z.string().optional().refine((val) => !val || phoneRegex.test(val), {
     message: "Invalid phone number format (e.g., 555-123-4567)",
   }),
@@ -161,6 +235,17 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // First check for email domain issues with custom messages
+    const emailValidation = validateEmailDomain(email);
+    if (!emailValidation.valid) {
+      toast({
+        title: emailValidation.suggestion ? "Did you mean?" : "Invalid email",
+        description: emailValidation.message,
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       const validated = signupSchema.parse({ email, password, fullName, phoneNumber, smsOptIn });
