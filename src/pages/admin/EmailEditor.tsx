@@ -5,11 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Loader2, Send, Users, Newspaper, User, Eye, X } from "lucide-react";
+import { Mail, Loader2, Send, Users, Newspaper, User, Eye, X, TestTube, ShieldCheck, UserPlus, CreditCard } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,24 +26,234 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 type RecipientType = "all_users" | "subscribers" | "specific";
+type EmailTemplateType = "custom" | "otp" | "welcome" | "subscription";
 
 interface RecipientCounts {
   allUsers: number;
   subscribers: number;
 }
 
+// Email template HTML generator functions
+const generateOtpEmailHtml = (otp: string) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
+  <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
+    <div style="text-align: center; margin-bottom: 16px;">
+      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px;" />
+      <div>
+        <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
+      </div>
+    </div>
+    
+    <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 12px;">
+      Your verification code:
+    </p>
+    
+    <div style="background: #002D72; padding: 12px 16px; text-align: center; border-radius: 6px; margin-bottom: 12px;">
+      <span style="font-size: 24px; font-weight: bold; letter-spacing: 6px; color: #ffffff; font-family: 'Courier New', monospace;">
+        ${otp}
+      </span>
+    </div>
+    
+    <p style="color: #666; text-align: center; font-size: 11px; margin: 0 0 12px;">
+      Expires in <strong style="color: #FF5910;">5 min</strong>
+    </p>
+    
+    <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
+      <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
+        Didn't request this? Ignore this email.
+      </p>
+      <div style="text-align: center; margin-bottom: 8px;">
+        <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+      </div>
+      <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
+        <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+const generateWelcomeEmailHtml = (name: string) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
+  <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
+    <div style="text-align: center; margin-bottom: 16px;">
+      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px;" />
+      <div>
+        <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
+      </div>
+    </div>
+    
+    <p style="color: #ffffff; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
+      Welcome, ${name}!
+    </p>
+    
+    <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 16px;">
+      Your account has been created successfully.
+    </p>
+    
+    <div style="background: #002D72; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+      <p style="color: #ffffff; font-size: 11px; margin: 0 0 8px; font-weight: bold;">What's Next:</p>
+      <ul style="color: #d0d0d0; font-size: 10px; margin: 0; padding-left: 16px;">
+        <li style="margin-bottom: 4px;">Choose a subscription plan</li>
+        <li style="margin-bottom: 4px;">Watch live streams</li>
+        <li style="margin-bottom: 4px;">Connect with fans</li>
+      </ul>
+    </div>
+    
+    <p style="color: #FF5910; text-align: center; font-size: 12px; font-weight: bold; margin: 0 0 12px;">
+      Let's Go Mets!
+    </p>
+    
+    <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
+      <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
+        The MetsXMFanZone Team
+      </p>
+      <div style="text-align: center; margin-bottom: 8px;">
+        <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+      </div>
+      <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
+        <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+const generateSubscriptionEmailHtml = (name: string, planName: string, amount: string) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
+  <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
+    <div style="text-align: center; margin-bottom: 16px;">
+      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px;" />
+      <div>
+        <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
+      </div>
+    </div>
+    
+    <p style="color: #4ade80; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
+      Payment Successful!
+    </p>
+    
+    <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 16px;">
+      Hi ${name}, your subscription is active.
+    </p>
+    
+    <div style="background: #002D72; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+        <span style="color: #a0a0a0; font-size: 11px;">Plan:</span>
+        <span style="color: #ffffff; font-size: 11px; font-weight: bold;">${planName}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+        <span style="color: #a0a0a0; font-size: 11px;">Amount:</span>
+        <span style="color: #ffffff; font-size: 11px; font-weight: bold;">$${amount}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="color: #a0a0a0; font-size: 11px;">Status:</span>
+        <span style="color: #4ade80; font-size: 11px; font-weight: bold;">Active</span>
+      </div>
+    </div>
+    
+    <div style="background: #1f1f3a; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
+      <p style="color: #FF5910; font-size: 10px; margin: 0 0 6px; font-weight: bold;">Your Benefits:</p>
+      <p style="color: #d0d0d0; font-size: 10px; margin: 0; line-height: 1.4;">
+        Live streams • Replays • Premium content • Ad-free
+      </p>
+    </div>
+    
+    <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
+      <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
+        The MetsXMFanZone Team
+      </p>
+      <div style="text-align: center; margin-bottom: 8px;">
+        <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+      </div>
+      <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
+        <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
+
 export default function EmailEditor() {
+  const [activeTab, setActiveTab] = useState<EmailTemplateType>("custom");
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
   const [recipientType, setRecipientType] = useState<RecipientType>("all_users");
   const [specificEmails, setSpecificEmails] = useState<string[]>([]);
   const [emailInput, setEmailInput] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [isSendingTest, setIsSendingTest] = useState(false);
   const [showSendDialog, setShowSendDialog] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [recipientCounts, setRecipientCounts] = useState<RecipientCounts>({ allUsers: 0, subscribers: 0 });
+  const [testEmail, setTestEmail] = useState("");
+  
+  // Template-specific fields
+  const [otpCode, setOtpCode] = useState("123456");
+  const [welcomeName, setWelcomeName] = useState("Mets Fan");
+  const [subscriptionName, setSubscriptionName] = useState("Mets Fan");
+  const [subscriptionPlan, setSubscriptionPlan] = useState("Premium Monthly");
+  const [subscriptionAmount, setSubscriptionAmount] = useState("4.99");
+  
   const { toast } = useToast();
 
   // Fetch recipient counts
@@ -113,8 +322,99 @@ export default function EmailEditor() {
     }
   };
 
+  const getCurrentEmailHtml = () => {
+    switch (activeTab) {
+      case "otp":
+        return generateOtpEmailHtml(otpCode);
+      case "welcome":
+        return generateWelcomeEmailHtml(welcomeName);
+      case "subscription":
+        return generateSubscriptionEmailHtml(subscriptionName, subscriptionPlan, subscriptionAmount);
+      case "custom":
+      default:
+        return content;
+    }
+  };
+
+  const getCurrentSubject = () => {
+    switch (activeTab) {
+      case "otp":
+        return "Your MetsXMFanZone Verification Code";
+      case "welcome":
+        return "Welcome to MetsXMFanZone.com";
+      case "subscription":
+        return `Payment Confirmed - ${subscriptionPlan} Plan`;
+      case "custom":
+      default:
+        return subject;
+    }
+  };
+
+  const sendTestEmail = async () => {
+    if (!testEmail.trim() || !testEmail.includes("@")) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address for testing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingTest(true);
+
+    try {
+      if (activeTab === "otp") {
+        const { error } = await supabase.functions.invoke("send-otp-email", {
+          body: { to: testEmail, otp: otpCode },
+        });
+        if (error) throw error;
+      } else if (activeTab === "welcome") {
+        const { error } = await supabase.functions.invoke("send-confirmation-email", {
+          body: { type: "welcome", email: testEmail, name: welcomeName },
+        });
+        if (error) throw error;
+      } else if (activeTab === "subscription") {
+        const { error } = await supabase.functions.invoke("send-confirmation-email", {
+          body: { 
+            type: "subscription", 
+            email: testEmail, 
+            name: subscriptionName,
+            planType: subscriptionPlan.toLowerCase().includes("annual") ? "annual" : "premium",
+            amount: subscriptionAmount,
+          },
+        });
+        if (error) throw error;
+      } else {
+        // Custom email
+        const { error } = await supabase.functions.invoke("send-user-email", {
+          body: { 
+            subject, 
+            content,
+            recipientType: "specific",
+            specificEmails: [testEmail],
+          },
+        });
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Test Email Sent!",
+        description: `Test email sent to ${testEmail}`,
+      });
+    } catch (error: any) {
+      console.error("Error sending test email:", error);
+      toast({
+        title: "Send Failed",
+        description: error.message || "Failed to send test email",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
+
   const handleSend = async () => {
-    if (!subject.trim() || !content.trim()) {
+    if (activeTab === "custom" && (!subject.trim() || !content.trim())) {
       toast({
         title: "Required Fields",
         description: "Please enter both subject and content before sending",
@@ -142,8 +442,8 @@ export default function EmailEditor() {
     try {
       const { data, error } = await supabase.functions.invoke("send-user-email", {
         body: { 
-          subject, 
-          content,
+          subject: getCurrentSubject(), 
+          content: getCurrentEmailHtml(),
           recipientType,
           specificEmails: recipientType === "specific" ? specificEmails : undefined,
         },
@@ -157,8 +457,10 @@ export default function EmailEditor() {
       });
       
       // Clear form after successful send
-      setSubject("");
-      setContent("");
+      if (activeTab === "custom") {
+        setSubject("");
+        setContent("");
+      }
       setSpecificEmails([]);
     } catch (error: any) {
       console.error("Error sending email:", error);
@@ -225,185 +527,417 @@ export default function EmailEditor() {
       <div className="mb-4 sm:mb-6">
         <h2 className="text-xl sm:text-2xl font-bold mb-1">Email Editor</h2>
         <p className="text-xs sm:text-sm text-muted-foreground">
-          Send emails to registered users and newsletter subscribers
+          Manage and test all email templates
         </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* Main Editor */}
-        <div className="lg:col-span-2 space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Compose Email
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Use {"{{name}}"} to personalize with recipient's name
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Recipient Selection */}
-              <div className="space-y-2">
-                <Label className="text-sm">Recipients</Label>
-                <Select value={recipientType} onValueChange={(v) => setRecipientType(v as RecipientType)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all_users">
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4" />
-                        All Registered Users ({recipientCounts.allUsers})
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="subscribers">
-                      <div className="flex items-center gap-2">
-                        <Newspaper className="w-4 h-4" />
-                        Newsletter Subscribers ({recipientCounts.subscribers})
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="specific">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        Specific Recipients
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as EmailTemplateType)} className="space-y-4">
+        <TabsList className="grid grid-cols-4 w-full">
+          <TabsTrigger value="custom" className="text-xs sm:text-sm">
+            <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            Custom
+          </TabsTrigger>
+          <TabsTrigger value="otp" className="text-xs sm:text-sm">
+            <ShieldCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            2FA
+          </TabsTrigger>
+          <TabsTrigger value="welcome" className="text-xs sm:text-sm">
+            <UserPlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            Welcome
+          </TabsTrigger>
+          <TabsTrigger value="subscription" className="text-xs sm:text-sm">
+            <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            Payment
+          </TabsTrigger>
+        </TabsList>
 
-              {/* Specific Emails Input */}
-              {recipientType === "specific" && (
+        {/* Test Email Section - Shown for all tabs */}
+        <Card className="border-dashed border-2 border-muted">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <TestTube className="w-4 h-4" />
+              Send Test Email
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Test the current template before sending to users
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              <Input
+                type="email"
+                placeholder="Enter test email address"
+                value={testEmail}
+                onChange={(e) => setTestEmail(e.target.value)}
+                className="flex-1 text-sm"
+              />
+              <Button
+                onClick={sendTestEmail}
+                size="sm"
+                variant="secondary"
+                disabled={isSendingTest || !testEmail.trim()}
+              >
+                {isSendingTest ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-1" />
+                    Test
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 2FA OTP Tab */}
+        <TabsContent value="otp" className="space-y-4">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4" />
+                  2FA Verification Email
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Configure the OTP code for preview
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-sm">Add Email Addresses</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="email"
-                      placeholder="Enter email and press Enter"
-                      value={emailInput}
-                      onChange={(e) => setEmailInput(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      className="flex-1 text-sm"
-                    />
-                    <Button type="button" onClick={addEmail} size="sm">
-                      Add
-                    </Button>
-                  </div>
-                  {specificEmails.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {specificEmails.map((email) => (
-                        <Badge key={email} variant="secondary" className="text-xs">
-                          {email}
-                          <button
-                            onClick={() => removeEmail(email)}
-                            className="ml-1 hover:text-destructive"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
+                  <Label className="text-sm">OTP Code (Preview)</Label>
+                  <Input
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    placeholder="123456"
+                    maxLength={6}
+                    className="font-mono text-lg tracking-widest"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    This is just for preview. Actual OTP codes are generated automatically.
+                  </p>
                 </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="subject" className="text-sm">Subject *</Label>
-                <Input
-                  id="subject"
-                  placeholder="Enter email subject"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  className="text-sm"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="content" className="text-sm">Email Content (HTML) *</Label>
-                <Textarea
-                  id="content"
-                  placeholder="Write your email content here using HTML..."
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  rows={12}
-                  className="text-sm font-mono"
-                />
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-2 pt-2">
                 <Button
                   onClick={() => setShowPreview(true)}
                   variant="outline"
                   size="sm"
-                  disabled={!content.trim()}
-                  className="flex-1"
+                  className="w-full"
                 >
                   <Eye className="w-4 h-4 mr-2" />
-                  Preview
+                  Preview Email
                 </Button>
-                <Button
-                  onClick={handleSend}
-                  variant="default"
-                  size="sm"
-                  disabled={isSending || !subject.trim() || !content.trim() || getRecipientCount() === 0}
-                  className="flex-1"
-                >
-                  {isSending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      Send to {getRecipientCount()} {getRecipientCount() === 1 ? "recipient" : "recipients"}
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-[#0a0a0a] border-[#2a2a3e]">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-muted-foreground">Live Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div 
+                  className="scale-90 origin-top-left"
+                  dangerouslySetInnerHTML={{ __html: generateOtpEmailHtml(otpCode || "123456") }}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
-        {/* Templates Sidebar */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Quick Templates</CardTitle>
-              <CardDescription className="text-xs">
-                Click to load a template
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {emailTemplates.map((template, index) => (
+        {/* Welcome Tab */}
+        <TabsContent value="welcome" className="space-y-4">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Welcome Email
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Sent when a new user creates an account
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm">User Name (Preview)</Label>
+                  <Input
+                    value={welcomeName}
+                    onChange={(e) => setWelcomeName(e.target.value)}
+                    placeholder="Mets Fan"
+                  />
+                </div>
                 <Button
-                  key={index}
+                  onClick={() => setShowPreview(true)}
                   variant="outline"
                   size="sm"
-                  className="w-full justify-start text-xs"
-                  onClick={() => loadTemplate(template)}
+                  className="w-full"
                 >
-                  {template.name}
+                  <Eye className="w-4 h-4 mr-2" />
+                  Preview Email
                 </Button>
-              ))}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-[#0a0a0a] border-[#2a2a3e]">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-muted-foreground">Live Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div 
+                  className="scale-90 origin-top-left"
+                  dangerouslySetInnerHTML={{ __html: generateWelcomeEmailHtml(welcomeName || "Mets Fan") }}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Personalization</CardTitle>
-              <CardDescription className="text-xs">
-                Available variables
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-1">
-              <code className="text-xs bg-muted px-2 py-1 rounded block">{"{{name}}"} - Recipient's name</code>
-              <code className="text-xs bg-muted px-2 py-1 rounded block">{"{{email}}"} - Recipient's email</code>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+        {/* Subscription Tab */}
+        <TabsContent value="subscription" className="space-y-4">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <CreditCard className="w-4 h-4" />
+                  Payment Confirmation Email
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Sent after successful subscription payment
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm">User Name</Label>
+                  <Input
+                    value={subscriptionName}
+                    onChange={(e) => setSubscriptionName(e.target.value)}
+                    placeholder="Mets Fan"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">Plan Name</Label>
+                  <Select value={subscriptionPlan} onValueChange={setSubscriptionPlan}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Premium Monthly">Premium Monthly</SelectItem>
+                      <SelectItem value="Annual">Annual</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">Amount</Label>
+                  <Input
+                    value={subscriptionAmount}
+                    onChange={(e) => setSubscriptionAmount(e.target.value)}
+                    placeholder="4.99"
+                  />
+                </div>
+                <Button
+                  onClick={() => setShowPreview(true)}
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  Preview Email
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-[#0a0a0a] border-[#2a2a3e]">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-muted-foreground">Live Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div 
+                  className="scale-90 origin-top-left"
+                  dangerouslySetInnerHTML={{ __html: generateSubscriptionEmailHtml(subscriptionName || "Mets Fan", subscriptionPlan, subscriptionAmount || "4.99") }}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Custom Email Tab */}
+        <TabsContent value="custom" className="space-y-4">
+          <div className="grid gap-4 lg:grid-cols-3">
+            {/* Main Editor */}
+            <div className="lg:col-span-2 space-y-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    Compose Email
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Use {"{{name}}"} to personalize with recipient's name
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Recipient Selection */}
+                  <div className="space-y-2">
+                    <Label className="text-sm">Recipients</Label>
+                    <Select value={recipientType} onValueChange={(v) => setRecipientType(v as RecipientType)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all_users">
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4" />
+                            All Registered Users ({recipientCounts.allUsers})
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="subscribers">
+                          <div className="flex items-center gap-2">
+                            <Newspaper className="w-4 h-4" />
+                            Newsletter Subscribers ({recipientCounts.subscribers})
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="specific">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4" />
+                            Specific Recipients
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Specific Emails Input */}
+                  {recipientType === "specific" && (
+                    <div className="space-y-2">
+                      <Label className="text-sm">Add Email Addresses</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="email"
+                          placeholder="Enter email and press Enter"
+                          value={emailInput}
+                          onChange={(e) => setEmailInput(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          className="flex-1 text-sm"
+                        />
+                        <Button type="button" onClick={addEmail} size="sm">
+                          Add
+                        </Button>
+                      </div>
+                      {specificEmails.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {specificEmails.map((email) => (
+                            <Badge key={email} variant="secondary" className="text-xs">
+                              {email}
+                              <button
+                                onClick={() => removeEmail(email)}
+                                className="ml-1 hover:text-destructive"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="subject" className="text-sm">Subject *</Label>
+                    <Input
+                      id="subject"
+                      placeholder="Enter email subject"
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      className="text-sm"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="content" className="text-sm">Email Content (HTML) *</Label>
+                    <Textarea
+                      id="content"
+                      placeholder="Write your email content here using HTML..."
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      rows={12}
+                      className="text-sm font-mono"
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                    <Button
+                      onClick={() => setShowPreview(true)}
+                      variant="outline"
+                      size="sm"
+                      disabled={!content.trim()}
+                      className="flex-1"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Preview
+                    </Button>
+                    <Button
+                      onClick={handleSend}
+                      variant="default"
+                      size="sm"
+                      disabled={isSending || !subject.trim() || !content.trim() || getRecipientCount() === 0}
+                      className="flex-1"
+                    >
+                      {isSending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Send to {getRecipientCount()} {getRecipientCount() === 1 ? "recipient" : "recipients"}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Templates Sidebar */}
+            <div className="space-y-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm">Quick Templates</CardTitle>
+                  <CardDescription className="text-xs">
+                    Click to load a template
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {emailTemplates.map((template, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start text-xs"
+                      onClick={() => loadTemplate(template)}
+                    >
+                      {template.name}
+                    </Button>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm">Personalization</CardTitle>
+                  <CardDescription className="text-xs">
+                    Available variables
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-1">
+                  <code className="text-xs bg-muted px-2 py-1 rounded block">{"{{name}}"} - Recipient's name</code>
+                  <code className="text-xs bg-muted px-2 py-1 rounded block">{"{{email}}"} - Recipient's email</code>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Send Confirmation Dialog */}
       <AlertDialog open={showSendDialog} onOpenChange={setShowSendDialog}>
@@ -424,19 +958,20 @@ export default function EmailEditor() {
 
       {/* Preview Dialog */}
       <AlertDialog open={showPreview} onOpenChange={setShowPreview}>
-        <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-auto">
+        <AlertDialogContent className="max-w-md max-h-[90vh] overflow-auto bg-[#0a0a0a] border-[#2a2a3e]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Email Preview</AlertDialogTitle>
+            <AlertDialogTitle className="text-white">Email Preview</AlertDialogTitle>
             <AlertDialogDescription>
-              <strong>Subject:</strong> {subject || "(No subject)"}
+              <strong>Subject:</strong> {getCurrentSubject() || "(No subject)"}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div 
-            className="border rounded-lg p-4 bg-white text-foreground"
             dangerouslySetInnerHTML={{ 
               __html: DOMPurify.sanitize(
-                content.replace(/\{\{name\}\}/g, "John Doe").replace(/\{\{email\}\}/g, "johndoe@example.com"),
-                { ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr', 'ul', 'ol', 'li', 'a', 'strong', 'b', 'em', 'i', 'u', 'span', 'div', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'], ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'class', 'target'] }
+                activeTab === "custom" 
+                  ? content.replace(/\{\{name\}\}/g, "John Doe").replace(/\{\{email\}\}/g, "johndoe@example.com")
+                  : getCurrentEmailHtml(),
+                { ALLOWED_TAGS: ['html', 'head', 'body', 'meta', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr', 'ul', 'ol', 'li', 'a', 'strong', 'b', 'em', 'i', 'u', 'span', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'code'], ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'class', 'target', 'charset', 'name', 'content'] }
               )
             }}
           />
