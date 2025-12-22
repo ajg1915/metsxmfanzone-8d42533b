@@ -1,33 +1,69 @@
 import { motion } from "framer-motion";
+import { useBackgroundSettings } from "@/hooks/useBackgroundSettings";
 
 const AuthBackground = () => {
+  const { data: background } = useBackgroundSettings("auth");
+
+  // Dynamic background style based on settings
+  const getDynamicBackground = () => {
+    if (!background) {
+      // Default gradient if no background is set
+      return {
+        background: "linear-gradient(135deg, #002D72 0%, #001a42 50%, #0a0a0a 100%)",
+      };
+    }
+
+    switch (background.background_type) {
+      case "image":
+        return {
+          backgroundImage: `url(${background.background_value})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        };
+      case "gradient":
+        return {
+          background: background.background_value,
+        };
+      case "color":
+        return {
+          backgroundColor: background.background_value,
+        };
+      default:
+        return {
+          background: "linear-gradient(135deg, #002D72 0%, #001a42 50%, #0a0a0a 100%)",
+        };
+    }
+  };
+
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
-      {/* Base gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#002D72] via-[#001a42] to-[#0a0a0a]" />
+      {/* Dynamic background layer */}
+      <div className="absolute inset-0 transition-all duration-500" style={getDynamicBackground()} />
       
-      {/* Animated baseball stitches pattern */}
-      <svg className="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern id="stitches" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-            <path
-              d="M25 0 C 30 25, 20 50, 25 75 C 30 100, 25 100, 25 100"
-              stroke="#FF5910"
-              strokeWidth="2"
-              fill="none"
-              strokeDasharray="4 4"
-            />
-            <path
-              d="M75 0 C 70 25, 80 50, 75 75 C 70 100, 75 100, 75 100"
-              stroke="#FF5910"
-              strokeWidth="2"
-              fill="none"
-              strokeDasharray="4 4"
-            />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#stitches)" />
-      </svg>
+      {/* Animated baseball stitches pattern - only show for non-image backgrounds */}
+      {background?.background_type !== "image" && (
+        <svg className="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="stitches" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+              <path
+                d="M25 0 C 30 25, 20 50, 25 75 C 30 100, 25 100, 25 100"
+                stroke="#FF5910"
+                strokeWidth="2"
+                fill="none"
+                strokeDasharray="4 4"
+              />
+              <path
+                d="M75 0 C 70 25, 80 50, 75 75 C 70 100, 75 100, 75 100"
+                stroke="#FF5910"
+                strokeWidth="2"
+                fill="none"
+                strokeDasharray="4 4"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#stitches)" />
+        </svg>
+      )}
 
       {/* Floating orbs */}
       <motion.div
@@ -148,17 +184,19 @@ const AuthBackground = () => {
         </svg>
       </motion.div>
 
-      {/* Grid overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255,89,16,0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,89,16,0.3) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px',
-        }}
-      />
+      {/* Grid overlay - only show for non-image backgrounds */}
+      {background?.background_type !== "image" && (
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,89,16,0.3) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,89,16,0.3) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+          }}
+        />
+      )}
 
       {/* Vignette effect */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
