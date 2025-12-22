@@ -28,60 +28,104 @@ const handler = async (req: Request): Promise<Response> => {
     let subject = "";
 
     if (type === "welcome") {
-      subject = "Welcome to MetsXMFanZone! 🎉";
+      subject = "Welcome to MetsXMFanZone!";
       emailContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #002D72; text-align: center;">Welcome to MetsXMFanZone!</h1>
-          <p>Hi ${name || "Mets Fan"},</p>
-          <p>Thank you for creating an account with us! We're excited to have you join the MetsXMFanZone community.</p>
-          <p>Your account has been successfully created. You can now access exclusive Mets content, live streams, and connect with fellow fans.</p>
-          <div style="background-color: #f4f4f4; padding: 20px; margin: 20px 0; border-radius: 8px;">
-            <h3 style="margin-top: 0;">What's Next?</h3>
-            <ul>
-              <li>Choose a subscription plan to unlock premium content</li>
-              <li>Watch live game streams and replays</li>
-              <li>Read the latest Mets news and blog posts</li>
-              <li>Connect with other Mets fans in our community</li>
-            </ul>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
+          <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
+            <div style="text-align: center; margin-bottom: 16px;">
+              <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
+            </div>
+            
+            <p style="color: #ffffff; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
+              Welcome, ${name || "Mets Fan"}!
+            </p>
+            
+            <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 16px;">
+              Your account has been created successfully.
+            </p>
+            
+            <div style="background: #002D72; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+              <p style="color: #ffffff; font-size: 11px; margin: 0 0 8px; font-weight: bold;">What's Next:</p>
+              <ul style="color: #d0d0d0; font-size: 10px; margin: 0; padding-left: 16px;">
+                <li style="margin-bottom: 4px;">Choose a subscription plan</li>
+                <li style="margin-bottom: 4px;">Watch live streams</li>
+                <li style="margin-bottom: 4px;">Connect with fans</li>
+              </ul>
+            </div>
+            
+            <p style="color: #FF5910; text-align: center; font-size: 12px; font-weight: bold; margin: 0 0 12px;">
+              Let's Go Mets!
+            </p>
+            
+            <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
+              <p style="color: #555; font-size: 10px; text-align: center; margin: 0;">
+                The MetsXMFanZone Team
+              </p>
+            </div>
           </div>
-          <p>If you have any questions, feel free to reach out to our support team.</p>
-          <p style="margin-top: 30px;">Let's Go Mets!</p>
-          <p><strong>The MetsXMFanZone Team</strong></p>
-        </div>
+        </body>
+        </html>
       `;
     } else if (type === "subscription") {
       const planName = planType === "annual" ? "Annual" : "Premium Monthly";
-      subject = `Payment Confirmed - ${planName} Plan 🎊`;
+      subject = `Payment Confirmed - ${planName} Plan`;
       emailContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #002D72; text-align: center;">Payment Successful!</h1>
-          <p>Hi ${name || "Mets Fan"},</p>
-          <p>Thank you for subscribing to MetsXMFanZone! Your payment has been successfully processed.</p>
-          <div style="background-color: #f4f4f4; padding: 20px; margin: 20px 0; border-radius: 8px;">
-            <h3 style="margin-top: 0;">Subscription Details</h3>
-            <p><strong>Plan:</strong> ${planName}</p>
-            <p><strong>Amount:</strong> $${amount}</p>
-            <p><strong>Status:</strong> Active</p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
+          <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
+            <div style="text-align: center; margin-bottom: 16px;">
+              <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
+            </div>
+            
+            <p style="color: #4ade80; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
+              Payment Successful!
+            </p>
+            
+            <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 16px;">
+              Hi ${name || "Mets Fan"}, your subscription is active.
+            </p>
+            
+            <div style="background: #002D72; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: #a0a0a0; font-size: 11px;">Plan:</span>
+                <span style="color: #ffffff; font-size: 11px; font-weight: bold;">${planName}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: #a0a0a0; font-size: 11px;">Amount:</span>
+                <span style="color: #ffffff; font-size: 11px; font-weight: bold;">$${amount}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: #a0a0a0; font-size: 11px;">Status:</span>
+                <span style="color: #4ade80; font-size: 11px; font-weight: bold;">Active</span>
+              </div>
+            </div>
+            
+            <div style="background: #1f1f3a; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
+              <p style="color: #FF5910; font-size: 10px; margin: 0 0 6px; font-weight: bold;">Your Benefits:</p>
+              <p style="color: #d0d0d0; font-size: 10px; margin: 0; line-height: 1.4;">
+                Live streams • Replays • Premium content • Ad-free
+              </p>
+            </div>
+            
+            <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
+              <p style="color: #555; font-size: 10px; text-align: center; margin: 0;">
+                The MetsXMFanZone Team
+              </p>
+            </div>
           </div>
-          <div style="background-color: #e8f4f8; padding: 20px; margin: 20px 0; border-radius: 8px;">
-            <h3 style="margin-top: 0;">What You Get:</h3>
-            <ul>
-              <li>Access to all live game streams</li>
-              <li>Exclusive spring training coverage</li>
-              <li>Full access to video gallery and replays</li>
-              <li>Premium blog content and analysis</li>
-              <li>Ad-free browsing experience</li>
-              <li>Community access and engagement</li>
-            </ul>
-          </div>
-          <p>Your subscription is now active and you have full access to all premium features!</p>
-          <p style="margin-top: 30px;">Thank you for your support!</p>
-          <p><strong>The MetsXMFanZone Team</strong></p>
-          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-          <p style="font-size: 12px; color: #666; text-align: center;">
-            Questions? Contact us at support@metsxmfanzone.com
-          </p>
-        </div>
+        </body>
+        </html>
       `;
     }
 
