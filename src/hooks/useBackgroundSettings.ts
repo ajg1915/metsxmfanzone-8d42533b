@@ -19,14 +19,13 @@ export const useBackgroundSettings = (pageType: "auth" | "welcome") => {
         .select("*")
         .eq("page_type", pageType)
         .eq("is_active", true)
-        .single();
-      
-      if (error && error.code !== "PGRST116") {
-        // PGRST116 = no rows returned, which is fine
-        throw error;
-      }
-      
-      return data as BackgroundSetting | null;
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      return (data as BackgroundSetting | null) ?? null;
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });

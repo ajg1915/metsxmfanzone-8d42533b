@@ -14,12 +14,16 @@ const AuthBackground = () => {
     }
 
     switch (background.background_type) {
-      case "image":
+      case "image": {
+        const v = background.background_value.trim();
+        const backgroundImage = v.startsWith("url(") ? v : `url(${v})`;
         return {
-          backgroundImage: `url(${background.background_value})`,
+          backgroundImage,
           backgroundSize: "cover",
           backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         };
+      }
       case "gradient":
         return {
           background: background.background_value,
