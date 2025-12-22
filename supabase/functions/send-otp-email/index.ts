@@ -64,8 +64,25 @@ serve(async (req) => {
             </p>
             
             <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
-              <p style="color: #555; font-size: 10px; text-align: center; margin: 0;">
+              <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
                 Didn't request this? Ignore this email.
+              </p>
+              <div style="text-align: center; margin-bottom: 8px;">
+                <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+                  <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
+                </a>
+                <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+                  <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
+                </a>
+                <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+                  <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
+                </a>
+                <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+                  <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
+                </a>
+              </div>
+              <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
+                <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
               </p>
             </div>
           </div>
