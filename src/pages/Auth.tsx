@@ -293,28 +293,48 @@ const Auth = () => {
             .eq("id", data.user.id);
         }
 
-        // Generate and send OTP for 2FA
-        const { otp, expiry } = generateOtp();
-        setGeneratedOtp(otp);
-        setOtpExpiry(expiry);
-        setPendingUserData({ userId: data.user.id, isSignup: true });
-        
-        const emailSent = await sendOtpEmail(validated.email, otp);
-        if (emailSent) {
-          setShow2FA(true);
-          setResendCooldown(60);
-          toast({
-            title: "Verification code sent",
-            description: "Please check your email for the 6-digit code.",
+        // Generate confirmation token
+        const confirmationToken = crypto.randomUUID() + "-" + Date.now().toString(36);
+        const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+        // Store the confirmation token
+        const { error: tokenError } = await supabase
+          .from("email_confirmation_tokens")
+          .insert({
+            user_id: data.user.id,
+            token: confirmationToken,
+            email: validated.email,
+            expires_at: tokenExpiry.toISOString(),
           });
-        } else {
-          // If email fails, still allow signup but warn user
-          toast({
-            title: "Account created",
-            description: "Please check your email to confirm your account.",
-          });
-          navigate(`/confirm-account?email=${encodeURIComponent(validated.email)}`);
+
+        if (tokenError) {
+          console.error("Failed to store confirmation token:", tokenError);
         }
+
+        // Send confirmation email
+        try {
+          const { error: emailError } = await supabase.functions.invoke('send-email-confirmation', {
+            body: {
+              email: validated.email,
+              name: validated.fullName,
+              userId: data.user.id,
+              token: confirmationToken,
+            },
+          });
+
+          if (emailError) {
+            console.error("Failed to send confirmation email:", emailError);
+          }
+        } catch (err) {
+          console.error("Error sending confirmation email:", err);
+        }
+
+        // Navigate to confirmation page
+        toast({
+          title: "Account created!",
+          description: "Please check your email and click the confirmation link to activate your account.",
+        });
+        navigate(`/confirm-account?email=${encodeURIComponent(validated.email)}`);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -365,6 +385,25 @@ const Auth = () => {
       }
 
       if (data.user) {
+        // Check if email is verified
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("email_verified")
+          .eq("id", data.user.id)
+          .single();
+
+        if (!profile?.email_verified) {
+          // Sign out the user since they haven't confirmed their email
+          await supabase.auth.signOut();
+          toast({
+            title: "Email not confirmed",
+            description: "Please check your email and click the confirmation link to activate your account.",
+            variant: "destructive",
+          });
+          navigate(`/confirm-account?email=${encodeURIComponent(validated.email)}`);
+          return;
+        }
+
         // Generate and send OTP for 2FA
         const { otp, expiry } = generateOtp();
         setGeneratedOtp(otp);
