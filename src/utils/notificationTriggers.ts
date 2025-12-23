@@ -41,6 +41,34 @@ const sendPushNotification = async (
   }
 };
 
+// Helper to send email notifications
+const sendEmailNotification = async (
+  title: string,
+  message: string,
+  notificationType: 'game_alert' | 'score_update' | 'lineup' | 'news' | 'live_stream' | 'event' | 'general',
+  url?: string,
+  gameInfo?: {
+    opponent?: string;
+    date?: string;
+    time?: string;
+    location?: string;
+  }
+) => {
+  try {
+    await supabase.functions.invoke('send-game-notification-email', {
+      body: {
+        title,
+        message,
+        notificationType,
+        url,
+        gameInfo
+      }
+    });
+  } catch (error) {
+    console.error('Failed to send email notification:', error);
+  }
+};
+
 // Show browser notification if permission granted
 const showBrowserNotification = (title: string, body: string, icon: string = '/logo-192.png') => {
   if ('Notification' in window && Notification.permission === 'granted') {
@@ -70,6 +98,7 @@ export const setupNotificationListeners = () => {
         
         await sendPushNotification(title, news.title, '/#news', 'mets-news');
         await sendSMSNotification(`🔥 Breaking Mets News: ${news.title}`);
+        await sendEmailNotification(title, news.details || news.title, 'news', '/#news');
         showBrowserNotification(title, news.title);
       }
     )
@@ -93,6 +122,7 @@ export const setupNotificationListeners = () => {
           const title = '🔴 LIVE NOW!';
           await sendPushNotification(title, stream.title, '/live', 'live-stream');
           await sendSMSNotification(`🔴 LIVE NOW: ${stream.title}`);
+          await sendEmailNotification(title, stream.description || stream.title, 'live_stream', '/live');
           showBrowserNotification(title, stream.title);
         }
       }
@@ -118,6 +148,7 @@ export const setupNotificationListeners = () => {
           const title = '🔴 LIVE NOW!';
           await sendPushNotification(title, newStream.title, '/live', 'live-stream');
           await sendSMSNotification(`🔴 LIVE NOW: ${newStream.title}`);
+          await sendEmailNotification(title, newStream.description || newStream.title, 'live_stream', '/live');
           showBrowserNotification(title, newStream.title);
         }
       }
@@ -141,6 +172,7 @@ export const setupNotificationListeners = () => {
         
         await sendPushNotification(title, post.title, `/blog/${post.slug}`, 'blog-post');
         await sendSMSNotification(`📰 New Blog Post: ${post.title}`);
+        await sendEmailNotification(title, post.excerpt || post.title, 'news', `/blog/${post.slug}`);
         showBrowserNotification(title, post.title);
       }
     )
@@ -163,6 +195,16 @@ export const setupNotificationListeners = () => {
         
         await sendPushNotification(title, event.title, '/events', 'event');
         await sendSMSNotification(`📅 New Event: ${event.title}`);
+        await sendEmailNotification(
+          title, 
+          event.description || event.title, 
+          'event', 
+          '/events',
+          {
+            date: event.event_date,
+            location: event.location
+          }
+        );
         showBrowserNotification(title, event.title);
       }
     )
@@ -206,6 +248,7 @@ export const setupNotificationListeners = () => {
         
         await sendPushNotification(title, video.title, '/video-gallery', 'video');
         await sendSMSNotification(`🎬 New Video: ${video.title}`);
+        await sendEmailNotification(title, video.description || video.title, 'general', '/video-gallery');
         showBrowserNotification(title, video.title);
       }
     )
@@ -228,6 +271,7 @@ export const setupNotificationListeners = () => {
         
         await sendPushNotification(title, podcast.title, '/podcast', 'podcast');
         await sendSMSNotification(`🎙️ New Podcast: ${podcast.title}`);
+        await sendEmailNotification(title, podcast.description || podcast.title, 'general', '/podcast');
         showBrowserNotification(title, podcast.title);
       }
     )
@@ -252,6 +296,7 @@ export const setupNotificationListeners = () => {
           const title = '🎙️ Podcast LIVE NOW!';
           await sendPushNotification(title, newPodcast.title, '/community-podcast', 'podcast-live');
           await sendSMSNotification(`🎙️ Podcast LIVE: ${newPodcast.title}`);
+          await sendEmailNotification(title, newPodcast.description || newPodcast.title, 'live_stream', '/community-podcast');
           showBrowserNotification(title, newPodcast.title);
         }
       }
@@ -276,8 +321,44 @@ export const setupNotificationListeners = () => {
         if (!oldNotif.is_active && newNotif.is_active) {
           const title = '📢 Important Update!';
           await sendPushNotification(title, newNotif.message, newNotif.link_url || '/', 'announcement');
+          await sendEmailNotification(title, newNotif.message, 'general', newNotif.link_url || '/');
           showBrowserNotification(title, newNotif.message);
         }
+      }
+    )
+    .subscribe();
+
+  // Listen for new lineup cards (game alerts)
+  const lineupChannel = supabase
+    .channel('lineup-notifications')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'lineup_cards',
+        filter: 'published=eq.true'
+      },
+      async (payload) => {
+        const lineup = payload.new as any;
+        const title = '📋 Game Lineup Posted!';
+        const message = `Lineup for ${lineup.opponent} on ${lineup.game_date} is now available!`;
+        
+        await sendPushNotification(title, message, '/mets-lineup-card', 'lineup');
+        await sendSMSNotification(`📋 ${message}`);
+        await sendEmailNotification(
+          title, 
+          message, 
+          'lineup', 
+          '/mets-lineup-card',
+          {
+            opponent: lineup.opponent,
+            date: lineup.game_date,
+            time: lineup.game_time,
+            location: lineup.location
+          }
+        );
+        showBrowserNotification(title, message);
       }
     )
     .subscribe();
@@ -294,5 +375,6 @@ export const setupNotificationListeners = () => {
     supabase.removeChannel(podcastsChannel);
     supabase.removeChannel(podcastLiveChannel);
     supabase.removeChannel(liveNotificationChannel);
+    supabase.removeChannel(lineupChannel);
   };
 };
