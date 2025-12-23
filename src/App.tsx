@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { useSessionExpiryWarning } from "@/hooks/useSessionExpiryWarning";
+import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import Index from "./pages/Index";
 import Live from "./pages/Live";
 import Community from "./pages/Community";
@@ -98,6 +100,13 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useAutoRefresh();
+  useSessionExpiryWarning();
+  
+  // Set up notification listeners for real-time alerts
+  useEffect(() => {
+    const cleanup = setupNotificationListeners();
+    return cleanup;
+  }, []);
   
   // Disable right-click context menu across the entire website
   useEffect(() => {
