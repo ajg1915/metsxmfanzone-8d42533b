@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,7 +10,7 @@ import MetsNewsTracker from "@/components/MetsNewsTracker";
 import MetsRSSFeed from "@/components/MetsRSSFeed";
 import { StreamPlayer } from "@/components/StreamPlayer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Lock, Calendar, TrendingUp, Facebook } from "lucide-react";
+import { Lock, Calendar, TrendingUp, Facebook, Users } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -86,15 +86,23 @@ const SpringTrainingLive = () => {
                 </div>
               </div>
 
-              {/* Follow Facebook Button */}
-              <div className="mt-6">
+              {/* Action Buttons */}
+              <div className="mt-6 flex flex-wrap gap-3">
                 <Button
                   variant="outline"
                   className="gap-2"
                   onClick={() => window.open("https://facebook.com/metsxmfanzone", "_blank")}
                 >
                   <Facebook className="w-5 h-5" />
-                  Follow MetsXMFanZone on Facebook
+                  Follow on Facebook
+                </Button>
+                <Button
+                  variant="default"
+                  className="gap-2"
+                  onClick={() => navigate("/mets-roster")}
+                >
+                  <Users className="w-5 h-5" />
+                  View 2026 Roster
                 </Button>
               </div>
             </div>

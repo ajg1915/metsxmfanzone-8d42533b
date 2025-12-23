@@ -72,6 +72,7 @@ import VideoGallery from "./pages/VideoGallery";
 import SocialMediaHub from "./pages/SocialMediaHub";
 import NLScores from "./pages/NLScores";
 import Events from "./pages/Events";
+import MetsRoster from "./pages/MetsRoster";
 import LineupCardManagement from "./pages/admin/LineupCardManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
 import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
@@ -208,6 +209,7 @@ const App = () => {
           <Route path="/social" element={<SocialMediaHub />} />
           <Route path="/nl-scores" element={<NLScores />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/mets-roster" element={<MetsRoster />} />
           <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
           <Route path="/mlb-network" element={<MLBNetwork />} />
           <Route path="/espn-network" element={<ESPNNetwork />} />
