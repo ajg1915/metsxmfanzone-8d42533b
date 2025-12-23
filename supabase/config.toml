@@ -44,3 +44,9 @@ verify_jwt = true
 
 [functions.send-otp-email]
 verify_jwt = false
+
+[functions.send-email-confirmation]
+verify_jwt = false
+
+[functions.verify-email-confirmation]
+verify_jwt = false
