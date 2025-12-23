@@ -115,7 +115,7 @@ const LiveStreamsSection = () => {
 
   return (
     <>
-      <UpgradePrompt open={showUpgradePrompt} />
+      <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
       <section className="py-6 sm:py-8 md:py-10 bg-gradient-to-b from-secondary/30 to-background">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
