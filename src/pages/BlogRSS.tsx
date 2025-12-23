@@ -84,7 +84,10 @@ export default function BlogRSS() {
       const pre = document.createElement("pre");
       pre.textContent = rss;
       pre.style.cssText = "white-space: pre-wrap; word-wrap: break-word; font-family: monospace; padding: 20px;";
-      document.body.innerHTML = "";
+      // Safely clear body content without using innerHTML
+      while (document.body.firstChild) {
+        document.body.removeChild(document.body.firstChild);
+      }
       document.body.appendChild(pre);
     }
   }, [rss]);
