@@ -118,11 +118,49 @@ const newPasswordSchema = z.object({
 
 const REMEMBER_ME_KEY = "metsxm_remember_user";
 const REMEMBER_ME_EXPIRY_DAYS = 30;
+const MIN_FORM_FILL_TIME_MS = 3000; // Minimum 3 seconds to fill form (bots are faster)
 
 interface RememberedUser {
   email: string;
   expiresAt: number;
 }
+
+// Bot detection utilities
+const detectBot = (): { isBot: boolean; reason?: string } => {
+  // Check for headless browser indicators
+  const navigatorAny = navigator as any;
+  
+  // Check webdriver (Selenium, Puppeteer)
+  if (navigatorAny.webdriver) {
+    return { isBot: true, reason: "Automated browser detected" };
+  }
+  
+  // Check for missing browser features that bots often lack
+  if (!window.requestAnimationFrame || !window.cancelAnimationFrame) {
+    return { isBot: true, reason: "Missing browser features" };
+  }
+  
+  // Check for phantom/nightmare.js
+  if (window.hasOwnProperty('_phantom') || window.hasOwnProperty('callPhantom')) {
+    return { isBot: true, reason: "Headless browser detected" };
+  }
+  
+  // Check for unusual screen dimensions (headless browsers often have 0x0 or unusual sizes)
+  if (window.screen.width === 0 || window.screen.height === 0) {
+    return { isBot: true, reason: "Invalid screen dimensions" };
+  }
+  
+  // Check for missing plugins (most real browsers have at least 1 plugin)
+  // Note: Modern browsers may return 0 plugins for privacy, so this is a soft check
+  
+  // Check for automation tools via browser capabilities
+  const languages = navigator.languages;
+  if (!languages || languages.length === 0) {
+    return { isBot: true, reason: "Missing language settings" };
+  }
+  
+  return { isBot: false };
+};
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -150,6 +188,10 @@ const Auth = () => {
   const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
   const [pendingUserData, setPendingUserData] = useState<{ userId: string; isSignup: boolean } | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
+  
+  // Bot detection states
+  const [honeypot, setHoneypot] = useState(""); // Should remain empty - bots fill this
+  const [formLoadTime] = useState(() => Date.now()); // Track when form loaded
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -235,6 +277,41 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Bot detection: Check honeypot field
+    if (honeypot) {
+      console.warn("Bot detected: honeypot field filled");
+      toast({
+        title: "Signup failed",
+        description: "Unable to process your request. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Bot detection: Check form fill time
+    const fillTime = Date.now() - formLoadTime;
+    if (fillTime < MIN_FORM_FILL_TIME_MS) {
+      console.warn("Bot detected: form submitted too quickly", fillTime);
+      toast({
+        title: "Please slow down",
+        description: "Please take your time filling out the form.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Bot detection: Browser checks
+    const botCheck = detectBot();
+    if (botCheck.isBot) {
+      console.warn("Bot detected:", botCheck.reason);
+      toast({
+        title: "Signup failed",
+        description: "Unable to verify your browser. Please try a different browser.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     // First check for email domain issues with custom messages
     const emailValidation = validateEmailDomain(email);
@@ -357,6 +434,41 @@ const Auth = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Bot detection: Check honeypot field
+    if (honeypot) {
+      console.warn("Bot detected: honeypot field filled");
+      toast({
+        title: "Login failed",
+        description: "Unable to process your request. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Bot detection: Check form fill time
+    const fillTime = Date.now() - formLoadTime;
+    if (fillTime < MIN_FORM_FILL_TIME_MS) {
+      console.warn("Bot detected: form submitted too quickly", fillTime);
+      toast({
+        title: "Please slow down",
+        description: "Please take your time filling out the form.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Bot detection: Browser checks
+    const botCheck = detectBot();
+    if (botCheck.isBot) {
+      console.warn("Bot detected:", botCheck.reason);
+      toast({
+        title: "Login failed",
+        description: "Unable to verify your browser. Please try a different browser.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       const validated = loginSchema.parse({ email, password });
@@ -930,6 +1042,20 @@ const Auth = () => {
                 />
               </div>
             )}
+
+            {/* Honeypot field - invisible to humans, bots will fill it */}
+            <div className="absolute -left-[9999px] -top-[9999px]" aria-hidden="true">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+              />
+            </div>
 
             {!isForgotPassword && !isResettingPassword && (
               <div className="space-y-2">
