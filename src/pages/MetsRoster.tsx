@@ -6,9 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Users, Search, RefreshCw, User } from "lucide-react";
+import { Search, RefreshCw, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import rosterLogo from "@/assets/metsxmfanzone-logo-roster.png";
 
 interface Player {
   id: number;
@@ -205,7 +206,7 @@ const MetsRoster = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center gap-3 mb-4">
-                <img src="/lovable-uploads/5f2b9889-d498-461e-a953-56fd549f5718.png" alt="MetsXMFanZone Logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
+                <img src={rosterLogo} alt="MetsXMFanZone Logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
                 <div>
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary">
                     2026 Mets Roster
