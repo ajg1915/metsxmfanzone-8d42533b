@@ -111,6 +111,17 @@ export default function ConfirmAccount() {
     }
   };
 
+  // Check if there's a pending plan selection
+  const hasPendingPlan = localStorage.getItem("pending_signup_plan");
+  
+  const handleContinueAfterConfirmation = () => {
+    if (hasPendingPlan) {
+      navigate("/plans?required=true");
+    } else {
+      navigate("/auth?mode=login");
+    }
+  };
+
   // Show success state
   if (verificationState === "success") {
     return (
@@ -126,13 +137,16 @@ export default function ConfirmAccount() {
             </CardHeader>
             <CardContent className="space-y-6 text-center">
               <p className="text-muted-foreground">
-                Your account has been successfully verified. You can now log in and start enjoying MetsXMFanZone!
+                {hasPendingPlan 
+                  ? "Your account is now active. Please select your subscription plan to continue."
+                  : "Your account has been successfully verified. You can now log in and start enjoying MetsXMFanZone!"
+                }
               </p>
               <Button
-                onClick={() => navigate("/auth?mode=login")}
+                onClick={handleContinueAfterConfirmation}
                 className="w-full bg-[#FF5910] hover:bg-[#FF5910]/90"
               >
-                Continue to Login
+                {hasPendingPlan ? "Select Your Plan" : "Continue to Login"}
               </Button>
             </CardContent>
           </Card>

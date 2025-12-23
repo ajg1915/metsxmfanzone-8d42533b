@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { Shield, ArrowLeft } from "lucide-react";
@@ -93,10 +94,16 @@ const signupSchema = z.object({
     }),
   password: z.string().min(6, "Password must be at least 6 characters"),
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
-  phoneNumber: z.string().optional().refine((val) => !val || phoneRegex.test(val), {
+  phoneNumber: z.string().min(10, "Phone number is required").refine((val) => phoneRegex.test(val), {
     message: "Invalid phone number format (e.g., 555-123-4567)",
   }),
-  smsOptIn: z.boolean().optional(),
+  smsOptIn: z.boolean(),
+  agreeToTerms: z.literal(true, {
+    errorMap: () => ({ message: "You must agree to the Terms & Privacy Policy" }),
+  }),
+  selectedPlan: z.enum(["free", "premium", "annual"], {
+    errorMap: () => ({ message: "Please select a plan" }),
+  }),
 });
 
 const loginSchema = z.object({
@@ -174,6 +181,8 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [smsOptIn, setSmsOptIn] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   
@@ -325,7 +334,15 @@ const Auth = () => {
     }
     
     try {
-      const validated = signupSchema.parse({ email, password, fullName, phoneNumber, smsOptIn });
+      const validated = signupSchema.parse({ 
+        email, 
+        password, 
+        fullName, 
+        phoneNumber, 
+        smsOptIn,
+        agreeToTerms: agreeToTerms as true,
+        selectedPlan: selectedPlan as "free" | "premium" | "annual",
+      });
       setLoading(true);
 
       const { data, error } = await supabase.auth.signUp({
@@ -406,6 +423,9 @@ const Auth = () => {
           console.error("Error sending confirmation email:", err);
         }
 
+        // Store selected plan in localStorage for after confirmation
+        localStorage.setItem("pending_signup_plan", validated.selectedPlan);
+        
         // Navigate to confirmation page
         toast({
           title: "Account created!",
@@ -996,7 +1016,7 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phoneNumber">Phone Number (optional)</Label>
+                  <Label htmlFor="phoneNumber">Phone Number <span className="text-destructive">*</span></Label>
                   <Input
                     id="phoneNumber"
                     type="tel"
@@ -1004,6 +1024,7 @@ const Auth = () => {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     disabled={loading}
+                    required
                   />
                 </div>
                 <div className="flex items-start space-x-2">
@@ -1011,7 +1032,7 @@ const Auth = () => {
                     id="smsOptIn"
                     checked={smsOptIn}
                     onCheckedChange={(checked) => setSmsOptIn(checked === true)}
-                    disabled={loading || !phoneNumber}
+                    disabled={loading}
                   />
                   <div className="grid gap-1.5 leading-none">
                     <Label
@@ -1022,6 +1043,45 @@ const Auth = () => {
                     </Label>
                     <p className="text-xs text-muted-foreground">
                       Get text alerts for news, live streams, and updates. Msg & data rates may apply.
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="selectedPlan">Select Your Plan <span className="text-destructive">*</span></Label>
+                  <Select value={selectedPlan} onValueChange={setSelectedPlan} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a plan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="free">Free - $0/forever</SelectItem>
+                      <SelectItem value="premium">Premium - $12.99/month</SelectItem>
+                      <SelectItem value="annual">Annual - $129.99/year (Best Value)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    You can upgrade or change your plan anytime after signup.
+                  </p>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="agreeToTerms"
+                    checked={agreeToTerms}
+                    onCheckedChange={(checked) => setAgreeToTerms(checked === true)}
+                    disabled={loading}
+                    required
+                  />
+                  <div className="grid gap-1.5 leading-none">
+                    <Label
+                      htmlFor="agreeToTerms"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      I agree to the rules <span className="text-destructive">*</span>
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      By creating an account, you agree to our{" "}
+                      <Link to="/terms" target="_blank" className="text-primary hover:underline">Terms of Service</Link>
+                      {" "}and{" "}
+                      <Link to="/privacy" target="_blank" className="text-primary hover:underline">Privacy Policy</Link>.
                     </p>
                   </div>
                 </div>
@@ -1161,6 +1221,8 @@ const Auth = () => {
                     setFullName("");
                     setPhoneNumber("");
                     setSmsOptIn(false);
+                    setAgreeToTerms(false);
+                    setSelectedPlan("");
                   }}
                   className="text-primary hover:underline"
                   disabled={loading}
