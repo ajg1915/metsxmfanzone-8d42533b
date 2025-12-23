@@ -124,7 +124,7 @@ const newPasswordSchema = z.object({
 });
 
 const REMEMBER_ME_KEY = "metsxm_remember_user";
-const REMEMBER_ME_EXPIRY_DAYS = 30;
+const REMEMBER_ME_EXPIRY_HOURS = 48;
 const MIN_FORM_FILL_TIME_MS = 3000; // Minimum 3 seconds to fill form (bots are faster)
 
 interface RememberedUser {
@@ -625,7 +625,7 @@ const Auth = () => {
   const completeAuthentication = async (userId: string, isSignup: boolean) => {
     // Save remember me preference if checked (only for normal logins, not remembered logins)
     if (rememberMe && !isSignup && !isRememberedLogin) {
-      const expiresAt = Date.now() + REMEMBER_ME_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
+      const expiresAt = Date.now() + REMEMBER_ME_EXPIRY_HOURS * 60 * 60 * 1000;
       const rememberedData: RememberedUser = { email, expiresAt };
       localStorage.setItem(REMEMBER_ME_KEY, JSON.stringify(rememberedData));
     }
@@ -1157,7 +1157,7 @@ const Auth = () => {
                   htmlFor="rememberMe"
                   className="text-sm font-normal text-muted-foreground cursor-pointer"
                 >
-                  Remember me for 30 days
+                  Remember me for 48 hours
                 </Label>
               </div>
             )}
