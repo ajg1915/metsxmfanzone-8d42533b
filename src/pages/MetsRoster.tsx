@@ -284,7 +284,7 @@ const MetsRoster = () => {
                     <Card key={i} className="overflow-hidden">
                       <CardContent className="p-4">
                         <div className="flex items-start gap-4">
-                          <Skeleton className="w-16 h-16 rounded-lg" />
+                          <Skeleton className="w-20 h-20 rounded-full" />
                           <div className="flex-1 space-y-2">
                             <Skeleton className="h-5 w-32" />
                             <Skeleton className="h-4 w-24" />
@@ -312,11 +312,29 @@ const MetsRoster = () => {
                       >
                         <CardContent className="p-4">
                           <div className="flex items-start gap-4">
-                            {/* Jersey Number */}
-                            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                              <span className="text-2xl font-bold text-primary">
-                                {player.jerseyNumber}
-                              </span>
+                            {/* Player Headshot */}
+                            <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/20 flex-shrink-0">
+                              <img
+                                src={`https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${player.id}/headshot/67/current`}
+                                alt={player.fullName}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // Fallback to jersey number display if image fails
+                                  e.currentTarget.style.display = 'none';
+                                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                }}
+                              />
+                              <div className="hidden absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+                                <span className="text-2xl font-bold text-primary">
+                                  {player.jerseyNumber}
+                                </span>
+                              </div>
+                              {/* Jersey number badge */}
+                              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary flex items-center justify-center border-2 border-background">
+                                <span className="text-xs font-bold text-primary-foreground">
+                                  {player.jerseyNumber}
+                                </span>
+                              </div>
                             </div>
                             
                             {/* Player Info */}
