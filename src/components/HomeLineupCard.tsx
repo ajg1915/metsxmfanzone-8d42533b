@@ -168,10 +168,9 @@ export default function HomeLineupCard({
                     </p>}
                 </div>
               </div>
-              {lineupCard?.location && <div className="flex items-center gap-1 text-xs opacity-90">
-                  <MapPin className="w-3 h-3" />
-                  <span className="hidden sm:inline">{lineupCard.location}</span>
-                </div>}
+              <Link to="/mets-roster" className="flex items-center gap-1 text-xs opacity-90 hover:opacity-100 transition-opacity underline">
+                <span>Roster</span>
+              </Link>
             </div>
           </div>
 
