@@ -1047,7 +1047,7 @@ const Auth = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="selectedPlan">Select Your Plan <span className="text-destructive">*</span></Label>
+                  <Label htmlFor="selectedPlan">Select Your Membership <span className="text-destructive">*</span></Label>
                   <Select value={selectedPlan} onValueChange={setSelectedPlan} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Choose a plan" />
