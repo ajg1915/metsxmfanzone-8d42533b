@@ -554,6 +554,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_enabled: boolean | null
+          id: string
+          notification_type: string
+          push_enabled: boolean | null
+          sms_enabled: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_enabled?: boolean | null
+          id?: string
+          notification_type: string
+          push_enabled?: boolean | null
+          sms_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_enabled?: boolean | null
+          id?: string
+          notification_type?: string
+          push_enabled?: boolean | null
+          sms_enabled?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_subscriptions: {
         Row: {
           auth: string
@@ -690,8 +723,10 @@ export type Database = {
           avatar_url: string | null
           created_at: string | null
           email: string | null
+          email_notifications_enabled: boolean | null
           email_verified: boolean | null
           full_name: string | null
+          game_notifications_enabled: boolean | null
           id: string
           phone_number: string | null
           sms_notifications_enabled: boolean | null
@@ -701,8 +736,10 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           email?: string | null
+          email_notifications_enabled?: boolean | null
           email_verified?: boolean | null
           full_name?: string | null
+          game_notifications_enabled?: boolean | null
           id: string
           phone_number?: string | null
           sms_notifications_enabled?: boolean | null
@@ -712,8 +749,10 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           email?: string | null
+          email_notifications_enabled?: boolean | null
           email_verified?: boolean | null
           full_name?: string | null
+          game_notifications_enabled?: boolean | null
           id?: string
           phone_number?: string | null
           sms_notifications_enabled?: boolean | null
