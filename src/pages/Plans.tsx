@@ -4,9 +4,9 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Check, AlertCircle } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -14,15 +14,65 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import CheckoutModal from "@/components/CheckoutModal";
+import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Plans = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const { tier, loading: subscriptionLoading } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  
+  // Check if user must select a plan (coming from signup)
+  const pendingPlan = localStorage.getItem("pending_signup_plan");
+  const mustSelectPlan = searchParams.get("required") === "true" || !!pendingPlan;
+  const [hasPlanSelected, setHasPlanSelected] = useState(false);
+  
+  // Block navigation if plan selection is required
+  useEffect(() => {
+    if (mustSelectPlan && !hasPlanSelected) {
+      // Prevent back navigation
+      const handlePopState = (e: PopStateEvent) => {
+        e.preventDefault();
+        window.history.pushState(null, "", window.location.href);
+      };
+      
+      window.history.pushState(null, "", window.location.href);
+      window.addEventListener("popstate", handlePopState);
+      
+      return () => {
+        window.removeEventListener("popstate", handlePopState);
+      };
+    }
+  }, [mustSelectPlan, hasPlanSelected]);
 
   const handleSelectPlan = (planId: string) => {
     setSelectedPlan(planId);
+    
+    if (planId === "free") {
+      // Free plan - mark as selected and redirect to home
+      localStorage.removeItem("pending_signup_plan");
+      setHasPlanSelected(true);
+      navigate("/");
+      return;
+    }
+    
     setCheckoutOpen(true);
+  };
+  
+  const handleCheckoutClose = (open: boolean) => {
+    setCheckoutOpen(open);
+    
+    // If checkout was completed successfully, clear the pending plan
+    if (!open && selectedPlan && selectedPlan !== "free") {
+      // Check if subscription was created
+      if (tier === "premium" || tier === "annual") {
+        localStorage.removeItem("pending_signup_plan");
+        setHasPlanSelected(true);
+      }
+    }
   };
 
   const plans = [
@@ -131,10 +181,23 @@ const Plans = () => {
         />
         <link rel="canonical" href="https://www.metsxmfanzone.com/plans" />
       </Helmet>
-      <Navigation />
-      <main className="pt-16">
+      {!mustSelectPlan && <Navigation />}
+      <main className={mustSelectPlan ? "pt-8" : "pt-16"}>
         <section className="py-8 sm:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+            {/* Required Plan Selection Banner */}
+            {mustSelectPlan && (
+              <div className="mb-8 bg-primary/10 border border-primary/30 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-foreground">Please Select a Plan</h3>
+                  <p className="text-sm text-muted-foreground">
+                    To complete your account setup, please select a subscription plan below. You can choose the Free plan if you want basic access, or upgrade to Premium for full features.
+                  </p>
+                </div>
+              </div>
+            )}
+            
             {/* Header */}
             <div className="text-center mb-10">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -218,12 +281,12 @@ const Plans = () => {
           </div>
         </section>
       </main>
-      <Footer />
+      {!mustSelectPlan && <Footer />}
 
       {/* Checkout Modal */}
       <CheckoutModal
         open={checkoutOpen}
-        onOpenChange={setCheckoutOpen}
+        onOpenChange={handleCheckoutClose}
         plan={selectedPlanData || null}
       />
     </div>
