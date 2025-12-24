@@ -1,0 +1,150 @@
+import { supabase } from "@/integrations/supabase/client";
+
+type EncryptableDataType = 'activity_logs' | 'profiles' | 'business_ads' | 'newsletter_subscribers';
+
+/**
+ * Secure Data Vault - AES-256-GCM Encryption System
+ * All sensitive data is encrypted at rest and only admins can decrypt
+ */
+
+/**
+ * Encrypts sensitive fields before storing in database
+ * Only admins can call this function
+ */
+export async function encryptSensitiveData(
+  dataType: EncryptableDataType,
+  data: Record<string, any>
+): Promise<Record<string, string> | null> {
+  try {
+    const { data: result, error } = await supabase.functions.invoke('secure-data-vault', {
+      body: {
+        action: 'encrypt',
+        dataType,
+        data
+      }
+    });
+
+    if (error) {
+      console.error('Encryption failed:', error);
+      return null;
+    }
+
+    return result?.encrypted || null;
+  } catch (error) {
+    console.error('Error encrypting data:', error);
+    return null;
+  }
+}
+
+/**
+ * Decrypts records that have been fetched from the database
+ * Only admins can decrypt - requires valid admin session
+ */
+export async function decryptRecords(
+  dataType: EncryptableDataType,
+  records: any[]
+): Promise<any[]> {
+  try {
+    const { data, error } = await supabase.functions.invoke('secure-data-vault', {
+      body: {
+        action: 'decrypt',
+        dataType,
+        data: { records }
+      }
+    });
+
+    if (error) {
+      console.error('Decryption failed:', error);
+      throw new Error('Failed to decrypt records - admin access required');
+    }
+
+    return data?.records || [];
+  } catch (error) {
+    console.error('Error decrypting records:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches and decrypts records in a single secure operation
+ * Only admins can access this data
+ */
+export async function fetchDecryptedData(
+  dataType: EncryptableDataType,
+  options?: {
+    limit?: number;
+    offset?: number;
+    filters?: Record<string, any>;
+  }
+): Promise<any[]> {
+  try {
+    const { data, error } = await supabase.functions.invoke('secure-data-vault', {
+      body: {
+        action: 'fetch-decrypted',
+        dataType,
+        data: {
+          limit: options?.limit || 100,
+          offset: options?.offset || 0,
+          filters: options?.filters
+        }
+      }
+    });
+
+    if (error) {
+      console.error('Failed to fetch decrypted data:', error);
+      throw new Error('Failed to fetch data - admin access required');
+    }
+
+    return data?.records || [];
+  } catch (error) {
+    console.error('Error fetching decrypted data:', error);
+    throw error;
+  }
+}
+
+// Convenience functions for specific data types
+
+export async function fetchDecryptedProfiles(limit = 100, offset = 0) {
+  return fetchDecryptedData('profiles', { limit, offset });
+}
+
+export async function fetchDecryptedBusinessAds(limit = 100, offset = 0) {
+  return fetchDecryptedData('business_ads', { limit, offset });
+}
+
+export async function fetchDecryptedActivityLogs(limit = 100, offset = 0) {
+  return fetchDecryptedData('activity_logs', { limit, offset });
+}
+
+export async function fetchDecryptedNewsletterSubscribers(limit = 100, offset = 0) {
+  return fetchDecryptedData('newsletter_subscribers', { limit, offset });
+}
+
+/**
+ * Masks sensitive data for display to non-admin users
+ * Shows only last 4 characters with asterisks
+ */
+export function maskSensitiveField(value: string | null | undefined): string {
+  if (!value) return '****';
+  if (value.length <= 4) return '****';
+  return '****' + value.slice(-4);
+}
+
+/**
+ * Masks email for display - shows first 2 chars and domain
+ */
+export function maskEmail(email: string | null | undefined): string {
+  if (!email) return '****@****.***';
+  const [local, domain] = email.split('@');
+  if (!domain) return '****@****.***';
+  const maskedLocal = local.slice(0, 2) + '****';
+  return `${maskedLocal}@${domain}`;
+}
+
+/**
+ * Masks phone number - shows only last 4 digits
+ */
+export function maskPhone(phone: string | null | undefined): string {
+  if (!phone) return '****-****';
+  return '****-' + phone.slice(-4);
+}
