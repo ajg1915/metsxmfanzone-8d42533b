@@ -287,7 +287,7 @@ export default function LiveStreamManagement() {
                 <div>
                   <Label htmlFor="assigned_pages">Assign to Pages *</Label>
                   <div className="space-y-2 mt-2">
-                    {['guide', 'live', 'metsxmfanzone', 'mlb-network', 'espn-network', 'spring-training-live'].map((page) => (
+                    {['guide', 'live', 'metsxmfanzone', 'mlb-network', 'espn-network', 'pix11-network', 'spring-training-live'].map((page) => (
                       <div key={page} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
@@ -302,7 +302,7 @@ export default function LiveStreamManagement() {
                           className="rounded border-border"
                         />
                         <Label htmlFor={page} className="cursor-pointer font-normal">
-                          {page === 'guide' ? 'Guide Page' : page === 'live' ? 'Live Page' : page === 'metsxmfanzone' ? 'MetsXMFanZone TV' : page === 'mlb-network' ? 'MLB Network' : page === 'espn-network' ? 'ESPN Network' : 'Spring Training Live'}
+                          {page === 'guide' ? 'Guide Page' : page === 'live' ? 'Live Page' : page === 'metsxmfanzone' ? 'MetsXMFanZone TV' : page === 'mlb-network' ? 'MLB Network' : page === 'espn-network' ? 'ESPN Network' : page === 'pix11-network' ? 'PIX11 Network' : 'Spring Training Live'}
                         </Label>
                       </div>
                     ))}
@@ -395,6 +395,7 @@ export default function LiveStreamManagement() {
                     if (p === 'metsxmfanzone') return 'MetsXMFanZone TV';
                     if (p === 'mlb-network') return 'MLB Network';
                     if (p === 'espn-network') return 'ESPN Network';
+                    if (p === 'pix11-network') return 'PIX11 Network';
                     if (p === 'spring-training-live') return 'Spring Training Live';
                     return p;
                   }).join(', ') : 'None'}</p>
