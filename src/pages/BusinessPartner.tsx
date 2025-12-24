@@ -142,7 +142,7 @@ const BusinessPartner = () => {
   }];
   return <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="pt-16">
+      <main className="pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-12">
             <img src={metsLogo} alt="MetsXMFanZone" className="w-20 h-20 mb-6 mx-auto object-scale-down" />

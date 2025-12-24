@@ -151,7 +151,7 @@ export default function Events() {
         
         <Navigation />
         
-        <main className="min-h-screen bg-background pt-16">
+        <main className="min-h-screen bg-background pt-12">
           {content}
         </main>
         

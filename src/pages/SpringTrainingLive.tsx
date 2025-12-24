@@ -66,7 +66,7 @@ const SpringTrainingLive = () => {
       />
       <Navigation />
 
-      <main className="flex-1 pt-16 sm:pt-20">
+      <main className="flex-1 pt-12">
         {/* Hero Banner with Spring Training Branding */}
         <div className="relative overflow-hidden bg-gradient-to-br from-[#00843D] via-[#006B32] to-background">
           {/* Animated background elements */}

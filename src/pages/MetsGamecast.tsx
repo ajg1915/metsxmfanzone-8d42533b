@@ -291,7 +291,7 @@ const MetsGamecast = () => {
   if (loading) {
     return <div className="min-h-screen bg-background flex flex-col">
         <Navigation />
-        <main className="flex-1 container mx-auto px-4 py-8 pt-20">
+        <main className="flex-1 container mx-auto px-4 py-8 pt-12">
           <Skeleton className="h-96 w-full" />
         </main>
         <Footer />
@@ -304,7 +304,7 @@ const MetsGamecast = () => {
       </Helmet>
       <Navigation />
       
-      <main className="flex-1 pt-16">
+      <main className="flex-1 pt-12">
         {/* Games Ticker */}
         <div className="bg-black/90 border-b border-border">
           <ScrollArea className="w-full">

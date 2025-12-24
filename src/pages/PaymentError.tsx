@@ -17,7 +17,7 @@ const PaymentError = () => {
       </Helmet>
       <Navigation />
       
-      <main className="flex-1 flex items-center justify-center px-4 pt-20">
+      <main className="flex-1 flex items-center justify-center px-4 pt-12">
         <Card className="w-full max-w-lg border-2 border-destructive">
           <CardHeader>
             <CardTitle className="text-2xl text-center text-destructive">

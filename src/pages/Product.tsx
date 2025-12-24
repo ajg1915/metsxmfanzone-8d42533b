@@ -109,7 +109,7 @@ const Product = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main className="flex-1 pt-20 sm:pt-24">
+        <main className="flex-1 pt-12">
           <div className="container mx-auto px-4 py-8">
             <p className="text-center text-muted-foreground">Loading...</p>
           </div>
@@ -123,7 +123,7 @@ const Product = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main className="flex-1 pt-20 sm:pt-24">
+        <main className="flex-1 pt-12">
           <div className="container mx-auto px-4 py-8 text-center">
             <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
             <Button onClick={() => navigate("/merch")}>
@@ -145,7 +145,7 @@ const Product = () => {
       </Helmet>
       <Navigation />
       
-      <main className="flex-1 pt-20 sm:pt-24">
+      <main className="flex-1 pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
           <div className="flex justify-between items-center mb-6">
             <Button variant="ghost" onClick={() => navigate("/merch")}>

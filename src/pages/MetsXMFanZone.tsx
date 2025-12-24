@@ -20,7 +20,7 @@ const MetsXMFanZone = () => {
       />
       <Navigation />
       
-      <main className="flex-1 pt-16 sm:pt-20">
+      <main className="flex-1 pt-12">
         {/* Hero Banner with MetsXMFanZone Branding */}
         <div className="relative overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-background">
           {/* Animated background elements */}

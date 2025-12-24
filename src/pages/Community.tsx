@@ -249,7 +249,7 @@ const Community = () => {
       </Helmet>
       <Navigation />
       
-      <div className="pt-20 sm:pt-24">
+      <div className="pt-12">
         <StoriesSection />
       </div>
       
