@@ -43,7 +43,7 @@ const Contact = () => {
         <link rel="canonical" href="https://www.metsxmfanzone.com/contact" />
       </Helmet>
       <Navigation />
-      <main className="pt-16">
+      <main className="pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-7xl">
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-3 sm:mb-4">

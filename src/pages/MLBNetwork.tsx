@@ -19,7 +19,7 @@ const MLBNetwork = () => {
       />
       <Navigation />
       
-      <main className="flex-1 pt-16 sm:pt-20">
+      <main className="flex-1 pt-12">
         {/* Hero Banner with MLB Network Branding */}
         <div className="relative overflow-hidden bg-gradient-to-br from-[#041E42] via-[#0a2d5c] to-background">
           {/* Animated background elements */}

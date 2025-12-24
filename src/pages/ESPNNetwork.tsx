@@ -19,7 +19,7 @@ const ESPNNetwork = () => {
       />
       <Navigation />
       
-      <main className="flex-1 pt-16 sm:pt-20">
+      <main className="flex-1 pt-12">
         {/* Hero Banner with ESPN Branding */}
         <div className="relative overflow-hidden bg-gradient-to-br from-[#CC0000] via-[#8B0000] to-background">
           {/* Animated background elements */}

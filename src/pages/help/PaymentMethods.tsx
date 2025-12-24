@@ -12,7 +12,7 @@ const PaymentMethods = () => {
         <link rel="canonical" href="https://www.metsxmfanzone.com/help/payment-methods" />
       </Helmet>
       <Navigation />
-      <main className="pt-16">
+      <main className="pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl text-secondary">
           <Link to="/help-center" className="inline-flex items-center text-primary hover:underline mb-6">
             <ArrowLeft className="w-4 h-4 mr-2" />

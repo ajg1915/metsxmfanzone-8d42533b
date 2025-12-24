@@ -182,7 +182,7 @@ const Plans = () => {
         <link rel="canonical" href="https://www.metsxmfanzone.com/plans" />
       </Helmet>
       {!mustSelectPlan && <Navigation />}
-      <main className={mustSelectPlan ? "pt-8" : "pt-16"}>
+      <main className={mustSelectPlan ? "pt-8" : "pt-12"}>
         <section className="py-8 sm:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
             {/* Required Plan Selection Banner */}

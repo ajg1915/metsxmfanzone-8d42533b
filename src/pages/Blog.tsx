@@ -102,7 +102,7 @@ export default function Blog() {
       />
       <Navigation />
       
-      <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pt-20 sm:pt-24 max-w-7xl">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pt-12 max-w-7xl">
         <div className="w-full">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
             <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">Blog</h1>

@@ -187,7 +187,7 @@ const Live = () => {
           canonical="https://www.metsxmfanzone.com/live"
         />
         <Navigation />
-        <main className="pt-16 flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background">
+        <main className="pt-12 flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background">
           <div className="text-center">
             <p className="text-muted-foreground">Loading...</p>
           </div>
@@ -207,7 +207,7 @@ const Live = () => {
             canonical="https://www.metsxmfanzone.com/live"
           />
           <Navigation />
-          <main className="pt-16 flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background">
+          <main className="pt-12 flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background">
             <div className="text-center space-y-4">
               <Lock className="w-12 h-12 mx-auto text-muted-foreground" />
               <p className="text-muted-foreground">Premium content requires a subscription</p>
@@ -247,7 +247,7 @@ const Live = () => {
         structuredData={liveStreamSchema}
       />
       <Navigation />
-      <main className="pt-16 sm:pt-20">
+      <main className="pt-12">
         <section className="sm:py-12 md:py-16 bg-gradient-to-b from-secondary/20 to-background py-px">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             <div className="text-center mb-8 sm:mb-12">

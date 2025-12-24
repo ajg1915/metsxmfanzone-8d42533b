@@ -61,7 +61,7 @@ const Merch = () => {
       </Helmet>
       <Navigation />
       
-      <main className="flex-1 pt-20 sm:pt-24">
+      <main className="flex-1 pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-7xl">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">

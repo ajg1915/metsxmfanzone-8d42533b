@@ -20,7 +20,7 @@ const PIX11Network = () => {
       />
       <Navigation />
       
-      <main className="flex-1 pt-16 sm:pt-20">
+      <main className="flex-1 pt-12">
         {/* Hero Banner with PIX11 Branding */}
         <div className="relative overflow-hidden bg-gradient-to-br from-[#1e3a5f] via-[#0d2137] to-background">
           {/* Animated background elements */}

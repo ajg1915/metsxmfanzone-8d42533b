@@ -69,7 +69,7 @@ const FAQs = () => {
         <link rel="canonical" href="https://www.metsxmfanzone.com/faqs" />
       </Helmet>
       <Navigation />
-      <main className="pt-16">
+      <main className="pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-4xl">
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">

@@ -84,7 +84,7 @@ const Feedback = () => {
         <link rel="canonical" href="https://www.metsxmfanzone.com/feedback" />
       </Helmet>
       <Navigation />
-      <main className="pt-20 pb-16">
+      <main className="pt-12 pb-16">
         <div className="container mx-auto px-4 max-w-2xl">
           <Card>
             <CardHeader>

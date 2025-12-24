@@ -63,7 +63,7 @@ const HelpCenter = () => {
         <link rel="canonical" href="https://www.metsxmfanzone.com/help-center" />
       </Helmet>
       <Navigation />
-      <main className="pt-16">
+      <main className="pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-12">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3 sm:mb-4">

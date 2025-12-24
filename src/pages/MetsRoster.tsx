@@ -200,7 +200,7 @@ const MetsRoster = () => {
       
       <Navigation />
 
-      <main className="flex-1 pt-20 sm:pt-24">
+      <main className="flex-1 pt-12">
         {/* Hero Section */}
         <section className="bg-gradient-to-b from-primary/20 to-background py-8 sm:py-12">
           <div className="container mx-auto px-4">

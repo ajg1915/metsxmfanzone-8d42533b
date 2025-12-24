@@ -142,7 +142,7 @@ const CommunityPodcast = () => {
         <link rel="canonical" href="https://www.metsxmfanzone.com/community-podcast" />
       </Helmet>
       <Navigation />
-      <main className="pt-16">
+      <main className="pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-7xl">
           {/* Header */}
           <div className="text-center mb-8 sm:mb-12">
