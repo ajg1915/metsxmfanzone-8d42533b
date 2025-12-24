@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Edit, Trash2, FileText, Sparkles, Upload, Music, Copy } from "lucide-react";
 import { z } from "zod";
+import { validateFile, generateSafeFilename } from "@/utils/fileValidation";
 
 const blogPostSchema = z.object({
   title: z.string().trim().min(3, "Title must be at least 3 characters").max(200, "Title must be less than 200 characters"),
@@ -258,21 +259,12 @@ export default function BlogManagement() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    // Comprehensive file validation
+    const validation = await validateFile(file, 'image', 5);
+    if (!validation.valid) {
       toast({
         title: "Error",
-        description: "Please upload an image file",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "Error",
-        description: "Image must be less than 5MB",
+        description: validation.error || "Invalid file",
         variant: "destructive",
       });
       return;
@@ -280,8 +272,7 @@ export default function BlogManagement() {
 
     setUploadingImage(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const fileName = generateSafeFilename(file.name);
       const filePath = `blog-images/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -315,21 +306,12 @@ export default function BlogManagement() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('audio/')) {
+    // Comprehensive file validation
+    const validation = await validateFile(file, 'audio', 50);
+    if (!validation.valid) {
       toast({
         title: "Error",
-        description: "Please upload an audio file (MP3, WAV, etc.)",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate file size (max 50MB for audio)
-    if (file.size > 50 * 1024 * 1024) {
-      toast({
-        title: "Error",
-        description: "Audio must be less than 50MB",
+        description: validation.error || "Invalid file",
         variant: "destructive",
       });
       return;
@@ -337,8 +319,7 @@ export default function BlogManagement() {
 
     setUploadingAudio(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const fileName = generateSafeFilename(file.name);
       const filePath = `blog-audio/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
