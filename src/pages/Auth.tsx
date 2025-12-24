@@ -264,22 +264,26 @@ const Auth = () => {
 
   const sendOtpEmail = async (userEmail: string, otp: string) => {
     try {
-      const { data, error } = await supabase.functions.invoke('send-otp-email', {
+      const { data, error } = await supabase.functions.invoke("send-otp-email", {
         body: {
           to: userEmail,
-          otp: otp,
+          otp,
         },
       });
-      
+
       if (error) {
-        console.error('Failed to send OTP email:', error);
+        console.error("Failed to send OTP email:", error);
         return false;
       }
-      
-      console.log('OTP email response:', data);
+
+      if (!data?.success) {
+        console.error("OTP email function returned failure:", data);
+        return false;
+      }
+
       return true;
     } catch (err) {
-      console.error('Error sending OTP:', err);
+      console.error("Error sending OTP:", err);
       return false;
     }
   };
@@ -551,6 +555,11 @@ const Auth = () => {
             description: "Please check your email for the 6-digit code.",
           });
         } else {
+          toast({
+            title: "2FA email not delivered",
+            description: "We couldn't send your 6-digit code by email. You'll be logged in without 2FA for now.",
+            variant: "destructive",
+          });
           // If email fails, proceed without 2FA
           await completeAuthentication(data.user.id, false);
         }

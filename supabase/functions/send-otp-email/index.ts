@@ -36,6 +36,7 @@ serve(async (req) => {
       from: "MetsXMFanZone <onboarding@resend.dev>",
       to: [to],
       subject: "Your MetsXMFanZone Verification Code",
+      text: `Your MetsXMFanZone verification code is ${otp}. It expires in 5 minutes.`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -70,20 +71,6 @@ serve(async (req) => {
               <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
                 Didn't request this? Ignore this email.
               </p>
-              <div style="text-align: center; margin-bottom: 8px;">
-                <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-                <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-                <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-                <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-              </div>
               <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
                 <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
               </p>
@@ -94,10 +81,23 @@ serve(async (req) => {
       `,
     });
 
+    if ((emailResponse as any)?.error) {
+      console.error("Resend returned an error:", (emailResponse as any).error);
+      throw new Error((emailResponse as any).error?.message || "Email provider error");
+    }
+
+    if (!(emailResponse as any)?.data?.id) {
+      console.error("Unexpected email provider response:", emailResponse);
+      throw new Error("Email provider did not return a message id");
+    }
+
     console.log("OTP email sent successfully:", emailResponse);
 
     return new Response(
-      JSON.stringify({ success: true, response: emailResponse }),
+      JSON.stringify({
+        success: true,
+        messageId: (emailResponse as any).data.id,
+      }),
       {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
