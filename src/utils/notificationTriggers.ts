@@ -1,8 +1,40 @@
 import { supabase } from "@/integrations/supabase/client";
 
-// Helper to send SMS notifications
+// Helper to check if user is admin before sending admin-only notifications
+const isCurrentUserAdmin = async (): Promise<boolean> => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user?.id) return false;
+    
+    const { data } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', session.user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+    
+    return !!data;
+  } catch {
+    return false;
+  }
+};
+
+// Helper to send SMS notifications (admin only - silently skips if not admin)
 const sendSMSNotification = async (message: string) => {
   try {
+    // Only admins can trigger SMS notifications
+    const isAdmin = await isCurrentUserAdmin();
+    if (!isAdmin) {
+      console.log('SMS notification skipped - user is not admin');
+      return;
+    }
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      console.log('SMS notification skipped - no valid session');
+      return;
+    }
+
     await supabase.functions.invoke('send-sms-notification', {
       body: {
         message,
