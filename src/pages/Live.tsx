@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
@@ -13,6 +12,7 @@ import { Lock, Newspaper } from "lucide-react";
 import { TVGuideChannel } from "@/components/TVGuideChannel";
 import { TVScheduleCard } from "@/components/TVScheduleCard";
 import { StreamPlayer } from "@/components/StreamPlayer";
+import SEOHead, { generateVideoSchema } from "@/components/SEOHead";
 interface LiveStream {
   id: string;
   title: string;
@@ -178,13 +178,14 @@ const Live = () => {
     route: "/espn-network",
     logo: "https://wallpapers.com/images/hd/incredible-espn-logo-lbluyg5qlvhnplyr.jpg"
   }];
-  // Show loading while checking subscription
   if (subscriptionLoading) {
     return <div className="min-h-screen bg-background">
-        <Helmet>
-          <title>Watch Mets Live Streams - Live Game Coverage & Analysis | MetsXMFanZone</title>
-          <meta name="description" content="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7." />
-        </Helmet>
+        <SEOHead
+          title="Watch Mets Live Streams - Live Game Coverage & Analysis"
+          description="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7."
+          keywords="Mets live stream, watch Mets live, Mets game stream, live baseball, Mets pre-game, Mets post-game, MLB live stream"
+          canonical="https://www.metsxmfanzone.com/live"
+        />
         <Navigation />
         <main className="pt-16 flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background">
           <div className="text-center">
@@ -199,12 +200,12 @@ const Live = () => {
     return <>
         <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
         <div className="min-h-screen bg-background">
-          <Helmet>
-            <title>Watch Mets Live Streams - Live Game Coverage & Analysis | MetsXMFanZone</title>
-            <meta name="description" content="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7." />
-            <meta name="keywords" content="Mets live stream, watch Mets live, Mets game stream, live baseball, Mets pre-game, Mets post-game, MLB live stream" />
-            <link rel="canonical" href="https://www.metsxmfanzone.com/live" />
-          </Helmet>
+          <SEOHead
+            title="Watch Mets Live Streams - Live Game Coverage & Analysis"
+            description="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7."
+            keywords="Mets live stream, watch Mets live, Mets game stream, live baseball, Mets pre-game, Mets post-game, MLB live stream"
+            canonical="https://www.metsxmfanzone.com/live"
+          />
           <Navigation />
           <main className="pt-16 flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background">
             <div className="text-center space-y-4">
@@ -217,13 +218,34 @@ const Live = () => {
         </div>
       </>;
   }
+  // Generate BroadcastEvent structured data for live streams
+  const liveStreamSchema = {
+    "@context": "https://schema.org",
+    "@type": "BroadcastEvent",
+    "name": "MetsXMFanZone TV Guide - Live Mets Coverage",
+    "description": "Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content.",
+    "isLiveBroadcast": true,
+    "videoFormat": "HD",
+    "broadcastOfEvent": {
+      "@type": "SportsEvent",
+      "name": "New York Mets Live Coverage",
+      "sport": "Baseball"
+    },
+    "publishedOn": {
+      "@type": "BroadcastService",
+      "name": "MetsXMFanZone",
+      "url": "https://www.metsxmfanzone.com"
+    }
+  };
+
   return <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Watch Mets Live Streams - Live Game Coverage & Analysis | MetsXMFanZone</title>
-        <meta name="description" content="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7." />
-        <meta name="keywords" content="Mets live stream, watch Mets live, Mets game stream, live baseball, Mets pre-game, Mets post-game, MLB live stream" />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/live" />
-      </Helmet>
+      <SEOHead
+        title="Watch Mets Live Streams - Live Game Coverage & Analysis"
+        description="Watch New York Mets live streams, pre-game shows, post-game analysis, and exclusive fan content. Stream live Mets games and coverage 24/7."
+        keywords="Mets live stream, watch Mets live, Mets game stream, live baseball, Mets pre-game, Mets post-game, MLB live stream"
+        canonical="https://www.metsxmfanzone.com/live"
+        structuredData={liveStreamSchema}
+      />
       <Navigation />
       <main className="pt-16 sm:pt-20">
         <section className="sm:py-12 md:py-16 bg-gradient-to-b from-secondary/20 to-background py-px">

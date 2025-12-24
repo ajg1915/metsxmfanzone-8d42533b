@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
+import SEOHead, { generatePodcastSchema } from "@/components/SEOHead";
 
 interface PodcastEpisode {
   id: string;
@@ -117,20 +117,45 @@ const Podcast = () => {
     },
   ];
 
+  // Generate PodcastSeries structured data
+  const podcastSeriesSchema = {
+    "@context": "https://schema.org",
+    "@type": "PodcastSeries",
+    "name": "MetsXMFanZone Podcast",
+    "description": "Listen to the best Mets podcasts, live shows, game analysis, and fan discussions. Daily Mets content featuring expert commentary and interviews.",
+    "url": "https://www.metsxmfanzone.com/podcast",
+    "image": "https://www.metsxmfanzone.com/logo-512.png",
+    "author": {
+      "@type": "Organization",
+      "name": "MetsXMFanZone"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MetsXMFanZone",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.metsxmfanzone.com/logo-512.png"
+      }
+    },
+    "webFeed": "https://www.metsxmfanzone.com/podcast/rss",
+    "episode": episodes.slice(0, 10).map((ep) => ({
+      "@type": "PodcastEpisode",
+      "name": ep.title,
+      "description": ep.description || ep.title,
+      "datePublished": ep.published_at || ep.created_at,
+      "url": ep.audio_url
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Mets Podcast - Live Shows & Exclusive Audio Content | MetsXMFanZone</title>
-        <meta
-          name="description"
-          content="Listen to the best Mets podcasts, live shows, game analysis, and fan discussions. Daily Mets content featuring expert commentary and interviews."
-        />
-        <meta
-          name="keywords"
-          content="Mets podcast, baseball podcast, Mets live show, Mets audio, MLB podcast, Mets commentary, Mets interviews"
-        />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/podcast" />
-      </Helmet>
+      <SEOHead
+        title="Mets Podcast - Live Shows & Exclusive Audio Content"
+        description="Listen to the best Mets podcasts, live shows, game analysis, and fan discussions. Daily Mets content featuring expert commentary, player interviews, and breaking news coverage."
+        keywords="Mets podcast, baseball podcast, Mets live show, Mets audio, MLB podcast, Mets commentary, Mets interviews, New York Mets radio, Mets talk show"
+        canonical="https://www.metsxmfanzone.com/podcast"
+        structuredData={podcastSeriesSchema}
+      />
       <Navigation />
       <main className="pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-7xl">

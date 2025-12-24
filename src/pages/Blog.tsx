@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Calendar, Tag, Rss } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 
 interface BlogPost {
   id: string;
@@ -65,30 +65,41 @@ export default function Blog() {
     return matchesSearch && matchesCategory;
   });
 
+  // Generate CollectionPage structured data for blog listing
+  const blogListingSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Mets News, Analysis & Updates - MetsXMFanZone Blog",
+    "description": "Latest New York Mets news, game analysis, player updates, and exclusive content.",
+    "url": "https://www.metsxmfanzone.com/blog",
+    "publisher": {
+      "@type": "Organization",
+      "name": "MetsXMFanZone",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.metsxmfanzone.com/logo-512.png"
+      }
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": posts.slice(0, 10).map((post, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `https://www.metsxmfanzone.com/blog/${post.slug}`,
+        "name": post.title
+      }))
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
-      <Helmet>
-        <title>Mets News, Analysis & Updates - MetsXMFanZone Blog</title>
-        <meta name="description" content="Latest New York Mets news, game analysis, player updates, and exclusive content. Stay informed with in-depth Mets coverage and commentary." />
-        <meta name="keywords" content="Mets news, Mets blog, Mets analysis, New York Mets updates, Mets commentary, baseball news, MLB news" />
-        
-        {/* Open Graph */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.metsxmfanzone.com/blog" />
-        <meta property="og:title" content="Mets News, Analysis & Updates - MetsXMFanZone Blog" />
-        <meta property="og:description" content="Latest New York Mets news, game analysis, player updates, and exclusive content." />
-        <meta property="og:image" content={`${window.location.origin}/logo-512.png`} />
-        <meta property="og:site_name" content="MetsXMFanZone" />
-        
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@metsxmfanzone" />
-        <meta name="twitter:title" content="Mets News, Analysis & Updates - MetsXMFanZone Blog" />
-        <meta name="twitter:description" content="Latest New York Mets news, game analysis, player updates, and exclusive content." />
-        <meta name="twitter:image" content={`${window.location.origin}/logo-512.png`} />
-        
-        <link rel="canonical" href="https://www.metsxmfanzone.com/blog" />
-      </Helmet>
+      <SEOHead
+        title="Mets News, Analysis & Updates - MetsXMFanZone Blog"
+        description="Latest New York Mets news, game analysis, player updates, and exclusive content. Stay informed with in-depth Mets coverage, trade rumors, injury reports, and expert commentary."
+        keywords="Mets news, Mets blog, Mets analysis, New York Mets updates, Mets commentary, baseball news, MLB news, Mets trade rumors, Mets injury updates, Mets game recaps"
+        canonical="https://www.metsxmfanzone.com/blog"
+        structuredData={blogListingSchema}
+      />
       <Navigation />
       
       <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pt-20 sm:pt-24 max-w-7xl">
