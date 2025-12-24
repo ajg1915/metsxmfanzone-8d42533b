@@ -162,9 +162,31 @@ serve(async (req) => {
       );
     }
 
+    // Audit logging helper - logs all admin data access to activity_logs
+    const logAdminAccess = async (accessAction: string, recordCount: number, targetDataType: string) => {
+      try {
+        await supabase.from('activity_logs').insert({
+          user_id: user.id,
+          action: accessAction,
+          log_type: 'admin_data_access',
+          resource_type: targetDataType,
+          details: {
+            action: accessAction,
+            data_type: targetDataType,
+            record_count: recordCount,
+            timestamp: new Date().toISOString(),
+            admin_email: user.email,
+          },
+        });
+      } catch (logError) {
+        console.error('Failed to log admin access:', logError);
+      }
+    };
+
     if (action === 'encrypt') {
       const encrypted = await encryptFields(data, fields);
-      console.log(`Encrypted ${dataType} data for admin ${user.id}`);
+      await logAdminAccess('encrypt', 1, dataType);
+      console.log(`[AUDIT] Admin ${user.id} encrypted ${dataType} data`);
       
       return new Response(
         JSON.stringify({ encrypted }),
@@ -186,7 +208,8 @@ serve(async (req) => {
         records.map((record: any) => decryptRecord(record, fields))
       );
       
-      console.log(`Decrypted ${decryptedRecords.length} ${dataType} records for admin ${user.id}`);
+      await logAdminAccess('decrypt', decryptedRecords.length, dataType);
+      console.log(`[AUDIT] Admin ${user.id} decrypted ${decryptedRecords.length} ${dataType} records`);
       
       return new Response(
         JSON.stringify({ records: decryptedRecords }),
@@ -222,7 +245,8 @@ serve(async (req) => {
         (records || []).map((record: any) => decryptRecord(record, fields))
       );
       
-      console.log(`Fetched and decrypted ${decryptedRecords.length} ${dataType} records for admin ${user.id}`);
+      await logAdminAccess('fetch-decrypted', decryptedRecords.length, dataType);
+      console.log(`[AUDIT] Admin ${user.id} fetched and decrypted ${decryptedRecords.length} ${dataType} records`);
       
       return new Response(
         JSON.stringify({ records: decryptedRecords }),
