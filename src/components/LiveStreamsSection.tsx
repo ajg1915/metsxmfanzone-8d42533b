@@ -66,11 +66,13 @@ const LiveStreamsSection = () => {
     }
   };
   const getStreamPageUrl = (stream: LiveStream) => {
-    // Filter out 'live' and get the first available network page
-    const networkPages = stream.assigned_pages.filter(page => page !== 'live');
+    // Filter out 'live' and 'guide' and get the first available network page
+    const networkPages = stream.assigned_pages.filter(page => page !== 'live' && page !== 'guide');
     if (networkPages.includes('metsxmfanzone')) return '/metsxmfanzone-tv';
     if (networkPages.includes('mlb-network')) return '/mlb-network';
     if (networkPages.includes('espn-network')) return '/espn-network';
+    if (networkPages.includes('pix11-network')) return '/pix11-network';
+    if (networkPages.includes('spring-training-live')) return '/spring-training-live';
 
     // Default fallback
     return '/live';
