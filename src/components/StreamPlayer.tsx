@@ -189,7 +189,12 @@ export function StreamPlayer({
               {stream.description && <p className="text-muted-foreground">{stream.description}</p>}
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No live stream available at the moment.</p>
+            <p className="text-sm text-muted-foreground mt-2">Check back later for live content.</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
