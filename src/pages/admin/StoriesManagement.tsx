@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { validateFile, generateSafeFilename, FileType } from "@/utils/fileValidation";
 
 interface Story {
   id: string;
@@ -105,8 +106,7 @@ const StoriesManagement = () => {
 
       if (mediaFile) {
         mediaType = mediaFile.type.startsWith("video/") ? "video" : "image";
-        const fileExt = mediaFile.name.split(".").pop();
-        const fileName = `${Date.now()}.${fileExt}`;
+        const fileName = generateSafeFilename(mediaFile.name);
 
         const { error: uploadError } = await supabase.storage
           .from("stories")
@@ -117,8 +117,7 @@ const StoriesManagement = () => {
       }
 
       if (thumbnailFile) {
-        const thumbExt = thumbnailFile.name.split(".").pop();
-        const thumbName = `thumb_${Date.now()}.${thumbExt}`;
+        const thumbName = `thumb_${generateSafeFilename(thumbnailFile.name)}`;
 
         const { error: thumbError } = await supabase.storage
           .from("stories")
@@ -283,8 +282,6 @@ const StoriesManagement = () => {
   };
 
   const handleMediaFileChange = async (file: File | null) => {
-    setMediaFile(file);
-    
     if (mediaPreview) {
       URL.revokeObjectURL(mediaPreview);
       setMediaPreview(null);
@@ -294,17 +291,36 @@ const StoriesManagement = () => {
     setVideoFrames([]);
     setSelectedFrameIndex(0);
     
-    if (file) {
-      if (file.type.startsWith('image/')) {
-        setMediaPreview(URL.createObjectURL(file));
-      } else if (file.type.startsWith('video/')) {
-        try {
-          const frames = await generateVideoFrames(file);
-          setVideoFrames(frames);
-          setMediaPreview(frames[0]);
-        } catch (error) {
-          console.error('Error generating video frames:', error);
-        }
+    if (!file) {
+      setMediaFile(null);
+      return;
+    }
+    
+    // Determine file type and validate
+    const fileType: FileType = file.type.startsWith('video/') ? 'video' : 'image';
+    const maxSize = fileType === 'video' ? 100 : 10; // 100MB for video, 10MB for images
+    
+    const validation = await validateFile(file, fileType, maxSize);
+    if (!validation.valid) {
+      toast({
+        title: "Error",
+        description: validation.error || "Invalid file",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setMediaFile(file);
+    
+    if (file.type.startsWith('image/')) {
+      setMediaPreview(URL.createObjectURL(file));
+    } else if (file.type.startsWith('video/')) {
+      try {
+        const frames = await generateVideoFrames(file);
+        setVideoFrames(frames);
+        setMediaPreview(frames[0]);
+      } catch (error) {
+        console.error('Error generating video frames:', error);
       }
     }
   };
@@ -320,17 +336,30 @@ const StoriesManagement = () => {
     setThumbnailPreview(videoFrames[index]);
   };
 
-  const handleThumbnailFileChange = (file: File | null) => {
-    setThumbnailFile(file);
-    
+  const handleThumbnailFileChange = async (file: File | null) => {
     if (thumbnailPreview) {
       URL.revokeObjectURL(thumbnailPreview);
       setThumbnailPreview(null);
     }
     
-    if (file) {
-      setThumbnailPreview(URL.createObjectURL(file));
+    if (!file) {
+      setThumbnailFile(null);
+      return;
     }
+    
+    // Validate thumbnail as image
+    const validation = await validateFile(file, 'image', 5);
+    if (!validation.valid) {
+      toast({
+        title: "Error",
+        description: validation.error || "Invalid thumbnail",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setThumbnailFile(file);
+    setThumbnailPreview(URL.createObjectURL(file));
   };
 
   const resetForm = () => {
