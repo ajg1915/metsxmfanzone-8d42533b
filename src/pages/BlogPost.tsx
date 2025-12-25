@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Tag, ArrowLeft, Headphones, Volume2, Loader2, Pause, Play, Square, Settings } from "lucide-react";
+import { Calendar, Tag, ArrowLeft, Headphones, Volume2, Square, Settings } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
@@ -43,15 +43,8 @@ export default function BlogPost() {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // TTS states
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
-  const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  
-  
   // Free browser TTS states
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [availableVoices, setAvailableVoices] = useState<VoiceOption[]>([]);
   const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
   const [speechRate, setSpeechRate] = useState(1);
@@ -105,15 +98,12 @@ export default function BlogPost() {
     }
   }, [slug]);
 
-  // Cleanup audio URLs and speech on unmount
+  // Cleanup speech on unmount
   useEffect(() => {
     return () => {
-      if (generatedAudioUrl) {
-        URL.revokeObjectURL(generatedAudioUrl);
-      }
       speechSynthesis.cancel();
     };
-  }, [generatedAudioUrl]);
+  }, []);
 
   const fetchPost = async () => {
     try {
@@ -250,101 +240,6 @@ export default function BlogPost() {
     setIsSpeaking(false);
   };
 
-  // OpenAI TTS (premium, requires API key)
-  const handleGenerateAudio = async () => {
-    if (!post) return;
-
-    setIsGeneratingAudio(true);
-
-    try {
-      const textToSpeak = `${post.title}. ${post.content}`.slice(0, 5000);
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/openai-tts`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ text: textToSpeak }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        try {
-          const parsed = JSON.parse(errorText);
-          throw new Error(parsed.error || "Failed to generate audio");
-        } catch {
-          throw new Error(errorText || "Failed to generate audio");
-        }
-      }
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      if (generatedAudioUrl) {
-        URL.revokeObjectURL(generatedAudioUrl);
-      }
-      
-      setGeneratedAudioUrl(audioUrl);
-      
-      if (audioRef.current) {
-        audioRef.current.src = audioUrl;
-        void audioRef.current
-          .play()
-          .then(() => setIsPlaying(true))
-          .catch((err) => {
-            console.error("Audio play() blocked:", err);
-            setIsPlaying(false);
-            toast({
-              title: "Playback Blocked",
-              description: "Tap Play to start audio (your browser blocked auto-play).",
-              variant: "destructive",
-            });
-          });
-      }
-
-      toast({
-        title: "Audio Ready",
-        description: "Article audio has been generated",
-      });
-    } catch (error: any) {
-      console.error("Error generating audio:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate audio",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingAudio(false);
-    }
-  };
-
-  const togglePlayPause = () => {
-    if (!audioRef.current) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-      return;
-    }
-
-    void audioRef.current
-      .play()
-      .then(() => setIsPlaying(true))
-      .catch((err) => {
-        console.error("Audio play() failed:", err);
-        setIsPlaying(false);
-        toast({
-          title: "Playback Error",
-          description: "Could not play audio. Try again or refresh the page.",
-          variant: "destructive",
-        });
-      });
-  };
 
   if (loading) {
     return (
@@ -445,13 +340,6 @@ export default function BlogPost() {
       
       <Navigation />
       
-      {/* Hidden audio element for TTS playback */}
-      <audio
-        ref={audioRef}
-        onEnded={() => setIsPlaying(false)}
-        onPause={() => setIsPlaying(false)}
-        onPlay={() => setIsPlaying(true)}
-      />
       
       
       <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pt-12">
