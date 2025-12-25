@@ -4,11 +4,19 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Tag, ArrowLeft, Headphones, Volume2, Loader2, Pause, Play } from "lucide-react";
+import { Calendar, Tag, ArrowLeft, Headphones, Volume2, Loader2, Pause, Play, Square, Settings } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import { useToast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface BlogPost {
   id: string;
@@ -23,6 +31,11 @@ interface BlogPost {
   published_at: string;
 }
 
+interface VoiceOption {
+  voice: SpeechSynthesisVoice;
+  label: string;
+}
+
 export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -34,7 +47,56 @@ export default function BlogPost() {
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Free browser TTS states
+  const [availableVoices, setAvailableVoices] = useState<VoiceOption[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [speechRate, setSpeechRate] = useState(1);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  // Load available browser voices
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = speechSynthesis.getVoices();
+      // Filter for English voices and prioritize high-quality ones
+      const englishVoices = voices
+        .filter(v => v.lang.startsWith('en'))
+        .map(voice => ({
+          voice,
+          label: `${voice.name} (${voice.lang})${voice.localService ? '' : ' ☁️'}`
+        }))
+        .sort((a, b) => {
+          // Prioritize non-local (cloud/premium) voices
+          if (!a.voice.localService && b.voice.localService) return -1;
+          if (a.voice.localService && !b.voice.localService) return 1;
+          // Then sort by name
+          return a.voice.name.localeCompare(b.voice.name);
+        });
+      
+      setAvailableVoices(englishVoices);
+      
+      // Auto-select best voice (prefer Google or Microsoft voices)
+      const preferredVoice = englishVoices.find(v => 
+        v.voice.name.includes('Google') || 
+        v.voice.name.includes('Microsoft') ||
+        v.voice.name.includes('Samantha') ||
+        v.voice.name.includes('Daniel')
+      ) || englishVoices[0];
+      
+      if (preferredVoice && !selectedVoice) {
+        setSelectedVoice(preferredVoice.voice);
+      }
+    };
+
+    loadVoices();
+    speechSynthesis.onvoiceschanged = loadVoices;
+
+    return () => {
+      speechSynthesis.onvoiceschanged = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (slug) {
@@ -42,12 +104,13 @@ export default function BlogPost() {
     }
   }, [slug]);
 
-  // Cleanup audio URL on unmount
+  // Cleanup audio URL and speech on unmount
   useEffect(() => {
     return () => {
       if (generatedAudioUrl) {
         URL.revokeObjectURL(generatedAudioUrl);
       }
+      speechSynthesis.cancel();
     };
   }, [generatedAudioUrl]);
 
@@ -79,13 +142,65 @@ export default function BlogPost() {
     }
   };
 
+  // Free browser TTS - no API key needed
+  const handleBrowserTTS = () => {
+    if (!post) return;
+
+    if (isSpeaking) {
+      speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    // Strip HTML tags and create clean text
+    const textToSpeak = `${post.title}. ${post.content}`
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    }
+    
+    utterance.rate = speechRate;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = (e) => {
+      console.error('Speech error:', e);
+      setIsSpeaking(false);
+      toast({
+        title: "Speech Error",
+        description: "Failed to play audio. Try a different voice.",
+        variant: "destructive",
+      });
+    };
+
+    utteranceRef.current = utterance;
+    speechSynthesis.speak(utterance);
+    
+    toast({
+      title: "Playing Article",
+      description: `Using ${selectedVoice?.name || 'default'} voice`,
+    });
+  };
+
+  const stopBrowserTTS = () => {
+    speechSynthesis.cancel();
+    setIsSpeaking(false);
+  };
+
+  // OpenAI TTS (premium, requires API key)
   const handleGenerateAudio = async () => {
     if (!post) return;
 
     setIsGeneratingAudio(true);
 
     try {
-      // Combine title and content for TTS, limit to reasonable length
       const textToSpeak = `${post.title}. ${post.content}`.slice(0, 5000);
 
       const response = await fetch(
@@ -114,14 +229,12 @@ export default function BlogPost() {
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       
-      // Clean up previous URL if exists
       if (generatedAudioUrl) {
         URL.revokeObjectURL(generatedAudioUrl);
       }
       
       setGeneratedAudioUrl(audioUrl);
       
-      // Auto-play the generated audio
       if (audioRef.current) {
         audioRef.current.src = audioUrl;
         audioRef.current.play();
@@ -300,50 +413,74 @@ export default function BlogPost() {
                   {post.category}
                 </span>
                 
-                {/* Listen Button - Only show if no pre-uploaded audio */}
-                {!post.audio_url && (
-                  <>
-                    {generatedAudioUrl ? (
+                {/* Free Browser TTS Controls */}
+                {!post.audio_url && availableVoices.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    {isSpeaking ? (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={togglePlayPause}
+                        onClick={stopBrowserTTS}
                         className="gap-2"
                       >
-                        {isPlaying ? (
-                          <>
-                            <Pause className="w-4 h-4" />
-                            Pause
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4" />
-                            Play
-                          </>
-                        )}
+                        <Square className="w-4 h-4" />
+                        Stop
                       </Button>
                     ) : (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={handleGenerateAudio}
-                        disabled={isGeneratingAudio}
+                        onClick={handleBrowserTTS}
                         className="gap-2"
                       >
-                        {isGeneratingAudio ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Generating...
-                          </>
-                        ) : (
-                          <>
-                            <Volume2 className="w-4 h-4" />
-                            Listen
-                          </>
-                        )}
+                        <Volume2 className="w-4 h-4" />
+                        Listen Free
                       </Button>
                     )}
-                  </>
+                    
+                    {/* Voice Settings Dropdown */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="gap-1 px-2">
+                          <Settings className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-64 max-h-80 overflow-y-auto">
+                        <DropdownMenuLabel>Voice Settings</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel className="text-xs text-muted-foreground">
+                          Select Voice ({availableVoices.length} available)
+                        </DropdownMenuLabel>
+                        {availableVoices.slice(0, 15).map(({ voice, label }) => (
+                          <DropdownMenuItem
+                            key={voice.name}
+                            onClick={() => setSelectedVoice(voice)}
+                            className={selectedVoice?.name === voice.name ? "bg-primary/10" : ""}
+                          >
+                            {selectedVoice?.name === voice.name && "✓ "}
+                            {label}
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel className="text-xs text-muted-foreground">
+                          Speed: {speechRate}x
+                        </DropdownMenuLabel>
+                        <div className="px-2 py-1 flex gap-1">
+                          {[0.75, 1, 1.25, 1.5].map(rate => (
+                            <Button
+                              key={rate}
+                              variant={speechRate === rate ? "default" : "outline"}
+                              size="sm"
+                              className="flex-1 text-xs"
+                              onClick={() => setSpeechRate(rate)}
+                            >
+                              {rate}x
+                            </Button>
+                          ))}
+                        </div>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 )}
               </div>
 
@@ -378,17 +515,23 @@ export default function BlogPost() {
               </Card>
             )}
 
-            {/* TTS Audio Player (when generated) */}
-            {generatedAudioUrl && !post.audio_url && (
-              <Card className="mb-6 border-primary/20">
+            {/* Speaking indicator */}
+            {isSpeaking && (
+              <Card className="mb-6 border-primary/20 bg-primary/5">
                 <CardContent className="py-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Volume2 className="w-5 h-5 text-primary" />
-                    <span className="font-medium">AI-Generated Audio</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-primary rounded-full animate-pulse" />
+                      <span className="font-medium">Now Playing</span>
+                      <span className="text-sm text-muted-foreground">
+                        {selectedVoice?.name || 'Default voice'}
+                      </span>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={stopBrowserTTS}>
+                      <Square className="w-4 h-4 mr-2" />
+                      Stop
+                    </Button>
                   </div>
-                  <audio controls className="w-full" src={generatedAudioUrl}>
-                    Your browser does not support the audio element.
-                  </audio>
                 </CardContent>
               </Card>
             )}
