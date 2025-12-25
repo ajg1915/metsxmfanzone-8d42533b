@@ -152,6 +152,7 @@ serve(async (req) => {
       profiles: ['email', 'phone_number', 'full_name'],
       business_ads: ['contact_email', 'contact_phone', 'business_name'],
       newsletter_subscribers: ['email', 'full_name'],
+      notification_subscriptions: ['endpoint', 'p256dh', 'auth'],
     };
 
     const fields = encryptionSchema[dataType];

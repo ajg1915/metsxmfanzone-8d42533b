@@ -72,19 +72,45 @@ export const useNotifications = () => {
         });
       }
 
-      // Store subscription in database
+      // Get subscription data
       const subscriptionJSON = subscription.toJSON();
-      
-      const { error } = await supabase
-        .from("notification_subscriptions")
-        .upsert({
-          user_id: user.id,
-          endpoint: subscriptionJSON.endpoint || "",
-          p256dh: subscriptionJSON.keys?.p256dh || "",
-          auth: subscriptionJSON.keys?.auth || "",
-        });
+      const endpoint = subscriptionJSON.endpoint || "";
+      const p256dh = subscriptionJSON.keys?.p256dh || "";
+      const auth = subscriptionJSON.keys?.auth || "";
 
-      if (error) throw error;
+      // Encrypt subscription data before storing
+      const { data: encryptedData, error: encryptError } = await supabase.functions.invoke('encrypt-on-save', {
+        body: {
+          action: 'encrypt',
+          table: 'notification_subscriptions',
+          data: { endpoint, p256dh, auth }
+        }
+      });
+
+      if (encryptError) {
+        console.error("Encryption failed, storing unencrypted:", encryptError);
+        // Fallback to unencrypted storage
+        const { error } = await supabase
+          .from("notification_subscriptions")
+          .upsert({
+            user_id: user.id,
+            endpoint,
+            p256dh,
+            auth,
+          });
+        if (error) throw error;
+      } else {
+        // Store encrypted subscription
+        const { error } = await supabase
+          .from("notification_subscriptions")
+          .upsert({
+            user_id: user.id,
+            endpoint: encryptedData?.data?.endpoint || endpoint,
+            p256dh: encryptedData?.data?.p256dh || p256dh,
+            auth: encryptedData?.data?.auth || auth,
+          });
+        if (error) throw error;
+      }
 
       setIsSubscribed(true);
       toast({
