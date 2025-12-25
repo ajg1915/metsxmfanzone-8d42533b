@@ -258,8 +258,8 @@ export default function BlogPost() {
     setIsSpeaking(false);
   };
 
-  // ElevenLabs AI Voice (realistic, natural sounding)
-  const handleElevenLabsTTS = async () => {
+  // OpenAI TTS (realistic, natural sounding)
+  const handleAIVoice = async () => {
     if (!post) return;
 
     // If already have audio, just play/pause
@@ -281,10 +281,10 @@ export default function BlogPost() {
         .replace(/<[^>]*>/g, '')
         .replace(/\s+/g, ' ')
         .trim()
-        .slice(0, 5000);
+        .slice(0, 4000);
 
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/openai-tts`,
         {
           method: "POST",
           headers: {
@@ -292,7 +292,10 @@ export default function BlogPost() {
             apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify({ text: textToSpeak }),
+          body: JSON.stringify({ 
+            text: textToSpeak,
+            voice: "nova" // Natural female voice
+          }),
         }
       );
 
@@ -335,7 +338,7 @@ export default function BlogPost() {
 
       toast({
         title: "AI Voice Ready",
-        description: "Playing with realistic AI voice",
+        description: "Playing with OpenAI voice",
       });
     } catch (error: unknown) {
       console.error("Error generating AI audio:", error);
@@ -623,7 +626,7 @@ export default function BlogPost() {
                       <Button
                         variant="default"
                         size="sm"
-                        onClick={handleElevenLabsTTS}
+                        onClick={handleAIVoice}
                         disabled={isGeneratingAIVoice}
                         className="gap-2"
                       >
