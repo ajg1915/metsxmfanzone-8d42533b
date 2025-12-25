@@ -53,6 +53,30 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_verification_codes: {
+        Row: {
+          code_hash: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code_hash: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code_hash?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       background_settings: {
         Row: {
           background_type: string

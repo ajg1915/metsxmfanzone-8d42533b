@@ -7,6 +7,7 @@ import { AdminSidebar } from "@/components/AdminSidebar";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
+import { AdminPinVerification } from "@/components/AdminPinVerification";
 
 export function AdminLayout() {
   const { user, loading } = useAuth();
@@ -14,6 +15,28 @@ export function AdminLayout() {
   const { toast } = useToast();
   const [isAdmin, setIsAdmin] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [needsPinVerification, setNeedsPinVerification] = useState(false);
+  const [pinVerified, setPinVerified] = useState(false);
+
+  useEffect(() => {
+    // Check if already verified this session
+    const verified = sessionStorage.getItem("admin_verified");
+    const verifiedAt = sessionStorage.getItem("admin_verified_at");
+    
+    if (verified === "true" && verifiedAt) {
+      // Check if verification is still valid (24 hour max)
+      const verifiedTime = new Date(verifiedAt);
+      const hoursSinceVerification = (Date.now() - verifiedTime.getTime()) / (1000 * 60 * 60);
+      
+      if (hoursSinceVerification < 24) {
+        setPinVerified(true);
+      } else {
+        // Expired, clear it
+        sessionStorage.removeItem("admin_verified");
+        sessionStorage.removeItem("admin_verified_at");
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -41,12 +64,26 @@ export function AdminLayout() {
         }
 
         setIsAdmin(true);
+        
+        // If not already PIN verified, require PIN
+        if (!pinVerified) {
+          setNeedsPinVerification(true);
+        }
       }
       setChecking(false);
     };
 
     checkAdmin();
-  }, [user, loading, navigate, toast]);
+  }, [user, loading, navigate, toast, pinVerified]);
+
+  const handlePinVerified = () => {
+    setPinVerified(true);
+    setNeedsPinVerification(false);
+  };
+
+  const handlePinCancel = () => {
+    navigate("/");
+  };
 
   if (loading || checking) {
     return (
@@ -58,6 +95,17 @@ export function AdminLayout() {
 
   if (!isAdmin) {
     return null;
+  }
+
+  // Show PIN verification if needed
+  if (needsPinVerification && !pinVerified && user) {
+    return (
+      <AdminPinVerification
+        userId={user.id}
+        onVerified={handlePinVerified}
+        onCancel={handlePinCancel}
+      />
+    );
   }
 
   return (

@@ -1,0 +1,316 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { Shield, Lock, Key } from "lucide-react";
+
+interface AdminPinVerificationProps {
+  userId: string;
+  onVerified: () => void;
+  onCancel: () => void;
+}
+
+// Simple hash function for PIN (in production, use bcrypt via edge function)
+const hashPin = async (pin: string): Promise<string> => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin + "metsxm_admin_salt_2024");
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+};
+
+export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinVerificationProps) {
+  const [pin, setPin] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+  const [isSetupMode, setIsSetupMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [verifying, setVerifying] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<Date | null>(null);
+  const { toast } = useToast();
+
+  const MAX_ATTEMPTS = 5;
+  const LOCKOUT_MINUTES = 15;
+
+  useEffect(() => {
+    checkExistingPin();
+  }, [userId]);
+
+  useEffect(() => {
+    // Check lockout from sessionStorage
+    const lockout = sessionStorage.getItem("admin_lockout");
+    if (lockout) {
+      const lockoutTime = new Date(lockout);
+      if (lockoutTime > new Date()) {
+        setLockoutUntil(lockoutTime);
+      } else {
+        sessionStorage.removeItem("admin_lockout");
+        sessionStorage.removeItem("admin_attempts");
+      }
+    }
+    const storedAttempts = sessionStorage.getItem("admin_attempts");
+    if (storedAttempts) {
+      setAttempts(parseInt(storedAttempts, 10));
+    }
+  }, []);
+
+  const checkExistingPin = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("admin_verification_codes")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking PIN:", error);
+      }
+
+      setIsSetupMode(!data);
+    } catch (err) {
+      console.error("Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetupPin = async () => {
+    if (pin.length < 6) {
+      toast({
+        title: "PIN too short",
+        description: "PIN must be at least 6 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (pin !== confirmPin) {
+      toast({
+        title: "PINs don't match",
+        description: "Please make sure both PINs match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setVerifying(true);
+    try {
+      const hashedPin = await hashPin(pin);
+
+      const { error } = await supabase
+        .from("admin_verification_codes")
+        .insert({
+          user_id: userId,
+          code_hash: hashedPin,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "PIN Created",
+        description: "Your admin verification PIN has been set up successfully",
+      });
+
+      // Store verification in session
+      sessionStorage.setItem("admin_verified", "true");
+      sessionStorage.setItem("admin_verified_at", new Date().toISOString());
+      onVerified();
+    } catch (err) {
+      console.error("Error setting up PIN:", err);
+      toast({
+        title: "Setup Failed",
+        description: "Failed to set up PIN. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleVerifyPin = async () => {
+    if (lockoutUntil && lockoutUntil > new Date()) {
+      const remaining = Math.ceil((lockoutUntil.getTime() - Date.now()) / 60000);
+      toast({
+        title: "Account Locked",
+        description: `Too many failed attempts. Try again in ${remaining} minutes.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setVerifying(true);
+    try {
+      const hashedPin = await hashPin(pin);
+
+      const { data, error } = await supabase
+        .from("admin_verification_codes")
+        .select("code_hash")
+        .eq("user_id", userId)
+        .single();
+
+      if (error) throw error;
+
+      if (data.code_hash === hashedPin) {
+        // Success - clear attempts and verify
+        sessionStorage.removeItem("admin_attempts");
+        sessionStorage.removeItem("admin_lockout");
+        sessionStorage.setItem("admin_verified", "true");
+        sessionStorage.setItem("admin_verified_at", new Date().toISOString());
+        
+        toast({
+          title: "Verified",
+          description: "Admin access granted",
+        });
+        onVerified();
+      } else {
+        // Failed attempt
+        const newAttempts = attempts + 1;
+        setAttempts(newAttempts);
+        sessionStorage.setItem("admin_attempts", newAttempts.toString());
+
+        if (newAttempts >= MAX_ATTEMPTS) {
+          const lockout = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000);
+          setLockoutUntil(lockout);
+          sessionStorage.setItem("admin_lockout", lockout.toISOString());
+          
+          toast({
+            title: "Account Locked",
+            description: `Too many failed attempts. Locked for ${LOCKOUT_MINUTES} minutes.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Incorrect PIN",
+            description: `${MAX_ATTEMPTS - newAttempts} attempts remaining`,
+            variant: "destructive",
+          });
+        }
+        setPin("");
+      }
+    } catch (err) {
+      console.error("Error verifying PIN:", err);
+      toast({
+        title: "Verification Failed",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  const isLockedOut = lockoutUntil && lockoutUntil > new Date();
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <Shield className="h-6 w-6 text-primary" />
+          </div>
+          <CardTitle className="text-xl">
+            {isSetupMode ? "Set Up Admin PIN" : "Admin Verification"}
+          </CardTitle>
+          <CardDescription>
+            {isSetupMode 
+              ? "Create a secure PIN that only you know to access admin features"
+              : "Enter your secret PIN to access the admin panel"
+            }
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {isLockedOut ? (
+            <div className="text-center py-8">
+              <Lock className="h-12 w-12 mx-auto text-destructive mb-4" />
+              <p className="text-destructive font-medium">Account Temporarily Locked</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Too many failed attempts. Please wait{" "}
+                {Math.ceil((lockoutUntil!.getTime() - Date.now()) / 60000)} minutes.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="pin" className="flex items-center gap-2">
+                  <Key className="h-4 w-4" />
+                  {isSetupMode ? "Create PIN (min 6 characters)" : "Enter PIN"}
+                </Label>
+                <Input
+                  id="pin"
+                  type="password"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                  placeholder="••••••"
+                  className="text-center text-lg tracking-widest"
+                  maxLength={20}
+                  autoComplete="off"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !isSetupMode) {
+                      handleVerifyPin();
+                    }
+                  }}
+                />
+              </div>
+
+              {isSetupMode && (
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPin">Confirm PIN</Label>
+                  <Input
+                    id="confirmPin"
+                    type="password"
+                    value={confirmPin}
+                    onChange={(e) => setConfirmPin(e.target.value)}
+                    placeholder="••••••"
+                    className="text-center text-lg tracking-widest"
+                    maxLength={20}
+                    autoComplete="off"
+                  />
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={onCancel}
+                  className="flex-1"
+                  disabled={verifying}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={isSetupMode ? handleSetupPin : handleVerifyPin}
+                  className="flex-1"
+                  disabled={verifying || pin.length < 6}
+                >
+                  {verifying ? "Verifying..." : isSetupMode ? "Set PIN" : "Verify"}
+                </Button>
+              </div>
+
+              {!isSetupMode && attempts > 0 && (
+                <p className="text-xs text-center text-muted-foreground">
+                  {MAX_ATTEMPTS - attempts} attempts remaining before lockout
+                </p>
+              )}
+            </>
+          )}
+
+          <p className="text-xs text-center text-muted-foreground pt-4 border-t">
+            This PIN is stored securely and cannot be recovered. 
+            {isSetupMode && " Remember it carefully."}
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
