@@ -13,15 +13,6 @@ interface AdminPinVerificationProps {
   onCancel: () => void;
 }
 
-// Simple hash function for PIN (in production, use bcrypt via edge function)
-const hashPin = async (pin: string): Promise<string> => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(pin + "metsxm_admin_salt_2024");
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-};
-
 export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinVerificationProps) {
   const [pin, setPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
@@ -59,17 +50,28 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
 
   const checkExistingPin = async () => {
     try {
-      const { data, error } = await supabase
-        .from("admin_verification_codes")
-        .select("id")
-        .eq("user_id", userId)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error checking PIN:", error);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setLoading(false);
+        return;
       }
 
-      setIsSetupMode(!data);
+      const response = await supabase.functions.invoke('admin-pin-verify', {
+        body: { action: 'check' }
+      });
+
+      if (response.error) {
+        console.error("Error checking PIN:", response.error);
+        // Fallback to direct check
+        const { data } = await supabase
+          .from("admin_verification_codes")
+          .select("id")
+          .eq("user_id", userId)
+          .maybeSingle();
+        setIsSetupMode(!data);
+      } else {
+        setIsSetupMode(!response.data.hasPin);
+      }
     } catch (err) {
       console.error("Error:", err);
     } finally {
@@ -98,20 +100,16 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
 
     setVerifying(true);
     try {
-      const hashedPin = await hashPin(pin);
+      const response = await supabase.functions.invoke('admin-pin-verify', {
+        body: { action: 'setup', pin }
+      });
 
-      const { error } = await supabase
-        .from("admin_verification_codes")
-        .insert({
-          user_id: userId,
-          code_hash: hashedPin,
-        });
-
-      if (error) throw error;
+      if (response.error) throw response.error;
+      if (response.data.error) throw new Error(response.data.error);
 
       toast({
         title: "PIN Created",
-        description: "Your admin verification PIN has been set up successfully",
+        description: "Your admin verification PIN has been set up securely",
       });
 
       // Store verification in session
@@ -143,17 +141,13 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
 
     setVerifying(true);
     try {
-      const hashedPin = await hashPin(pin);
+      const response = await supabase.functions.invoke('admin-pin-verify', {
+        body: { action: 'verify', pin }
+      });
 
-      const { data, error } = await supabase
-        .from("admin_verification_codes")
-        .select("code_hash")
-        .eq("user_id", userId)
-        .single();
+      if (response.error) throw response.error;
 
-      if (error) throw error;
-
-      if (data.code_hash === hashedPin) {
+      if (response.data.valid) {
         // Success - clear attempts and verify
         sessionStorage.removeItem("admin_attempts");
         sessionStorage.removeItem("admin_lockout");
@@ -306,8 +300,8 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
           )}
 
           <p className="text-xs text-center text-muted-foreground pt-4 border-t">
-            This PIN is stored securely and cannot be recovered. 
-            {isSetupMode && " Remember it carefully."}
+            PIN verification is performed securely on the server.
+            {isSetupMode && " Remember your PIN carefully - it cannot be recovered."}
           </p>
         </CardContent>
       </Card>
