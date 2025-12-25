@@ -12,6 +12,57 @@ const corsHeaders = {
 // VAPID keys for web push
 const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
 
+// AES-GCM decryption for encrypted push subscription data
+async function getEncryptionKey(): Promise<CryptoKey> {
+  const keyString = Deno.env.get('ACTIVITY_LOGS_ENCRYPTION_KEY') ?? '';
+  if (!keyString) {
+    throw new Error('Encryption key not configured');
+  }
+  
+  const encoder = new TextEncoder();
+  const keyData = await crypto.subtle.digest('SHA-256', encoder.encode(keyString));
+  
+  return crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'AES-GCM' },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function decrypt(ciphertext: string): Promise<string> {
+  if (!ciphertext) return '';
+  
+  try {
+    // Check if already decrypted (not base64 encrypted format)
+    if (!ciphertext.match(/^[A-Za-z0-9+/]+=*$/)) {
+      return ciphertext;
+    }
+    
+    const key = await getEncryptionKey();
+    const combined = Uint8Array.from(atob(ciphertext), c => c.charCodeAt(0));
+    
+    if (combined.length < 13) {
+      return ciphertext; // Too short to be encrypted
+    }
+    
+    const iv = combined.slice(0, 12);
+    const encrypted = combined.slice(12);
+    
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      encrypted
+    );
+    
+    return new TextDecoder().decode(decrypted);
+  } catch (error) {
+    // Return original if decryption fails (might not be encrypted)
+    return ciphertext;
+  }
+}
+
 // Helper function to create the JWT for VAPID
 async function createVapidJwt(audience: string, subject: string, privateKeyBase64: string): Promise<string> {
   const header = { alg: 'ES256', typ: 'JWT' };
@@ -195,19 +246,24 @@ serve(async (req) => {
       tag: tag || 'metsxm-notification',
     };
 
-    // Send push notifications to all subscribers
+    // Send push notifications to all subscribers - decrypt endpoints first
     const notificationPromises = subscriptions.map(async (subscription) => {
       try {
+        // Decrypt the push subscription data
+        const decryptedEndpoint = await decrypt(subscription.endpoint);
+        const decryptedP256dh = await decrypt(subscription.p256dh);
+        const decryptedAuth = await decrypt(subscription.auth);
+
         const success = await sendPushNotification(
           {
-            endpoint: subscription.endpoint,
-            p256dh: subscription.p256dh,
-            auth: subscription.auth,
+            endpoint: decryptedEndpoint,
+            p256dh: decryptedP256dh,
+            auth: decryptedAuth,
           },
           payload
         );
 
-        return { success, endpoint: subscription.endpoint, userId: subscription.user_id };
+        return { success, endpoint: decryptedEndpoint.substring(0, 50), userId: subscription.user_id };
       } catch (error) {
         console.error('Error sending notification:', error);
         

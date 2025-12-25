@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { trackBulkExport } from "@/utils/securityAlerts";
 
-type EncryptableDataType = 'activity_logs' | 'profiles' | 'business_ads' | 'newsletter_subscribers';
+type EncryptableDataType = 'activity_logs' | 'profiles' | 'business_ads' | 'newsletter_subscribers' | 'notification_subscriptions';
 
 /**
  * Secure Data Vault - AES-256-GCM Encryption System
@@ -128,6 +128,10 @@ export async function fetchDecryptedActivityLogs(limit = 100, offset = 0) {
 
 export async function fetchDecryptedNewsletterSubscribers(limit = 100, offset = 0) {
   return fetchDecryptedData('newsletter_subscribers', { limit, offset });
+}
+
+export async function fetchDecryptedNotificationSubscriptions(limit = 100, offset = 0) {
+  return fetchDecryptedData('notification_subscriptions', { limit, offset });
 }
 
 /**
