@@ -146,11 +146,24 @@ export default function BlogPost() {
   const handleBrowserTTS = () => {
     if (!post) return;
 
+    // Check if speech synthesis is supported
+    if (!('speechSynthesis' in window)) {
+      toast({
+        title: "Not Supported",
+        description: "Text-to-speech is not supported in your browser.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (isSpeaking) {
       speechSynthesis.cancel();
       setIsSpeaking(false);
       return;
     }
+
+    // Cancel any pending speech first
+    speechSynthesis.cancel();
 
     // Strip HTML tags and create clean text
     const textToSpeak = `${post.title}. ${post.content}`
@@ -158,35 +171,74 @@ export default function BlogPost() {
       .replace(/\s+/g, ' ')
       .trim();
 
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    // Limit text length for better performance
+    const maxLength = 5000;
+    const truncatedText = textToSpeak.length > maxLength 
+      ? textToSpeak.slice(0, maxLength) + '... (text truncated for performance)'
+      : textToSpeak;
+
+    const utterance = new SpeechSynthesisUtterance(truncatedText);
     
+    // Wait for voices to load if needed
+    const voices = speechSynthesis.getVoices();
     if (selectedVoice) {
       utterance.voice = selectedVoice;
+    } else if (voices.length > 0) {
+      // Use first available voice if none selected
+      const englishVoice = voices.find(v => v.lang.startsWith('en'));
+      if (englishVoice) utterance.voice = englishVoice;
     }
     
     utterance.rate = speechRate;
     utterance.pitch = 1;
     utterance.volume = 1;
+    utterance.lang = 'en-US';
 
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = (e) => {
-      console.error('Speech error:', e);
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+    };
+    
+    utterance.onend = () => {
       setIsSpeaking(false);
+    };
+    
+    utterance.onerror = (e) => {
+      console.error('Speech error:', e.error, e);
+      setIsSpeaking(false);
+      
+      // Handle specific errors
+      if (e.error === 'canceled') {
+        return; // User canceled, no error to show
+      }
+      
       toast({
         title: "Speech Error",
-        description: "Failed to play audio. Try a different voice.",
+        description: e.error === 'not-allowed' 
+          ? "Please allow audio permissions in your browser."
+          : "Failed to play audio. Try refreshing the page.",
         variant: "destructive",
       });
     };
 
     utteranceRef.current = utterance;
-    speechSynthesis.speak(utterance);
     
-    toast({
-      title: "Playing Article",
-      description: `Using ${selectedVoice?.name || 'default'} voice`,
-    });
+    // Small delay to ensure proper initialization
+    setTimeout(() => {
+      try {
+        speechSynthesis.speak(utterance);
+        toast({
+          title: "Playing Article",
+          description: `Using ${utterance.voice?.name || 'default'} voice`,
+        });
+      } catch (err) {
+        console.error('Failed to start speech:', err);
+        toast({
+          title: "Audio Error",
+          description: "Could not start text-to-speech. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }, 100);
   };
 
   const stopBrowserTTS = () => {
