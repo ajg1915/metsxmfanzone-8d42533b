@@ -171,15 +171,14 @@ export default function BlogPost() {
       .replace(/\s+/g, ' ')
       .trim();
 
-    // Limit text length for better performance
-    const maxLength = 5000;
-    const truncatedText = textToSpeak.length > maxLength 
-      ? textToSpeak.slice(0, maxLength) + '... (text truncated for performance)'
+    // Limit text length for better performance (some browsers fail on very long text)
+    const maxLength = 2000;
+    const truncatedText = textToSpeak.length > maxLength
+      ? textToSpeak.slice(0, maxLength) + "..."
       : textToSpeak;
 
     const utterance = new SpeechSynthesisUtterance(truncatedText);
-    
-    // Wait for voices to load if needed
+
     const voices = speechSynthesis.getVoices();
     if (selectedVoice) {
       utterance.voice = selectedVoice;
@@ -187,58 +186,62 @@ export default function BlogPost() {
       // Use first available voice if none selected
       const englishVoice = voices.find(v => v.lang.startsWith('en'));
       if (englishVoice) utterance.voice = englishVoice;
+    } else {
+      toast({
+        title: "Voices Loading",
+        description: "Voices are still loading — try again in a moment.",
+        variant: "destructive",
+      });
+      return;
     }
-    
+
     utterance.rate = speechRate;
     utterance.pitch = 1;
     utterance.volume = 1;
     utterance.lang = 'en-US';
 
-    utterance.onstart = () => {
-      setIsSpeaking(true);
-    };
-    
-    utterance.onend = () => {
-      setIsSpeaking(false);
-    };
-    
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+
     utterance.onerror = (e) => {
       console.error('Speech error:', e.error, e);
       setIsSpeaking(false);
-      
-      // Handle specific errors
-      if (e.error === 'canceled') {
-        return; // User canceled, no error to show
-      }
-      
+
+      if (e.error === 'canceled') return;
+
       toast({
         title: "Speech Error",
-        description: e.error === 'not-allowed' 
-          ? "Please allow audio permissions in your browser."
-          : "Failed to play audio. Try refreshing the page.",
+        description: `TTS error: ${e.error || 'unknown'}. Try another voice or refresh.`,
         variant: "destructive",
       });
     };
 
     utteranceRef.current = utterance;
-    
-    // Small delay to ensure proper initialization
-    setTimeout(() => {
+
+    try {
       try {
-        speechSynthesis.speak(utterance);
-        toast({
-          title: "Playing Article",
-          description: `Using ${utterance.voice?.name || 'default'} voice`,
-        });
-      } catch (err) {
-        console.error('Failed to start speech:', err);
-        toast({
-          title: "Audio Error",
-          description: "Could not start text-to-speech. Please try again.",
-          variant: "destructive",
-        });
+        // Some browsers pause speech synthesis; resume helps reliability.
+        speechSynthesis.resume();
+      } catch {
+        // ignore
       }
-    }, 100);
+
+      // IMPORTANT: call speak synchronously (no setTimeout) to preserve user-gesture requirements.
+      speechSynthesis.speak(utterance);
+
+      toast({
+        title: "Playing Article",
+        description: `Using ${utterance.voice?.name || 'default'} voice`,
+      });
+    } catch (err) {
+      console.error('Failed to start speech:', err);
+      setIsSpeaking(false);
+      toast({
+        title: "Audio Error",
+        description: "Could not start text-to-speech. Try refreshing the page.",
+        variant: "destructive",
+      });
+    }
   };
 
   const stopBrowserTTS = () => {
@@ -289,8 +292,18 @@ export default function BlogPost() {
       
       if (audioRef.current) {
         audioRef.current.src = audioUrl;
-        audioRef.current.play();
-        setIsPlaying(true);
+        void audioRef.current
+          .play()
+          .then(() => setIsPlaying(true))
+          .catch((err) => {
+            console.error("Audio play() blocked:", err);
+            setIsPlaying(false);
+            toast({
+              title: "Playback Blocked",
+              description: "Tap Play to start audio (your browser blocked auto-play).",
+              variant: "destructive",
+            });
+          });
       }
 
       toast({
@@ -310,14 +323,26 @@ export default function BlogPost() {
   };
 
   const togglePlayPause = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+      return;
     }
+
+    void audioRef.current
+      .play()
+      .then(() => setIsPlaying(true))
+      .catch((err) => {
+        console.error("Audio play() failed:", err);
+        setIsPlaying(false);
+        toast({
+          title: "Playback Error",
+          description: "Could not play audio. Try again or refresh the page.",
+          variant: "destructive",
+        });
+      });
   };
 
   if (loading) {
