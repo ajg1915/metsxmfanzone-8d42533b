@@ -972,10 +972,8 @@ export default function EmailEditor() {
                   ? content.replace(/\{\{name\}\}/g, "John Doe").replace(/\{\{email\}\}/g, "johndoe@example.com")
                   : getCurrentEmailHtml(),
                 { 
-                  ALLOWED_TAGS: ['div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr', 'ul', 'ol', 'li', 'strong', 'b', 'em', 'i', 'span', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'],
-                  ALLOWED_ATTR: ['src', 'alt', 'style', 'class'],
-                  FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'a', 'link', 'meta', 'head', 'html', 'body'],
-                  FORBID_ATTR: ['onclick', 'onerror', 'onload', 'onmouseover', 'onfocus', 'onblur', 'href', 'target', 'action', 'formaction'],
+                  ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'img'],
+                  ALLOWED_ATTR: ['href', 'src'],
                   ALLOW_DATA_ATTR: false,
                 }
               )
