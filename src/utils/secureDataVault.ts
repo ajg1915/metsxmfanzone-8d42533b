@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { trackBulkExport } from "@/utils/securityAlerts";
 
 type EncryptableDataType = 'activity_logs' | 'profiles' | 'business_ads' | 'newsletter_subscribers';
 
@@ -95,7 +96,16 @@ export async function fetchDecryptedData(
       throw new Error('Failed to fetch data - admin access required');
     }
 
-    return data?.records || [];
+    const records = data?.records || [];
+    
+    // Track bulk exports for security alerts (threshold check happens in edge function)
+    if (records.length >= 50) {
+      const { data: userData } = await supabase.auth.getUser();
+      const adminEmail = userData?.user?.email || 'unknown';
+      trackBulkExport(adminEmail, dataType, records.length);
+    }
+
+    return records;
   } catch (error) {
     console.error('Error fetching decrypted data:', error);
     throw error;

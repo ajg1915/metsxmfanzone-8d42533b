@@ -13,6 +13,7 @@ import { z } from "zod";
 import { Shield, ArrowLeft } from "lucide-react";
 import AuthBackground from "@/components/AuthBackground";
 import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
+import { trackFailedLogin } from "@/utils/securityAlerts";
 
 const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
@@ -504,6 +505,9 @@ const Auth = () => {
       });
 
       if (error) {
+        // Track failed login attempt for security alerts
+        trackFailedLogin(validated.email);
+        
         if (error.message.includes("Invalid login credentials")) {
           toast({
             title: "Login failed",
