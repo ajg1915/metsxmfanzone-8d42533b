@@ -50,6 +50,12 @@ export default function BlogPost() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
+  // ElevenLabs AI Voice states
+  const [isGeneratingAIVoice, setIsGeneratingAIVoice] = useState(false);
+  const [aiAudioUrl, setAiAudioUrl] = useState<string | null>(null);
+  const [isPlayingAI, setIsPlayingAI] = useState(false);
+  const aiAudioRef = useRef<HTMLAudioElement | null>(null);
+  
   // Free browser TTS states
   const [availableVoices, setAvailableVoices] = useState<VoiceOption[]>([]);
   const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
@@ -104,15 +110,18 @@ export default function BlogPost() {
     }
   }, [slug]);
 
-  // Cleanup audio URL and speech on unmount
+  // Cleanup audio URLs and speech on unmount
   useEffect(() => {
     return () => {
       if (generatedAudioUrl) {
         URL.revokeObjectURL(generatedAudioUrl);
       }
+      if (aiAudioUrl) {
+        URL.revokeObjectURL(aiAudioUrl);
+      }
       speechSynthesis.cancel();
     };
-  }, [generatedAudioUrl]);
+  }, [generatedAudioUrl, aiAudioUrl]);
 
   const fetchPost = async () => {
     try {
@@ -247,6 +256,105 @@ export default function BlogPost() {
   const stopBrowserTTS = () => {
     speechSynthesis.cancel();
     setIsSpeaking(false);
+  };
+
+  // ElevenLabs AI Voice (realistic, natural sounding)
+  const handleElevenLabsTTS = async () => {
+    if (!post) return;
+
+    // If already have audio, just play/pause
+    if (aiAudioUrl && aiAudioRef.current) {
+      if (isPlayingAI) {
+        aiAudioRef.current.pause();
+        setIsPlayingAI(false);
+      } else {
+        void aiAudioRef.current.play().then(() => setIsPlayingAI(true)).catch(console.error);
+      }
+      return;
+    }
+
+    setIsGeneratingAIVoice(true);
+
+    try {
+      // Strip HTML and prepare text
+      const textToSpeak = `${post.title}. ${post.content}`
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 5000);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text: textToSpeak }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = "Failed to generate audio";
+        try {
+          const parsed = JSON.parse(errorText);
+          errorMessage = parsed.error || errorMessage;
+        } catch {
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      if (aiAudioUrl) {
+        URL.revokeObjectURL(aiAudioUrl);
+      }
+      
+      setAiAudioUrl(audioUrl);
+      
+      if (aiAudioRef.current) {
+        aiAudioRef.current.src = audioUrl;
+        void aiAudioRef.current
+          .play()
+          .then(() => setIsPlayingAI(true))
+          .catch((err) => {
+            console.error("AI Audio play() blocked:", err);
+            setIsPlayingAI(false);
+            toast({
+              title: "Playback Blocked",
+              description: "Tap Play to start audio.",
+              variant: "destructive",
+            });
+          });
+      }
+
+      toast({
+        title: "AI Voice Ready",
+        description: "Playing with realistic AI voice",
+      });
+    } catch (error: unknown) {
+      console.error("Error generating AI audio:", error);
+      toast({
+        title: "AI Voice Error",
+        description: error instanceof Error ? error.message : "Failed to generate AI voice",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingAIVoice(false);
+    }
+  };
+
+  const stopAIAudio = () => {
+    if (aiAudioRef.current) {
+      aiAudioRef.current.pause();
+      aiAudioRef.current.currentTime = 0;
+    }
+    setIsPlayingAI(false);
   };
 
   // OpenAI TTS (premium, requires API key)
@@ -452,6 +560,14 @@ export default function BlogPost() {
         onPlay={() => setIsPlaying(true)}
       />
       
+      {/* Hidden audio element for AI voice playback */}
+      <audio
+        ref={aiAudioRef}
+        onEnded={() => setIsPlayingAI(false)}
+        onPause={() => setIsPlayingAI(false)}
+        onPlay={() => setIsPlayingAI(true)}
+      />
+      
       <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pt-12">
         <div className="max-w-4xl mx-auto w-full">
           <Button 
@@ -490,6 +606,48 @@ export default function BlogPost() {
                   {post.category}
                 </span>
                 
+                {/* AI Voice Button - Realistic ElevenLabs */}
+                {!post.audio_url && (
+                  <div className="flex items-center gap-2">
+                    {isPlayingAI ? (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={stopAIAudio}
+                        className="gap-2"
+                      >
+                        <Square className="w-4 h-4" />
+                        Stop AI Voice
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={handleElevenLabsTTS}
+                        disabled={isGeneratingAIVoice}
+                        className="gap-2"
+                      >
+                        {isGeneratingAIVoice ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Generating...
+                          </>
+                        ) : aiAudioUrl ? (
+                          <>
+                            <Play className="w-4 h-4" />
+                            Play AI Voice
+                          </>
+                        ) : (
+                          <>
+                            <Headphones className="w-4 h-4" />
+                            AI Voice
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                )}
+                
                 {/* Free Browser TTS Controls */}
                 {!post.audio_url && availableVoices.length > 0 && (
                   <div className="flex items-center gap-2">
@@ -511,7 +669,7 @@ export default function BlogPost() {
                         className="gap-2"
                       >
                         <Volume2 className="w-4 h-4" />
-                        Listen Free
+                        Free Voice
                       </Button>
                     )}
                     
@@ -523,7 +681,7 @@ export default function BlogPost() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-64 max-h-80 overflow-y-auto">
-                        <DropdownMenuLabel>Voice Settings</DropdownMenuLabel>
+                        <DropdownMenuLabel>Free Voice Settings</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel className="text-xs text-muted-foreground">
                           Select Voice ({availableVoices.length} available)
@@ -592,14 +750,35 @@ export default function BlogPost() {
               </Card>
             )}
 
-            {/* Speaking indicator */}
-            {isSpeaking && (
+            {/* AI Voice playing indicator */}
+            {isPlayingAI && (
               <Card className="mb-6 border-primary/20 bg-primary/5">
                 <CardContent className="py-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 bg-primary rounded-full animate-pulse" />
-                      <span className="font-medium">Now Playing</span>
+                      <span className="font-medium">AI Voice Playing</span>
+                      <span className="text-sm text-muted-foreground">
+                        ElevenLabs Realistic Voice
+                      </span>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={stopAIAudio}>
+                      <Square className="w-4 h-4 mr-2" />
+                      Stop
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Browser TTS speaking indicator */}
+            {isSpeaking && (
+              <Card className="mb-6 border-muted/50 bg-muted/10">
+                <CardContent className="py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-muted-foreground rounded-full animate-pulse" />
+                      <span className="font-medium">Free Voice Playing</span>
                       <span className="text-sm text-muted-foreground">
                         {selectedVoice?.name || 'Default voice'}
                       </span>
