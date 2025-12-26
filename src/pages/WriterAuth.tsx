@@ -475,13 +475,16 @@ const WriterAuth = () => {
 
           <div className="mt-6 text-center text-sm space-y-3">
             <p className="text-muted-foreground">
+              Want to become a writer?{" "}
+              <Link to="/writer-register" className="text-primary hover:underline font-medium">
+                Apply here
+              </Link>
+            </p>
+            <p className="text-muted-foreground">
               Not a writer?{" "}
               <Link to="/auth" className="text-primary hover:underline">
                 Sign in as a fan
               </Link>
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Writer access is by invitation only. Contact an administrator to request access.
             </p>
           </div>
         </CardContent>

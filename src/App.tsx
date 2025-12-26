@@ -80,6 +80,8 @@ import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
 import UserManagement from "./pages/admin/UserManagement";
 import BackgroundManagement from "./pages/admin/BackgroundManagement";
 import ActivityDashboard from "./pages/admin/ActivityDashboard";
+import WriterApplications from "./pages/admin/WriterApplications";
+import WriterRegister from "./pages/WriterRegister";
 import CreateAccount from "./pages/help/CreateAccount";
 import NavigatePlatform from "./pages/help/NavigatePlatform";
 import WatchStreams from "./pages/help/WatchStreams";
@@ -143,6 +145,7 @@ const App = () => {
           <Route path="/payment-error" element={<PaymentError />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/writer-auth" element={<WriterAuth />} />
+          <Route path="/writer-register" element={<WriterRegister />} />
           <Route path="/confirm-account" element={<ConfirmAccount />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -204,6 +207,7 @@ const App = () => {
             <Route path="lineup-card-management" element={<LineupCardManagement />} />
             <Route path="backgrounds" element={<BackgroundManagement />} />
             <Route path="activity" element={<ActivityDashboard />} />
+            <Route path="writer-applications" element={<WriterApplications />} />
           </Route>
           {/* Writer Portal Routes */}
           <Route path="/writer" element={<WriterDashboard />} />
