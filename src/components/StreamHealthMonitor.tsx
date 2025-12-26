@@ -12,6 +12,11 @@ export function useStreamHealthMonitor({ player, streamId }: StreamHealthMonitor
   const sessionId = useRef(crypto.randomUUID());
   const errorCount = useRef(0);
   const lastErrorTime = useRef<number>(0);
+  const lastAudioLevel = useRef<number>(0);
+  const silentDuration = useRef<number>(0);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
 
   const reportIssue = useCallback(async (issueType: string, severity: string, description: string) => {
     // Prevent duplicate reports within 30 seconds
@@ -38,6 +43,8 @@ export function useStreamHealthMonitor({ player, streamId }: StreamHealthMonitor
 
   useEffect(() => {
     if (!player || !streamId) return;
+
+    console.log('StreamHealthMonitor: Initializing for stream', streamId);
 
     // Monitor buffering/waiting events
     const handleWaiting = () => {
@@ -118,29 +125,113 @@ export function useStreamHealthMonitor({ player, streamId }: StreamHealthMonitor
     player.on('error', handleError);
     player.on('stalled', handleStalled);
 
-    // Monitor audio issues
-    const checkAudio = () => {
+    // Enhanced audio monitoring using Web Audio API
+    const setupAudioMonitoring = () => {
       try {
-        const audioTracks = player.audioTracks?.();
-        if (audioTracks && audioTracks.length > 0) {
-          const activeTrack = Array.from(audioTracks as any[]).find((t: any) => t.enabled);
-          if (!activeTrack && !player.muted()) {
-            reportIssue('audio', 'medium', 'No active audio track detected');
-          }
+        const videoElement = player.el()?.querySelector('video');
+        if (!videoElement) {
+          console.log('StreamHealthMonitor: Video element not found');
+          return;
+        }
+
+        // Create audio context if not exists
+        if (!audioContextRef.current) {
+          audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+
+        // Only create source once
+        if (!sourceRef.current && audioContextRef.current.state !== 'closed') {
+          sourceRef.current = audioContextRef.current.createMediaElementSource(videoElement);
+          analyserRef.current = audioContextRef.current.createAnalyser();
+          analyserRef.current.fftSize = 256;
+          
+          sourceRef.current.connect(analyserRef.current);
+          analyserRef.current.connect(audioContextRef.current.destination);
+          
+          console.log('StreamHealthMonitor: Audio monitoring initialized');
         }
       } catch (e) {
-        // Audio track API not available
+        console.log('StreamHealthMonitor: Could not setup Web Audio API', e);
       }
     };
 
-    const audioCheckInterval = setInterval(checkAudio, 30000);
+    // Check audio levels using Web Audio API
+    const checkAudioLevels = () => {
+      // Don't check if player is muted (user choice, not an issue)
+      if (player.muted()) return;
+      
+      if (analyserRef.current) {
+        const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+        analyserRef.current.getByteFrequencyData(dataArray);
+        
+        // Calculate average audio level
+        const average = dataArray.reduce((sum, val) => sum + val, 0) / dataArray.length;
+        
+        // If audio level is very low for extended period, report issue
+        if (average < 5) {
+          silentDuration.current += 5; // 5 second check interval
+          
+          // Report after 15 seconds of silence
+          if (silentDuration.current >= 15) {
+            console.log('StreamHealthMonitor: Low/no audio detected for', silentDuration.current, 'seconds');
+            reportIssue(
+              'audio',
+              silentDuration.current > 30 ? 'high' : 'medium',
+              `No audio detected for ${silentDuration.current} seconds - possible audio stream issue`
+            );
+            silentDuration.current = 0; // Reset after reporting
+          }
+        } else {
+          silentDuration.current = 0; // Reset on audio detected
+        }
+        
+        lastAudioLevel.current = average;
+      } else {
+        // Fallback: Check audio tracks if Web Audio API not available
+        try {
+          const audioTracks = player.audioTracks?.();
+          if (audioTracks && audioTracks.length > 0) {
+            const activeTrack = Array.from(audioTracks as any[]).find((t: any) => t.enabled);
+            if (!activeTrack) {
+              reportIssue('audio', 'medium', 'No active audio track detected');
+            }
+          }
+        } catch (e) {
+          // Audio track API not available
+        }
+      }
+    };
+
+    // Setup audio monitoring after player is ready
+    const handleCanPlay = () => {
+      console.log('StreamHealthMonitor: Player can play, setting up audio monitoring');
+      setTimeout(setupAudioMonitoring, 1000);
+    };
+
+    player.on('canplay', handleCanPlay);
+
+    // If already playing, setup immediately
+    if (!player.paused()) {
+      setupAudioMonitoring();
+    }
+
+    const audioCheckInterval = setInterval(checkAudioLevels, 5000);
 
     return () => {
       player.off('waiting', handleWaiting);
       player.off('playing', handlePlaying);
       player.off('error', handleError);
       player.off('stalled', handleStalled);
+      player.off('canplay', handleCanPlay);
       clearInterval(audioCheckInterval);
+      
+      // Cleanup audio context
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close().catch(() => {});
+      }
+      audioContextRef.current = null;
+      analyserRef.current = null;
+      sourceRef.current = null;
     };
   }, [player, streamId, reportIssue]);
 
