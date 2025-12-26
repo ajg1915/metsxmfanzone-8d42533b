@@ -22,6 +22,28 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Get the origin from the request to determine RP ID
+  const origin = req.headers.get("origin") || "";
+  let rpId = "localhost";
+  
+  if (origin.includes("lovable.app")) {
+    // Extract the full subdomain for lovable.app previews
+    const url = new URL(origin);
+    rpId = url.hostname;
+  } else if (origin.includes("lovable.dev")) {
+    rpId = "lovable.dev";
+  } else if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
+    rpId = "localhost";
+  } else {
+    // For custom domains, extract the hostname
+    try {
+      const url = new URL(origin);
+      rpId = url.hostname;
+    } catch {
+      rpId = "localhost";
+    }
+  }
+
   try {
     // Create Supabase client with service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -115,11 +137,6 @@ serve(async (req) => {
       .from("webauthn_challenges")
       .delete()
       .lt("expires_at", new Date().toISOString());
-
-    // Determine RP ID based on environment
-    const rpId = new URL(supabaseUrl).hostname.includes("supabase")
-      ? "lovable.dev" // Production
-      : "localhost"; // Development
 
     // Build WebAuthn credential request options in SimpleWebAuthn format
     const options = {
