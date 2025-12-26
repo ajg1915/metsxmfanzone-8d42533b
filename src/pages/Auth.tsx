@@ -10,11 +10,10 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { Shield, ArrowLeft, Fingerprint } from "lucide-react";
+import { Shield, ArrowLeft } from "lucide-react";
 import AuthBackground from "@/components/AuthBackground";
 import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 import { trackFailedLogin } from "@/utils/securityAlerts";
-import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
 
 const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
@@ -204,20 +203,12 @@ const Auth = () => {
   const [honeypot, setHoneypot] = useState(""); // Should remain empty - bots fill this
   const [formLoadTime] = useState(() => Date.now()); // Track when form loaded
   
-  // Biometric login states
-  const [biometricSupported, setBiometricSupported] = useState(false);
-  const [biometricLoading, setBiometricLoading] = useState(false);
-  const [showBiometricEmailInput, setShowBiometricEmailInput] = useState(false);
-  const [biometricEmail, setBiometricEmail] = useState("");
   
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Check for remembered user on mount and biometric support
+  // Check for remembered user on mount
   useEffect(() => {
-    // Check biometric support
-    setBiometricSupported(browserSupportsWebAuthn());
-    
     const stored = localStorage.getItem(REMEMBER_ME_KEY);
     if (stored) {
       try {
@@ -234,94 +225,6 @@ const Auth = () => {
       }
     }
   }, []);
-
-  // Biometric login handler
-  const handleBiometricLogin = async () => {
-    if (!biometricEmail) {
-      toast({
-        title: "Email required",
-        description: "Please enter your email to use biometric login.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setBiometricLoading(true);
-    try {
-      // Get login options from server
-      const optionsResponse = await supabase.functions.invoke("webauthn-login-options", {
-        body: { email: biometricEmail },
-      });
-
-      if (optionsResponse.error || optionsResponse.data?.error) {
-        throw new Error(optionsResponse.data?.error || "Failed to get login options");
-      }
-
-      const { options } = optionsResponse.data;
-
-      // Convert challenge and allowCredentials to proper format
-      // The credential IDs are already base64url encoded strings from the server
-      const authOptions = {
-        ...options,
-        challenge: options.challenge,
-        allowCredentials: options.allowCredentials?.map((cred: any) => ({
-          ...cred,
-          id: cred.id, // Keep as base64url string - SimpleWebAuthn handles conversion
-        })),
-      };
-
-      // Start biometric authentication
-      const credential = await startAuthentication(authOptions);
-
-      // Verify with server
-      const verifyResponse = await supabase.functions.invoke("webauthn-login-verify", {
-        body: {
-          credential: {
-            id: credential.id,
-            rawId: credential.rawId,
-            response: {
-              authenticatorData: credential.response.authenticatorData,
-              clientDataJSON: credential.response.clientDataJSON,
-              signature: credential.response.signature,
-            },
-            type: credential.type,
-          },
-          email: biometricEmail,
-        },
-      });
-
-      if (verifyResponse.error || verifyResponse.data?.error) {
-        throw new Error(verifyResponse.data?.error || "Authentication failed");
-      }
-
-      // If we have a verification URL, use it to complete login
-      if (verifyResponse.data.verificationUrl) {
-        window.location.href = verifyResponse.data.verificationUrl;
-      } else {
-        toast({
-          title: "Login successful!",
-          description: "Redirecting...",
-        });
-        navigate("/");
-      }
-    } catch (error: any) {
-      console.error("Biometric login error:", error);
-      if (error.name === "NotAllowedError") {
-        toast({
-          title: "Cancelled",
-          description: "Biometric authentication was cancelled.",
-        });
-      } else {
-        toast({
-          title: "Login failed",
-          description: error.message || "Biometric authentication failed. Try password login.",
-          variant: "destructive",
-        });
-      }
-    } finally {
-      setBiometricLoading(false);
-    }
-  };
 
   useEffect(() => {
     if (mode === "login") {
@@ -1325,61 +1228,6 @@ const Auth = () => {
               {loading ? "Loading..." : isResettingPassword ? "Update Password" : isForgotPassword ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
             </Button>
 
-            {/* Biometric Login Option */}
-            {isLogin && !isForgotPassword && !isResettingPassword && biometricSupported && (
-              <div className="space-y-3">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">Or</span>
-                  </div>
-                </div>
-                
-                {showBiometricEmailInput ? (
-                  <div className="space-y-2">
-                    <Input
-                      type="email"
-                      placeholder="Enter email for biometric login"
-                      value={biometricEmail}
-                      onChange={(e) => setBiometricEmail(e.target.value)}
-                      disabled={biometricLoading}
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="flex-1"
-                        onClick={handleBiometricLogin}
-                        disabled={biometricLoading || !biometricEmail}
-                      >
-                        <Fingerprint className="h-4 w-4 mr-2" />
-                        {biometricLoading ? "Authenticating..." : "Continue"}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => setShowBiometricEmailInput(false)}
-                        disabled={biometricLoading}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => setShowBiometricEmailInput(true)}
-                  >
-                    <Fingerprint className="h-4 w-4 mr-2" />
-                    Sign in with Biometric
-                  </Button>
-                )}
-              </div>
-            )}
 
           </form>
 
