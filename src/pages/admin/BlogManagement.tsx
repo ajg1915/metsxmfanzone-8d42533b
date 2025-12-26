@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit, Trash2, FileText, Sparkles, Upload, Music, Copy, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Plus, Edit, Trash2, FileText, Sparkles, Upload, Music, Copy, CheckCircle, XCircle, Clock, ShieldAlert, Loader2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { z } from "zod";
 import { validateFile, generateSafeFilename } from "@/utils/fileValidation";
 
@@ -66,6 +67,16 @@ export default function BlogManagement() {
   const [generatingContent, setGeneratingContent] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [checkingAI, setCheckingAI] = useState<string | null>(null);
+  const [aiCheckResult, setAiCheckResult] = useState<{
+    postId: string;
+    isAIGenerated: boolean;
+    isPlagiarized: boolean;
+    confidence: number;
+    reasons: string[];
+  } | null>(null);
+  const [showRevokeDialog, setShowRevokeDialog] = useState(false);
+  const [revokeTarget, setRevokeTarget] = useState<BlogPost | null>(null);
 
   useEffect(() => {
     fetchPosts();
@@ -145,6 +156,122 @@ export default function BlogManagement() {
       toast({
         title: "Error",
         description: "Failed to reject article",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCheckAI = async (post: BlogPost) => {
+    if (!post.content || post.content.length < 50) {
+      toast({
+        title: "Error",
+        description: "Article content is too short to analyze",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setCheckingAI(post.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('check-ai-content', {
+        body: { content: post.content, title: post.title }
+      });
+
+      if (error) throw error;
+
+      if (data.isAIGenerated || data.isPlagiarized) {
+        setAiCheckResult({
+          postId: post.id,
+          isAIGenerated: data.isAIGenerated,
+          isPlagiarized: data.isPlagiarized,
+          confidence: data.confidence,
+          reasons: data.reasons || []
+        });
+        setRevokeTarget(post);
+        setShowRevokeDialog(true);
+      } else {
+        toast({
+          title: "Content Verified ✓",
+          description: `Article appears to be original content (${data.confidence}% confidence)`,
+        });
+      }
+    } catch (error: any) {
+      console.error("Error checking AI content:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to check article content",
+        variant: "destructive",
+      });
+    } finally {
+      setCheckingAI(null);
+    }
+  };
+
+  const handleRevokeWriter = async () => {
+    if (!revokeTarget || !aiCheckResult) return;
+
+    try {
+      // 1. Delete the article
+      const { error: deleteError } = await supabase
+        .from("blog_posts")
+        .delete()
+        .eq("id", revokeTarget.id);
+
+      if (deleteError) throw deleteError;
+
+      // 2. Remove writer role from user
+      if (revokeTarget.user_id) {
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .delete()
+          .eq("user_id", revokeTarget.user_id)
+          .eq("role", "writer");
+
+        if (roleError) {
+          console.error("Error removing writer role:", roleError);
+        }
+      }
+
+      // 3. Send revocation email
+      const writerName = revokeTarget.profiles?.full_name || revokeTarget.profiles?.email || "Writer";
+      const writerEmail = revokeTarget.profiles?.email;
+
+      if (writerEmail) {
+        const reasons: string[] = [];
+        if (aiCheckResult.isAIGenerated) {
+          reasons.push("Content was detected as AI-generated (ChatGPT, Claude, or similar AI tools)");
+        }
+        if (aiCheckResult.isPlagiarized) {
+          reasons.push("Content appears to be plagiarized or copied from other sources");
+        }
+        if (aiCheckResult.reasons.length > 0) {
+          reasons.push(...aiCheckResult.reasons);
+        }
+
+        await supabase.functions.invoke('send-writer-revoked-email', {
+          body: {
+            email: writerEmail,
+            name: writerName,
+            articleTitle: revokeTarget.title,
+            reasons
+          }
+        });
+      }
+
+      toast({
+        title: "Writer Access Revoked",
+        description: "Article deleted, writer role removed, and notification email sent.",
+      });
+
+      setShowRevokeDialog(false);
+      setRevokeTarget(null);
+      setAiCheckResult(null);
+      fetchPosts();
+    } catch (error: any) {
+      console.error("Error revoking writer:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to revoke writer access",
         variant: "destructive",
       });
     }
@@ -704,6 +831,20 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
                   <div className="flex gap-2 flex-wrap">
                     {post.approval_status === "pending" && (
                       <>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-yellow-500 border-yellow-500/50" 
+                          onClick={() => handleCheckAI(post)}
+                          disabled={checkingAI === post.id}
+                        >
+                          {checkingAI === post.id ? (
+                            <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                          ) : (
+                            <ShieldAlert className="w-4 h-4 mr-1" />
+                          )}
+                          AI Check
+                        </Button>
                         <Button variant="outline" size="sm" className="text-green-500 border-green-500/50" onClick={() => handleApprove(post)}>
                           <CheckCircle className="w-4 h-4 mr-1" /> Approve
                         </Button>
@@ -733,6 +874,69 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
           ))
         )}
       </div>
+
+      {/* AI Detection Revocation Dialog */}
+      <AlertDialog open={showRevokeDialog} onOpenChange={setShowRevokeDialog}>
+        <AlertDialogContent className="max-w-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-500 flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5" />
+              AI/Plagiarism Detected
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4">
+                <p>This article has been flagged for the following issues:</p>
+                
+                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 space-y-2">
+                  {aiCheckResult?.isAIGenerated && (
+                    <p className="text-red-400 font-medium">• AI-Generated Content Detected</p>
+                  )}
+                  {aiCheckResult?.isPlagiarized && (
+                    <p className="text-red-400 font-medium">• Plagiarized Content Detected</p>
+                  )}
+                  <p className="text-sm text-muted-foreground">
+                    Confidence: {aiCheckResult?.confidence}%
+                  </p>
+                  {aiCheckResult?.reasons && aiCheckResult.reasons.length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-sm font-medium">Reasons:</p>
+                      <ul className="text-sm text-muted-foreground list-disc pl-4 mt-1">
+                        {aiCheckResult.reasons.slice(0, 5).map((reason, i) => (
+                          <li key={i}>{reason}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                  <p className="text-sm font-medium text-yellow-400">Taking action will:</p>
+                  <ul className="text-sm text-muted-foreground list-disc pl-4 mt-1">
+                    <li>Delete the article "{revokeTarget?.title}"</li>
+                    <li>Remove writer access from the user</li>
+                    <li>Send an email notification explaining the violation</li>
+                  </ul>
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setShowRevokeDialog(false);
+              setRevokeTarget(null);
+              setAiCheckResult(null);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRevokeWriter}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Revoke Writer Access
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

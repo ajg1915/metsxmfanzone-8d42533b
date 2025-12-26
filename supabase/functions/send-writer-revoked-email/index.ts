@@ -1,0 +1,120 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+// HTML escape function to prevent XSS
+const escapeHtml = (str: string): string => {
+  return str.replace(/[&<>"']/g, (m) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[m] || m));
+};
+
+interface WriterRevokedEmailRequest {
+  email: string;
+  name: string;
+  articleTitle: string;
+  reasons: string[];
+}
+
+const handler = async (req: Request): Promise<Response> => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { email, name, articleTitle, reasons }: WriterRevokedEmailRequest = await req.json();
+
+    console.log(`Sending writer revocation email to ${email}`);
+
+    // Escape all user-provided content
+    const safeName = escapeHtml(name);
+    const safeTitle = escapeHtml(articleTitle);
+    const safeReasons = reasons.map(r => escapeHtml(r));
+
+    const subject = "Important: Your Writer Access Has Been Revoked";
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: #dc2626; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 28px;">Writer Access Revoked</h1>
+        </div>
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0; border-top: none;">
+          <p style="font-size: 18px;">Dear ${safeName},</p>
+          
+          <p>We regret to inform you that your writer access at MetsXMFanZone has been <strong style="color: #dc2626;">revoked</strong>.</p>
+          
+          <div style="background: #fef2f2; padding: 20px; border-radius: 8px; border-left: 4px solid #dc2626; margin: 20px 0;">
+            <p style="margin: 0 0 10px 0;"><strong>Article in question:</strong> "${safeTitle}"</p>
+            <p style="margin: 0;"><strong>Reason(s):</strong></p>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+              ${safeReasons.map(reason => `<li>${reason}</li>`).join('')}
+            </ul>
+          </div>
+          
+          <div style="background: #fff7ed; padding: 20px; border-radius: 8px; border-left: 4px solid #f97316; margin: 20px 0;">
+            <h3 style="margin: 0 0 10px 0; color: #c2410c;">Our Content Policy</h3>
+            <p style="margin: 0;">At MetsXMFanZone, we maintain strict standards for original, authentic content:</p>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+              <li><strong>No AI-Generated Content:</strong> All articles must be written entirely by the author. AI tools like ChatGPT, Claude, or similar are not permitted.</li>
+              <li><strong>Original Work Only:</strong> Content must not be copied or plagiarized from other sources.</li>
+              <li><strong>Proper Citations Required:</strong> Any quotes, statistics, or information from external sources must include proper citations and attributions.</li>
+            </ul>
+          </div>
+          
+          <p>The article "${safeTitle}" has been removed from our platform.</p>
+          
+          <p>If you believe this decision was made in error, you may contact our support team with evidence that your content was original and properly attributed. However, please note that we have a zero-tolerance policy for AI-generated or plagiarized content.</p>
+          
+          <p>You may still access MetsXMFanZone as a regular member to enjoy content from other contributors.</p>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="mailto:support@metsxmfanzone.com" style="background: #002D72; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Contact Support</a>
+          </div>
+          
+          <p style="margin-top: 30px;">Regards,<br><strong>MetsXMFanZone Editorial Team</strong></p>
+        </div>
+        <div style="text-align: center; padding: 20px; color: #666; font-size: 12px;">
+          <p>© ${new Date().getFullYear()} MetsXMFanZone. All rights reserved.</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const emailResponse = await resend.emails.send({
+      from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
+      to: [email],
+      subject,
+      html: htmlContent,
+    });
+
+    console.log("Writer revocation email sent successfully:", emailResponse);
+
+    return new Response(JSON.stringify({ success: true, data: emailResponse }), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  } catch (error: any) {
+    console.error("Error in send-writer-revoked-email:", error);
+    return new Response(
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+};
+
+serve(handler);
