@@ -1,0 +1,363 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Users, Eye, Radio, MessageSquare, FileText, Globe, Monitor, Smartphone, RefreshCw } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+
+interface PresenceData {
+  id: string;
+  session_id: string;
+  current_page: string;
+  page_type: string;
+  is_authenticated: boolean;
+  user_agent: string | null;
+  last_seen_at: string;
+}
+
+interface BlogViewStats {
+  blog_post_id: string;
+  title: string;
+  view_count: number;
+}
+
+interface StreamViewStats {
+  stream_id: string;
+  title: string;
+  view_count: number;
+}
+
+export default function RealtimeAnalytics() {
+  const [presenceData, setPresenceData] = useState<PresenceData[]>([]);
+  const [blogStats, setBlogStats] = useState<BlogViewStats[]>([]);
+  const [streamStats, setStreamStats] = useState<StreamViewStats[]>([]);
+  const [blogComments, setBlogComments] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Clean up stale presence records first
+      await supabase.rpc('cleanup_stale_presence');
+
+      // Fetch current presence
+      const { data: presence } = await supabase
+        .from('realtime_presence')
+        .select('*')
+        .gte('last_seen_at', new Date(Date.now() - 5 * 60 * 1000).toISOString())
+        .order('last_seen_at', { ascending: false });
+
+      setPresenceData(presence || []);
+
+      // Fetch blog view stats (last 24 hours)
+      const { data: blogViews } = await supabase
+        .from('blog_views')
+        .select('blog_post_id, blog_posts(title)')
+        .gte('viewed_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+      if (blogViews) {
+        const statsMap = new Map<string, { title: string; count: number }>();
+        blogViews.forEach((view: any) => {
+          const id = view.blog_post_id;
+          const title = view.blog_posts?.title || 'Unknown';
+          if (statsMap.has(id)) {
+            statsMap.get(id)!.count++;
+          } else {
+            statsMap.set(id, { title, count: 1 });
+          }
+        });
+        setBlogStats(
+          Array.from(statsMap.entries())
+            .map(([id, data]) => ({ blog_post_id: id, title: data.title, view_count: data.count }))
+            .sort((a, b) => b.view_count - a.view_count)
+            .slice(0, 10)
+        );
+      }
+
+      // Fetch stream view stats (last 24 hours)
+      const { data: streamViews } = await supabase
+        .from('stream_views')
+        .select('stream_id, live_streams(title)')
+        .gte('viewed_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+      if (streamViews) {
+        const statsMap = new Map<string, { title: string; count: number }>();
+        streamViews.forEach((view: any) => {
+          const id = view.stream_id;
+          const title = view.live_streams?.title || 'Unknown';
+          if (statsMap.has(id)) {
+            statsMap.get(id)!.count++;
+          } else {
+            statsMap.set(id, { title, count: 1 });
+          }
+        });
+        setStreamStats(
+          Array.from(statsMap.entries())
+            .map(([id, data]) => ({ stream_id: id, title: data.title, view_count: data.count }))
+            .sort((a, b) => b.view_count - a.view_count)
+            .slice(0, 10)
+        );
+      }
+
+      // Fetch blog comments count (last 24 hours)
+      const { count: commentsCount } = await supabase
+        .from('blog_comments')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+      setBlogComments(commentsCount || 0);
+      setLastRefresh(new Date());
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+
+    // Set up real-time subscription for presence updates
+    const channel = supabase
+      .channel('realtime-presence')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'realtime_presence' },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    // Refresh data every 30 seconds
+    const interval = setInterval(fetchData, 30000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const getDeviceIcon = (userAgent: string | null) => {
+    if (!userAgent) return <Globe className="h-4 w-4" />;
+    if (/Mobile|Android|iPhone|iPad/.test(userAgent)) {
+      return <Smartphone className="h-4 w-4" />;
+    }
+    return <Monitor className="h-4 w-4" />;
+  };
+
+  const getPageLabel = (page: string) => {
+    if (page === '/') return 'Home';
+    if (page.startsWith('/blog/')) return page.replace('/blog/', 'Blog: ');
+    if (page.startsWith('/admin')) return 'Admin Panel';
+    return page.replace('/', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
+
+  // Calculate stats by page type
+  const onlineUsers = presenceData.length;
+  const streamViewers = presenceData.filter(p => p.page_type === 'stream').length;
+  const blogViewers = presenceData.filter(p => p.page_type === 'blog').length;
+  const authenticatedUsers = presenceData.filter(p => p.is_authenticated).length;
+
+  return (
+    <div className="w-full max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+        <div>
+          <h2 className="text-base sm:text-lg font-bold">Real-Time Analytics</h2>
+          <p className="text-xs text-muted-foreground">
+            Last updated: {lastRefresh.toLocaleTimeString()}
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4 mb-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium">Online Now</CardTitle>
+            <Users className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+          </CardHeader>
+          <CardContent className="px-3 pb-3">
+            <div className="text-xl sm:text-2xl font-bold text-green-500">{onlineUsers}</div>
+            <p className="text-[10px] text-muted-foreground">{authenticatedUsers} logged in</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium">Watching Streams</CardTitle>
+            <Radio className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
+          </CardHeader>
+          <CardContent className="px-3 pb-3">
+            <div className="text-xl sm:text-2xl font-bold text-red-500">{streamViewers}</div>
+            <p className="text-[10px] text-muted-foreground">Live viewers</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium">Reading Blogs</CardTitle>
+            <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent className="px-3 pb-3">
+            <div className="text-xl sm:text-2xl font-bold text-blue-500">{blogViewers}</div>
+            <p className="text-[10px] text-muted-foreground">Active readers</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium">Comments (24h)</CardTitle>
+            <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500" />
+          </CardHeader>
+          <CardContent className="px-3 pb-3">
+            <div className="text-xl sm:text-2xl font-bold text-purple-500">{blogComments}</div>
+            <p className="text-[10px] text-muted-foreground">New comments</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {/* Active Users List */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Active Visitors
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Users currently on the site
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[300px]">
+              {presenceData.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No active visitors
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {presenceData.map((user) => (
+                    <div
+                      key={user.id}
+                      className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+                    >
+                      <div className="flex items-center gap-2">
+                        {getDeviceIcon(user.user_agent)}
+                        <div>
+                          <p className="text-xs font-medium truncate max-w-[150px]">
+                            {getPageLabel(user.current_page)}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {new Date(user.last_seen_at).toLocaleTimeString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Badge variant={user.is_authenticated ? "default" : "secondary"} className="text-[10px]">
+                          {user.is_authenticated ? "User" : "Guest"}
+                        </Badge>
+                        <Badge variant="outline" className="text-[10px]">
+                          {user.page_type}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        {/* Top Content */}
+        <div className="space-y-4">
+          {/* Top Blog Posts */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Top Blog Posts (24h)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[120px]">
+                {blogStats.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-2">
+                    No blog views yet
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {blogStats.map((stat, index) => (
+                      <div
+                        key={stat.blog_post_id}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-muted-foreground">
+                            #{index + 1}
+                          </span>
+                          <span className="text-xs truncate max-w-[200px]">
+                            {stat.title}
+                          </span>
+                        </div>
+                        <Badge variant="secondary" className="text-[10px]">
+                          {stat.view_count} views
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </CardContent>
+          </Card>
+
+          {/* Top Streams */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Radio className="h-4 w-4" />
+                Top Streams (24h)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[120px]">
+                {streamStats.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-2">
+                    No stream views yet
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {streamStats.map((stat, index) => (
+                      <div
+                        key={stat.stream_id}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-muted-foreground">
+                            #{index + 1}
+                          </span>
+                          <span className="text-xs truncate max-w-[200px]">
+                            {stat.title}
+                          </span>
+                        </div>
+                        <Badge variant="secondary" className="text-[10px]">
+                          {stat.view_count} views
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -207,6 +207,38 @@ export type Database = {
           },
         ]
       }
+      blog_views: {
+        Row: {
+          blog_post_id: string | null
+          id: string
+          session_id: string | null
+          user_id: string | null
+          viewed_at: string
+        }
+        Insert: {
+          blog_post_id?: string | null
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          blog_post_id?: string | null
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_views_blog_post_id_fkey"
+            columns: ["blog_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_ads: {
         Row: {
           ad_description: string
@@ -787,6 +819,42 @@ export type Database = {
         }
         Relationships: []
       }
+      realtime_presence: {
+        Row: {
+          created_at: string
+          current_page: string
+          id: string
+          is_authenticated: boolean | null
+          last_seen_at: string
+          page_type: string | null
+          session_id: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_page: string
+          id?: string
+          is_authenticated?: boolean | null
+          last_seen_at?: string
+          page_type?: string | null
+          session_id: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_page?: string
+          id?: string
+          is_authenticated?: boolean | null
+          last_seen_at?: string
+          page_type?: string | null
+          session_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       seo_settings: {
         Row: {
           canonical_url: string | null
@@ -912,6 +980,38 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      stream_views: {
+        Row: {
+          id: string
+          session_id: string | null
+          stream_id: string | null
+          user_id: string | null
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          session_id?: string | null
+          stream_id?: string | null
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          session_id?: string | null
+          stream_id?: string | null
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_views_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "live_streams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
@@ -1244,6 +1344,7 @@ export type Database = {
       }
     }
     Functions: {
+      cleanup_stale_presence: { Args: never; Returns: undefined }
       get_user_subscription_safe: {
         Args: { p_user_id: string }
         Returns: {

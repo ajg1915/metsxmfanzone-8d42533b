@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Upload, Activity, Radio, ClipboardList, HelpCircle, ArrowRight, UserCog } from "lucide-react";
+import { Users, FileText, Upload, Activity, Radio, ClipboardList, HelpCircle, ArrowRight, UserCog, Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,6 +52,13 @@ export default function AdminDashboard() {
   }, []);
 
   const quickAccessItems = [
+    {
+      title: "Real-Time Analytics",
+      description: "Live visitor tracking",
+      icon: Eye,
+      url: "/admin/realtime-analytics",
+      stat: "Live Data",
+    },
     {
       title: "Blog Management",
       description: "Create and manage blog posts",
