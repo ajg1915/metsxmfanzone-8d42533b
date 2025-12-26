@@ -41,8 +41,21 @@ interface RecipientCounts {
   subscribers: number;
 }
 
+// HTML escaping utility to prevent XSS in email templates
+const escapeHtml = (str: string): string => {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
 // Email template HTML generator functions
-const generateOtpEmailHtml = (otp: string) => `
+const generateOtpEmailHtml = (otp: string) => {
+  const safeOtp = escapeHtml(otp);
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -64,7 +77,7 @@ const generateOtpEmailHtml = (otp: string) => `
     
     <div style="background: #002D72; padding: 12px 16px; text-align: center; border-radius: 6px; margin-bottom: 12px;">
       <span style="font-size: 24px; font-weight: bold; letter-spacing: 6px; color: #ffffff; font-family: 'Courier New', monospace;">
-        ${otp}
+        ${safeOtp}
       </span>
     </div>
     
@@ -97,8 +110,11 @@ const generateOtpEmailHtml = (otp: string) => `
   </div>
 </body>
 </html>`;
+};
 
-const generateWelcomeEmailHtml = (name: string) => `
+const generateWelcomeEmailHtml = (name: string) => {
+  const safeName = escapeHtml(name);
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -115,7 +131,7 @@ const generateWelcomeEmailHtml = (name: string) => `
     </div>
     
     <p style="color: #ffffff; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
-      Welcome, ${name}!
+      Welcome, ${safeName}!
     </p>
     
     <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 16px;">
@@ -160,8 +176,13 @@ const generateWelcomeEmailHtml = (name: string) => `
   </div>
 </body>
 </html>`;
+};
 
-const generateSubscriptionEmailHtml = (name: string, planName: string, amount: string) => `
+const generateSubscriptionEmailHtml = (name: string, planName: string, amount: string) => {
+  const safeName = escapeHtml(name);
+  const safePlanName = escapeHtml(planName);
+  const safeAmount = escapeHtml(amount);
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -182,17 +203,17 @@ const generateSubscriptionEmailHtml = (name: string, planName: string, amount: s
     </p>
     
     <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 16px;">
-      Hi ${name}, your subscription is active.
+      Hi ${safeName}, your subscription is active.
     </p>
     
     <div style="background: #002D72; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
       <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
         <span style="color: #a0a0a0; font-size: 11px;">Plan:</span>
-        <span style="color: #ffffff; font-size: 11px; font-weight: bold;">${planName}</span>
+        <span style="color: #ffffff; font-size: 11px; font-weight: bold;">${safePlanName}</span>
       </div>
       <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
         <span style="color: #a0a0a0; font-size: 11px;">Amount:</span>
-        <span style="color: #ffffff; font-size: 11px; font-weight: bold;">$${amount}</span>
+        <span style="color: #ffffff; font-size: 11px; font-weight: bold;">$${safeAmount}</span>
       </div>
       <div style="display: flex; justify-content: space-between;">
         <span style="color: #a0a0a0; font-size: 11px;">Status:</span>
@@ -232,6 +253,7 @@ const generateSubscriptionEmailHtml = (name: string, planName: string, amount: s
   </div>
 </body>
 </html>`;
+};
 
 export default function EmailEditor() {
   const [activeTab, setActiveTab] = useState<EmailTemplateType>("custom");
