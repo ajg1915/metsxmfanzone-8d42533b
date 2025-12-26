@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "videojs-landscape-fullscreen";
+import { useStreamHealthMonitor } from "./StreamHealthMonitor";
+import { StreamAlertBanner } from "./StreamAlertBanner";
 
 interface LiveStream {
   id: string;
@@ -31,6 +33,12 @@ export function StreamPlayer({
   const [showUnmuteBanner, setShowUnmuteBanner] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
+
+  // Initialize health monitoring
+  useStreamHealthMonitor({
+    player: playerRef.current,
+    streamId: stream?.id || ''
+  });
 
   useEffect(() => {
     fetchStream();
@@ -166,6 +174,9 @@ export function StreamPlayer({
       <CardContent>
         {stream ? (
           <div className="space-y-4">
+            {/* Stream Alert Banner for viewers */}
+            <StreamAlertBanner streamId={stream.id} />
+            
             {isMuted && showUnmuteBanner && (
               <div 
                 className="bg-primary/20 border-2 border-primary rounded-lg p-4 text-center animate-pulse cursor-pointer hover:bg-primary/30 transition-colors"

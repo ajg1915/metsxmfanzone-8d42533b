@@ -1,4 +1,4 @@
-import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, ClipboardList, UserCog, Send, Wallpaper, Activity, PenLine, Eye } from "lucide-react";
+import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, ClipboardList, UserCog, Send, Wallpaper, Activity, PenLine, Eye, HeartPulse } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -33,6 +33,7 @@ const mediaItems = [
 
 const liveManagementItems = [
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
+  { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
   { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
   { title: "Replays", url: "/admin/stream-replays", icon: PlaySquare },
   { title: "Notifications", url: "/admin/live-notifications", icon: Bell },
