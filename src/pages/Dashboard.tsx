@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 import NotificationSettings from "@/components/NotificationSettings";
+import PasskeyManager from "@/components/PasskeyManager";
 import { Badge } from "@/components/ui/badge";
 import { User, CreditCard, Calendar, ArrowUpCircle, Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -447,6 +448,8 @@ const Dashboard = () => {
             </div>
 
             <NotificationSettings />
+            
+            <PasskeyManager />
 
             {/* Features Access Card */}
             <Card className="border-2 border-primary">

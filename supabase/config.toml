@@ -65,3 +65,15 @@ verify_jwt = true
 
 [functions.stream-health-report]
 verify_jwt = false
+
+[functions.webauthn-register-options]
+verify_jwt = true
+
+[functions.webauthn-register-verify]
+verify_jwt = true
+
+[functions.webauthn-login-options]
+verify_jwt = false
+
+[functions.webauthn-login-verify]
+verify_jwt = false
