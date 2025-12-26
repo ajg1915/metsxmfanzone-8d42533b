@@ -102,14 +102,18 @@ export default function BlogManagement() {
     try {
       const { error } = await supabase
         .from("blog_posts")
-        .update({ approval_status: "approved" })
+        .update({ 
+          approval_status: "approved", 
+          published: true,
+          published_at: new Date().toISOString()
+        })
         .eq("id", post.id);
 
       if (error) throw error;
 
       toast({
-        title: "Approved",
-        description: "Article has been approved.",
+        title: "Approved & Published",
+        description: "Article has been approved and is now live on the blog.",
       });
       fetchPosts();
     } catch (error) {
