@@ -98,6 +98,7 @@ import PaymentMethods from "./pages/help/PaymentMethods";
 import CancelSubscription from "./pages/help/CancelSubscription";
 import ReturnPolicy from "./pages/help/ReturnPolicy";
 import Logout from "./pages/Logout";
+import WriterAuth from "./pages/WriterAuth";
 import WriterDashboard from "./pages/writer/WriterDashboard";
 import WriterArticleEditor from "./pages/writer/WriterArticleEditor";
 
@@ -141,6 +142,7 @@ const App = () => {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-error" element={<PaymentError />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/writer-auth" element={<WriterAuth />} />
           <Route path="/confirm-account" element={<ConfirmAccount />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="/dashboard" element={<Dashboard />} />

@@ -1266,6 +1266,16 @@ const Auth = () => {
                 </button>
               )
             )}
+            
+            {/* Writer Portal Link */}
+            <div className="pt-2 border-t border-border/50">
+              <Link 
+                to="/writer-auth" 
+                className="text-muted-foreground hover:text-primary text-xs flex items-center justify-center gap-1"
+              >
+                Are you a writer? Sign in to Writer Portal →
+              </Link>
+            </div>
           </div>
         </CardContent>
       </Card>
