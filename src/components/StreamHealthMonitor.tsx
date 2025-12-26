@@ -155,11 +155,8 @@ export function useStreamHealthMonitor({ player, streamId }: StreamHealthMonitor
       }
     };
 
-    // Check audio levels using Web Audio API
+    // Check audio levels using Web Audio API - works even when player is muted
     const checkAudioLevels = () => {
-      // Don't check if player is muted (user choice, not an issue)
-      if (player.muted()) return;
-      
       if (analyserRef.current) {
         const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
         analyserRef.current.getByteFrequencyData(dataArray);
@@ -167,21 +164,26 @@ export function useStreamHealthMonitor({ player, streamId }: StreamHealthMonitor
         // Calculate average audio level
         const average = dataArray.reduce((sum, val) => sum + val, 0) / dataArray.length;
         
+        console.log('StreamHealthMonitor: Audio level check -', average.toFixed(2));
+        
         // If audio level is very low for extended period, report issue
         if (average < 5) {
           silentDuration.current += 5; // 5 second check interval
           
           // Report after 15 seconds of silence
           if (silentDuration.current >= 15) {
-            console.log('StreamHealthMonitor: Low/no audio detected for', silentDuration.current, 'seconds');
+            console.log('StreamHealthMonitor: LOW/NO AUDIO DETECTED for', silentDuration.current, 'seconds');
             reportIssue(
               'audio',
               silentDuration.current > 30 ? 'high' : 'medium',
-              `No audio detected for ${silentDuration.current} seconds - possible audio stream issue`
+              `No audio detected for ${silentDuration.current} seconds - audio stream issue detected`
             );
             silentDuration.current = 0; // Reset after reporting
           }
         } else {
+          if (silentDuration.current > 0) {
+            console.log('StreamHealthMonitor: Audio restored after', silentDuration.current, 'seconds of silence');
+          }
           silentDuration.current = 0; // Reset on audio detected
         }
         
@@ -193,7 +195,7 @@ export function useStreamHealthMonitor({ player, streamId }: StreamHealthMonitor
           if (audioTracks && audioTracks.length > 0) {
             const activeTrack = Array.from(audioTracks as any[]).find((t: any) => t.enabled);
             if (!activeTrack) {
-              reportIssue('audio', 'medium', 'No active audio track detected');
+              reportIssue('audio', 'medium', 'No active audio track detected in stream');
             }
           }
         } catch (e) {
