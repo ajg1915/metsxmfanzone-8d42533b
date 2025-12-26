@@ -827,6 +827,7 @@ export type Database = {
           is_authenticated: boolean | null
           last_seen_at: string
           page_type: string | null
+          referrer_source: string | null
           session_id: string
           user_agent: string | null
           user_id: string | null
@@ -838,6 +839,7 @@ export type Database = {
           is_authenticated?: boolean | null
           last_seen_at?: string
           page_type?: string | null
+          referrer_source?: string | null
           session_id: string
           user_agent?: string | null
           user_id?: string | null
@@ -849,6 +851,7 @@ export type Database = {
           is_authenticated?: boolean | null
           last_seen_at?: string
           page_type?: string | null
+          referrer_source?: string | null
           session_id?: string
           user_agent?: string | null
           user_id?: string | null

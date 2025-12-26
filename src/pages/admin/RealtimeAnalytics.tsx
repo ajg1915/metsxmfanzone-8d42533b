@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Users, Eye, Radio, MessageSquare, FileText, Globe, Monitor, Smartphone, RefreshCw } from "lucide-react";
+import { Users, Eye, Radio, MessageSquare, FileText, Globe, Monitor, Smartphone, RefreshCw, TrendingUp, Search, Share2, Link2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
@@ -14,6 +14,7 @@ interface PresenceData {
   is_authenticated: boolean;
   user_agent: string | null;
   last_seen_at: string;
+  referrer_source: string;
 }
 
 interface BlogViewStats {
@@ -22,16 +23,18 @@ interface BlogViewStats {
   view_count: number;
 }
 
-interface StreamViewStats {
-  stream_id: string;
-  title: string;
-  view_count: number;
+interface TrafficSource {
+  source: string;
+  count: number;
+  label: string;
 }
 
 export default function RealtimeAnalytics() {
   const [presenceData, setPresenceData] = useState<PresenceData[]>([]);
   const [blogStats, setBlogStats] = useState<BlogViewStats[]>([]);
-  const [streamStats, setStreamStats] = useState<StreamViewStats[]>([]);
+  const [trafficSources, setTrafficSources] = useState<TrafficSource[]>([]);
+  const [monthlyViewers, setMonthlyViewers] = useState<number>(0);
+  const [totalViewers, setTotalViewers] = useState<number>(0);
   const [blogComments, setBlogComments] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
@@ -76,30 +79,50 @@ export default function RealtimeAnalytics() {
         );
       }
 
-      // Fetch stream view stats (last 24 hours)
-      const { data: streamViews } = await supabase
-        .from('stream_views')
-        .select('stream_id, live_streams(title)')
-        .gte('viewed_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
-
-      if (streamViews) {
-        const statsMap = new Map<string, { title: string; count: number }>();
-        streamViews.forEach((view: any) => {
-          const id = view.stream_id;
-          const title = view.live_streams?.title || 'Unknown';
-          if (statsMap.has(id)) {
-            statsMap.get(id)!.count++;
-          } else {
-            statsMap.set(id, { title, count: 1 });
-          }
+      // Calculate traffic sources from presence data
+      if (presence) {
+        const sourceMap = new Map<string, number>();
+        presence.forEach((p: any) => {
+          const source = p.referrer_source || 'direct';
+          sourceMap.set(source, (sourceMap.get(source) || 0) + 1);
         });
-        setStreamStats(
-          Array.from(statsMap.entries())
-            .map(([id, data]) => ({ stream_id: id, title: data.title, view_count: data.count }))
-            .sort((a, b) => b.view_count - a.view_count)
-            .slice(0, 10)
+        
+        const sourceLabels: Record<string, string> = {
+          'direct': 'Direct Traffic',
+          'search': 'Search Engines',
+          'social': 'Social Media',
+          'referral': 'External Links'
+        };
+        
+        setTrafficSources(
+          Array.from(sourceMap.entries())
+            .map(([source, count]) => ({
+              source,
+              count,
+              label: sourceLabels[source] || source
+            }))
+            .sort((a, b) => b.count - a.count)
         );
       }
+
+      // Fetch monthly viewers (unique sessions this month)
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      
+      const { count: monthlyCount } = await supabase
+        .from('realtime_presence')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', startOfMonth.toISOString());
+      
+      setMonthlyViewers(monthlyCount || 0);
+
+      // Fetch total viewers (all time unique sessions)
+      const { count: totalCount } = await supabase
+        .from('realtime_presence')
+        .select('*', { count: 'exact', head: true });
+      
+      setTotalViewers(totalCount || 0);
 
       // Fetch blog comments count (last 24 hours)
       const { count: commentsCount } = await supabase
@@ -317,43 +340,79 @@ export default function RealtimeAnalytics() {
             </CardContent>
           </Card>
 
-          {/* Top Streams */}
+          {/* Traffic Sources */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
-                <Radio className="h-4 w-4" />
-                Top Streams (24h)
+                <Share2 className="h-4 w-4" />
+                Traffic Sources
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[120px]">
-                {streamStats.length === 0 ? (
+                {trafficSources.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-2">
-                    No stream views yet
+                    No traffic data yet
                   </p>
                 ) : (
                   <div className="space-y-2">
-                    {streamStats.map((stat, index) => (
-                      <div
-                        key={stat.stream_id}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-muted-foreground">
-                            #{index + 1}
-                          </span>
-                          <span className="text-xs truncate max-w-[200px]">
-                            {stat.title}
-                          </span>
+                    {trafficSources.map((source) => {
+                      const getSourceIcon = () => {
+                        switch(source.source) {
+                          case 'search': return <Search className="h-3 w-3 text-green-500" />;
+                          case 'social': return <Share2 className="h-3 w-3 text-blue-500" />;
+                          case 'referral': return <Link2 className="h-3 w-3 text-purple-500" />;
+                          default: return <Globe className="h-3 w-3 text-gray-500" />;
+                        }
+                      };
+                      return (
+                        <div
+                          key={source.source}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2">
+                            {getSourceIcon()}
+                            <span className="text-xs">
+                              {source.label}
+                            </span>
+                          </div>
+                          <Badge variant="secondary" className="text-[10px]">
+                            {source.count} visitors
+                          </Badge>
                         </div>
-                        <Badge variant="secondary" className="text-[10px]">
-                          {stat.view_count} views
-                        </Badge>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </ScrollArea>
+            </CardContent>
+          </Card>
+
+          {/* Monthly & Total Stats */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Viewer Statistics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-orange-500" />
+                    <span className="text-xs font-medium">Monthly Viewers</span>
+                  </div>
+                  <span className="text-lg font-bold text-orange-500">{monthlyViewers.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-cyan-500" />
+                    <span className="text-xs font-medium">Total Viewers (All Time)</span>
+                  </div>
+                  <span className="text-lg font-bold text-cyan-500">{totalViewers.toLocaleString()}</span>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

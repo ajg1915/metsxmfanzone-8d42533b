@@ -21,6 +21,31 @@ const getPageType = (path: string): string => {
   return 'general';
 };
 
+// Determine referrer source for traffic analytics
+const getReferrerSource = (): string => {
+  const referrer = document.referrer.toLowerCase();
+  const storedSource = sessionStorage.getItem('referrer_source');
+  
+  // Return stored source if already determined this session
+  if (storedSource) return storedSource;
+  
+  let source = 'direct';
+  
+  if (!referrer) {
+    source = 'direct';
+  } else if (referrer.includes('google.') || referrer.includes('bing.') || referrer.includes('yahoo.') || referrer.includes('duckduckgo.') || referrer.includes('baidu.')) {
+    source = 'search';
+  } else if (referrer.includes('facebook.') || referrer.includes('twitter.') || referrer.includes('x.com') || referrer.includes('instagram.') || referrer.includes('tiktok.') || referrer.includes('linkedin.') || referrer.includes('reddit.') || referrer.includes('youtube.')) {
+    source = 'social';
+  } else if (!referrer.includes(window.location.hostname)) {
+    source = 'referral';
+  }
+  
+  // Store for this session
+  sessionStorage.setItem('referrer_source', source);
+  return source;
+};
+
 export const usePresenceTracking = () => {
   const location = useLocation();
   const sessionId = useRef(getSessionId());
@@ -41,6 +66,7 @@ export const usePresenceTracking = () => {
           is_authenticated: !!user,
           user_agent: navigator.userAgent,
           last_seen_at: new Date().toISOString(),
+          referrer_source: getReferrerSource(),
         }, {
           onConflict: 'session_id'
         });
