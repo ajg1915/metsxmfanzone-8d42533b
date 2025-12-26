@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Navigation from "@/components/Navigation";
@@ -8,13 +8,14 @@ import { Button } from "@/components/ui/button";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 import NotificationSettings from "@/components/NotificationSettings";
 import { Badge } from "@/components/ui/badge";
-import { User, CreditCard, Calendar, ArrowUpCircle } from "lucide-react";
+import { User, CreditCard, Calendar, ArrowUpCircle, Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -28,7 +29,9 @@ const Dashboard = () => {
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>("active");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -79,6 +82,73 @@ const Dashboard = () => {
 
     fetchUserData();
   }, [user]);
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please upload a JPG, PNG, WebP, or GIF image.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please upload an image smaller than 2MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+      
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      // Update profile with new avatar URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      setAvatarUrl(publicUrl);
+      toast({
+        title: "Avatar Updated",
+        description: "Your profile picture has been updated.",
+      });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload avatar. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   const handleSaveProfile = async () => {
     if (!user) return;
@@ -150,16 +220,18 @@ const Dashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="text-foreground">{user.email}</p>
-                  </div>
-                  {fullName && (
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={avatarUrl} alt="Profile avatar" />
+                      <AvatarFallback className="bg-primary/10 text-primary text-lg">
+                        {fullName ? fullName.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                     <div>
-                      <p className="text-sm text-muted-foreground">Full Name</p>
-                      <p className="text-foreground">{fullName}</p>
+                      <p className="font-medium text-foreground">{fullName || "Set your name"}</p>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
                     </div>
-                  )}
+                  </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Member Since</p>
                     <p className="text-foreground">
@@ -180,6 +252,50 @@ const Dashboard = () => {
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4 py-4">
+                        {/* Avatar Upload Section */}
+                        <div className="space-y-2">
+                          <Label>Profile Picture</Label>
+                          <div className="flex items-center gap-4">
+                            <Avatar className="h-20 w-20">
+                              <AvatarImage src={avatarUrl} alt="Profile avatar" />
+                              <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                                {fullName ? fullName.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 space-y-2">
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleAvatarUpload}
+                                accept="image/jpeg,image/png,image/webp,image/gif"
+                                className="hidden"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={uploadingAvatar}
+                                className="w-full"
+                              >
+                                {uploadingAvatar ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Uploading...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Upload className="w-4 h-4 mr-2" />
+                                    Upload Photo
+                                  </>
+                                )}
+                              </Button>
+                              <p className="text-xs text-muted-foreground">
+                                JPG, PNG, WebP or GIF. Max 2MB.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                         <div className="space-y-2">
                           <Label htmlFor="fullName">Full Name</Label>
                           <Input
@@ -187,15 +303,6 @@ const Dashboard = () => {
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             placeholder="Enter your full name"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="avatarUrl">Avatar URL</Label>
-                          <Input
-                            id="avatarUrl"
-                            value={avatarUrl}
-                            onChange={(e) => setAvatarUrl(e.target.value)}
-                            placeholder="https://example.com/avatar.jpg"
                           />
                         </div>
                       </div>
