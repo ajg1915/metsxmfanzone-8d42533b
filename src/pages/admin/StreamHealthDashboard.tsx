@@ -200,9 +200,12 @@ export default function StreamHealthDashboard() {
   };
 
   // Calculate summary stats
-  const unresolvedCount = reports.filter(r => !r.resolved).length;
-  const highSeverityCount = reports.filter(r => r.severity === 'high' && !r.resolved).length;
   const activeAlertsCount = alerts.filter(a => a.is_active).length;
+  const totalIssuesDetected = reports.length;
+  const issuesByType = reports.reduce((acc, r) => {
+    acc[r.issue_type] = (acc[r.issue_type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   return (
     <div className="w-full max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
@@ -213,7 +216,7 @@ export default function StreamHealthDashboard() {
             Stream Health Monitor
           </h2>
           <p className="text-xs text-muted-foreground">
-            Monitor stream issues and send viewer alerts
+            Automatic stream issue detection & viewer alerts
           </p>
         </div>
         <div className="flex gap-2">
@@ -229,27 +232,7 @@ export default function StreamHealthDashboard() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid gap-2 sm:gap-3 grid-cols-3 mb-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
-            <CardTitle className="text-[10px] sm:text-xs font-medium">Unresolved</CardTitle>
-            <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-xl sm:text-2xl font-bold text-yellow-500">{unresolvedCount}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
-            <CardTitle className="text-[10px] sm:text-xs font-medium">High Severity</CardTitle>
-            <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
-          </CardHeader>
-          <CardContent className="px-3 pb-3">
-            <div className="text-xl sm:text-2xl font-bold text-red-500">{highSeverityCount}</div>
-          </CardContent>
-        </Card>
-
+      <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-4 mb-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
             <CardTitle className="text-[10px] sm:text-xs font-medium">Active Alerts</CardTitle>
@@ -259,72 +242,56 @@ export default function StreamHealthDashboard() {
             <div className="text-xl sm:text-2xl font-bold text-blue-500">{activeAlertsCount}</div>
           </CardContent>
         </Card>
-      </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Health Reports */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              Recent Issues
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Viewer-reported stream problems
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium">Issues Detected</CardTitle>
+            <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500" />
           </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[400px]">
-              {reports.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No issues reported
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {reports.map((report) => (
-                    <div
-                      key={report.id}
-                      className={`p-3 rounded-lg border ${report.resolved ? 'bg-muted/30 opacity-60' : 'bg-muted/50'}`}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-lg">{getIssueIcon(report.issue_type)}</span>
-                            <Badge variant={getSeverityColor(report.severity)} className="text-[10px]">
-                              {report.severity}
-                            </Badge>
-                            <Badge variant="outline" className="text-[10px]">
-                              {report.issue_type}
-                            </Badge>
-                          </div>
-                          <p className="text-xs font-medium truncate">
-                            {report.live_streams?.title || 'Unknown Stream'}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground mt-1">
-                            {report.description}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground mt-1">
-                            {new Date(report.created_at).toLocaleString()}
-                          </p>
-                        </div>
-                        {!report.resolved && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => resolveReport(report.id)}
-                          >
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </ScrollArea>
+          <CardContent className="px-3 pb-3">
+            <div className="text-xl sm:text-2xl font-bold text-yellow-500">{totalIssuesDetected}</div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium">Buffering/Lag</CardTitle>
+            <span className="text-sm">⏳</span>
+          </CardHeader>
+          <CardContent className="px-3 pb-3">
+            <div className="text-xl sm:text-2xl font-bold">{(issuesByType['buffering'] || 0) + (issuesByType['lag'] || 0)}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
+            <CardTitle className="text-[10px] sm:text-xs font-medium">Audio/Video</CardTitle>
+            <span className="text-sm">📺</span>
+          </CardHeader>
+          <CardContent className="px-3 pb-3">
+            <div className="text-xl sm:text-2xl font-bold">{(issuesByType['audio'] || 0) + (issuesByType['video'] || 0)}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Detection Status Card */}
+      <Card className="mb-4">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-green-500" />
+            Automatic Detection Active
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Stream issues are automatically detected and reported. Alerts are sent to viewers when multiple issues are detected.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-muted-foreground">Monitoring all active streams</span>
+          </div>
+        </CardContent>
+      </Card>
 
         {/* Active Alerts */}
         <Card>
@@ -387,7 +354,6 @@ export default function StreamHealthDashboard() {
             </ScrollArea>
           </CardContent>
         </Card>
-      </div>
 
       {/* Send Alert Dialog */}
       <Dialog open={showAlertDialog} onOpenChange={setShowAlertDialog}>
