@@ -19,6 +19,8 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
   const [isSetupMode, setIsSetupMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [lockoutUntil, setLockoutUntil] = useState<Date | null>(null);
   const { toast } = useToast();
@@ -196,6 +198,45 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
     }
   };
 
+  const handleResetPin = async () => {
+    setResetting(true);
+    try {
+      // Delete the existing PIN
+      const { error } = await supabase
+        .from("admin_verification_codes")
+        .delete()
+        .eq("user_id", userId);
+
+      if (error) throw error;
+
+      // Clear lockout state
+      sessionStorage.removeItem("admin_attempts");
+      sessionStorage.removeItem("admin_lockout");
+      setAttempts(0);
+      setLockoutUntil(null);
+
+      // Switch to setup mode
+      setIsSetupMode(true);
+      setShowResetConfirm(false);
+      setPin("");
+      setConfirmPin("");
+
+      toast({
+        title: "PIN Reset",
+        description: "Please set up a new PIN to continue.",
+      });
+    } catch (err) {
+      console.error("Error resetting PIN:", err);
+      toast({
+        title: "Reset Failed",
+        description: "Failed to reset PIN. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -214,17 +255,46 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
             <Shield className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-xl">
-            {isSetupMode ? "Set Up Admin PIN" : "Admin Verification"}
+            {isSetupMode ? "Set Up Admin PIN" : showResetConfirm ? "Reset PIN" : "Admin Verification"}
           </CardTitle>
           <CardDescription>
             {isSetupMode 
               ? "Create a secure PIN that only you know to access admin features"
+              : showResetConfirm
+              ? "Are you sure you want to reset your PIN?"
               : "Enter your secret PIN to access the admin panel"
             }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {isLockedOut ? (
+          {showResetConfirm ? (
+            <div className="space-y-4">
+              <div className="text-center py-4">
+                <Key className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-sm text-muted-foreground">
+                  This will delete your current PIN and allow you to set up a new one.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowResetConfirm(false)}
+                  className="flex-1"
+                  disabled={resetting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleResetPin}
+                  className="flex-1"
+                  disabled={resetting}
+                >
+                  {resetting ? "Resetting..." : "Reset PIN"}
+                </Button>
+              </div>
+            </div>
+          ) : isLockedOut ? (
             <div className="text-center py-8">
               <Lock className="h-12 w-12 mx-auto text-destructive mb-4" />
               <p className="text-destructive font-medium">Account Temporarily Locked</p>
@@ -232,6 +302,13 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
                 Too many failed attempts. Please wait{" "}
                 {Math.ceil((lockoutUntil!.getTime() - Date.now()) / 60000)} minutes.
               </p>
+              <Button
+                variant="link"
+                onClick={() => setShowResetConfirm(true)}
+                className="mt-4 text-primary"
+              >
+                Forgot PIN? Reset it
+              </Button>
             </div>
           ) : (
             <>
@@ -291,17 +368,28 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
                 </Button>
               </div>
 
-              {!isSetupMode && attempts > 0 && (
-                <p className="text-xs text-center text-muted-foreground">
-                  {MAX_ATTEMPTS - attempts} attempts remaining before lockout
-                </p>
+              {!isSetupMode && (
+                <div className="text-center">
+                  {attempts > 0 && (
+                    <p className="text-xs text-muted-foreground mb-2">
+                      {MAX_ATTEMPTS - attempts} attempts remaining before lockout
+                    </p>
+                  )}
+                  <Button
+                    variant="link"
+                    onClick={() => setShowResetConfirm(true)}
+                    className="text-xs text-muted-foreground hover:text-primary"
+                  >
+                    Forgot PIN?
+                  </Button>
+                </div>
               )}
             </>
           )}
 
           <p className="text-xs text-center text-muted-foreground pt-4 border-t">
             PIN verification is performed securely on the server.
-            {isSetupMode && " Remember your PIN carefully - it cannot be recovered."}
+            {isSetupMode && " Remember your PIN carefully."}
           </p>
         </CardContent>
       </Card>
