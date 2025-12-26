@@ -63,8 +63,13 @@ export const useNotifications = () => {
       let subscription = await registration.pushManager.getSubscription();
       
       if (!subscription) {
-        // Generate VAPID key (you should generate your own and store it securely)
-        const vapidPublicKey = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U';
+        // Get VAPID public key from environment variable for better key management
+        const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+        
+        if (!vapidPublicKey) {
+          console.warn('VAPID public key not configured. Push notifications will not work. Set VITE_VAPID_PUBLIC_KEY environment variable.');
+          return;
+        }
         
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
