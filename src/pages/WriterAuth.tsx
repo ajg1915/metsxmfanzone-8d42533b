@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { Shield, ArrowLeft, PenLine } from "lucide-react";
+import { Shield, ArrowLeft, PenLine, KeyRound } from "lucide-react";
 import AuthBackground from "@/components/AuthBackground";
 import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 
@@ -58,6 +58,11 @@ const WriterAuth = () => {
   const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
   const [pendingUserData, setPendingUserData] = useState<{ userId: string } | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
+  
+  // Forgot password states
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
   
   // Bot detection states
   const [honeypot, setHoneypot] = useState("");
@@ -324,6 +329,138 @@ const WriterAuth = () => {
     setPendingUserData(null);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!forgotPasswordEmail) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+        redirectTo: `${window.location.origin}/writer-auth`,
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setForgotPasswordSent(true);
+      toast({
+        title: "Check your email",
+        description: "Password reset instructions have been sent to your email.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBackFromForgotPassword = () => {
+    setShowForgotPassword(false);
+    setForgotPasswordEmail("");
+    setForgotPasswordSent(false);
+  };
+
+  // Forgot Password Screen
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 relative">
+        <AuthBackground />
+        <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl">
+          <CardHeader className="space-y-1">
+            <div className="flex flex-col items-center gap-3 mb-4">
+              <img 
+                src={authLogo} 
+                alt="MetsXMFanZone" 
+                className="h-20 w-auto object-contain"
+              />
+              <div className="flex items-center gap-2">
+                <PenLine className="h-5 w-5 text-[#FF5910]" />
+                <span className="text-lg font-bold text-[#FF5910]">Writer Portal</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <KeyRound className="h-5 w-5 text-primary" />
+              <CardTitle className="text-xl font-bold">Reset Password</CardTitle>
+            </div>
+            <CardDescription className="text-center">
+              {forgotPasswordSent 
+                ? "Check your email for reset instructions" 
+                : "Enter your email to receive password reset instructions"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {forgotPasswordSent ? (
+              <div className="text-center space-y-4">
+                <div className="p-4 bg-primary/10 rounded-lg">
+                  <p className="text-sm text-foreground">
+                    We've sent password reset instructions to <span className="font-medium">{forgotPasswordEmail}</span>. 
+                    Please check your inbox and follow the link to reset your password.
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleBackFromForgotPassword} 
+                  variant="outline" 
+                  className="w-full"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to login
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="forgot-email">Email</Label>
+                  <Input
+                    id="forgot-email"
+                    type="email"
+                    placeholder="writer@mets.com"
+                    value={forgotPasswordEmail}
+                    onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                </div>
+
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Sending..." : "Send Reset Instructions"}
+                </Button>
+
+                <button
+                  type="button"
+                  onClick={handleBackFromForgotPassword}
+                  className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mx-auto"
+                  disabled={loading}
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to login
+                </button>
+              </form>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // 2FA Verification Screen
   if (show2FA) {
     return (
@@ -466,6 +603,16 @@ const WriterAuth = () => {
                 required
                 disabled={loading}
               />
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-sm text-primary hover:underline"
+              >
+                Forgot password?
+              </button>
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
