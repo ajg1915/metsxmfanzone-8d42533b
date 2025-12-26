@@ -86,6 +86,7 @@ import RealtimeAnalytics from "./pages/admin/RealtimeAnalytics";
 import StreamHealthDashboard from "./pages/admin/StreamHealthDashboard";
 import WriterRegister from "./pages/WriterRegister";
 import CreateAccount from "./pages/help/CreateAccount";
+import BiometricLogin from "./pages/help/BiometricLogin";
 import NavigatePlatform from "./pages/help/NavigatePlatform";
 import WatchStreams from "./pages/help/WatchStreams";
 import CommunityGuidelines from "./pages/help/CommunityGuidelines";
@@ -159,6 +160,7 @@ const App = () => {
           <Route path="/blog/rss" element={<BlogRSS />} />
           <Route path="/help-center" element={<HelpCenter />} />
           <Route path="/help/create-account" element={<CreateAccount />} />
+          <Route path="/help/biometric-login" element={<BiometricLogin />} />
           <Route path="/help/navigate-platform" element={<NavigatePlatform />} />
           <Route path="/help/watch-streams" element={<WatchStreams />} />
           <Route path="/help/community-guidelines" element={<CommunityGuidelines />} />
