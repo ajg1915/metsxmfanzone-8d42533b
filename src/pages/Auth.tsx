@@ -260,12 +260,13 @@ const Auth = () => {
       const { options } = optionsResponse.data;
 
       // Convert challenge and allowCredentials to proper format
+      // The credential IDs are already base64url encoded strings from the server
       const authOptions = {
         ...options,
         challenge: options.challenge,
         allowCredentials: options.allowCredentials?.map((cred: any) => ({
           ...cred,
-          id: Uint8Array.from(atob(cred.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
+          id: cred.id, // Keep as base64url string - SimpleWebAuthn handles conversion
         })),
       };
 
