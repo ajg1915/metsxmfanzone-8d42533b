@@ -10,10 +10,11 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { Shield, ArrowLeft } from "lucide-react";
+import { Shield, ArrowLeft, Fingerprint } from "lucide-react";
 import AuthBackground from "@/components/AuthBackground";
 import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 import { trackFailedLogin } from "@/utils/securityAlerts";
+import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
 
 const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
@@ -203,12 +204,22 @@ const Auth = () => {
   const [honeypot, setHoneypot] = useState(""); // Should remain empty - bots fill this
   const [formLoadTime] = useState(() => Date.now()); // Track when form loaded
   
+  // Biometric login states
+  const [biometricSupported, setBiometricSupported] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
+  const [showBiometricEmailInput, setShowBiometricEmailInput] = useState(false);
+  const [biometricEmail, setBiometricEmail] = useState("");
+  const [biometricError, setBiometricError] = useState<string | null>(null);
+  const [biometricPendingUserId, setBiometricPendingUserId] = useState<string | null>(null);
   
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Check for remembered user on mount
+  // Check for remembered user on mount and biometric support
   useEffect(() => {
+    // Check biometric support
+    setBiometricSupported(browserSupportsWebAuthn());
+    
     const stored = localStorage.getItem(REMEMBER_ME_KEY);
     if (stored) {
       try {
@@ -225,6 +236,148 @@ const Auth = () => {
       }
     }
   }, []);
+
+  // Biometric login handler with 2FA
+  const handleBiometricLogin = async () => {
+    if (!biometricEmail) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email to use biometric login.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setBiometricLoading(true);
+    setBiometricError(null);
+    
+    try {
+      // Step 1: Get login options from server
+      const optionsResponse = await supabase.functions.invoke("webauthn-login-options", {
+        body: { email: biometricEmail },
+      });
+
+      if (optionsResponse.error) {
+        throw new Error(optionsResponse.error.message || "Failed to get login options");
+      }
+
+      if (optionsResponse.data?.error) {
+        throw new Error(optionsResponse.data.error);
+      }
+
+      const { options, userId } = optionsResponse.data;
+
+      if (!options) {
+        throw new Error("No login options received. Please register a passkey first.");
+      }
+
+      // Step 2: Start biometric authentication using SimpleWebAuthn
+      const credential = await startAuthentication({
+        optionsJSON: options,
+      });
+
+      // Step 3: Verify with server
+      const verifyResponse = await supabase.functions.invoke("webauthn-login-verify", {
+        body: {
+          credential: {
+            id: credential.id,
+            rawId: credential.rawId,
+            response: {
+              authenticatorData: credential.response.authenticatorData,
+              clientDataJSON: credential.response.clientDataJSON,
+              signature: credential.response.signature,
+            },
+            type: credential.type,
+          },
+          email: biometricEmail,
+        },
+      });
+
+      if (verifyResponse.error) {
+        throw new Error(verifyResponse.error.message || "Authentication failed");
+      }
+
+      if (verifyResponse.data?.error) {
+        throw new Error(verifyResponse.data.error);
+      }
+
+      // Step 4: Biometric verified - now trigger 2FA
+      // Generate and send OTP for 2FA
+      const { otp, expiry } = generateOtp();
+      setGeneratedOtp(otp);
+      setOtpExpiry(expiry);
+      
+      // Send OTP email
+      const otpSent = await sendOtpEmail(biometricEmail, otp);
+      
+      if (!otpSent) {
+        toast({
+          title: "Verification issue",
+          description: "Could not send verification code. Please try password login.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Store user info for after 2FA
+      setBiometricPendingUserId(userId);
+      setPendingUserData({ userId, isSignup: false });
+      
+      // Show 2FA screen
+      setShow2FA(true);
+      setShowBiometricEmailInput(false);
+      
+      toast({
+        title: "Biometric verified!",
+        description: "Please enter the verification code sent to your email.",
+      });
+
+    } catch (error: any) {
+      console.error("Biometric login error:", error);
+      
+      // Handle specific WebAuthn errors
+      if (error.name === "NotAllowedError") {
+        setBiometricError("Biometric authentication was cancelled.");
+        toast({
+          title: "Cancelled",
+          description: "Biometric authentication was cancelled.",
+        });
+      } else if (error.name === "SecurityError") {
+        setBiometricError("Security error. Please ensure you're on a secure connection.");
+        toast({
+          title: "Security Error",
+          description: "Please ensure you're using HTTPS.",
+          variant: "destructive",
+        });
+      } else if (error.message?.includes("No passkeys found")) {
+        setBiometricError("No biometric credentials found. Please register first from your account settings.");
+        toast({
+          title: "No passkeys found",
+          description: "Please register a passkey first from your account dashboard.",
+          variant: "destructive",
+        });
+      } else if (error.message?.includes("not found")) {
+        setBiometricError("Account not found. Please check your email or sign up.");
+        toast({
+          title: "Account not found",
+          description: "No account found with this email. Please sign up first.",
+          variant: "destructive",
+        });
+      } else {
+        setBiometricError(error.message || "Biometric authentication failed. Try password login.");
+        toast({
+          title: "Login failed",
+          description: error.message || "Biometric authentication failed. Try password login.",
+          variant: "destructive",
+        });
+        
+        // Track failed login attempt
+        trackFailedLogin(biometricEmail, "biometric_failed");
+      }
+    } finally {
+      setBiometricLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (mode === "login") {
@@ -1228,6 +1381,74 @@ const Auth = () => {
               {loading ? "Loading..." : isResettingPassword ? "Update Password" : isForgotPassword ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
             </Button>
 
+            {/* Biometric Login Option */}
+            {isLogin && !isForgotPassword && !isResettingPassword && biometricSupported && (
+              <div className="space-y-3">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">Or</span>
+                  </div>
+                </div>
+                
+                {showBiometricEmailInput ? (
+                  <div className="space-y-3">
+                    <Input
+                      type="email"
+                      placeholder="Enter email for biometric login"
+                      value={biometricEmail}
+                      onChange={(e) => {
+                        setBiometricEmail(e.target.value);
+                        setBiometricError(null);
+                      }}
+                      disabled={biometricLoading}
+                      className={biometricError ? "border-destructive" : ""}
+                    />
+                    
+                    {biometricError && (
+                      <p className="text-xs text-destructive">{biometricError}</p>
+                    )}
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={handleBiometricLogin}
+                        disabled={biometricLoading || !biometricEmail}
+                      >
+                        <Fingerprint className="h-4 w-4 mr-2" />
+                        {biometricLoading ? "Authenticating..." : "Continue with Biometric"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          setShowBiometricEmailInput(false);
+                          setBiometricError(null);
+                          setBiometricEmail("");
+                        }}
+                        disabled={biometricLoading}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setShowBiometricEmailInput(true)}
+                  >
+                    <Fingerprint className="h-4 w-4 mr-2" />
+                    Sign in with Biometrics
+                  </Button>
+                )}
+              </div>
+            )}
 
           </form>
 

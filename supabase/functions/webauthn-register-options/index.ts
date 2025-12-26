@@ -6,11 +6,21 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Generate a random challenge
+// Generate a random challenge as base64url
 function generateChallenge(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
   return btoa(String.fromCharCode(...array))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
+}
+
+// Convert string to base64url
+function stringToBase64url(str: string): string {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  return btoa(String.fromCharCode(...bytes))
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=/g, "");
@@ -96,19 +106,20 @@ serve(async (req) => {
       .delete()
       .lt("expires_at", new Date().toISOString());
 
-    // Build WebAuthn credential creation options
+    // Determine RP ID based on environment
     const rpId = new URL(supabaseUrl).hostname.includes("supabase")
       ? "lovable.dev" // Production
       : "localhost"; // Development
 
+    // Build WebAuthn credential creation options in SimpleWebAuthn format
     const options = {
-      challenge,
+      challenge, // base64url string
       rp: {
         name: "MetsXMFanZone",
         id: rpId,
       },
       user: {
-        id: user.id,
+        id: stringToBase64url(user.id), // base64url encoded user ID
         name: userEmail,
         displayName: userName,
       },
@@ -120,17 +131,18 @@ serve(async (req) => {
         authenticatorAttachment: "platform", // Use device's built-in authenticator
         userVerification: "required",
         residentKey: "preferred",
+        requireResidentKey: false,
       },
       timeout: 60000,
       attestation: "none",
       excludeCredentials: existingPasskeys?.map((pk) => ({
-        id: pk.credential_id,
+        id: pk.credential_id, // Already base64url encoded
         type: "public-key",
         transports: ["internal"],
       })) || [],
     };
 
-    console.log("Generated registration options for user:", user.id);
+    console.log("Generated registration options for user:", user.id, "rpId:", rpId);
 
     return new Response(
       JSON.stringify({ options, deviceName }),

@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Generate a random challenge
+// Generate a random challenge as base64url
 function generateChallenge(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
@@ -40,7 +40,7 @@ serve(async (req) => {
       );
     }
 
-    // Find the user by email (try both exact match and lowercase)
+    // Find the user by email (try both exact match and case-insensitive)
     let profile = null;
     
     // First try exact match
@@ -53,7 +53,7 @@ serve(async (req) => {
     if (exactMatch) {
       profile = exactMatch;
     } else {
-      // Try lowercase
+      // Try case-insensitive match
       const { data: lowerMatch } = await supabase
         .from("profiles")
         .select("id, email")
@@ -82,7 +82,7 @@ serve(async (req) => {
 
     if (passkeysError || !passkeys || passkeys.length === 0) {
       return new Response(
-        JSON.stringify({ error: "No passkeys found for this email. Please register a passkey first." }),
+        JSON.stringify({ error: "No passkeys found for this email. Please register a passkey first from your account settings." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -116,24 +116,25 @@ serve(async (req) => {
       .delete()
       .lt("expires_at", new Date().toISOString());
 
-    // Build WebAuthn credential request options
+    // Determine RP ID based on environment
     const rpId = new URL(supabaseUrl).hostname.includes("supabase")
       ? "lovable.dev" // Production
       : "localhost"; // Development
 
+    // Build WebAuthn credential request options in SimpleWebAuthn format
     const options = {
-      challenge,
+      challenge, // base64url string
       rpId,
       timeout: 60000,
       userVerification: "required",
       allowCredentials: passkeys.map((pk) => ({
-        id: pk.credential_id,
+        id: pk.credential_id, // Already base64url encoded credential ID
         type: "public-key",
         transports: pk.transports || ["internal"],
       })),
     };
 
-    console.log("Generated login options for email:", email);
+    console.log("Generated login options for email:", email, "with", passkeys.length, "credentials");
 
     return new Response(
       JSON.stringify({ 
