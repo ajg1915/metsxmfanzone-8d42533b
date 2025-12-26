@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,14 @@ import { z } from "zod";
 import { Shield, ArrowLeft, PenLine, KeyRound } from "lucide-react";
 import AuthBackground from "@/components/AuthBackground";
 import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
+
+const newPasswordSchema = z.object({
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -47,9 +55,14 @@ const detectBot = (): { isBot: boolean; reason?: string } => {
 };
 
 const WriterAuth = () => {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  // Password reset mode
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   
   // 2FA states
   const [show2FA, setShow2FA] = useState(false);
@@ -71,14 +84,25 @@ const WriterAuth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check for password reset mode from URL hash
+  useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
+    const type = hashParams.get('type');
+    
+    if (accessToken && type === 'recovery') {
+      setIsResettingPassword(true);
+    }
+  }, []);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && !show2FA) {
+      if (session && !show2FA && !isResettingPassword) {
         // Check if user is a writer
         checkWriterRole(session.user.id);
       }
     });
-  }, [show2FA]);
+  }, [show2FA, isResettingPassword]);
 
   // Resend cooldown timer
   useEffect(() => {
@@ -379,6 +403,119 @@ const WriterAuth = () => {
     setForgotPasswordSent(false);
   };
 
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const validated = newPasswordSchema.parse({ password, confirmPassword });
+      setLoading(true);
+
+      const { error } = await supabase.auth.updateUser({
+        password: validated.password,
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Password updated!",
+        description: "Your password has been successfully reset. You can now login.",
+      });
+      
+      setIsResettingPassword(false);
+      setPassword("");
+      setConfirmPassword("");
+      // Clear the hash from URL
+      window.history.replaceState(null, '', window.location.pathname);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Password Reset Screen (when coming from email link)
+  if (isResettingPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 relative">
+        <AuthBackground />
+        <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl">
+          <CardHeader className="space-y-1">
+            <div className="flex flex-col items-center gap-3 mb-4">
+              <img 
+                src={authLogo} 
+                alt="MetsXMFanZone" 
+                className="h-16 sm:h-20 w-auto object-contain"
+              />
+              <div className="flex items-center gap-2">
+                <PenLine className="h-5 w-5 text-[#FF5910]" />
+                <span className="text-lg font-bold text-[#FF5910]">Writer Portal</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <KeyRound className="h-5 w-5 text-primary" />
+              <CardTitle className="text-xl font-bold">Set New Password</CardTitle>
+            </div>
+            <CardDescription className="text-center">
+              Enter your new password below
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleUpdatePassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Updating..." : "Update Password"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // Forgot Password Screen
   if (showForgotPassword) {
     return (
@@ -390,7 +527,7 @@ const WriterAuth = () => {
               <img 
                 src={authLogo} 
                 alt="MetsXMFanZone" 
-                className="h-20 w-auto object-contain"
+                className="h-16 sm:h-20 w-auto object-contain"
               />
               <div className="flex items-center gap-2">
                 <PenLine className="h-5 w-5 text-[#FF5910]" />
@@ -472,7 +609,7 @@ const WriterAuth = () => {
               <img 
                 src={authLogo} 
                 alt="MetsXMFanZone" 
-                className="h-20 w-auto object-contain"
+                className="h-16 sm:h-20 w-auto object-contain"
               />
               <div className="flex items-center gap-2">
                 <PenLine className="h-5 w-5 text-[#FF5910]" />
@@ -547,19 +684,19 @@ const WriterAuth = () => {
       <AuthBackground />
       <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl">
         <CardHeader className="space-y-1">
-          <div className="flex flex-col items-center gap-3 mb-4">
+          <div className="flex flex-col items-center gap-2 sm:gap-3 mb-4">
             <img 
               src={authLogo} 
               alt="MetsXMFanZone" 
-              className="h-20 w-auto object-contain"
+              className="h-16 sm:h-20 w-auto object-contain"
             />
             <div className="flex items-center gap-2">
-              <PenLine className="h-5 w-5 text-[#FF5910]" />
-              <span className="text-lg font-bold text-[#FF5910]">Writer Portal</span>
+              <PenLine className="h-4 w-4 sm:h-5 sm:w-5 text-[#FF5910]" />
+              <span className="text-base sm:text-lg font-bold text-[#FF5910]">Writer Portal</span>
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-center">Writer Sign In</CardTitle>
-          <CardDescription className="text-center">
+          <CardTitle className="text-xl sm:text-2xl font-bold text-center">Writer Sign In</CardTitle>
+          <CardDescription className="text-center text-sm">
             Access your writer dashboard to create and manage articles
           </CardDescription>
         </CardHeader>

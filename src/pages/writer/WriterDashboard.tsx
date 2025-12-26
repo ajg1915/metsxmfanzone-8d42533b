@@ -135,19 +135,19 @@ export default function WriterDashboard() {
   if (!isWriter) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
       <header className="border-b border-border bg-card">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <PenLine className="w-8 h-8 text-primary" />
-            <div>
-              <h1 className="text-xl font-bold">Writer Portal</h1>
-              <p className="text-sm text-muted-foreground">Create and manage your articles</p>
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <PenLine className="w-6 h-6 sm:w-8 sm:h-8 text-primary flex-shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-xl font-bold truncate">Writer Portal</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Create and manage your articles</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+            <div className="hidden sm:flex items-center gap-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={profile?.avatar_url || ""} />
                 <AvatarFallback>
@@ -158,57 +158,57 @@ export default function WriterDashboard() {
                 {profile?.full_name || profile?.email}
               </span>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="px-2 sm:px-3">
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Sign Out</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-4 sm:space-y-8">
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
           <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <FileText className="w-8 h-8 text-primary" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.total}</p>
-                  <p className="text-sm text-muted-foreground">Total Articles</p>
+            <CardContent className="p-3 sm:pt-6 sm:p-6">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-primary flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-lg sm:text-2xl font-bold">{stats.total}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Total Articles</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <Clock className="w-8 h-8 text-yellow-500" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.pending}</p>
-                  <p className="text-sm text-muted-foreground">Pending Review</p>
+            <CardContent className="p-3 sm:pt-6 sm:p-6">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-lg sm:text-2xl font-bold">{stats.pending}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Pending</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-8 h-8 text-green-500" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.approved}</p>
-                  <p className="text-sm text-muted-foreground">Approved</p>
+            <CardContent className="p-3 sm:pt-6 sm:p-6">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-lg sm:text-2xl font-bold">{stats.approved}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Approved</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-8 h-8 text-blue-500" />
-                <div>
-                  <p className="text-2xl font-bold">{stats.published}</p>
-                  <p className="text-sm text-muted-foreground">Published</p>
+            <CardContent className="p-3 sm:pt-6 sm:p-6">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-lg sm:text-2xl font-bold">{stats.published}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Published</p>
                 </div>
               </div>
             </CardContent>
@@ -216,9 +216,9 @@ export default function WriterDashboard() {
         </div>
 
         {/* New Article Button */}
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Your Articles</h2>
-          <Button asChild>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+          <h2 className="text-xl sm:text-2xl font-bold">Your Articles</h2>
+          <Button asChild size="sm" className="w-full sm:w-auto">
             <Link to="/writer/new-article">
               <Plus className="w-4 h-4 mr-2" />
               New Article
@@ -229,13 +229,13 @@ export default function WriterDashboard() {
         {/* Articles List */}
         {articles.length === 0 ? (
           <Card>
-            <CardContent className="py-12 text-center">
-              <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No articles yet</h3>
-              <p className="text-muted-foreground mb-4">
+            <CardContent className="py-8 sm:py-12 text-center">
+              <FileText className="w-10 h-10 sm:w-12 sm:h-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-base sm:text-lg font-semibold mb-2">No articles yet</h3>
+              <p className="text-sm text-muted-foreground mb-4">
                 Start writing your first article to share with the community.
               </p>
-              <Button asChild>
+              <Button asChild size="sm">
                 <Link to="/writer/new-article">
                   <Plus className="w-4 h-4 mr-2" />
                   Create Your First Article
@@ -244,18 +244,18 @@ export default function WriterDashboard() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {articles.map(article => (
               <Card key={article.id} className="hover:bg-accent/5 transition-colors">
-                <CardContent className="py-4">
-                  <div className="flex items-start justify-between gap-4">
+                <CardContent className="p-3 sm:py-4 sm:px-6">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold truncate">{article.title}</h3>
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-sm sm:text-base truncate">{article.title}</h3>
                         {getStatusBadge(article)}
                       </div>
                       {article.excerpt && (
-                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-2">
                           {article.excerpt}
                         </p>
                       )}
@@ -263,7 +263,7 @@ export default function WriterDashboard() {
                         Last updated: {new Date(article.updated_at).toLocaleDateString()}
                       </p>
                     </div>
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="outline" size="sm" asChild className="w-full sm:w-auto flex-shrink-0">
                       <Link to={`/writer/edit/${article.id}`}>
                         Edit
                       </Link>
@@ -277,26 +277,26 @@ export default function WriterDashboard() {
 
         {/* Profile Section */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <User className="w-4 h-4 sm:w-5 sm:h-5" />
               Your Profile
             </CardTitle>
-            <CardDescription>Manage your writer profile</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">Manage your writer profile</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <Avatar className="h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0">
                 <AvatarImage src={profile?.avatar_url || ""} />
-                <AvatarFallback className="text-lg">
+                <AvatarFallback className="text-base sm:text-lg">
                   {profile?.full_name?.charAt(0) || "W"}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <p className="font-semibold">{profile?.full_name || "Writer"}</p>
-                <p className="text-sm text-muted-foreground">{profile?.email}</p>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-sm sm:text-base">{profile?.full_name || "Writer"}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">{profile?.email}</p>
               </div>
-              <Button variant="outline" className="ml-auto" asChild>
+              <Button variant="outline" size="sm" className="w-full sm:w-auto flex-shrink-0" asChild>
                 <Link to="/dashboard">
                   Edit Profile
                 </Link>
