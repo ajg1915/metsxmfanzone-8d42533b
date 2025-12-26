@@ -98,6 +98,8 @@ import PaymentMethods from "./pages/help/PaymentMethods";
 import CancelSubscription from "./pages/help/CancelSubscription";
 import ReturnPolicy from "./pages/help/ReturnPolicy";
 import Logout from "./pages/Logout";
+import WriterDashboard from "./pages/writer/WriterDashboard";
+import WriterArticleEditor from "./pages/writer/WriterArticleEditor";
 
 const queryClient = new QueryClient();
 
@@ -201,6 +203,10 @@ const App = () => {
             <Route path="backgrounds" element={<BackgroundManagement />} />
             <Route path="activity" element={<ActivityDashboard />} />
           </Route>
+          {/* Writer Portal Routes */}
+          <Route path="/writer" element={<WriterDashboard />} />
+          <Route path="/writer/new-article" element={<WriterArticleEditor />} />
+          <Route path="/writer/edit/:id" element={<WriterArticleEditor />} />
           <Route path="/spring-training-live" element={<SpringTrainingLive />} />
             <Route path="/merch" element={<Merch />} />
             <Route path="/product/:handle" element={<Product />} />
