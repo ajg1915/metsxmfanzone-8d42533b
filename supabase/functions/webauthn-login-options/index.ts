@@ -30,6 +30,8 @@ serve(async (req) => {
 
     // Parse the request body
     const { email } = await req.json();
+    
+    console.log("Received login options request for email:", email);
 
     if (!email) {
       return new Response(
@@ -38,14 +40,31 @@ serve(async (req) => {
       );
     }
 
-    // Find the user by email
-    const { data: profile, error: profileError } = await supabase
+    // Find the user by email (try both exact match and lowercase)
+    let profile = null;
+    
+    // First try exact match
+    const { data: exactMatch } = await supabase
       .from("profiles")
-      .select("id")
-      .eq("email", email.toLowerCase())
+      .select("id, email")
+      .eq("email", email)
       .single();
+    
+    if (exactMatch) {
+      profile = exactMatch;
+    } else {
+      // Try lowercase
+      const { data: lowerMatch } = await supabase
+        .from("profiles")
+        .select("id, email")
+        .ilike("email", email)
+        .single();
+      profile = lowerMatch;
+    }
 
-    if (profileError || !profile) {
+    console.log("Profile lookup result:", profile ? "found" : "not found");
+
+    if (!profile) {
       // Don't reveal if user exists or not for security
       return new Response(
         JSON.stringify({ error: "No passkeys found for this email" }),
@@ -59,9 +78,11 @@ serve(async (req) => {
       .select("credential_id, transports")
       .eq("user_id", profile.id);
 
+    console.log("Passkeys lookup result:", passkeys?.length || 0, "passkeys found");
+
     if (passkeysError || !passkeys || passkeys.length === 0) {
       return new Response(
-        JSON.stringify({ error: "No passkeys found for this email" }),
+        JSON.stringify({ error: "No passkeys found for this email. Please register a passkey first." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
