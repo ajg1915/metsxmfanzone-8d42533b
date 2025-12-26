@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,13 +12,15 @@ import { Shield, ArrowLeft, PenLine, KeyRound } from "lucide-react";
 import AuthBackground from "@/components/AuthBackground";
 import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 
-const newPasswordSchema = z.object({
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const newPasswordSchema = z
+  .object({
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -29,41 +31,56 @@ const MIN_FORM_FILL_TIME_MS = 3000;
 
 const detectBot = (): { isBot: boolean; reason?: string } => {
   const navigatorAny = navigator as any;
-  
+
   if (navigatorAny.webdriver) {
     return { isBot: true, reason: "Automated browser detected" };
   }
-  
+
   if (!window.requestAnimationFrame || !window.cancelAnimationFrame) {
     return { isBot: true, reason: "Missing browser features" };
   }
-  
-  if (window.hasOwnProperty('_phantom') || window.hasOwnProperty('callPhantom')) {
+
+  if (window.hasOwnProperty("_phantom") || window.hasOwnProperty("callPhantom")) {
     return { isBot: true, reason: "Headless browser detected" };
   }
-  
+
   if (window.screen.width === 0 || window.screen.height === 0) {
     return { isBot: true, reason: "Invalid screen dimensions" };
   }
-  
+
   const languages = navigator.languages;
   if (!languages || languages.length === 0) {
     return { isBot: true, reason: "Missing language settings" };
   }
-  
+
   return { isBot: false };
 };
 
+const getIsPasswordRecoveryMode = () => {
+  if (typeof window === "undefined") return false;
+
+  // Support both query-string and hash-based recovery flows
+  const searchParams = new URLSearchParams(window.location.search);
+  if (searchParams.get("mode") === "reset" || searchParams.get("type") === "recovery") {
+    return true;
+  }
+
+  const hash = window.location.hash?.startsWith("#")
+    ? window.location.hash.slice(1)
+    : window.location.hash;
+  const hashParams = new URLSearchParams(hash);
+  return hashParams.get("type") === "recovery";
+};
+
 const WriterAuth = () => {
-  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  
-  // Password reset mode
-  const [isResettingPassword, setIsResettingPassword] = useState(false);
-  
+
+  // Password reset mode (initialize immediately to avoid redirect "bounce")
+  const [isResettingPassword, setIsResettingPassword] = useState(() => getIsPasswordRecoveryMode());
+
   // 2FA states
   const [show2FA, setShow2FA] = useState(false);
   const [otpCode, setOtpCode] = useState("");
@@ -71,29 +88,18 @@ const WriterAuth = () => {
   const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
   const [pendingUserData, setPendingUserData] = useState<{ userId: string } | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
-  
+
   // Forgot password states
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
-  
+
   // Bot detection states
   const [honeypot, setHoneypot] = useState("");
   const [formLoadTime] = useState(() => Date.now());
-  
+
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Check for password reset mode from URL hash
-  useEffect(() => {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const accessToken = hashParams.get('access_token');
-    const type = hashParams.get('type');
-    
-    if (accessToken && type === 'recovery') {
-      setIsResettingPassword(true);
-    }
-  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -369,7 +375,7 @@ const WriterAuth = () => {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
-        redirectTo: `${window.location.origin}/writer-auth`,
+        redirectTo: `${window.location.origin}/writer-auth?mode=reset`,
       });
 
       if (error) {
