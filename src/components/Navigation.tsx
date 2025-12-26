@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sheet,
   SheetContent,
@@ -33,24 +33,38 @@ const Navigation = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [userProfile, setUserProfile] = useState<{ full_name: string | null; avatar_url: string | null }>({ full_name: null, avatar_url: null });
 
   useEffect(() => {
-    const checkAdmin = async () => {
+    const checkAdminAndProfile = async () => {
       if (user) {
-        const { data } = await supabase
+        // Check admin role
+        const { data: roleData } = await supabase
           .from("user_roles")
           .select("role")
           .eq("user_id", user.id)
           .eq("role", "admin")
           .single();
 
-        setIsAdmin(!!data);
+        setIsAdmin(!!roleData);
+
+        // Fetch user profile
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", user.id)
+          .single();
+
+        if (profileData) {
+          setUserProfile(profileData);
+        }
       } else {
         setIsAdmin(false);
+        setUserProfile({ full_name: null, avatar_url: null });
       }
     };
 
-    checkAdmin();
+    checkAdminAndProfile();
   }, [user]);
 
   const handleProtectedNavigation = (path: string) => {
@@ -144,11 +158,12 @@ const Navigation = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="hidden md:flex gap-1.5 text-xs h-8 px-2">
                       <Avatar className="h-5 w-5">
+                        <AvatarImage src={userProfile.avatar_url || undefined} alt="Profile" />
                         <AvatarFallback className="text-[10px]">
-                          {user.email?.charAt(0).toUpperCase()}
+                          {userProfile.full_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="max-w-[120px] truncate">{user.email}</span>
+                      <span className="max-w-[120px] truncate">{userProfile.full_name || user.email}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 bg-background z-50">
@@ -280,12 +295,13 @@ const Navigation = () => {
                         <div className="p-3 bg-muted/30 rounded-lg">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10">
+                              <AvatarImage src={userProfile.avatar_url || undefined} alt="Profile" />
                               <AvatarFallback className="text-sm bg-primary text-primary-foreground">
-                                {user.email?.charAt(0).toUpperCase()}
+                                {userProfile.full_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">{user.email}</p>
+                              <p className="text-sm font-medium truncate">{userProfile.full_name || user.email}</p>
                               <p className="text-xs text-muted-foreground">Logged in</p>
                             </div>
                           </div>
