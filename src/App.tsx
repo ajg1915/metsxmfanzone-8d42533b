@@ -83,6 +83,7 @@ import BackgroundManagement from "./pages/admin/BackgroundManagement";
 import ActivityDashboard from "./pages/admin/ActivityDashboard";
 import WriterApplications from "./pages/admin/WriterApplications";
 import RealtimeAnalytics from "./pages/admin/RealtimeAnalytics";
+import StreamHealthDashboard from "./pages/admin/StreamHealthDashboard";
 import WriterRegister from "./pages/WriterRegister";
 import CreateAccount from "./pages/help/CreateAccount";
 import NavigatePlatform from "./pages/help/NavigatePlatform";
@@ -212,6 +213,7 @@ const App = () => {
             <Route path="activity" element={<ActivityDashboard />} />
             <Route path="writer-applications" element={<WriterApplications />} />
             <Route path="realtime-analytics" element={<RealtimeAnalytics />} />
+            <Route path="stream-health" element={<StreamHealthDashboard />} />
           </Route>
           {/* Writer Portal Routes */}
           <Route path="/writer" element={<WriterDashboard />} />

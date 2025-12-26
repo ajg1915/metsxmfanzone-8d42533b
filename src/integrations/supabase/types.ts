@@ -981,6 +981,88 @@ export type Database = {
         }
         Relationships: []
       }
+      stream_alerts: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          message: string
+          stream_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          message: string
+          stream_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          message?: string
+          stream_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_alerts_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "live_streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stream_health_reports: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          issue_type: string
+          resolved: boolean | null
+          resolved_at: string | null
+          session_id: string | null
+          severity: string
+          stream_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          issue_type: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          session_id?: string | null
+          severity?: string
+          stream_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          issue_type?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          session_id?: string | null
+          severity?: string
+          stream_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_health_reports_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "live_streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stream_views: {
         Row: {
           id: string
