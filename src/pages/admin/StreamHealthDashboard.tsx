@@ -279,16 +279,23 @@ export default function StreamHealthDashboard() {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-green-500" />
-            Automatic Detection Active
+            Automatic Detection & Alerts Active
           </CardTitle>
           <CardDescription className="text-xs">
-            Stream issues are automatically detected and reported. Alerts are sent to viewers when multiple issues are detected.
+            The system automatically detects stream issues, selects the affected stream, generates an appropriate alert message, and sends it to viewers instantly.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-muted-foreground">Monitoring all active streams</span>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-muted-foreground">Monitoring all active streams</span>
+            </div>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>• High severity issues trigger immediate alerts</p>
+              <p>• Multiple reports of the same issue auto-send alerts</p>
+              <p>• Alerts auto-deactivate when stream stabilizes</p>
+            </div>
           </div>
         </CardContent>
       </Card>

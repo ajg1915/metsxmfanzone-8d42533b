@@ -42,8 +42,7 @@ serve(async (req) => {
 
     console.log('Health report created:', report.id);
 
-    // Check if we need to create or update an alert
-    // Count recent similar issues (last 5 minutes)
+    // Auto-send alert based on severity and issue frequency
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     const { count } = await supabase
       .from('stream_health_reports')
@@ -52,11 +51,13 @@ serve(async (req) => {
       .eq('issue_type', issue_type)
       .gte('created_at', fiveMinutesAgo);
 
-    console.log(`Similar issues in last 5 minutes: ${count}`);
+    console.log(`Similar issues in last 5 minutes: ${count}, Severity: ${severity}`);
 
-    // If 3+ similar reports, create an alert for viewers
-    if (count && count >= 3) {
-      // Check if there's already an active alert for this stream
+    // Auto-send alert: immediately for high severity, or 2+ reports for medium/low
+    const shouldSendAlert = severity === 'high' || (count && count >= 2);
+
+    if (shouldSendAlert) {
+      // Check if there's already an active alert for this stream and issue type
       const { data: existingAlert } = await supabase
         .from('stream_alerts')
         .select('*')
@@ -65,8 +66,10 @@ serve(async (req) => {
         .single();
 
       if (!existingAlert) {
-        const alertMessage = getAlertMessage(issue_type);
+        const alertMessage = getAlertMessage(issue_type, severity);
         
+        console.log(`Auto-sending alert for stream ${stream_id}: ${alertMessage}`);
+
         const { error: alertError } = await supabase
           .from('stream_alerts')
           .insert({
@@ -76,15 +79,36 @@ serve(async (req) => {
           });
 
         if (alertError) {
-          console.error('Error creating alert:', alertError);
+          console.error('Error creating auto-alert:', alertError);
         } else {
-          console.log('Created viewer alert for stream:', stream_id);
+          console.log('Auto-alert sent to viewers for stream:', stream_id);
         }
+      } else {
+        console.log('Active alert already exists for stream:', stream_id);
       }
     }
 
+    // Auto-resolve alert when stream stabilizes (no issues for 3 minutes)
+    const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000).toISOString();
+    const { count: recentIssueCount } = await supabase
+      .from('stream_health_reports')
+      .select('*', { count: 'exact', head: true })
+      .eq('stream_id', stream_id)
+      .gte('created_at', threeMinutesAgo);
+
+    if (recentIssueCount === 0) {
+      // Deactivate any active alerts for this stream
+      await supabase
+        .from('stream_alerts')
+        .update({ is_active: false, updated_at: new Date().toISOString() })
+        .eq('stream_id', stream_id)
+        .eq('is_active', true);
+      
+      console.log('Stream stabilized, auto-deactivated alerts for:', stream_id);
+    }
+
     return new Response(
-      JSON.stringify({ success: true, report_id: report.id }),
+      JSON.stringify({ success: true, report_id: report.id, alert_sent: shouldSendAlert }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
@@ -97,19 +121,21 @@ serve(async (req) => {
   }
 });
 
-function getAlertMessage(issueType: string): string {
+function getAlertMessage(issueType: string, severity: string): string {
+  const severityPrefix = severity === 'high' ? '⚠️ ' : '';
+  
   switch (issueType) {
     case 'buffering':
-      return "We're aware of buffering issues and are working to resolve them. Thank you for your patience.";
+      return `${severityPrefix}We're aware of buffering issues and are actively working to resolve them. Thank you for your patience.`;
     case 'audio':
-      return "We're experiencing audio issues and our team is working on a fix. We apologize for the inconvenience.";
+      return `${severityPrefix}We're experiencing audio issues and our team is working on a fix. We apologize for the inconvenience.`;
     case 'video':
-      return "We're aware of video quality issues and are actively working to restore normal service.";
+      return `${severityPrefix}We're aware of video quality issues and are actively working to restore normal service.`;
     case 'connection':
-      return "Some viewers are experiencing connection issues. Our team is investigating.";
+      return `${severityPrefix}Some viewers are experiencing connection issues. Our team is investigating and working on a fix.`;
     case 'lag':
-      return "We're aware of lag issues affecting the stream. We're working to improve performance.";
+      return `${severityPrefix}We're aware of lag issues affecting the stream. We're working to improve performance.`;
     default:
-      return "We're experiencing technical difficulties. Our team is aware and working on a fix. We apologize for any inconvenience.";
+      return `${severityPrefix}We're experiencing technical difficulties. Our team is aware and working on a fix. We apologize for any inconvenience.`;
   }
 }
