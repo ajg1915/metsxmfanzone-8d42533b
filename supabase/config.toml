@@ -56,3 +56,9 @@ verify_jwt = false
 
 [functions.secure-data-vault]
 verify_jwt = true
+
+[functions.check-ai-content]
+verify_jwt = true
+
+[functions.send-writer-revoked-email]
+verify_jwt = true
