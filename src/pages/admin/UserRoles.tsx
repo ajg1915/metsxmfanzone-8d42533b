@@ -13,10 +13,10 @@ interface UserRole {
   user_id: string;
   role: string;
   created_at: string;
-  profile?: {
+  profiles: {
     full_name: string | null;
     email: string | null;
-  };
+  } | null;
 }
 
 export default function UserRoles() {
@@ -31,41 +31,22 @@ export default function UserRoles() {
   }, []);
 
   const fetchUserRoles = async () => {
-    // First fetch all user roles
-    const { data: rolesData, error: rolesError } = await supabase
+    const { data, error } = await supabase
       .from("user_roles")
-      .select("*")
+      .select(`
+        *,
+        profiles (
+          full_name,
+          email
+        )
+      `)
       .order("created_at", { ascending: false });
 
-    if (rolesError) {
-      console.error("Error fetching user roles:", rolesError);
-      return;
+    if (error) {
+      console.error("Error fetching user roles:", error);
+    } else {
+      setUserRoles(data as any || []);
     }
-
-    if (!rolesData || rolesData.length === 0) {
-      setUserRoles([]);
-      return;
-    }
-
-    // Then fetch profiles for these users
-    const userIds = rolesData.map(r => r.user_id);
-    const { data: profilesData, error: profilesError } = await supabase
-      .from("profiles")
-      .select("id, full_name, email")
-      .in("id", userIds);
-
-    if (profilesError) {
-      console.error("Error fetching profiles:", profilesError);
-    }
-
-    // Map profiles to roles
-    const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
-    const rolesWithProfiles = rolesData.map(role => ({
-      ...role,
-      profile: profilesMap.get(role.user_id) || undefined,
-    }));
-
-    setUserRoles(rolesWithProfiles);
   };
 
   const handleAddRole = async () => {
@@ -213,7 +194,7 @@ export default function UserRoles() {
                   >
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold truncate">
-                        {userRole.profile?.full_name || userRole.profile?.email || "Unknown User"}
+                        {userRole.profiles?.full_name || userRole.profiles?.email || "Unknown User"}
                       </p>
                       <p className="text-sm text-muted-foreground capitalize">
                         {userRole.role}
