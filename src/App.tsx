@@ -8,6 +8,7 @@ import { PullToRefresh } from "@/components/PullToRefresh";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { useSessionExpiryWarning } from "@/hooks/useSessionExpiryWarning";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
+import { usePresenceTracking } from "@/hooks/usePresenceTracking";
 import Index from "./pages/Index";
 import Live from "./pages/Live";
 import Community from "./pages/Community";
@@ -81,6 +82,7 @@ import UserManagement from "./pages/admin/UserManagement";
 import BackgroundManagement from "./pages/admin/BackgroundManagement";
 import ActivityDashboard from "./pages/admin/ActivityDashboard";
 import WriterApplications from "./pages/admin/WriterApplications";
+import RealtimeAnalytics from "./pages/admin/RealtimeAnalytics";
 import WriterRegister from "./pages/WriterRegister";
 import CreateAccount from "./pages/help/CreateAccount";
 import NavigatePlatform from "./pages/help/NavigatePlatform";
@@ -109,6 +111,7 @@ const queryClient = new QueryClient();
 const App = () => {
   useAutoRefresh();
   useSessionExpiryWarning();
+  usePresenceTracking();
   
   // Set up notification listeners for real-time alerts
   useEffect(() => {
@@ -208,6 +211,7 @@ const App = () => {
             <Route path="backgrounds" element={<BackgroundManagement />} />
             <Route path="activity" element={<ActivityDashboard />} />
             <Route path="writer-applications" element={<WriterApplications />} />
+            <Route path="realtime-analytics" element={<RealtimeAnalytics />} />
           </Route>
           {/* Writer Portal Routes */}
           <Route path="/writer" element={<WriterDashboard />} />
