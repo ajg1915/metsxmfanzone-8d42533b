@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit, Trash2, FileText, Sparkles, Upload, Music, Copy } from "lucide-react";
+import { Plus, Edit, Trash2, FileText, Sparkles, Upload, Music, Copy, CheckCircle, XCircle, Clock } from "lucide-react";
 import { z } from "zod";
 import { validateFile, generateSafeFilename } from "@/utils/fileValidation";
 
@@ -37,6 +37,12 @@ interface BlogPost {
   published: boolean;
   published_at?: string;
   created_at: string;
+  approval_status?: string;
+  user_id?: string;
+  profiles?: {
+    full_name: string | null;
+    email: string | null;
+  };
 }
 
 export default function BlogManagement() {
@@ -69,7 +75,13 @@ export default function BlogManagement() {
     try {
       const { data, error } = await supabase
         .from("blog_posts")
-        .select("*")
+        .select(`
+          *,
+          profiles (
+            full_name,
+            email
+          )
+        `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -83,6 +95,54 @@ export default function BlogManagement() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApprove = async (post: BlogPost) => {
+    try {
+      const { error } = await supabase
+        .from("blog_posts")
+        .update({ approval_status: "approved" })
+        .eq("id", post.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Approved",
+        description: "Article has been approved.",
+      });
+      fetchPosts();
+    } catch (error) {
+      console.error("Error approving:", error);
+      toast({
+        title: "Error",
+        description: "Failed to approve article",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReject = async (post: BlogPost) => {
+    try {
+      const { error } = await supabase
+        .from("blog_posts")
+        .update({ approval_status: "rejected", published: false })
+        .eq("id", post.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Rejected",
+        description: "Article has been rejected.",
+      });
+      fetchPosts();
+    } catch (error) {
+      console.error("Error rejecting:", error);
+      toast({
+        title: "Error",
+        description: "Failed to reject article",
+        variant: "destructive",
+      });
     }
   };
 
@@ -593,21 +653,39 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
           </Card>
         ) : (
           posts.map((post) => (
-            <Card key={post.id}>
+            <Card key={post.id} className={post.approval_status === "pending" ? "border-yellow-500/50" : ""}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 flex-wrap">
                       <FileText className="w-5 h-5" />
                       {post.title}
-                      {post.published && (
+                      {post.approval_status === "pending" && (
+                        <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> Pending
+                        </span>
+                      )}
+                      {post.approval_status === "approved" && post.published && (
                         <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">
                           Published
+                        </span>
+                      )}
+                      {post.approval_status === "approved" && !post.published && (
+                        <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
+                          Approved
+                        </span>
+                      )}
+                      {post.approval_status === "rejected" && (
+                        <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">
+                          Rejected
                         </span>
                       )}
                     </CardTitle>
                     <CardDescription>
                       {post.category} • {new Date(post.created_at).toLocaleDateString()}
+                      {post.profiles && (
+                        <span className="ml-2">• By: {post.profiles.full_name || post.profiles.email}</span>
+                      )}
                     </CardDescription>
                     {post.tags.length > 0 && (
                       <div className="flex gap-1 mt-2">
@@ -619,7 +697,17 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
                       </div>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
+                    {post.approval_status === "pending" && (
+                      <>
+                        <Button variant="outline" size="sm" className="text-green-500 border-green-500/50" onClick={() => handleApprove(post)}>
+                          <CheckCircle className="w-4 h-4 mr-1" /> Approve
+                        </Button>
+                        <Button variant="outline" size="sm" className="text-red-500 border-red-500/50" onClick={() => handleReject(post)}>
+                          <XCircle className="w-4 h-4 mr-1" /> Reject
+                        </Button>
+                      </>
+                    )}
                     <Button variant="outline" size="sm" onClick={() => handleCopyForSharing(post)} title="Copy for sharing">
                       <Copy className="w-4 h-4" />
                     </Button>

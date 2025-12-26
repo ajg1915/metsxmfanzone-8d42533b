@@ -655,6 +655,26 @@ const Auth = () => {
         description: "You've successfully logged in.",
       });
       
+      // Check user roles first for role-based redirect
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
+      
+      // Check if user is admin
+      const isAdmin = roles?.some(r => r.role === "admin");
+      if (isAdmin) {
+        navigate("/admin");
+        return;
+      }
+      
+      // Check if user is writer
+      const isWriter = roles?.some(r => r.role === "writer");
+      if (isWriter) {
+        navigate("/writer");
+        return;
+      }
+      
       // Check subscription plan to determine redirect using safe function
       const { data: subscriptions } = await supabase
         .rpc("get_user_subscription_safe", { p_user_id: userId });

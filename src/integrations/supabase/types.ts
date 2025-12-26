@@ -147,6 +147,7 @@ export type Database = {
       }
       blog_posts: {
         Row: {
+          approval_status: string | null
           audio_url: string | null
           category: string
           content: string
@@ -163,6 +164,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          approval_status?: string | null
           audio_url?: string | null
           category?: string
           content: string
@@ -179,6 +181,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          approval_status?: string | null
           audio_url?: string | null
           category?: string
           content?: string
@@ -1221,9 +1224,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_writer: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "writer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1351,7 +1355,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "writer"],
     },
   },
 } as const
