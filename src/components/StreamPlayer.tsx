@@ -31,12 +31,13 @@ export function StreamPlayer({
   const [loading, setLoading] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [showUnmuteBanner, setShowUnmuteBanner] = useState(true);
+  const [playerReady, setPlayerReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
 
-  // Initialize health monitoring
+  // Initialize health monitoring - only when player is ready
   useStreamHealthMonitor({
-    player: playerRef.current,
+    player: playerReady ? playerRef.current : null,
     streamId: stream?.id || ''
   });
 
@@ -104,6 +105,7 @@ export function StreamPlayer({
 
       playerRef.current.ready(() => {
         console.log('Video.js player is ready');
+        setPlayerReady(true);
       });
 
       playerRef.current.on('error', (e: any) => {
@@ -119,6 +121,7 @@ export function StreamPlayer({
       if (playerRef.current) {
         playerRef.current.dispose();
         playerRef.current = null;
+        setPlayerReady(false);
       }
     };
   }, [stream]);
