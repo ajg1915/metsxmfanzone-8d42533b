@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.79.0";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import DOMPurify from "https://esm.sh/isomorphic-dompurify@2.16.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,6 +9,14 @@ const corsHeaders = {
   "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
+};
+
+// Sanitize HTML to prevent XSS in emails
+const sanitizeHtml = (html: string): string => {
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'img', 'div', 'span', 'table', 'tr', 'td', 'th', 'tbody', 'thead'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'class', 'width', 'height'],
+  });
 };
 
 serve(async (req) => {
@@ -49,6 +58,9 @@ serve(async (req) => {
       throw new Error("Subject and content are required");
     }
 
+    // Sanitize HTML content server-side
+    const sanitizedContent = sanitizeHtml(content);
+
     const { data: subscribers, error: subscribersError } = await supabase
       .from("newsletter_subscribers")
       .select("email, full_name")
@@ -80,11 +92,11 @@ serve(async (req) => {
           from: "MetsXMFanZone <onboarding@resend.dev>",
           to: [subscriber.email],
           subject: subject,
-          html: content,
+          html: sanitizedContent,
         });
         successCount++;
       } catch (error) {
-        console.error(`Failed to send to ${subscriber.email}:`, error);
+        console.error(`Failed to send to [REDACTED]:`, error);
         failureCount++;
       }
     }

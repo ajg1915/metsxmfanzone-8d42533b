@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.79.0";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import DOMPurify from "https://esm.sh/isomorphic-dompurify@2.16.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,6 +9,25 @@ const corsHeaders = {
   "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
+};
+
+// HTML escape utility for dynamic values
+const escapeHtml = (str: string): string => {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
+// Sanitize HTML to prevent XSS in emails
+const sanitizeHtml = (html: string): string => {
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'img', 'div', 'span', 'table', 'tr', 'td', 'th', 'tbody', 'thead'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'class', 'width', 'height'],
+  });
 };
 
 interface EmailRequest {
@@ -56,6 +76,9 @@ serve(async (req) => {
     if (!subject || !content) {
       throw new Error("Subject and content are required");
     }
+
+    // Sanitize HTML content server-side
+    const sanitizedContent = sanitizeHtml(content);
 
     let recipients: { email: string; name?: string }[] = [];
 
@@ -110,9 +133,10 @@ serve(async (req) => {
 
     for (const recipient of recipients) {
       try {
-        const personalizedContent = content
-          .replace(/\{\{name\}\}/g, recipient.name || "Fan")
-          .replace(/\{\{email\}\}/g, recipient.email);
+        // Escape dynamic values before inserting into sanitized template
+        const personalizedContent = sanitizedContent
+          .replace(/\{\{name\}\}/g, escapeHtml(recipient.name || "Fan"))
+          .replace(/\{\{email\}\}/g, escapeHtml(recipient.email));
 
         await resend.emails.send({
           from: "MetsXMFanZone <onboarding@resend.dev>",
@@ -122,7 +146,7 @@ serve(async (req) => {
         });
         successCount++;
       } catch (error) {
-        console.error(`Failed to send to ${recipient.email}:`, error);
+        console.error(`Failed to send to [REDACTED]:`, error);
         failureCount++;
       }
     }
