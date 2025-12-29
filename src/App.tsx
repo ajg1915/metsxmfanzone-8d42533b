@@ -75,7 +75,6 @@ import SocialMediaHub from "./pages/SocialMediaHub";
 import NLScores from "./pages/NLScores";
 import Events from "./pages/Events";
 import MetsRoster from "./pages/MetsRoster";
-import LineupCardManagement from "./pages/admin/LineupCardManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
 import SpringTrainingManagement from "./pages/admin/SpringTrainingManagement";
 import UserManagement from "./pages/admin/UserManagement";
@@ -210,7 +209,7 @@ const App = () => {
             <Route path="subscriptions" element={<SubscriptionManagement />} />
             <Route path="events" element={<EventsManagement />} />
             <Route path="spring-training" element={<SpringTrainingManagement />} />
-            <Route path="lineup-card-management" element={<LineupCardManagement />} />
+            <Route path="backgrounds" element={<BackgroundManagement />} />
             <Route path="backgrounds" element={<BackgroundManagement />} />
             <Route path="activity" element={<ActivityDashboard />} />
             <Route path="writer-applications" element={<WriterApplications />} />

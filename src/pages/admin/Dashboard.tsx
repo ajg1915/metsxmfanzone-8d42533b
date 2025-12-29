@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Upload, Activity, Radio, ClipboardList, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Megaphone } from "lucide-react";
+import { Users, FileText, Upload, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Megaphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,7 +24,6 @@ export default function AdminDashboard() {
     activeStreams: 0,
     totalStreams: 0,
     totalBlogs: 0,
-    totalLineupCards: 0,
   });
 
   useEffect(() => {
@@ -32,12 +31,11 @@ export default function AdminDashboard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) setAdminUserId(user.id);
 
-      const [postsResult, usersResult, streamsResult, blogsResult, lineupCardsResult] = await Promise.all([
+      const [postsResult, usersResult, streamsResult, blogsResult] = await Promise.all([
         supabase.from("posts").select("*", { count: "exact", head: true }),
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("live_streams").select("status"),
         supabase.from("blog_posts").select("*", { count: "exact", head: true }),
-        supabase.from("lineup_cards").select("*", { count: "exact", head: true }),
       ]);
 
       const activeStreams = streamsResult.data?.filter(s => s.status === "live").length || 0;
@@ -49,7 +47,6 @@ export default function AdminDashboard() {
         activeStreams,
         totalStreams,
         totalBlogs: blogsResult.count || 0,
-        totalLineupCards: lineupCardsResult.count || 0,
       });
     };
 
@@ -84,13 +81,6 @@ export default function AdminDashboard() {
       icon: Radio,
       url: "/admin/live-streams",
       stat: `${stats.activeStreams} Live`,
-    },
-    {
-      title: "Lineup Cards",
-      description: "Manage daily lineup cards",
-      icon: ClipboardList,
-      url: "/admin/lineup-card-management",
-      stat: `${stats.totalLineupCards} Cards`,
     },
     {
       title: "User Management",
@@ -153,10 +143,6 @@ export default function AdminDashboard() {
                   <div className="border-l-2 border-primary pl-3">
                     <p className="font-medium text-sm">Managing Users</p>
                     <p className="text-xs text-muted-foreground">Access User → User Management to view all users, change subscription plans, and manage accounts.</p>
-                  </div>
-                  <div className="border-l-2 border-primary pl-3">
-                    <p className="font-medium text-sm">Setting Up Lineup Cards</p>
-                    <p className="text-xs text-muted-foreground">Visit Live Management → Lineup Cards to create daily lineup cards with game details and player information.</p>
                   </div>
                 </div>
               </div>
