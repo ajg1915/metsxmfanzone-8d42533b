@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Building2, Megaphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import ScrollReveal from "@/components/ScrollReveal";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface BusinessAd {
   id: string;
@@ -47,89 +55,109 @@ const BusinessAdsSection = () => {
 
   if (loading) {
     return (
-      <section className="py-8">
-        <div className="flex items-center gap-3 mb-6">
-          <Megaphone className="h-6 w-6 text-primary" />
-          <h2 className="text-2xl font-bold text-foreground">Featured Business Partners</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="bg-card/50 border-border/50">
-              <Skeleton className="h-48 w-full rounded-t-lg" />
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-16 w-full" />
-              </CardContent>
-            </Card>
-          ))}
+      <section className="py-4 sm:py-6 md:py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-3 mb-3 sm:mb-4 md:mb-6">
+            <Megaphone className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold gradient-text">Featured Business Partners</h2>
+            <Badge variant="secondary" className="ml-2 text-[10px] sm:text-xs">Sponsored</Badge>
+          </div>
+          <div className="flex gap-3 md:gap-6">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="flex-1 min-w-0 h-56 sm:h-72 md:h-80 lg:h-96">
+                <Skeleton className="h-full w-full rounded-lg" />
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
     );
   }
 
   if (ads.length === 0) {
-    return null; // Don't show section if no approved ads
+    return null;
   }
 
   return (
-    <section className="py-8">
-      <div className="flex items-center gap-3 mb-6">
-        <Megaphone className="h-6 w-6 text-primary" />
-        <h2 className="text-2xl font-bold text-foreground">Featured Business Partners</h2>
-        <Badge variant="secondary" className="ml-2">Sponsored</Badge>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {ads.map((ad) => (
-          <Card 
-            key={ad.id} 
-            className="bg-card/80 border-border/50 backdrop-blur-sm hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 overflow-hidden group"
+    <ScrollReveal direction="up">
+      <section className="py-4 sm:py-6 md:py-8">
+        <div className="container mx-auto px-4">
+          <ScrollReveal direction="left" delay={100}>
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 md:mb-6">
+              <Megaphone className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold gradient-text">
+                Featured Business Partners
+              </h2>
+              <Badge variant="secondary" className="ml-1 sm:ml-2 text-[10px] sm:text-xs">Sponsored</Badge>
+            </div>
+          </ScrollReveal>
+          
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full max-w-7xl mx-auto"
           >
-            {ad.ad_image_url && (
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={ad.ad_image_url}
-                  alt={ad.ad_title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-              </div>
-            )}
-            
-            <CardHeader className={ad.ad_image_url ? "-mt-8 relative z-10" : ""}>
-              <div className="flex items-center gap-2 mb-2">
-                <Building2 className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{ad.business_name}</span>
-              </div>
-              <CardTitle className="text-lg text-foreground line-clamp-2">
-                {ad.ad_title}
-              </CardTitle>
-            </CardHeader>
-            
-            <CardContent className="space-y-4">
-              <CardDescription className="text-muted-foreground line-clamp-3">
-                {ad.ad_description}
-              </CardDescription>
-              
-              {ad.website_url && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full group/btn hover:bg-primary hover:text-primary-foreground"
-                  onClick={() => window.open(ad.website_url!, "_blank")}
+            <CarouselContent className="-ml-3 md:-ml-6">
+              {ads.map((ad, index) => (
+                <CarouselItem 
+                  key={ad.id} 
+                  className="pl-3 md:pl-6 basis-1/2 sm:basis-1/3 lg:basis-1/3"
                 >
-                  <ExternalLink className="h-4 w-4 mr-2 transition-transform group-hover/btn:translate-x-1" />
-                  Visit Website
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </section>
+                  <ScrollReveal direction="scale" delay={index * 100}>
+                    <Card 
+                      className="h-56 sm:h-72 md:h-80 lg:h-96 cursor-pointer overflow-hidden group border border-border/50 hover:border-primary transition-all duration-300 relative hover-glow"
+                      onClick={() => ad.website_url && window.open(ad.website_url, '_blank', 'noopener,noreferrer')}
+                    >
+                      <div className="relative w-full h-full">
+                        {ad.ad_image_url ? (
+                          <img 
+                            src={ad.ad_image_url} 
+                            alt={ad.ad_title} 
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                            <Building2 className="h-12 w-12 text-primary/50" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+                        
+                        {ad.website_url && (
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="w-10 h-10 rounded-full bg-primary/90 flex items-center justify-center">
+                              <ExternalLink className="w-4 h-4 text-primary-foreground" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <Building2 className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-[9px] sm:text-[10px] text-muted-foreground truncate">
+                              {ad.business_name}
+                            </span>
+                          </div>
+                          <p className="text-foreground text-[10px] sm:text-xs font-semibold line-clamp-2">
+                            {ad.ad_title}
+                          </p>
+                          <p className="text-muted-foreground text-[9px] sm:text-[10px] line-clamp-2 mt-0.5">
+                            {ad.ad_description}
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  </ScrollReveal>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex -left-4 h-8 w-8 border-border/50 bg-background/80 hover:bg-background" />
+            <CarouselNext className="hidden md:flex -right-4 h-8 w-8 border-border/50 bg-background/80 hover:bg-background" />
+          </Carousel>
+        </div>
+      </section>
+    </ScrollReveal>
   );
 };
 
