@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 import NotificationSettings from "@/components/NotificationSettings";
 import PasskeyManager from "@/components/PasskeyManager";
-import CreateBusinessAdForm from "@/components/CreateBusinessAdForm";
 import { Badge } from "@/components/ui/badge";
 import { User, CreditCard, Calendar, ArrowUpCircle, Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -451,8 +450,6 @@ const Dashboard = () => {
             <NotificationSettings />
             
             <PasskeyManager />
-
-            <CreateBusinessAdForm userId={user.id} />
 
             {/* Features Access Card */}
             <Card className="border-2 border-primary">

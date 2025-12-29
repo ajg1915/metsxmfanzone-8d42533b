@@ -1,9 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Upload, Activity, Radio, ClipboardList, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse } from "lucide-react";
+import { Users, FileText, Upload, Activity, Radio, ClipboardList, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Megaphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import CreateBusinessAdForm from "@/components/CreateBusinessAdForm";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +17,7 @@ import {
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [helpOpen, setHelpOpen] = useState(false);
+  const [adminUserId, setAdminUserId] = useState<string | null>(null);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalPosts: 0,
@@ -27,6 +29,9 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchStats = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) setAdminUserId(user.id);
+
       const [postsResult, usersResult, streamsResult, blogsResult, lineupCardsResult] = await Promise.all([
         supabase.from("posts").select("*", { count: "exact", head: true }),
         supabase.from("profiles").select("*", { count: "exact", head: true }),
@@ -239,6 +244,12 @@ export default function AdminDashboard() {
           })}
         </div>
       </div>
+
+      {adminUserId && (
+        <div className="mt-4 sm:mt-6">
+          <CreateBusinessAdForm userId={adminUserId} />
+        </div>
+      )}
     </div>
   );
 }
