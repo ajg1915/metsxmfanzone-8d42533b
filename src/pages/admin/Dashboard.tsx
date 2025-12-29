@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Upload, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Megaphone } from "lucide-react";
+import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Bell, Send, Image, Mail, BookOpen, Wallpaper, TrendingUp, Megaphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -69,6 +69,13 @@ export default function AdminDashboard() {
       stat: "Monitor",
     },
     {
+      title: "Activity Logs",
+      description: "View system activity",
+      icon: Activity,
+      url: "/admin/activity",
+      stat: "Logs",
+    },
+    {
       title: "Blog Management",
       description: "Create and manage blog posts",
       icon: FileText,
@@ -83,11 +90,67 @@ export default function AdminDashboard() {
       stat: `${stats.activeStreams} Live`,
     },
     {
+      title: "Notifications",
+      description: "Manage live notifications",
+      icon: Bell,
+      url: "/admin/live-notifications",
+      stat: "Alerts",
+    },
+    {
+      title: "Email Editor",
+      description: "Create and send emails",
+      icon: Send,
+      url: "/admin/email-editor",
+      stat: "Templates",
+    },
+    {
+      title: "Stories",
+      description: "Manage story content",
+      icon: Image,
+      url: "/admin/stories",
+      stat: "Stories",
+    },
+    {
+      title: "Newsletter",
+      description: "Send newsletters",
+      icon: Mail,
+      url: "/admin/newsletter",
+      stat: "Send",
+    },
+    {
+      title: "News Tracker",
+      description: "Mets news updates",
+      icon: TrendingUp,
+      url: "/admin/mets-news",
+      stat: "News",
+    },
+    {
+      title: "Tutorial",
+      description: "Manage onboarding steps",
+      icon: BookOpen,
+      url: "/admin/tutorial",
+      stat: "Setup",
+    },
+    {
+      title: "Backgrounds",
+      description: "Manage page backgrounds",
+      icon: Wallpaper,
+      url: "/admin/backgrounds",
+      stat: "Themes",
+    },
+    {
       title: "User Management",
       description: "Manage users and subscriptions",
       icon: UserCog,
       url: "/admin/user-management",
       stat: `${stats.totalUsers} Users`,
+    },
+    {
+      title: "Business Ads",
+      description: "Manage business advertisements",
+      icon: Megaphone,
+      url: "/admin/business-ads",
+      stat: "Ads",
     },
   ];
 

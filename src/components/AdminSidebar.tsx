@@ -16,11 +16,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 
 const mainItems = [
   { title: "Home", url: "/admin", icon: Home },
-  { title: "Real-Time", url: "/admin/realtime-analytics", icon: Eye },
-  { title: "Activity", url: "/admin/activity", icon: Activity },
-  { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
-  { title: "Tutorial", url: "/admin/tutorial", icon: BookOpen },
-  { title: "Backgrounds", url: "/admin/backgrounds", icon: Wallpaper },
 ];
 
 const mediaItems = [
@@ -36,9 +31,6 @@ const liveManagementItems = [
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
   { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
   { title: "Replays", url: "/admin/stream-replays", icon: PlaySquare },
-  { title: "Notifications", url: "/admin/live-notifications", icon: Bell },
-  { title: "Stories", url: "/admin/stories", icon: Image },
-  { title: "News Tracker", url: "/admin/mets-news", icon: TrendingUp },
   { title: "TV Schedule", url: "/admin/tv-schedule", icon: Calendar },
   { title: "Events", url: "/admin/events", icon: CalendarDays },
   { title: "Spring Training", url: "/admin/spring-training", icon: Trophy },
