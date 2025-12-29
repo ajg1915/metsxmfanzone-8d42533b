@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, ChevronDown, RefreshCw } from "lucide-react";
+import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, ChevronDown, RefreshCw, User } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +36,17 @@ interface MLBLeader {
 }
 interface HomeLineupCardProps {
   className?: string;
+}
+
+interface UpcomingGame {
+  date: string;
+  opponent: string;
+  isHome: boolean;
+  time: string;
+  probablePitcher?: {
+    name: string;
+    hand: string;
+  };
 }
 export default function HomeLineupCard({
   className
@@ -102,6 +113,57 @@ export default function HomeLineupCard({
       if (error) throw error;
       return data;
     }
+  });
+
+  // Upcoming Mets games with probable pitchers from MLB API
+  const {
+    data: upcomingGames
+  } = useQuery({
+    queryKey: ["mlb-mets-upcoming-games"],
+    queryFn: async (): Promise<UpcomingGame[]> => {
+      const today = new Date();
+      const startDate = today.toISOString().split("T")[0];
+      const endDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+      
+      const response = await fetch(
+        `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=121&startDate=${startDate}&endDate=${endDate}&hydrate=probablePitcher,team`
+      );
+      const data = await response.json();
+      
+      if (!data.dates || data.dates.length === 0) return [];
+      
+      const games: UpcomingGame[] = [];
+      for (const dateEntry of data.dates) {
+        for (const game of dateEntry.games) {
+          const isHome = game.teams.home.team.id === 121;
+          const opponent = isHome ? game.teams.away.team.name : game.teams.home.team.name;
+          const metsPitcher = isHome ? game.teams.home.probablePitcher : game.teams.away.probablePitcher;
+          
+          const gameDateTime = new Date(game.gameDate);
+          const timeStr = gameDateTime.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: "America/New_York"
+          });
+          
+          games.push({
+            date: dateEntry.date,
+            opponent: opponent.replace("New York ", "").replace("Los Angeles ", "").replace("San Francisco ", "").replace("San Diego ", ""),
+            isHome,
+            time: timeStr,
+            probablePitcher: metsPitcher ? {
+              name: metsPitcher.fullName,
+              hand: metsPitcher.pitchHand?.code === "R" ? "RHP" : metsPitcher.pitchHand?.code === "L" ? "LHP" : ""
+            } : undefined
+          });
+        }
+      }
+      
+      return games.slice(0, 5); // Get next 5 games
+    },
+    staleTime: 10 * 60 * 1000,
+    refetchInterval: 10 * 60 * 1000
   });
 
   // Real-time NL East Standings from MLB API
@@ -370,6 +432,55 @@ export default function HomeLineupCard({
 
         {/* Right Column - Spring Training & Standings */}
         <div className="space-y-4">
+          {/* Upcoming Games with Probable Pitchers */}
+          <Card className="border-primary/20">
+            <div className="bg-gradient-to-r from-green-600 to-green-500 p-2.5 text-white">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                <span className="font-bold text-sm">Probable Pitchers</span>
+              </div>
+            </div>
+            <CardContent className="p-2.5">
+              {upcomingGames && upcomingGames.length > 0 ? (
+                <div className="space-y-2">
+                  {upcomingGames.map((game, idx) => (
+                    <div key={idx} className="flex items-center gap-2 p-2 rounded bg-muted/30">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-xs truncate">
+                          {game.isHome ? "vs" : "@"} {game.opponent}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {format(new Date(game.date), "EEE, MMM d")} • {game.time}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        {game.probablePitcher ? (
+                          <>
+                            <p className="text-xs font-medium text-primary truncate max-w-[80px]">
+                              {game.probablePitcher.name.split(" ").pop()}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {game.probablePitcher.hand}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-xs text-muted-foreground italic">TBA</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <Link to="/mets-scores" className="block text-center text-xs text-primary hover:underline pt-1">
+                    View All Games →
+                  </Link>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground text-center py-2">
+                  No upcoming games
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Spring Training Preview */}
           <Card className="border-orange-500/20">
             <div className="bg-gradient-to-r from-primary/80 to-primary p-2.5 text-primary-foreground">
