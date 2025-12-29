@@ -159,6 +159,7 @@ export default function HomeLineupCard({
     refetchInterval: 5 * 60 * 1000
   });
   const lineup = lineupCard?.lineup_data as unknown as LineupPlayer[] | undefined;
+  const hasLineup = lineup && Array.isArray(lineup) && lineup.length > 0;
   const pitcher = lineupCard?.starting_pitcher as unknown as StartingPitcher | null;
   const metsStanding = standings?.find((s: any) => s.team_name === "Mets");
   const ScrollIndicator = () => <div className="flex justify-center py-2">
@@ -221,7 +222,7 @@ export default function HomeLineupCard({
           </div>
 
           <CardContent className="p-3 lg:p-5">
-            {lineupCard && lineup ? <div className="grid grid-cols-2 gap-3 lg:gap-5">
+            {hasLineup ? <div className="grid grid-cols-2 gap-3 lg:gap-5">
                 {/* Batting Order - Compact Grid */}
                 <div>
                   <p className="text-xs lg:text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2 lg:mb-3">
