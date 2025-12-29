@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Bell, Send, Image, Mail, BookOpen, Wallpaper, TrendingUp, Megaphone } from "lucide-react";
+import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Bell, Send, Image, Mail, BookOpen, Wallpaper, TrendingUp, Megaphone, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +18,7 @@ import {
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [helpOpen, setHelpOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [adminUserId, setAdminUserId] = useState<string | null>(null);
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -154,6 +156,11 @@ export default function AdminDashboard() {
     },
   ];
 
+  const filteredItems = quickAccessItems.filter(item => 
+    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="w-full max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
@@ -265,9 +272,20 @@ export default function AdminDashboard() {
       </div>
 
       <div className="mt-4 sm:mt-6">
-        <h3 className="text-sm sm:text-base font-semibold mb-2 sm:mb-3">Quick Access</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 sm:mb-3">
+          <h3 className="text-sm sm:text-base font-semibold">Quick Access</h3>
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search management areas..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8 h-8 text-xs"
+            />
+          </div>
+        </div>
         <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
-          {quickAccessItems.map((item) => {
+          {filteredItems.length > 0 ? filteredItems.map((item) => {
             const Icon = item.icon;
             return (
               <Card 
@@ -290,7 +308,11 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             );
-          })}
+          }) : (
+            <div className="col-span-full text-center py-8 text-muted-foreground text-sm">
+              No management areas found for "{searchQuery}"
+            </div>
+          )}
         </div>
       </div>
 
