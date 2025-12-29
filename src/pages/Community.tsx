@@ -14,6 +14,7 @@ import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone } from "lucide
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import StoriesSection from "@/components/StoriesSection";
+import BusinessAdsSection from "@/components/BusinessAdsSection";
 import Events from "./Events";
 import { CommunityAIChat } from "@/components/CommunityAIChat";
 import { z } from "zod";
@@ -345,6 +346,9 @@ const Community = () => {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Featured Business Ads Section */}
+          <BusinessAdsSection />
 
           {user && (
             <Card className="mb-6">
