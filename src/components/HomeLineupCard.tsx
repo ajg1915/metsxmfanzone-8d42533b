@@ -252,9 +252,71 @@ export default function HomeLineupCard({
                       {lineupCard.notes}
                     </p>}
                 </div>
-              </div> : <div className="text-center py-6 text-muted-foreground">
-                <p className="text-sm">No lineup available for today</p>
-                <p className="text-xs mt-1">Check back before game time</p>
+              </div> : <div className="grid grid-cols-2 gap-3 lg:gap-5">
+                {/* Lineup TBA */}
+                <div>
+                  <p className="text-xs lg:text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2 lg:mb-3">
+                    Batting Order
+                  </p>
+                  <div className="grid grid-cols-1 gap-1 lg:gap-2">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(pos => (
+                      <div key={pos} className="flex items-center gap-2 lg:gap-3 py-1 lg:py-2.5 px-2 lg:px-4 rounded bg-muted/30">
+                        <span className="text-xs lg:text-base font-bold text-primary w-4 lg:w-6">
+                          {pos}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-xs lg:text-base text-muted-foreground italic">TBA</p>
+                        </div>
+                        <span className="text-[10px] lg:text-sm text-muted-foreground font-mono">
+                          --
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right Column - TBA State */}
+                <div className="space-y-3 lg:space-y-4">
+                  <div>
+                    <p className="text-xs lg:text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2 lg:mb-3">
+                      Starting Pitcher
+                    </p>
+                    <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-3 lg:p-4 border border-primary/20">
+                      <p className="font-bold text-sm lg:text-lg text-muted-foreground italic">TBA</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Lineup typically released 1-2 hours before game time
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Quick Stats - Still show live stats */}
+                  <div>
+                    <p className="text-xs lg:text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2 lg:mb-3">
+                      2025 Season Stats
+                    </p>
+                    <div className="grid grid-cols-3 gap-2 lg:gap-3">
+                      <div className="bg-muted/50 rounded p-2 lg:p-3 text-center">
+                        <p className="text-lg lg:text-2xl font-bold text-primary">
+                          {metsStanding?.wins || "-"}
+                        </p>
+                        <p className="text-[10px] lg:text-xs text-muted-foreground">Wins</p>
+                      </div>
+                      <div className="bg-muted/50 rounded p-2 lg:p-3 text-center">
+                        <p className="text-lg lg:text-2xl font-bold text-primary">
+                          {metsStanding?.losses || "-"}
+                        </p>
+                        <p className="text-[10px] lg:text-xs text-muted-foreground">Losses</p>
+                      </div>
+                      <div className="bg-muted/50 rounded p-2 lg:p-3 text-center">
+                        <p className="text-lg lg:text-2xl font-bold text-primary">
+                          {metsStanding?.position || "-"}
+                          {metsStanding?.position === 1 ? "st" : metsStanding?.position === 2 ? "nd" : metsStanding?.position === 3 ? "rd" : "th"}
+                        </p>
+                        <p className="text-[10px] lg:text-xs text-muted-foreground">NL East</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>}
           </CardContent>
         </Card>

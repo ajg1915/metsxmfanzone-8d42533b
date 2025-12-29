@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.webauthn-login-verify]
 verify_jwt = false
+
+[functions.fetch-mets-lineup]
+verify_jwt = false
