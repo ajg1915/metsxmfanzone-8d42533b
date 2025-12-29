@@ -1,9 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, ChevronDown } from "lucide-react";
+import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, ChevronDown, RefreshCw } from "lucide-react";
 import { format } from "date-fns";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 interface LineupPlayer {
   position: number;
   name: string;
@@ -37,6 +40,37 @@ interface HomeLineupCardProps {
 export default function HomeLineupCard({
   className
 }: HomeLineupCardProps) {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const handleRefreshLineup = async () => {
+    setIsRefreshing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("fetch-mets-lineup");
+      
+      if (error) throw error;
+      
+      // Invalidate the lineup query to refetch from database
+      await queryClient.invalidateQueries({ queryKey: ["today-lineup-card"] });
+      
+      toast({
+        title: "Lineup Updated",
+        description: data.playersInLineup > 0 
+          ? `Found ${data.playersInLineup} players in lineup` 
+          : data.message || "No lineup available yet",
+      });
+    } catch (err) {
+      console.error("Error refreshing lineup:", err);
+      toast({
+        title: "Refresh Failed",
+        description: "Could not fetch lineup data. Try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
   const {
     data: lineupCard
   } = useQuery({
@@ -143,10 +177,22 @@ export default function HomeLineupCard({
         <h2 className="text-xl font-bold text-foreground">
           Mets Game Center
         </h2>
-        <Link to="/video-gallery" className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-sm font-medium">
-          <Video className="w-4 h-4" />
-          <span className="hidden sm:inline">Video Gallery</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRefreshLineup}
+            disabled={isRefreshing}
+            className="text-primary hover:text-primary/80 hover:bg-primary/10"
+          >
+            <RefreshCw className={`w-4 h-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh</span>
+          </Button>
+          <Link to="/video-gallery" className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-sm font-medium">
+            <Video className="w-4 h-4" />
+            <span className="hidden sm:inline">Video Gallery</span>
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
