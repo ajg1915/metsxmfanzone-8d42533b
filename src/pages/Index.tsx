@@ -21,7 +21,12 @@ import NotificationPrompt from "@/components/NotificationPrompt";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useEffect } from "react";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
+import { useAutoLineupFetch } from "@/hooks/useAutoLineupFetch";
+
 const Index = () => {
+  // Auto-fetch Mets lineup on game days (every 30 minutes)
+  useAutoLineupFetch();
+  
   useEffect(() => {
     const cleanup = setupNotificationListeners();
     return cleanup;
