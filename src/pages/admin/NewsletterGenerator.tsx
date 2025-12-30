@@ -57,10 +57,7 @@ const generateNewsletterHtml = (title: string, content: string) => {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 24px; border: 1px solid #2a2a3e;">
     <div style="text-align: center; margin-bottom: 20px;">
-      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px;" />
-      <div>
-        <span style="color: #002D72; font-size: 20px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 20px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 20px; font-weight: bold;">FanZone</span>
-      </div>
+      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px;" />
     </div>
     
     <div style="background: linear-gradient(135deg, #002D72, #003d99); padding: 16px 20px; border-radius: 8px; margin-bottom: 20px;">
