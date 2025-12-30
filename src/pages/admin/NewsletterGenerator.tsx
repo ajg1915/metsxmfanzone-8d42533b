@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Loader2, Send, Newspaper, Eye, Sparkles, Copy, RefreshCw, Users } from "lucide-react";
+import { Mail, Loader2, Send, Newspaper, Eye, Sparkles, Copy, RefreshCw, Users, TestTube } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -114,6 +114,8 @@ export default function NewsletterGenerator() {
   const [showSendDialog, setShowSendDialog] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [subscriberCount, setSubscriberCount] = useState(0);
+  const [testEmail, setTestEmail] = useState("");
+  const [isSendingTest, setIsSendingTest] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -204,6 +206,57 @@ export default function NewsletterGenerator() {
       return;
     }
     setShowSendDialog(true);
+  };
+
+  const sendTestEmail = async () => {
+    if (!testEmail.trim() || !testEmail.includes("@")) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address for testing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!subject.trim() || !generatedContent.trim()) {
+      toast({
+        title: "Required Fields",
+        description: "Please generate content and add a subject before sending a test",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingTest(true);
+
+    try {
+      const fullHtml = generateNewsletterHtml(subject, generatedContent);
+      
+      const { error } = await supabase.functions.invoke("send-user-email", {
+        body: { 
+          subject: `[TEST] ${subject}`, 
+          content: fullHtml,
+          recipientType: "specific",
+          specificEmails: [testEmail],
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Test Email Sent!",
+        description: `Newsletter test sent to ${testEmail}`,
+      });
+    } catch (error: any) {
+      console.error("Error sending test email:", error);
+      toast({
+        title: "Send Failed",
+        description: error.message || "Failed to send test email",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingTest(false);
+    }
   };
 
   const confirmSend = async () => {
@@ -361,6 +414,38 @@ export default function NewsletterGenerator() {
                   Tip: Edit the generated content as needed. HTML formatting is supported.
                 </p>
               </div>
+            </div>
+
+            {/* Test Email Section */}
+            <div className="border-t pt-4 space-y-3">
+              <Label className="text-sm font-medium">Send Test Email</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="Enter your email for testing"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  className="text-sm flex-1"
+                />
+                <Button
+                  onClick={sendTestEmail}
+                  variant="outline"
+                  size="sm"
+                  disabled={isSendingTest || !testEmail.trim() || !generatedContent.trim()}
+                >
+                  {isSendingTest ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <TestTube className="w-4 h-4 mr-1" />
+                      Test
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Send a test email to preview before sending to all subscribers
+              </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
