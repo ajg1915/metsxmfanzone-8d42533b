@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import DOMPurify from "dompurify";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Loader2, Copy, Send } from "lucide-react";
+import { Mail, Loader2, Send, Newspaper, Eye, Sparkles, Copy, RefreshCw, Users } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,27 +19,186 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export default function NewsletterEditor() {
+// HTML escaping utility to prevent XSS
+const escapeHtml = (str: string): string => {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
+// Newsletter HTML template generator
+const generateNewsletterHtml = (title: string, content: string) => {
+  const safeTitle = escapeHtml(title);
+  // Content is already HTML, sanitize it
+  const sanitizedContent = DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'br', 'img'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'style'],
+  });
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 24px; border: 1px solid #2a2a3e;">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px;" />
+      <div>
+        <span style="color: #002D72; font-size: 20px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 20px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 20px; font-weight: bold;">FanZone</span>
+      </div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #002D72, #003d99); padding: 16px 20px; border-radius: 8px; margin-bottom: 20px;">
+      <h1 style="color: #ffffff; font-size: 22px; margin: 0; text-align: center;">${safeTitle}</h1>
+    </div>
+    
+    <div style="color: #d0d0d0; font-size: 14px; line-height: 1.6;">
+      ${sanitizedContent}
+    </div>
+    
+    <div style="margin-top: 24px; text-align: center;">
+      <a href="https://metsxmfanzone.com" style="display: inline-block; background: #FF5910; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px;">
+        Visit MetsXMFanZone
+      </a>
+    </div>
+    
+    <div style="border-top: 1px solid #2a2a3e; margin-top: 24px; padding-top: 16px;">
+      <p style="color: #888; font-size: 11px; text-align: center; margin: 0 0 12px;">
+        You're receiving this because you subscribed to our newsletter.
+      </p>
+      <div style="text-align: center; margin-bottom: 10px;">
+        <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+        <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 8px; text-decoration: none;">
+          <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
+        </a>
+      </div>
+      <p style="color: #666; font-size: 10px; text-align: center; margin: 0;">
+        <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a> | Let's Go Mets!
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
+};
+
+export default function NewsletterGenerator() {
   const [subject, setSubject] = useState("");
-  const [content, setContent] = useState("");
+  const [topic, setTopic] = useState("");
+  const [tone, setTone] = useState("professional");
+  const [generatedContent, setGeneratedContent] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [showSendDialog, setShowSendDialog] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [subscriberCount, setSubscriberCount] = useState(0);
   const { toast } = useToast();
 
+  useEffect(() => {
+    const fetchSubscriberCount = async () => {
+      const { count } = await supabase
+        .from("newsletter_subscribers")
+        .select("id", { count: "exact", head: true })
+        .eq("is_active", true);
+      setSubscriberCount(count || 0);
+    };
+    fetchSubscriberCount();
+  }, []);
+
+  const handleGenerate = async () => {
+    if (!topic.trim()) {
+      toast({
+        title: "Topic Required",
+        description: "Please enter a topic for your newsletter",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-newsletter", {
+        body: {
+          topic,
+          tone,
+          sections: "introduction, main content, key highlights, call-to-action",
+          audience: "Mets baseball fans",
+        },
+      });
+
+      if (error) throw error;
+
+      // Extract just the HTML content if it's wrapped
+      let content = data.content || "";
+      
+      // If the response contains HTML, extract the body content
+      if (content.includes("<body")) {
+        const bodyMatch = content.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        if (bodyMatch) {
+          content = bodyMatch[1];
+        }
+      }
+      
+      setGeneratedContent(content);
+      
+      // Auto-generate subject from topic
+      if (!subject.trim()) {
+        setSubject(`MetsXMFanZone Update: ${topic}`);
+      }
+
+      toast({
+        title: "Newsletter Generated!",
+        description: "Review the content and make any edits before sending.",
+      });
+    } catch (error: any) {
+      console.error("Error generating newsletter:", error);
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate newsletter content",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(content);
+    const fullHtml = generateNewsletterHtml(subject, generatedContent);
+    navigator.clipboard.writeText(fullHtml);
     toast({
       title: "Copied!",
-      description: "Newsletter content copied to clipboard",
+      description: "Newsletter HTML copied to clipboard",
     });
   };
 
-  const handleSend = async () => {
-    if (!subject.trim() || !content.trim()) {
+  const handleSend = () => {
+    if (!subject.trim() || !generatedContent.trim()) {
       toast({
         title: "Required Fields",
-        description: "Please enter both subject and content before sending",
+        description: "Please generate content and add a subject before sending",
         variant: "destructive",
       });
       return;
@@ -51,8 +211,10 @@ export default function NewsletterEditor() {
     setIsSending(true);
 
     try {
+      const fullHtml = generateNewsletterHtml(subject, generatedContent);
+      
       const { data, error } = await supabase.functions.invoke("send-newsletter", {
-        body: { subject, content },
+        body: { subject, content: fullHtml },
       });
 
       if (error) throw error;
@@ -62,9 +224,10 @@ export default function NewsletterEditor() {
         description: `Successfully sent to ${data.sent} subscribers`,
       });
       
-      // Clear form after successful send
+      // Clear form
       setSubject("");
-      setContent("");
+      setTopic("");
+      setGeneratedContent("");
     } catch (error: any) {
       console.error("Error sending newsletter:", error);
       toast({
@@ -77,97 +240,245 @@ export default function NewsletterEditor() {
     }
   };
 
+  const previewHtml = generateNewsletterHtml(subject || "Newsletter Preview", generatedContent || "<p>Your newsletter content will appear here...</p>");
+
   return (
-    <div className="container mx-auto max-w-5xl px-3 sm:px-4 py-4 sm:py-6">
+    <div className="container mx-auto max-w-6xl px-3 sm:px-4 py-4 sm:py-6">
       <div className="mb-4 sm:mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold mb-1">Newsletter Editor</h2>
-        <p className="text-xs sm:text-sm text-muted-foreground">
-          Create and send newsletters to your subscribers
-        </p>
-      </div>
-
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-            <Mail className="w-4 h-4" />
-            Create Newsletter
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Compose your newsletter content
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="subject" className="text-sm">Email Subject *</Label>
-            <Input
-              id="subject"
-              placeholder="Enter newsletter subject line"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              className="text-sm"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="content" className="text-sm">Newsletter Content *</Label>
-            <Textarea
-              id="content"
-              placeholder="Write your newsletter content here... You can use HTML formatting."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={15}
-              className="text-sm font-mono"
-            />
-            <p className="text-xs text-muted-foreground">
-              Tip: You can use HTML tags for formatting (e.g., &lt;h2&gt;, &lt;p&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;a&gt;)
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold mb-1 flex items-center gap-2">
+              <Newspaper className="w-5 h-5 sm:w-6 sm:h-6" />
+              Newsletter Generator
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Create AI-powered newsletters for your subscribers
             </p>
           </div>
+          <Badge variant="secondary" className="flex items-center gap-1.5">
+            <Users className="w-3 h-3" />
+            {subscriberCount} Subscribers
+          </Badge>
+        </div>
+      </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 pt-2">
+      <div className="grid lg:grid-cols-2 gap-4">
+        {/* Left Panel - Generator */}
+        <Card className="border-border/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-primary" />
+              Generate Newsletter
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Use AI to create engaging content for your fans
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="topic" className="text-sm">Newsletter Topic *</Label>
+              <Input
+                id="topic"
+                placeholder="e.g., Spring Training Updates, Trade Deadline Recap..."
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                className="text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tone" className="text-sm">Tone</Label>
+              <Select value={tone} onValueChange={setTone}>
+                <SelectTrigger className="text-sm">
+                  <SelectValue placeholder="Select tone" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="casual">Casual & Friendly</SelectItem>
+                  <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
+                  <SelectItem value="informative">Informative</SelectItem>
+                  <SelectItem value="hype">Hype & Exciting</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <Button
-              onClick={handleCopy}
-              variant="outline"
+              onClick={handleGenerate}
+              disabled={isGenerating || !topic.trim()}
+              className="w-full"
               size="sm"
-              disabled={!content.trim()}
-              className="flex-1"
             >
-              <Copy className="w-4 h-4 mr-2" />
-              Copy Content
-            </Button>
-            <Button
-              onClick={handleSend}
-              variant="default"
-              size="sm"
-              disabled={isSending || !subject.trim() || !content.trim()}
-              className="flex-1"
-            >
-              {isSending ? (
+              {isGenerating ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Sending...
+                  Generating...
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4 mr-2" />
-                  Send to Subscribers
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate Newsletter
                 </>
               )}
             </Button>
-          </div>
-        </CardContent>
-      </Card>
 
+            <div className="border-t pt-4 space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="subject" className="text-sm">Email Subject *</Label>
+                <Input
+                  id="subject"
+                  placeholder="Enter email subject line"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  className="text-sm"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="content" className="text-sm">Newsletter Content</Label>
+                  {generatedContent && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleGenerate}
+                      disabled={isGenerating}
+                      className="h-6 px-2 text-xs"
+                    >
+                      <RefreshCw className="w-3 h-3 mr-1" />
+                      Regenerate
+                    </Button>
+                  )}
+                </div>
+                <Textarea
+                  id="content"
+                  placeholder="Generated newsletter content will appear here. You can edit it before sending."
+                  value={generatedContent}
+                  onChange={(e) => setGeneratedContent(e.target.value)}
+                  rows={12}
+                  className="text-sm font-mono"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Tip: Edit the generated content as needed. HTML formatting is supported.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+              <Button
+                onClick={() => setShowPreview(true)}
+                variant="outline"
+                size="sm"
+                disabled={!generatedContent.trim()}
+                className="flex-1"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Preview
+              </Button>
+              <Button
+                onClick={handleCopy}
+                variant="outline"
+                size="sm"
+                disabled={!generatedContent.trim()}
+                className="flex-1"
+              >
+                <Copy className="w-4 h-4 mr-2" />
+                Copy HTML
+              </Button>
+              <Button
+                onClick={handleSend}
+                variant="default"
+                size="sm"
+                disabled={isSending || !subject.trim() || !generatedContent.trim()}
+                className="flex-1"
+              >
+                {isSending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Send to All
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Right Panel - Live Preview */}
+        <Card className="border-border/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <Eye className="w-4 h-4" />
+              Live Preview
+            </CardTitle>
+            <CardDescription className="text-xs">
+              See how your newsletter will look
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-[#0a0a0a] rounded-lg p-2 overflow-auto max-h-[600px]">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(previewHtml, {
+                    ALLOWED_TAGS: ['html', 'head', 'meta', 'body', 'div', 'p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'br', 'img', 'span', 'style'],
+                    ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'charset', 'name', 'content'],
+                  }),
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Send Confirmation Dialog */}
       <AlertDialog open={showSendDialog} onOpenChange={setShowSendDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Send Newsletter to All Subscribers?</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Mail className="w-5 h-5" />
+              Send Newsletter to All Subscribers?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This will send the newsletter to all active subscribers. This action cannot be undone.
+              This will send the newsletter to <strong>{subscriberCount}</strong> active subscribers. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmSend}>Send Newsletter</AlertDialogAction>
+            <AlertDialogAction onClick={confirmSend}>
+              <Send className="w-4 h-4 mr-2" />
+              Send Newsletter
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Preview Dialog */}
+      <AlertDialog open={showPreview} onOpenChange={setShowPreview}>
+        <AlertDialogContent className="max-w-2xl max-h-[90vh] overflow-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Eye className="w-5 h-5" />
+              Newsletter Preview
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Subject: {subject || "No subject"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="bg-[#0a0a0a] rounded-lg p-2 overflow-auto max-h-[60vh]">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(previewHtml, {
+                  ALLOWED_TAGS: ['html', 'head', 'meta', 'body', 'div', 'p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'br', 'img', 'span', 'style'],
+                  ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'charset', 'name', 'content'],
+                }),
+              }}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
