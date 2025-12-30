@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Loader2, Send, Newspaper, Eye, Sparkles, Copy, RefreshCw, Users } from "lucide-react";
+import { Mail, Loader2, Send, Newspaper, Eye, Sparkles, Copy, RefreshCw, Users, Image, X, TestTube } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +27,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface NewsletterImage {
+  url: string;
+  caption: string;
+}
+
 // HTML escaping utility to prevent XSS
 const escapeHtml = (str: string): string => {
   if (!str) return '';
@@ -38,14 +43,26 @@ const escapeHtml = (str: string): string => {
     .replace(/'/g, '&#039;');
 };
 
-// Newsletter HTML template generator
-const generateNewsletterHtml = (title: string, content: string) => {
+// Newsletter HTML template generator with images
+const generateNewsletterHtml = (title: string, content: string, images: NewsletterImage[] = []) => {
   const safeTitle = escapeHtml(title);
   // Content is already HTML, sanitize it
   const sanitizedContent = DOMPurify.sanitize(content, {
     ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'br', 'img'],
     ALLOWED_ATTR: ['href', 'src', 'alt', 'style'],
   });
+
+  // Generate images HTML
+  const imagesHtml = images.length > 0 ? `
+    <div style="margin: 20px 0;">
+      ${images.map(img => `
+        <div style="margin-bottom: 16px; text-align: center;">
+          <img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.caption)}" style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #2a2a3e;" />
+          ${img.caption ? `<p style="color: #888; font-size: 12px; margin-top: 8px; font-style: italic;">${escapeHtml(img.caption)}</p>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
 
   return `
 <!DOCTYPE html>
@@ -70,6 +87,8 @@ const generateNewsletterHtml = (title: string, content: string) => {
     <div style="color: #d0d0d0; font-size: 14px; line-height: 1.6;">
       ${sanitizedContent}
     </div>
+    
+    ${imagesHtml}
     
     <div style="margin-top: 24px; text-align: center;">
       <a href="https://metsxmfanzone.com" style="display: inline-block; background: #FF5910; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px;">
@@ -111,9 +130,15 @@ export default function NewsletterGenerator() {
   const [generatedContent, setGeneratedContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [isSendingTest, setIsSendingTest] = useState(false);
   const [showSendDialog, setShowSendDialog] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showTestDialog, setShowTestDialog] = useState(false);
+  const [testEmail, setTestEmail] = useState("");
   const [subscriberCount, setSubscriberCount] = useState(0);
+  const [images, setImages] = useState<NewsletterImage[]>([]);
+  const [newImageUrl, setNewImageUrl] = useState("");
+  const [newImageCaption, setNewImageCaption] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -211,7 +236,7 @@ export default function NewsletterGenerator() {
     setIsSending(true);
 
     try {
-      const fullHtml = generateNewsletterHtml(subject, generatedContent);
+      const fullHtml = generateNewsletterHtml(subject, generatedContent, images);
       
       const { data, error } = await supabase.functions.invoke("send-newsletter", {
         body: { subject, content: fullHtml },
@@ -228,6 +253,7 @@ export default function NewsletterGenerator() {
       setSubject("");
       setTopic("");
       setGeneratedContent("");
+      setImages([]);
     } catch (error: any) {
       console.error("Error sending newsletter:", error);
       toast({
@@ -240,7 +266,80 @@ export default function NewsletterGenerator() {
     }
   };
 
-  const previewHtml = generateNewsletterHtml(subject || "Newsletter Preview", generatedContent || "<p>Your newsletter content will appear here...</p>");
+  const handleSendTest = () => {
+    if (!subject.trim() || !generatedContent.trim()) {
+      toast({
+        title: "Required Fields",
+        description: "Please generate content and add a subject before sending a test",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowTestDialog(true);
+  };
+
+  const confirmSendTest = async () => {
+    if (!testEmail.trim()) {
+      toast({
+        title: "Email Required",
+        description: "Please enter an email address for the test",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setShowTestDialog(false);
+    setIsSendingTest(true);
+
+    try {
+      const fullHtml = generateNewsletterHtml(subject, generatedContent, images);
+      
+      const { error } = await supabase.functions.invoke("send-newsletter", {
+        body: { subject: `[TEST] ${subject}`, content: fullHtml, testEmail },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Test Email Sent!",
+        description: `Test newsletter sent to ${testEmail}`,
+      });
+      setTestEmail("");
+    } catch (error: any) {
+      console.error("Error sending test email:", error);
+      toast({
+        title: "Test Send Failed",
+        description: error.message || "Failed to send test email",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
+
+  const addImage = () => {
+    if (!newImageUrl.trim()) {
+      toast({
+        title: "URL Required",
+        description: "Please enter an image URL",
+        variant: "destructive",
+      });
+      return;
+    }
+    setImages([...images, { url: newImageUrl, caption: newImageCaption }]);
+    setNewImageUrl("");
+    setNewImageCaption("");
+    toast({
+      title: "Image Added",
+      description: "Image has been added to the newsletter",
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  const previewHtml = generateNewsletterHtml(subject || "Newsletter Preview", generatedContent || "<p>Your newsletter content will appear here...</p>", images);
 
   return (
     <div className="container mx-auto max-w-6xl px-3 sm:px-4 py-4 sm:py-6">
@@ -363,6 +462,63 @@ export default function NewsletterGenerator() {
               </div>
             </div>
 
+            {/* Image Upload Section */}
+            <div className="border-t pt-4 space-y-3">
+              <Label className="text-sm flex items-center gap-2">
+                <Image className="w-4 h-4" />
+                Add Images
+              </Label>
+              <div className="space-y-2">
+                <Input
+                  placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  className="text-sm"
+                />
+                <Input
+                  placeholder="Image caption (optional)"
+                  value={newImageCaption}
+                  onChange={(e) => setNewImageCaption(e.target.value)}
+                  className="text-sm"
+                />
+                <Button
+                  onClick={addImage}
+                  variant="outline"
+                  size="sm"
+                  disabled={!newImageUrl.trim()}
+                  className="w-full"
+                >
+                  <Image className="w-4 h-4 mr-2" />
+                  Add Image
+                </Button>
+              </div>
+              
+              {images.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Added Images ({images.length})</Label>
+                  <div className="space-y-2 max-h-32 overflow-auto">
+                    {images.map((img, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-muted/50 rounded p-2">
+                        <img src={img.url} alt={img.caption} className="w-10 h-10 object-cover rounded" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs truncate">{img.caption || "No caption"}</p>
+                          <p className="text-xs text-muted-foreground truncate">{img.url}</p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeImage(index)}
+                          className="h-6 w-6 p-0"
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <Button
                 onClick={() => setShowPreview(true)}
@@ -383,6 +539,28 @@ export default function NewsletterGenerator() {
               >
                 <Copy className="w-4 h-4 mr-2" />
                 Copy HTML
+              </Button>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                onClick={handleSendTest}
+                variant="secondary"
+                size="sm"
+                disabled={isSendingTest || !subject.trim() || !generatedContent.trim()}
+                className="flex-1"
+              >
+                {isSendingTest ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending Test...
+                  </>
+                ) : (
+                  <>
+                    <TestTube className="w-4 h-4 mr-2" />
+                    Send Test
+                  </>
+                )}
               </Button>
               <Button
                 onClick={handleSend}
@@ -482,6 +660,42 @@ export default function NewsletterGenerator() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Test Email Dialog */}
+      <AlertDialog open={showTestDialog} onOpenChange={setShowTestDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <TestTube className="w-5 h-5" />
+              Send Test Email
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter an email address to send a test version of this newsletter.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Label htmlFor="testEmail" className="text-sm">Email Address</Label>
+            <Input
+              id="testEmail"
+              type="email"
+              placeholder="your@email.com"
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              className="mt-2"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmSendTest} disabled={!testEmail.trim()}>
+              <Send className="w-4 h-4 mr-2" />
+              Send Test
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
+
+export { generateNewsletterHtml };
+export type { NewsletterImage };
