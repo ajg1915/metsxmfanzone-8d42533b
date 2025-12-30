@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Bell, Send, Image, Mail, BookOpen, Wallpaper, TrendingUp, Megaphone, Search } from "lucide-react";
+import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Bell, Send, Image, Mail, BookOpen, Wallpaper, TrendingUp, Megaphone, Search, Calendar, MessageSquare, Mic, Video, QrCode, Clapperboard, Tv, CreditCard, ShieldCheck, Settings, PenTool, RotateCcw, Play } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -153,6 +153,104 @@ export default function AdminDashboard() {
       icon: Megaphone,
       url: "/admin/business-ads",
       stat: "Ads",
+    },
+    {
+      title: "Events",
+      description: "Manage upcoming events",
+      icon: Calendar,
+      url: "/admin/events",
+      stat: "Events",
+    },
+    {
+      title: "Feedback",
+      description: "View user feedback",
+      icon: MessageSquare,
+      url: "/admin/feedback",
+      stat: "Reviews",
+    },
+    {
+      title: "Podcasts",
+      description: "Manage podcast episodes",
+      icon: Mic,
+      url: "/admin/podcasts",
+      stat: "Episodes",
+    },
+    {
+      title: "Podcast Live",
+      description: "Live podcast streaming",
+      icon: Play,
+      url: "/admin/podcast-live",
+      stat: "Live",
+    },
+    {
+      title: "Posts",
+      description: "Manage community posts",
+      icon: PenTool,
+      url: "/admin/posts",
+      stat: `${stats.totalPosts} Posts`,
+    },
+    {
+      title: "QR Codes",
+      description: "Generate QR codes",
+      icon: QrCode,
+      url: "/admin/qr-codes",
+      stat: "Generate",
+    },
+    {
+      title: "Spring Training",
+      description: "Manage spring games",
+      icon: Clapperboard,
+      url: "/admin/spring-training",
+      stat: "Games",
+    },
+    {
+      title: "Stream Replay",
+      description: "Edit stream replays",
+      icon: RotateCcw,
+      url: "/admin/stream-replay",
+      stat: "Replays",
+    },
+    {
+      title: "Subscriptions",
+      description: "Manage subscription plans",
+      icon: CreditCard,
+      url: "/admin/subscriptions",
+      stat: "Plans",
+    },
+    {
+      title: "TV Schedule",
+      description: "Manage TV listings",
+      icon: Tv,
+      url: "/admin/tv-schedule",
+      stat: "Schedule",
+    },
+    {
+      title: "Video Gallery",
+      description: "Manage video content",
+      icon: Video,
+      url: "/admin/video-gallery",
+      stat: "Videos",
+    },
+    {
+      title: "Writer Apps",
+      description: "Review writer applications",
+      icon: PenTool,
+      url: "/admin/writer-applications",
+      stat: "Apps",
+    },
+    {
+      title: "User Roles",
+      description: "Manage user permissions",
+      icon: ShieldCheck,
+      url: "/admin/user-roles",
+      stat: "Roles",
+    },
+    {
+      title: "Settings",
+      description: "Admin portal settings",
+      icon: Settings,
+      url: "/admin/settings",
+      stat: "Config",
     },
   ];
 
