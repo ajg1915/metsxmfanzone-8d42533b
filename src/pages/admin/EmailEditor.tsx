@@ -382,6 +382,16 @@ export default function EmailEditor() {
       return;
     }
 
+    // Validate custom email has subject and content
+    if (activeTab === "custom" && (!subject.trim() || !content.trim())) {
+      toast({
+        title: "Required Fields",
+        description: "Please enter both subject and content before sending a test email",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSendingTest(true);
 
     try {
