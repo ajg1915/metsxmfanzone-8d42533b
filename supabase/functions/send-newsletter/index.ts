@@ -52,7 +52,7 @@ serve(async (req) => {
       throw new Error("Admin access required");
     }
 
-    const { subject, content, testEmail } = await req.json();
+    const { subject, content } = await req.json();
 
     if (!subject || !content) {
       throw new Error("Subject and content are required");
@@ -61,36 +61,6 @@ serve(async (req) => {
     // Sanitize HTML content server-side
     const sanitizedContent = sanitizeHtml(content);
 
-    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-
-    // If testEmail is provided, only send to that email
-    if (testEmail) {
-      console.log(`Sending test newsletter to: [REDACTED]`);
-      try {
-        await resend.emails.send({
-          from: "MetsXMFanZone <onboarding@resend.dev>",
-          to: [testEmail],
-          subject: subject,
-          html: sanitizedContent,
-        });
-        console.log("Test email sent successfully");
-        return new Response(
-          JSON.stringify({
-            message: "Test email sent successfully",
-            sent: 1,
-            failed: 0,
-          }),
-          {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      } catch (error) {
-        console.error("Failed to send test email:", error);
-        throw new Error("Failed to send test email");
-      }
-    }
-
-    // Otherwise, send to all subscribers
     const { data: subscribers, error: subscribersError } = await supabase
       .from("newsletter_subscribers")
       .select("email, full_name")
@@ -110,6 +80,7 @@ serve(async (req) => {
       );
     }
 
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     let successCount = 0;
     let failureCount = 0;
 
