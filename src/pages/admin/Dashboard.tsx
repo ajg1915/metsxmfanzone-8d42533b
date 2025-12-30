@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Bell, Send, Image, Mail, BookOpen, Wallpaper, TrendingUp, Megaphone, Search, Calendar, MessageSquare, Mic, Video, QrCode, Clapperboard, Tv, CreditCard, ShieldCheck, Settings, PenTool, RotateCcw, Play } from "lucide-react";
+import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Settings } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -57,11 +57,11 @@ export default function AdminDashboard() {
 
   const quickAccessItems = [
     {
-      title: "Real-Time Analytics",
-      description: "Live visitor tracking",
-      icon: Eye,
-      url: "/admin/realtime-analytics",
-      stat: "Live Data",
+      title: "Live Streams",
+      description: "Manage live streaming content",
+      icon: Radio,
+      url: "/admin/live-streams",
+      stat: `${stats.activeStreams} Live`,
     },
     {
       title: "Stream Health",
@@ -71,13 +71,6 @@ export default function AdminDashboard() {
       stat: "Monitor",
     },
     {
-      title: "Activity Logs",
-      description: "View system activity",
-      icon: Activity,
-      url: "/admin/activity",
-      stat: "Logs",
-    },
-    {
       title: "Blog Management",
       description: "Create and manage blog posts",
       icon: FileText,
@@ -85,32 +78,11 @@ export default function AdminDashboard() {
       stat: `${stats.totalBlogs} Posts`,
     },
     {
-      title: "Live Streams",
-      description: "Manage live streaming content",
-      icon: Radio,
-      url: "/admin/live-streams",
-      stat: `${stats.activeStreams} Live`,
-    },
-    {
-      title: "Notifications",
-      description: "Manage live notifications",
-      icon: Bell,
-      url: "/admin/live-notifications",
-      stat: "Alerts",
-    },
-    {
-      title: "Email Editor",
-      description: "Create and send emails",
-      icon: Send,
-      url: "/admin/email-editor",
-      stat: "Templates",
-    },
-    {
-      title: "Stories",
-      description: "Manage story content",
-      icon: Image,
-      url: "/admin/stories",
-      stat: "Stories",
+      title: "Real-Time Analytics",
+      description: "Live visitor tracking",
+      icon: Eye,
+      url: "/admin/realtime-analytics",
+      stat: "Live Data",
     },
     {
       title: "Newsletter",
@@ -120,27 +92,6 @@ export default function AdminDashboard() {
       stat: "Send",
     },
     {
-      title: "News Tracker",
-      description: "Mets news updates",
-      icon: TrendingUp,
-      url: "/admin/mets-news",
-      stat: "News",
-    },
-    {
-      title: "Tutorial",
-      description: "Manage onboarding steps",
-      icon: BookOpen,
-      url: "/admin/tutorial",
-      stat: "Setup",
-    },
-    {
-      title: "Backgrounds",
-      description: "Manage page backgrounds",
-      icon: Wallpaper,
-      url: "/admin/backgrounds",
-      stat: "Themes",
-    },
-    {
       title: "User Management",
       description: "Manage users and subscriptions",
       icon: UserCog,
@@ -148,102 +99,11 @@ export default function AdminDashboard() {
       stat: `${stats.totalUsers} Users`,
     },
     {
-      title: "Business Ads",
-      description: "Manage business advertisements",
-      icon: Megaphone,
-      url: "/admin/business-ads",
-      stat: "Ads",
-    },
-    {
-      title: "Events",
-      description: "Manage upcoming events",
-      icon: Calendar,
-      url: "/admin/events",
-      stat: "Events",
-    },
-    {
-      title: "Feedback",
-      description: "View user feedback",
-      icon: MessageSquare,
-      url: "/admin/feedback",
-      stat: "Reviews",
-    },
-    {
-      title: "Podcasts",
-      description: "Manage podcast episodes",
-      icon: Mic,
-      url: "/admin/podcasts",
-      stat: "Episodes",
-    },
-    {
-      title: "Podcast Live",
-      description: "Live podcast streaming",
-      icon: Play,
-      url: "/admin/podcast-live",
-      stat: "Live",
-    },
-    {
-      title: "Posts",
-      description: "Manage community posts",
-      icon: PenTool,
-      url: "/admin/posts",
-      stat: `${stats.totalPosts} Posts`,
-    },
-    {
-      title: "QR Codes",
-      description: "Generate QR codes",
-      icon: QrCode,
-      url: "/admin/qr-codes",
-      stat: "Generate",
-    },
-    {
-      title: "Spring Training",
-      description: "Manage spring games",
-      icon: Clapperboard,
-      url: "/admin/spring-training",
-      stat: "Games",
-    },
-    {
-      title: "Stream Replay",
-      description: "Edit stream replays",
-      icon: RotateCcw,
-      url: "/admin/stream-replay",
-      stat: "Replays",
-    },
-    {
       title: "Subscriptions",
       description: "Manage subscription plans",
       icon: CreditCard,
       url: "/admin/subscriptions",
       stat: "Plans",
-    },
-    {
-      title: "TV Schedule",
-      description: "Manage TV listings",
-      icon: Tv,
-      url: "/admin/tv-schedule",
-      stat: "Schedule",
-    },
-    {
-      title: "Video Gallery",
-      description: "Manage video content",
-      icon: Video,
-      url: "/admin/video-gallery",
-      stat: "Videos",
-    },
-    {
-      title: "Writer Apps",
-      description: "Review writer applications",
-      icon: PenTool,
-      url: "/admin/writer-applications",
-      stat: "Apps",
-    },
-    {
-      title: "User Roles",
-      description: "Manage user permissions",
-      icon: ShieldCheck,
-      url: "/admin/user-roles",
-      stat: "Roles",
     },
     {
       title: "Settings",
