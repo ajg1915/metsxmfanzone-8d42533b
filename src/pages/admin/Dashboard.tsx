@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Settings } from "lucide-react";
+import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Settings, BarChart3 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -22,10 +22,11 @@ export default function AdminDashboard() {
   const [adminUserId, setAdminUserId] = useState<string | null>(null);
   const [stats, setStats] = useState({
     totalUsers: 0,
-    totalPosts: 0,
+    totalBlogs: 0,
     activeStreams: 0,
     totalStreams: 0,
-    totalBlogs: 0,
+    totalVideos: 0,
+    totalPodcasts: 0,
   });
 
   useEffect(() => {
@@ -33,22 +34,24 @@ export default function AdminDashboard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) setAdminUserId(user.id);
 
-      const [postsResult, usersResult, streamsResult, blogsResult] = await Promise.all([
-        supabase.from("posts").select("*", { count: "exact", head: true }),
+      const [usersResult, streamsResult, blogsResult, videosResult, podcastsResult] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("live_streams").select("status"),
         supabase.from("blog_posts").select("*", { count: "exact", head: true }),
+        supabase.from("videos").select("*", { count: "exact", head: true }),
+        supabase.from("podcasts").select("*", { count: "exact", head: true }),
       ]);
 
       const activeStreams = streamsResult.data?.filter(s => s.status === "live").length || 0;
       const totalStreams = streamsResult.data?.length || 0;
 
       setStats({
-        totalPosts: postsResult.count || 0,
         totalUsers: usersResult.count || 0,
+        totalBlogs: blogsResult.count || 0,
         activeStreams,
         totalStreams,
-        totalBlogs: blogsResult.count || 0,
+        totalVideos: videosResult.count || 0,
+        totalPodcasts: podcastsResult.count || 0,
       });
     };
 
@@ -199,11 +202,12 @@ export default function AdminDashboard() {
 
         <Card className="min-w-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
-            <CardTitle className="text-[10px] sm:text-xs font-medium truncate">Posts</CardTitle>
-            <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground flex-shrink-0" />
+            <CardTitle className="text-[10px] sm:text-xs font-medium truncate">Website Stats</CardTitle>
+            <BarChart3 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-xl font-bold">{stats.totalPosts}</div>
+            <div className="text-lg sm:text-xl font-bold">{stats.totalBlogs + stats.totalVideos + stats.totalPodcasts}</div>
+            <p className="text-[10px] text-muted-foreground">Total Content</p>
           </CardContent>
         </Card>
 
