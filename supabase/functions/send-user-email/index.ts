@@ -1,7 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.79.0";
 import { Resend } from "https://esm.sh/resend@2.0.0";
-import DOMPurify from "https://esm.sh/isomorphic-dompurify@2.16.0";
+import * as ammonia from "https://deno.land/x/ammonia@0.3.1/mod.ts";
+
+await ammonia.init();
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,12 +24,15 @@ const escapeHtml = (str: string): string => {
     .replace(/'/g, '&#039;');
 };
 
-// Sanitize HTML to prevent XSS in emails
+// Sanitize HTML to prevent XSS in emails using Ammonia
 const sanitizeHtml = (html: string): string => {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'img', 'div', 'span', 'table', 'tr', 'td', 'th', 'tbody', 'thead'],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'style', 'class', 'width', 'height'],
-  });
+  try {
+    return ammonia.clean(html);
+  } catch (error) {
+    console.error("Error sanitizing HTML:", error);
+    // Fallback: escape all HTML if sanitization fails
+    return escapeHtml(html);
+  }
 };
 
 interface EmailRequest {
