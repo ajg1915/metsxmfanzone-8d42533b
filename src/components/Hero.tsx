@@ -4,10 +4,12 @@ import heroImage from "@/assets/hero-mets.png";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Hero = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const { user } = useAuth();
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -28,7 +30,7 @@ const Hero = () => {
     [emblaApi]
   );
 
-  const slides = [
+  const publicSlides = [
     {
       title: "Welcome to MetsXMFanZone",
       description: "Connect with thousands of passionate Mets fans. Share your thoughts, predictions, and game reactions the all new Live Home for Mets Fans",
@@ -45,6 +47,26 @@ const Hero = () => {
       image: heroImage
     }
   ];
+
+  const memberSlides = [
+    {
+      title: "Welcome Back, Fan!",
+      description: "Your home for live Mets coverage, exclusive content, and community discussions. Dive into today's action!",
+      image: heroImage
+    },
+    {
+      title: "Live Now",
+      description: "Check out our live streams, game highlights, and real-time updates. Stay connected to every play!",
+      image: heroImage
+    },
+    {
+      title: "Explore Your Benefits",
+      description: "Enjoy your member-exclusive podcasts, behind-the-scenes content, and premium features",
+      image: heroImage
+    }
+  ];
+
+  const slides = user ? memberSlides : publicSlides;
 
   return (
     <section className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] overflow-hidden">
@@ -78,13 +100,15 @@ const Hero = () => {
                     {slide.description}
                   </p>
                   
-                  <div className="flex items-center justify-center px-4">
-                    <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-primary/80 rounded-lg bg-background/60 backdrop-blur-md hover-lift">
-                      <span className="text-[11px] sm:text-xs md:text-sm text-foreground text-center leading-snug">
-                        ⚡ Start your <span className="text-primary font-bold">7-day FREE trial</span> for unlimited access
-                      </span>
+                  {!user && (
+                    <div className="flex items-center justify-center px-4">
+                      <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-primary/80 rounded-lg bg-background/60 backdrop-blur-md hover-lift">
+                        <span className="text-[11px] sm:text-xs md:text-sm text-foreground text-center leading-snug">
+                          ⚡ Start your <span className="text-primary font-bold">7-day FREE trial</span> for unlimited access
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
