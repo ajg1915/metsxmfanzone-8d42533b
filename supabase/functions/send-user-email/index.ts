@@ -133,6 +133,7 @@ serve(async (req) => {
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     let successCount = 0;
     let failureCount = 0;
+    let lastFailureMessage: string | null = null;
 
     console.log(`Sending email to ${recipients.length} recipients (type: ${recipientType})`);
 
@@ -155,13 +156,35 @@ serve(async (req) => {
         }
 
         successCount++;
-      } catch (error) {
+      } catch (error: any) {
+        // Capture a non-sensitive error message for UI
+        lastFailureMessage =
+          (typeof error?.message === "string" && error.message) ||
+          (typeof error?.name === "string" ? error.name : null) ||
+          "Email provider rejected the request";
+
         console.error(`Failed to send to [REDACTED]:`, error);
         failureCount++;
       }
     }
 
     console.log(`Email campaign complete: ${successCount} successful, ${failureCount} failed`);
+
+    // If *everything* failed, surface a real error to the client (useful for test emails)
+    if (successCount === 0 && failureCount > 0) {
+      return new Response(
+        JSON.stringify({
+          error: lastFailureMessage || "Failed to send email",
+          sent: successCount,
+          failed: failureCount,
+          total: recipients.length,
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     return new Response(
       JSON.stringify({
