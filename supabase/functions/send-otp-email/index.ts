@@ -33,10 +33,10 @@ serve(async (req) => {
     console.log(`Sending OTP email to: ${to}`);
 
     const emailResponse = await resend.emails.send({
-      from: "MetsXMFanZone <onboarding@resend.dev>",
+      from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
       to: [to],
       subject: "Your MetsXMFanZone Verification Code",
-      text: `Your MetsXMFanZone verification code is ${otp}. It expires in 5 minutes.`,
+      text: `Your MetsXMFanZone verification code is ${otp}. It expires in 5 minutes. IMPORTANT: If another company asks for this PIN, do not share it. We will never ask for your PIN and we will never call you.`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -66,6 +66,15 @@ serve(async (req) => {
             <p style="color: #666; text-align: center; font-size: 11px; margin: 0 0 12px;">
               Expires in <strong style="color: #FF5910;">5 min</strong>
             </p>
+            
+            <div style="background: #2a1a1a; border: 1px solid #FF5910; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+              <p style="color: #FF5910; font-size: 11px; font-weight: bold; margin: 0 0 6px; text-align: center;">
+                ⚠️ SECURITY WARNING
+              </p>
+              <p style="color: #ffffff; font-size: 10px; margin: 0; text-align: center; line-height: 1.4;">
+                If another company asks for this PIN, do not share it. We will never ask for your PIN and we will never call you.
+              </p>
+            </div>
             
             <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
               <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">

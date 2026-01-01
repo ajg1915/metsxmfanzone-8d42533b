@@ -175,7 +175,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       try {
         const emailResponse = await resend.emails.send({
-          from: "MetsXM FanZone <notifications@metsxmfanzone.com>",
+          from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
           to: [user.email],
           subject: `${title} - MetsXM FanZone`,
           html: emailHtml,
