@@ -463,30 +463,38 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className={`p-4 rounded-lg border-2 ${userPlan !== "free" ? "border-primary bg-primary/10" : "border-muted bg-muted/20"}`}>
-                    <h3 className="font-semibold text-foreground mb-2">Live Streams</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {userPlan === "free" ? "Limited access" : "Full access to all live games"}
-                    </p>
-                  </div>
-                  <div className={`p-4 rounded-lg border-2 ${userPlan !== "free" ? "border-primary bg-primary/10" : "border-muted bg-muted/20"}`}>
-                    <h3 className="font-semibold text-foreground mb-2">Game Replays</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {userPlan === "free" ? "Not available" : "Full game replays on demand"}
-                    </p>
-                  </div>
-                  <div className={`p-4 rounded-lg border-2 ${userPlan !== "free" ? "border-primary bg-primary/10" : "border-muted bg-muted/20"}`}>
-                    <h3 className="font-semibold text-foreground mb-2">Exclusive Content</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {userPlan === "free" ? "Not available" : "Behind-the-scenes and interviews"}
-                    </p>
-                  </div>
-                  <div className={`p-4 rounded-lg border-2 ${userPlan !== "free" ? "border-primary bg-primary/10" : "border-muted bg-muted/20"}`}>
-                    <h3 className="font-semibold text-foreground mb-2">Ad-Free</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {userPlan === "free" ? "Ads supported" : "Enjoy without interruptions"}
-                    </p>
-                  </div>
+                  <Link to="/live" className="block">
+                    <div className={`p-4 rounded-lg border-2 transition-colors hover:border-primary/80 ${userPlan !== "free" ? "border-primary bg-primary/10" : "border-muted bg-muted/20"}`}>
+                      <h3 className="font-semibold text-foreground mb-2">Mets Live Streams</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {userPlan === "free" ? "Limited access" : "Full access to all live games"}
+                      </p>
+                    </div>
+                  </Link>
+                  <Link to="/spring-training-live" className="block">
+                    <div className={`p-4 rounded-lg border-2 transition-colors hover:border-primary/80 ${userPlan !== "free" ? "border-primary bg-primary/10" : "border-muted bg-muted/20"}`}>
+                      <h3 className="font-semibold text-foreground mb-2">Spring Training</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {userPlan === "free" ? "Not available" : "Spring training games and coverage"}
+                      </p>
+                    </div>
+                  </Link>
+                  <Link to="/community" className="block">
+                    <div className={`p-4 rounded-lg border-2 transition-colors hover:border-primary/80 ${userPlan !== "free" ? "border-primary bg-primary/10" : "border-muted bg-muted/20"}`}>
+                      <h3 className="font-semibold text-foreground mb-2">Community</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {userPlan === "free" ? "Not available" : "Connect with fellow Mets fans"}
+                      </p>
+                    </div>
+                  </Link>
+                  <Link to="/podcast" className="block">
+                    <div className={`p-4 rounded-lg border-2 transition-colors hover:border-primary/80 ${userPlan !== "free" ? "border-primary bg-primary/10" : "border-muted bg-muted/20"}`}>
+                      <h3 className="font-semibold text-foreground mb-2">Podcast</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {userPlan === "free" ? "Ads supported" : "Exclusive podcast episodes"}
+                      </p>
+                    </div>
+                  </Link>
                 </div>
 
                 {userPlan === "free" && (
