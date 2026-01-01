@@ -395,39 +395,56 @@ export type Database = {
       }
       hero_slides: {
         Row: {
+          blog_post_id: string | null
           created_at: string
           description: string
           display_order: number | null
           id: string
           image_url: string | null
           is_for_members: boolean | null
+          link_text: string | null
+          link_url: string | null
           published: boolean | null
           title: string
           updated_at: string
         }
         Insert: {
+          blog_post_id?: string | null
           created_at?: string
           description: string
           display_order?: number | null
           id?: string
           image_url?: string | null
           is_for_members?: boolean | null
+          link_text?: string | null
+          link_url?: string | null
           published?: boolean | null
           title: string
           updated_at?: string
         }
         Update: {
+          blog_post_id?: string | null
           created_at?: string
           description?: string
           display_order?: number | null
           id?: string
           image_url?: string | null
           is_for_members?: boolean | null
+          link_text?: string | null
+          link_url?: string | null
           published?: boolean | null
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "hero_slides_blog_post_id_fkey"
+            columns: ["blog_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lineup_cards: {
         Row: {

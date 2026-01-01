@@ -6,8 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Trash2, GripVertical, Save, Image } from "lucide-react";
+import { Plus, Trash2, Save, Image, FileText } from "lucide-react";
 
 interface HeroSlide {
   id: string;
@@ -17,32 +18,55 @@ interface HeroSlide {
   display_order: number;
   is_for_members: boolean;
   published: boolean;
+  blog_post_id: string | null;
+  link_url: string | null;
+  link_text: string | null;
+}
+
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  featured_image_url: string | null;
+  excerpt: string | null;
 }
 
 const HeroManagement = () => {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const fetchSlides = async () => {
+  const fetchData = async () => {
     try {
-      const { data, error } = await supabase
-        .from("hero_slides")
-        .select("*")
-        .order("display_order", { ascending: true });
+      const [slidesRes, blogsRes] = await Promise.all([
+        supabase
+          .from("hero_slides")
+          .select("*")
+          .order("display_order", { ascending: true }),
+        supabase
+          .from("blog_posts")
+          .select("id, title, slug, featured_image_url, excerpt")
+          .eq("published", true)
+          .order("published_at", { ascending: false })
+          .limit(50)
+      ]);
 
-      if (error) throw error;
-      setSlides(data || []);
+      if (slidesRes.error) throw slidesRes.error;
+      if (blogsRes.error) throw blogsRes.error;
+      
+      setSlides(slidesRes.data || []);
+      setBlogPosts(blogsRes.data || []);
     } catch (error) {
-      console.error("Error fetching slides:", error);
-      toast.error("Failed to load slides");
+      console.error("Error fetching data:", error);
+      toast.error("Failed to load data");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSlides();
+    fetchData();
   }, []);
 
   const addSlide = async () => {
@@ -71,10 +95,36 @@ const HeroManagement = () => {
     }
   };
 
-  const updateSlide = (id: string, field: keyof HeroSlide, value: string | boolean | number) => {
+  const updateSlide = (id: string, field: keyof HeroSlide, value: string | boolean | number | null) => {
     setSlides(slides.map(slide => 
       slide.id === id ? { ...slide, [field]: value } : slide
     ));
+  };
+
+  const linkBlogPost = (slideId: string, blogId: string | null) => {
+    const blog = blogPosts.find(b => b.id === blogId);
+    setSlides(slides.map(slide => {
+      if (slide.id === slideId) {
+        if (blog) {
+          return {
+            ...slide,
+            blog_post_id: blogId,
+            title: blog.title,
+            description: blog.excerpt || slide.description,
+            image_url: blog.featured_image_url || slide.image_url,
+            link_url: `/blog/${blog.slug}`,
+            link_text: "Read Article"
+          };
+        } else {
+          return {
+            ...slide,
+            blog_post_id: null,
+            link_url: null
+          };
+        }
+      }
+      return slide;
+    }));
   };
 
   const saveSlide = async (slide: HeroSlide) => {
@@ -88,7 +138,10 @@ const HeroManagement = () => {
           image_url: slide.image_url,
           display_order: slide.display_order,
           is_for_members: slide.is_for_members,
-          published: slide.published
+          published: slide.published,
+          blog_post_id: slide.blog_post_id,
+          link_url: slide.link_url,
+          link_text: slide.link_text
         })
         .eq("id", slide.id);
 
@@ -136,7 +189,6 @@ const HeroManagement = () => {
     
     setSlides(newSlides);
 
-    // Save order changes
     try {
       await Promise.all([
         supabase.from("hero_slides").update({ display_order: newSlides[index].display_order }).eq("id", newSlides[index].id),
@@ -160,7 +212,7 @@ const HeroManagement = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Hero Slides Management</h1>
-          <p className="text-muted-foreground">Manage the hero carousel slides for logged-in members</p>
+          <p className="text-muted-foreground">Manage hero carousel slides for logged-in members. Link to blog posts or add custom content.</p>
         </div>
         <Button onClick={addSlide} className="gap-2">
           <Plus className="w-4 h-4" />
@@ -201,7 +253,17 @@ const HeroManagement = () => {
                         ▼
                       </Button>
                     </div>
-                    <CardTitle className="text-lg">Slide {index + 1}</CardTitle>
+                    <div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        Slide {index + 1}
+                        {slide.blog_post_id && (
+                          <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <FileText className="w-3 h-3" />
+                            Blog
+                          </span>
+                        )}
+                      </CardTitle>
+                    </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
@@ -223,6 +285,33 @@ const HeroManagement = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Blog Post Selection */}
+                <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+                  <Label className="text-sm font-medium flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Link to Blog Post (optional)
+                  </Label>
+                  <Select
+                    value={slide.blog_post_id || "none"}
+                    onValueChange={(value) => linkBlogPost(slide.id, value === "none" ? null : value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a blog post..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No blog link (custom content)</SelectItem>
+                      {blogPosts.map((blog) => (
+                        <SelectItem key={blog.id} value={blog.id}>
+                          {blog.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Selecting a blog post will auto-fill the title, description, and image from the blog.
+                  </p>
+                </div>
+
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor={`title-${slide.id}`}>Title</Label>
@@ -248,6 +337,7 @@ const HeroManagement = () => {
                     </div>
                   </div>
                 </div>
+
                 <div className="space-y-2">
                   <Label htmlFor={`desc-${slide.id}`}>Description</Label>
                   <Textarea
@@ -258,6 +348,28 @@ const HeroManagement = () => {
                     rows={3}
                   />
                 </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor={`link-${slide.id}`}>Link URL (optional)</Label>
+                    <Input
+                      id={`link-${slide.id}`}
+                      value={slide.link_url || ""}
+                      onChange={(e) => updateSlide(slide.id, "link_url", e.target.value)}
+                      placeholder="/blog/my-post or https://..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`linktext-${slide.id}`}>Link Button Text</Label>
+                    <Input
+                      id={`linktext-${slide.id}`}
+                      value={slide.link_text || ""}
+                      onChange={(e) => updateSlide(slide.id, "link_text", e.target.value)}
+                      placeholder="Read More"
+                    />
+                  </div>
+                </div>
+
                 <div className="flex justify-end">
                   <Button onClick={() => saveSlide(slide)} disabled={saving} className="gap-2">
                     <Save className="w-4 h-4" />
