@@ -86,6 +86,7 @@ import WriterApplications from "./pages/admin/WriterApplications";
 import RealtimeAnalytics from "./pages/admin/RealtimeAnalytics";
 import StreamHealthDashboard from "./pages/admin/StreamHealthDashboard";
 import SEOManagement from "./pages/admin/SEOManagement";
+import HeroManagement from "./pages/admin/HeroManagement";
 import WriterRegister from "./pages/WriterRegister";
 import CreateAccount from "./pages/help/CreateAccount";
 import BiometricLogin from "./pages/help/BiometricLogin";
@@ -192,6 +193,7 @@ const App = () => {
           <Route path="/legal/admin-setup" element={<AdminSetup />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="hero" element={<HeroManagement />} />
             <Route path="blog" element={<BlogManagement />} />
             <Route path="video-gallery-management" element={<VideoGalleryManagement />} />
             <Route path="podcasts" element={<PodcastManagement />} />

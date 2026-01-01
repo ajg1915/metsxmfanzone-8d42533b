@@ -1,15 +1,23 @@
-import { Button } from "@/components/ui/button";
-import { Play, Info } from "lucide-react";
 import heroImage from "@/assets/hero-mets.png";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+
+interface HeroSlide {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string | null;
+  display_order: number;
+}
 
 const Hero = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { user } = useAuth();
+  const [memberSlides, setMemberSlides] = useState<HeroSlide[]>([]);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -25,10 +33,25 @@ const Hero = () => {
     };
   }, [emblaApi, onSelect]);
 
-  const scrollTo = useCallback(
-    (index: number) => emblaApi && emblaApi.scrollTo(index),
-    [emblaApi]
-  );
+  // Fetch member slides from database
+  useEffect(() => {
+    const fetchMemberSlides = async () => {
+      const { data, error } = await supabase
+        .from("hero_slides")
+        .select("*")
+        .eq("is_for_members", true)
+        .eq("published", true)
+        .order("display_order", { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setMemberSlides(data);
+      }
+    };
+
+    if (user) {
+      fetchMemberSlides();
+    }
+  }, [user]);
 
   const publicSlides = [
     {
@@ -48,7 +71,7 @@ const Hero = () => {
     }
   ];
 
-  const memberSlides = [
+  const defaultMemberSlides = [
     {
       title: "Welcome Back, Fan!",
       description: "Your home for live Mets coverage, exclusive content, and community discussions. Dive into today's action!",
@@ -66,13 +89,22 @@ const Hero = () => {
     }
   ];
 
-  const slides = user ? memberSlides : publicSlides;
+  // Use database slides if available, otherwise use defaults
+  const slidesToShow = user 
+    ? (memberSlides.length > 0 
+        ? memberSlides.map(s => ({ 
+            title: s.title, 
+            description: s.description, 
+            image: s.image_url || heroImage 
+          }))
+        : defaultMemberSlides)
+    : publicSlides;
 
   return (
     <section className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] overflow-hidden">
       <div ref={emblaRef} className="overflow-hidden h-full">
         <div className="flex h-full">
-          {slides.map((slide, index) => (
+          {slidesToShow.map((slide, index) => (
             <div key={index} className="flex-[0_0_100%] min-w-0 relative">
               <div className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] flex items-center justify-center">
                 <div 
@@ -115,7 +147,6 @@ const Hero = () => {
           ))}
         </div>
       </div>
-
     </section>
   );
 };
