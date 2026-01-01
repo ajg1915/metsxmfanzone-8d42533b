@@ -1,6 +1,7 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { StreamPlayer } from "@/components/StreamPlayer";
+import StreamTimeLimit from "@/components/StreamTimeLimit";
 import SEOHead from "@/components/SEOHead";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import logo from "@/assets/metsxmfanzone-logo.png";
 
 const MetsXMFanZone = () => {
   return (
+    <StreamTimeLimit>
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
         title="MetsXMFanZone TV - Watch Live Mets Shows & Exclusive Content"
@@ -187,6 +189,7 @@ const MetsXMFanZone = () => {
       
       <Footer />
     </div>
+    </StreamTimeLimit>
   );
 };
 
