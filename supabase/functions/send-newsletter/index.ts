@@ -77,6 +77,7 @@ serve(async (req) => {
     // Sanitize HTML content server-side
     const sanitizedContent = sanitizeHtml(content);
 
+    // Fetch newsletter subscribers
     const { data: subscribers, error: subscribersError } = await supabase
       .from("newsletter_subscribers")
       .select("email, full_name")
@@ -84,12 +85,40 @@ serve(async (req) => {
 
     if (subscribersError) {
       console.error("Error fetching subscribers:", subscribersError);
-      throw new Error("Failed to fetch subscribers");
     }
 
-    if (!subscribers || subscribers.length === 0) {
+    // Fetch all registered users with emails
+    const { data: profiles, error: profilesError } = await supabase
+      .from("profiles")
+      .select("email, full_name")
+      .not("email", "is", null);
+
+    if (profilesError) {
+      console.error("Error fetching profiles:", profilesError);
+    }
+
+    // Combine and deduplicate by email (lowercase)
+    const emailMap = new Map<string, { email: string; full_name?: string }>();
+    
+    // Add subscribers first
+    for (const sub of subscribers || []) {
+      if (sub.email) {
+        emailMap.set(sub.email.toLowerCase(), { email: sub.email, full_name: sub.full_name || undefined });
+      }
+    }
+    
+    // Add registered users (won't overwrite existing)
+    for (const profile of profiles || []) {
+      if (profile.email && !emailMap.has(profile.email.toLowerCase())) {
+        emailMap.set(profile.email.toLowerCase(), { email: profile.email, full_name: profile.full_name || undefined });
+      }
+    }
+
+    const allRecipients = Array.from(emailMap.values());
+
+    if (allRecipients.length === 0) {
       return new Response(
-        JSON.stringify({ message: "No active subscribers found", sent: 0 }),
+        JSON.stringify({ message: "No recipients found", sent: 0 }),
         {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
@@ -100,13 +129,13 @@ serve(async (req) => {
     let successCount = 0;
     let failureCount = 0;
 
-    console.log(`Sending newsletter to ${subscribers.length} subscribers`);
+    console.log(`Sending newsletter to ${allRecipients.length} recipients (${subscribers?.length || 0} subscribers + ${profiles?.length || 0} users, deduplicated)`);
 
-    for (const subscriber of subscribers) {
+    for (const recipient of allRecipients) {
       try {
         const result = await resend.emails.send({
           from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
-          to: [subscriber.email],
+          to: [recipient.email],
           subject: subject,
           html: sanitizedContent,
           headers: {
