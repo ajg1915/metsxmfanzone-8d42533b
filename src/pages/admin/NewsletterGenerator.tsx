@@ -43,8 +43,8 @@ const generateNewsletterHtml = (title: string, content: string) => {
   const safeTitle = escapeHtml(title);
   // Content is already HTML, sanitize it
   const sanitizedContent = DOMPurify.sanitize(content, {
-    ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'a', 'h2', 'h3', 'ul', 'ol', 'li', 'br', 'img'],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'style'],
+    ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'a', 'h2', 'h3', 'ul', 'ol', 'li', 'br'],
+    ALLOWED_ATTR: ['href', 'style'],
   });
 
   return `
