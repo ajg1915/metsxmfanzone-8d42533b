@@ -259,6 +259,7 @@ export default function NewsletterGenerator() {
           content: fullHtml,
           recipientType: "specific",
           specificEmails: [testEmail],
+          useTestSender: true,
         },
       });
 
