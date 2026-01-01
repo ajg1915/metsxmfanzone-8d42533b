@@ -9,6 +9,8 @@ import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { useSessionExpiryWarning } from "@/hooks/useSessionExpiryWarning";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import { usePresenceTracking } from "@/hooks/usePresenceTracking";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
+import { StreamExitDialog } from "@/components/StreamExitDialog";
 import Index from "./pages/Index";
 import Live from "./pages/Live";
 import Community from "./pages/Community";
@@ -138,6 +140,8 @@ const App = () => {
         <PullToRefresh>
           <Toaster />
           <Sonner />
+          <ExitIntentPopup />
+          <StreamExitDialog />
           <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/live" element={<Live />} />
