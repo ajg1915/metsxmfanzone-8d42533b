@@ -189,7 +189,7 @@ export default function NewsletterGenerator() {
       
       // Auto-generate subject from topic
       if (!subject.trim()) {
-        setSubject(`MetsXMFanZone Update: ${topic}`);
+        setSubject(topic);
       }
 
       toast({
