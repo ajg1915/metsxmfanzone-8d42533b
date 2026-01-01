@@ -44,6 +44,7 @@ const userItems = [
   { title: "User Roles", url: "/admin/roles", icon: Shield },
   { title: "Users", url: "/admin/user-management", icon: UserCog },
   { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
+  { title: "Website Stats", url: "/admin/realtime-analytics", icon: TrendingUp },
 ];
 
 export function AdminSidebar() {
