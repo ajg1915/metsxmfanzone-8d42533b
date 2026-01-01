@@ -4,6 +4,9 @@ import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 interface HeroSlide {
   id: string;
@@ -11,6 +14,8 @@ interface HeroSlide {
   description: string;
   image_url: string | null;
   display_order: number;
+  link_url: string | null;
+  link_text: string | null;
 }
 
 const Hero = () => {
@@ -18,6 +23,7 @@ const Hero = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { user } = useAuth();
   const [memberSlides, setMemberSlides] = useState<HeroSlide[]>([]);
+  const navigate = useNavigate();
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -57,17 +63,23 @@ const Hero = () => {
     {
       title: "Welcome to MetsXMFanZone",
       description: "Connect with thousands of passionate Mets fans. Share your thoughts, predictions, and game reactions the all new Live Home for Mets Fans",
-      image: heroImage
+      image: heroImage,
+      link_url: null,
+      link_text: null
     },
     {
       title: "Live Game Coverage",
       description: "Watch exclusive live streams, game highlights, and expert analysis. Never miss a moment of Mets action",
-      image: heroImage
+      image: heroImage,
+      link_url: null,
+      link_text: null
     },
     {
       title: "Premium Content",
       description: "Access exclusive podcasts, behind-the-scenes content, and premium features with your membership",
-      image: heroImage
+      image: heroImage,
+      link_url: null,
+      link_text: null
     }
   ];
 
@@ -75,17 +87,23 @@ const Hero = () => {
     {
       title: "Welcome Back, Fan!",
       description: "Your home for live Mets coverage, exclusive content, and community discussions. Dive into today's action!",
-      image: heroImage
+      image: heroImage,
+      link_url: null,
+      link_text: null
     },
     {
       title: "Live Now",
       description: "Check out our live streams, game highlights, and real-time updates. Stay connected to every play!",
-      image: heroImage
+      image: heroImage,
+      link_url: null,
+      link_text: null
     },
     {
       title: "Explore Your Benefits",
       description: "Enjoy your member-exclusive podcasts, behind-the-scenes content, and premium features",
-      image: heroImage
+      image: heroImage,
+      link_url: null,
+      link_text: null
     }
   ];
 
@@ -95,10 +113,22 @@ const Hero = () => {
         ? memberSlides.map(s => ({ 
             title: s.title, 
             description: s.description, 
-            image: s.image_url || heroImage 
+            image: s.image_url || heroImage,
+            link_url: s.link_url,
+            link_text: s.link_text
           }))
         : defaultMemberSlides)
     : publicSlides;
+
+  const handleSlideClick = (linkUrl: string | null) => {
+    if (linkUrl) {
+      if (linkUrl.startsWith('http')) {
+        window.open(linkUrl, '_blank');
+      } else {
+        navigate(linkUrl);
+      }
+    }
+  };
 
   return (
     <section className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] overflow-hidden">
@@ -132,7 +162,18 @@ const Hero = () => {
                     {slide.description}
                   </p>
                   
-                  {!user && (
+                  {slide.link_url && slide.link_text && (
+                    <Button 
+                      onClick={() => handleSlideClick(slide.link_url)}
+                      className="gap-2"
+                      size="sm"
+                    >
+                      {slide.link_text}
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  )}
+                  
+                  {!user && !slide.link_url && (
                     <div className="flex items-center justify-center px-4">
                       <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-primary/80 rounded-lg bg-background/60 backdrop-blur-md hover-lift">
                         <span className="text-[11px] sm:text-xs md:text-sm text-foreground text-center leading-snug">
