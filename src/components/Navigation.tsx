@@ -143,12 +143,14 @@ const Navigation = () => {
             >
               Events
             </button>
-            <NavLink 
-              to="/plans" 
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Plans
-            </NavLink>
+            {!user && (
+              <NavLink 
+                to="/plans" 
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Plans
+              </NavLink>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -280,14 +282,16 @@ const Navigation = () => {
                     <CalendarDays className="w-4 h-4" />
                     Events
                   </button>
-                  <NavLink 
-                    to="/plans" 
-                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg touch-target"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Shield className="w-4 h-4" />
-                    Plans
-                  </NavLink>
+                  {!user && (
+                    <NavLink 
+                      to="/plans" 
+                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg touch-target"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Shield className="w-4 h-4" />
+                      Plans
+                    </NavLink>
+                  )}
                   
                   <div className="border-t border-border pt-4 mt-4">
                     {user ? (
