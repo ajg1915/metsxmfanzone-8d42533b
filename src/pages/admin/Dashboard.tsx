@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Settings, BarChart3, Globe } from "lucide-react";
+import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, BarChart3, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -114,13 +114,6 @@ export default function AdminDashboard() {
       icon: Globe,
       url: "/admin/seo",
       stat: "Optimize",
-    },
-    {
-      title: "Settings",
-      description: "Admin portal settings",
-      icon: Settings,
-      url: "/admin/settings",
-      stat: "Config",
     },
   ];
 
