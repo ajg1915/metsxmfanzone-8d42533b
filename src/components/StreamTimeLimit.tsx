@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -99,15 +99,17 @@ const StreamTimeLimit = ({ children }: StreamTimeLimitProps) => {
     return () => clearInterval(interval);
   }, [loading, userPlan]);
 
-  const handleUpgrade = useCallback(() => {
+  const handleUpgrade = () => {
     sessionStorage.removeItem(STORAGE_KEY);
-    navigate("/plans");
-  }, [navigate]);
+    setShowUpgradePrompt(false);
+    window.location.href = "/plans";
+  };
 
-  const handleGoHome = useCallback(() => {
+  const handleGoHome = () => {
     sessionStorage.removeItem(STORAGE_KEY);
-    navigate("/");
-  }, [navigate]);
+    setShowUpgradePrompt(false);
+    window.location.href = "/";
+  };
 
   if (loading) {
     return <>{children}</>;
@@ -122,8 +124,8 @@ const StreamTimeLimit = ({ children }: StreamTimeLimitProps) => {
     <>
       {!showUpgradePrompt && children}
       
-      <AlertDialog open={showUpgradePrompt} onOpenChange={() => {}}>
-        <AlertDialogContent className="max-w-md">
+      <AlertDialog open={showUpgradePrompt}>
+        <AlertDialogContent className="max-w-md" onEscapeKeyDown={(e) => e.preventDefault()}>
           <AlertDialogHeader className="text-center">
             <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
               <Clock className="w-8 h-8 text-primary" />
