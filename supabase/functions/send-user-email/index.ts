@@ -143,12 +143,17 @@ serve(async (req) => {
           .replace(/\{\{name\}\}/g, escapeHtml(recipient.name || "Fan"))
           .replace(/\{\{email\}\}/g, escapeHtml(recipient.email));
 
-        await resend.emails.send({
+        const result = await resend.emails.send({
           from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
           to: [recipient.email],
           subject: subject,
           html: personalizedContent,
         });
+
+        if ((result as any)?.error) {
+          throw (result as any).error;
+        }
+
         successCount++;
       } catch (error) {
         console.error(`Failed to send to [REDACTED]:`, error);
