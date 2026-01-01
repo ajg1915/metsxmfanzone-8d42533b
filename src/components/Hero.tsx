@@ -1,7 +1,8 @@
 import heroImage from "@/assets/hero-mets.png";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import useEmblaCarousel from "embla-carousel-react";
-import { useCallback, useEffect, useState } from "react";
+import Autoplay from "embla-carousel-autoplay";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -19,16 +20,31 @@ interface HeroSlide {
 }
 
 const Hero = () => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const autoplayRef = useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: false })
+  );
+  
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { 
+      loop: true,
+      dragFree: false,
+      containScroll: "trimSnaps",
+      align: "center"
+    },
+    [autoplayRef.current]
+  );
+  
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [prevIndex, setPrevIndex] = useState(0);
   const { user } = useAuth();
   const [memberSlides, setMemberSlides] = useState<HeroSlide[]>([]);
   const navigate = useNavigate();
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
+    setPrevIndex(selectedIndex);
     setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
+  }, [emblaApi, selectedIndex]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -132,30 +148,45 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] overflow-hidden">
-      <div ref={emblaRef} className="overflow-hidden h-full">
-        <div className="flex h-full">
+      <div ref={emblaRef} className="overflow-hidden h-full embla-hero">
+        <div className="flex h-full touch-pan-y">
           {slidesToShow.map((slide, index) => (
-            <div key={index} className="flex-[0_0_100%] min-w-0 relative">
+            <div 
+              key={index} 
+              className="flex-[0_0_100%] min-w-0 relative"
+              style={{ 
+                opacity: selectedIndex === index ? 1 : 0,
+                transition: 'opacity 0.5s ease-in-out'
+              }}
+            >
               <div className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] flex items-center justify-center">
                 <div 
-                  className="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700"
+                  className="absolute inset-0 bg-cover bg-center z-0"
                   style={{ 
                     backgroundImage: `url(${slide.image})`,
-                    transform: selectedIndex === index ? 'scale(1)' : 'scale(1.05)'
+                    transform: selectedIndex === index ? 'scale(1)' : 'scale(1.05)',
+                    transition: 'transform 0.7s ease-out'
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/75 to-background"></div>
                 </div>
                 
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-8 sm:py-10 md:py-14 max-w-6xl">
+                <div 
+                  className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-8 sm:py-10 md:py-14 max-w-6xl"
+                  style={{
+                    opacity: selectedIndex === index ? 1 : 0,
+                    transform: selectedIndex === index ? 'translateY(0)' : 'translateY(20px)',
+                    transition: 'opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s'
+                  }}
+                >
                   <div className="flex justify-center mb-4 sm:mb-5">
                     <img 
                       src={logo} 
                       alt="MetsXMFanZone" 
-                      className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain animate-scale-in" 
+                      className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain" 
                     />
                   </div>
-                  <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-primary mb-2 sm:mb-3 animate-fade-in px-2 leading-tight">
+                  <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-primary mb-2 sm:mb-3 px-2 leading-tight">
                     {slide.title}
                   </h1>
                   <p className="text-xs sm:text-sm md:text-base text-foreground/90 mb-4 sm:mb-5 max-w-lg md:max-w-xl lg:max-w-2xl mx-auto px-4 leading-relaxed">
