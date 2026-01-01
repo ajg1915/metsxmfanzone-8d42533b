@@ -21,7 +21,7 @@ interface HeroSlide {
 
 const Hero = () => {
   const autoplayRef = useRef(
-    Autoplay({ delay: 5000, stopOnInteraction: false })
+    Autoplay({ delay: 10000, stopOnInteraction: false })
   );
   
   const [emblaRef, emblaApi] = useEmblaCarousel(
