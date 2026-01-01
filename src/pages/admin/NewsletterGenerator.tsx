@@ -254,11 +254,12 @@ export default function NewsletterGenerator() {
       const fullHtml = generateNewsletterHtml(subject, generatedContent);
       
       const { error } = await supabase.functions.invoke("send-user-email", {
-        body: { 
-          subject: `[TEST] ${subject}`, 
+        body: {
+          subject: `[TEST] ${subject}`,
           content: fullHtml,
           recipientType: "specific",
           specificEmails: [testEmail],
+          useTestSender: true,
         },
       });
 
