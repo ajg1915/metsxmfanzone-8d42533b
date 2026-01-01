@@ -76,7 +76,7 @@ serve(async (req) => {
     });
 
     const authData = await authResponse.json();
-    console.log('PayPal auth response:', authData);
+    console.log('PayPal auth response: [REDACTED]');
 
     // Create PayPal order
     const orderResponse = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
@@ -102,7 +102,7 @@ serve(async (req) => {
     });
 
     const orderData = await orderResponse.json();
-    console.log('PayPal order response:', orderData);
+    console.log('PayPal order response:', { status: orderData.status || '[UNKNOWN]', id: '[REDACTED]' });
 
     if (!orderResponse.ok) {
       throw new Error(`PayPal error: ${JSON.stringify(orderData)}`);

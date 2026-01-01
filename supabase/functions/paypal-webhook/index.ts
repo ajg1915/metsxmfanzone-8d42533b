@@ -116,7 +116,7 @@ serve(async (req) => {
     }
 
     console.log('Webhook signature verified successfully');
-    console.log('Webhook data:', JSON.stringify(webhookEvent, null, 2));
+    console.log('Webhook data: event_type=' + webhookEvent.event_type + ', resource_id=[REDACTED]');
 
     const eventType = webhookEvent.event_type;
     const resource = webhookEvent.resource;
@@ -127,7 +127,7 @@ serve(async (req) => {
         // Payment completed - activate subscription
         const orderId = resource.billing_agreement_id || resource.id;
         
-        console.log('Processing payment completion for order:', orderId);
+        console.log('Processing payment completion for order: [REDACTED]');
 
         // Find subscription by PayPal order ID or subscription ID
         const { data: subscription, error: fetchError } = await supabase
@@ -296,7 +296,7 @@ serve(async (req) => {
         // Payment refunded
         const orderId = resource.billing_agreement_id || resource.sale_id;
         
-        console.log('Processing refund for order:', orderId);
+        console.log('Processing refund for order: [REDACTED]');
 
         const { error } = await supabase
           .from('subscriptions')
@@ -309,7 +309,7 @@ serve(async (req) => {
         if (error) {
           console.error('Error processing refund:', error);
         } else {
-          console.log('Refund processed for order:', orderId);
+          console.log('Refund processed for order: [REDACTED]');
         }
         break;
       }
