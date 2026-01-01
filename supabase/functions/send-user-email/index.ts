@@ -151,7 +151,7 @@ serve(async (req) => {
 
         const result = await resend.emails.send({
           from: useTestSender
-            ? "Lovable <onboarding@resend.dev>"
+            ? "MetsXMFanZone <onboarding@resend.dev>"
             : "MetsXM Fanzone <noreply@metsxmfanzone.com>",
           to: [recipient.email],
           subject: subject,
