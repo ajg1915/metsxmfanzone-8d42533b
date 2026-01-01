@@ -101,6 +101,30 @@ const generateNewsletterHtml = (title: string, content: string) => {
 </html>`;
 };
 
+const getFunctionInvokeErrorMessage = async (err: any): Promise<string> => {
+  if (!err) return "Unknown error";
+
+  // Supabase FunctionsHttpError stores the Response in `context`
+  const ctx = err?.context;
+  if (err?.name === "FunctionsHttpError" && ctx && typeof ctx?.headers?.get === "function") {
+    try {
+      const contentType = String(ctx.headers.get("Content-Type") || "");
+      if (contentType.includes("application/json") && typeof ctx.json === "function") {
+        const body = await ctx.json();
+        return body?.error || body?.message || err.message || "Request failed";
+      }
+      if (typeof ctx.text === "function") {
+        const text = await ctx.text();
+        return text || err.message || "Request failed";
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  return err?.message || String(err);
+};
+
 export default function NewsletterGenerator() {
   const [subject, setSubject] = useState("");
   const [topic, setTopic] = useState("");
@@ -246,9 +270,10 @@ export default function NewsletterGenerator() {
       });
     } catch (error: any) {
       console.error("Error sending test email:", error);
+      const message = await getFunctionInvokeErrorMessage(error);
       toast({
         title: "Send Failed",
-        description: error.message || "Failed to send test email",
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -280,9 +305,10 @@ export default function NewsletterGenerator() {
       setGeneratedContent("");
     } catch (error: any) {
       console.error("Error sending newsletter:", error);
+      const message = await getFunctionInvokeErrorMessage(error);
       toast({
         title: "Send Failed",
-        description: error.message || "Failed to send newsletter",
+        description: message,
         variant: "destructive",
       });
     } finally {
