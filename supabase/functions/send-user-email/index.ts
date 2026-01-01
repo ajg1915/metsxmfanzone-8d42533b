@@ -40,6 +40,11 @@ interface EmailRequest {
   content: string;
   recipientType: "all_users" | "subscribers" | "specific";
   specificEmails?: string[];
+  /**
+   * If true, uses a verified test sender address. Useful while the custom domain is still verifying.
+   * NOTE: Only recommended for test emails.
+   */
+  useTestSender?: boolean;
 }
 
 serve(async (req) => {
@@ -76,7 +81,7 @@ serve(async (req) => {
       throw new Error("Admin access required");
     }
 
-    const { subject, content, recipientType, specificEmails }: EmailRequest = await req.json();
+    const { subject, content, recipientType, specificEmails, useTestSender }: EmailRequest = await req.json();
 
     if (!subject || !content) {
       throw new Error("Subject and content are required");
@@ -145,7 +150,9 @@ serve(async (req) => {
           .replace(/\{\{email\}\}/g, escapeHtml(recipient.email));
 
         const result = await resend.emails.send({
-          from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
+          from: useTestSender
+            ? "Lovable <onboarding@resend.dev>"
+            : "MetsXM Fanzone <noreply@metsxmfanzone.com>",
           to: [recipient.email],
           subject: subject,
           html: personalizedContent,
