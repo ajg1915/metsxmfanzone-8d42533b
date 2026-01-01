@@ -50,7 +50,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
     },
     {
       name: "Facebook",
-      url: "https://www.facebook.com/groups/metsxmfanzoneofficial",
+      url: "https://www.facebook.com/metsxmfanzoneofficial",
       shareUrl: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
       color: "hover:bg-[#1877F2]",
       icon: (

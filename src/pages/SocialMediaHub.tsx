@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 const SocialMediaHub = () => {
   // Social media profile links - update these with your actual URLs
   const socialLinks = {
-    facebook: 'https://www.facebook.com/metsxmfanzone',
+    facebook: 'https://www.facebook.com/metsxmfanzoneofficial',
     instagram: 'https://www.instagram.com/metsxmfanzone',
     twitter: 'https://twitter.com/metsxmfanzone',
     tiktok: 'https://www.tiktok.com/@metsxmfanzone',
