@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Heart, Star, Users, Home } from "lucide-react";
+import { Home } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
 const compassionateMessages = [
   "Thank you for watching with us today! Your support means the world to the MetsXM community. 💙🧡",
@@ -65,14 +66,14 @@ export function StreamExitDialog({
       <DialogContent className="sm:max-w-md border-primary/30 bg-gradient-to-br from-background to-muted/30">
         <DialogHeader className="text-center space-y-4">
           <div className="mx-auto flex items-center justify-center gap-2">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center animate-bounce">
-              <Heart className="h-6 w-6 text-blue-500" />
+            <div className="w-12 h-12 rounded-full flex items-center justify-center animate-bounce">
+              <img src={metsLogo} alt="MetsXM" className="h-10 w-10 object-contain" />
             </div>
-            <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.1s' }}>
-              <Star className="h-5 w-5 text-orange-500" />
+            <div className="w-14 h-14 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.1s' }}>
+              <img src={metsLogo} alt="MetsXM" className="h-12 w-12 object-contain" />
             </div>
-            <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.2s' }}>
-              <Users className="h-6 w-6 text-primary" />
+            <div className="w-12 h-12 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.2s' }}>
+              <img src={metsLogo} alt="MetsXM" className="h-10 w-10 object-contain" />
             </div>
           </div>
           <DialogTitle className="text-xl text-center">Thanks for Watching!</DialogTitle>
@@ -93,7 +94,7 @@ export function StreamExitDialog({
             onClick={handleBackToStreams}
             className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-orange-500 hover:from-blue-700 hover:to-orange-600"
           >
-            <Heart className="h-4 w-4 mr-2" />
+            <img src={metsLogo} alt="MetsXM" className="h-4 w-4 mr-2" />
             Back to Streams
           </Button>
         </DialogFooter>
