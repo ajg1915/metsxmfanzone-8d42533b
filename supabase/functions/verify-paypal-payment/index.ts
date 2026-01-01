@@ -73,7 +73,7 @@ serve(async (req) => {
     });
 
     const captureData = await captureResponse.json();
-    console.log('PayPal capture response:', captureData);
+    console.log('PayPal capture response:', { status: captureData.status || '[UNKNOWN]', id: '[REDACTED]' });
 
     if (!captureResponse.ok || captureData.status !== 'COMPLETED') {
       throw new Error('Payment capture failed');
