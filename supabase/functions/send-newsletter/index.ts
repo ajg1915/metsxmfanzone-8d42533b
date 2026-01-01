@@ -68,11 +68,14 @@ serve(async (req) => {
       throw new Error("Admin access required");
     }
 
-    const { subject, content } = await req.json();
+    const { subject, content, additionalEmails } = await req.json();
 
     if (!subject || !content) {
       throw new Error("Subject and content are required");
     }
+
+    // Parse additional emails (external recipients)
+    const extraEmails: string[] = Array.isArray(additionalEmails) ? additionalEmails : [];
 
     // Sanitize HTML content server-side
     const sanitizedContent = sanitizeHtml(content);
@@ -114,6 +117,13 @@ serve(async (req) => {
       }
     }
 
+    // Add additional external emails
+    for (const email of extraEmails) {
+      if (email && !emailMap.has(email.toLowerCase())) {
+        emailMap.set(email.toLowerCase(), { email });
+      }
+    }
+
     const allRecipients = Array.from(emailMap.values());
 
     if (allRecipients.length === 0) {
@@ -129,7 +139,7 @@ serve(async (req) => {
     let successCount = 0;
     let failureCount = 0;
 
-    console.log(`Sending newsletter to ${allRecipients.length} recipients (${subscribers?.length || 0} subscribers + ${profiles?.length || 0} users, deduplicated)`);
+    console.log(`Sending newsletter to ${allRecipients.length} recipients (${subscribers?.length || 0} subscribers + ${profiles?.length || 0} users + ${extraEmails.length} additional, deduplicated)`);
 
     for (const recipient of allRecipients) {
       try {
