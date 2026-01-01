@@ -141,7 +141,11 @@ serve(async (req) => {
 
     console.log(`Sending newsletter to ${allRecipients.length} recipients (${subscribers?.length || 0} subscribers + ${profiles?.length || 0} users + ${extraEmails.length} additional, deduplicated)`);
 
-    for (const recipient of allRecipients) {
+    // Helper to delay between sends (Resend rate limit: 2 requests/second)
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    for (let i = 0; i < allRecipients.length; i++) {
+      const recipient = allRecipients[i];
       try {
         const result = await resend.emails.send({
           from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
@@ -162,6 +166,11 @@ serve(async (req) => {
       } catch (error) {
         console.error(`Failed to send to [REDACTED]:`, error);
         failureCount++;
+      }
+
+      // Rate limit: wait 600ms between emails to stay under 2/sec
+      if (i < allRecipients.length - 1) {
+        await delay(600);
       }
     }
 
