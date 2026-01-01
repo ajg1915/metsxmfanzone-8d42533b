@@ -137,6 +137,7 @@ export default function NewsletterGenerator() {
   const [subscriberCount, setSubscriberCount] = useState(0);
   const [testEmail, setTestEmail] = useState("");
   const [isSendingTest, setIsSendingTest] = useState(false);
+  const [additionalEmails, setAdditionalEmails] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -289,8 +290,14 @@ export default function NewsletterGenerator() {
     try {
       const fullHtml = generateNewsletterHtml(subject, generatedContent);
       
+      // Parse additional emails
+      const extraEmails = additionalEmails
+        .split(/[,\n]/)
+        .map(e => e.trim())
+        .filter(e => e && e.includes("@"));
+
       const { data, error } = await supabase.functions.invoke("send-newsletter", {
-        body: { subject, content: fullHtml },
+        body: { subject, content: fullHtml, additionalEmails: extraEmails },
       });
 
       if (error) throw error;
@@ -468,7 +475,22 @@ export default function NewsletterGenerator() {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Send a test email to preview before sending to all subscribers
+                Send a test email to preview before sending to all recipients
+              </p>
+            </div>
+
+            {/* Additional Emails Section */}
+            <div className="border-t pt-4 space-y-3">
+              <Label className="text-sm font-medium">Additional Recipients (Optional)</Label>
+              <Textarea
+                placeholder="Enter additional email addresses (comma or newline separated)&#10;e.g., contact@example.com, promo@partner.com"
+                value={additionalEmails}
+                onChange={(e) => setAdditionalEmails(e.target.value)}
+                rows={3}
+                className="text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                These emails will receive the newsletter in addition to subscribers and registered users
               </p>
             </div>
 
