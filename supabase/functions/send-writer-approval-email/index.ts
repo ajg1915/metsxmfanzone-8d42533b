@@ -94,7 +94,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
+      from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
       to: [email],
       subject,
       html: htmlContent,

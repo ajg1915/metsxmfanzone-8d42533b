@@ -148,7 +148,7 @@ serve(async (req) => {
       const recipient = allRecipients[i];
       try {
         const result = await resend.emails.send({
-          from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
+          from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
           to: [recipient.email],
           subject: subject,
           html: sanitizedContent,
