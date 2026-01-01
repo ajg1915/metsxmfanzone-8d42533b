@@ -33,7 +33,7 @@ serve(async (req) => {
     console.log(`Sending OTP email to: ${to}`);
 
     const emailResponse = await resend.emails.send({
-      from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
+      from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
       to: [to],
       subject: "Your MetsXMFanZone Verification Code",
       text: `Your MetsXMFanZone verification code is ${otp}. It expires in 5 minutes. IMPORTANT: If another company asks for this PIN, do not share it. We will never ask for your PIN and we will never call you.`,
