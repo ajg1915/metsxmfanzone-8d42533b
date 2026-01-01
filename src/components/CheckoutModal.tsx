@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Tag, X, CreditCard, Shield, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import metsLogo from "@/assets/metsxmfanzone-logo.png";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -168,6 +169,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
+            <img src={metsLogo} alt="MetsXM" className="h-8 w-8 object-contain" />
             <DialogTitle className="text-xl font-semibold">Checkout</DialogTitle>
           </div>
         </DialogHeader>

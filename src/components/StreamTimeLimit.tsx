@@ -11,7 +11,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Clock, Crown } from "lucide-react";
+import { Crown } from "lucide-react";
+import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
 interface StreamTimeLimitProps {
   children: React.ReactNode;
@@ -127,8 +128,8 @@ const StreamTimeLimit = ({ children }: StreamTimeLimitProps) => {
       <AlertDialog open={showUpgradePrompt}>
         <AlertDialogContent className="max-w-md" onEscapeKeyDown={(e) => e.preventDefault()}>
           <AlertDialogHeader className="text-center">
-            <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <Clock className="w-8 h-8 text-primary" />
+            <div className="mx-auto mb-4 w-16 h-16 rounded-full flex items-center justify-center">
+              <img src={metsLogo} alt="MetsXM" className="w-14 h-14 object-contain" />
             </div>
             <AlertDialogTitle className="text-xl">
               Your Free Preview Has Ended
@@ -144,7 +145,7 @@ const StreamTimeLimit = ({ children }: StreamTimeLimitProps) => {
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
             <Button onClick={handleUpgrade} className="w-full gap-2">
-              <Crown className="w-4 h-4" />
+              <img src={metsLogo} alt="MetsXM" className="w-4 h-4 object-contain" />
               Select a Plan
             </Button>
             <Button variant="outline" onClick={handleGoHome} className="w-full">
