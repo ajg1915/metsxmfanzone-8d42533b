@@ -156,6 +156,10 @@ serve(async (req) => {
           to: [recipient.email],
           subject: subject,
           html: personalizedContent,
+          headers: {
+            "List-Unsubscribe": "<mailto:unsubscribe@metsxmfanzone.com>",
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
         });
 
         if ((result as any)?.error) {
