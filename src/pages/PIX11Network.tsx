@@ -2,6 +2,7 @@ import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { StreamPlayer } from "@/components/StreamPlayer";
+import StreamTimeLimit from "@/components/StreamTimeLimit";
 import SEOHead from "@/components/SEOHead";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { motion } from "framer-motion";
 
 const PIX11Network = () => {
   return (
+    <StreamTimeLimit>
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
         title="PIX11 Live Stream - Watch PIX11 New York Live | MetsXMFanZone"
@@ -190,6 +192,7 @@ const PIX11Network = () => {
       
       <Footer />
     </div>
+    </StreamTimeLimit>
   );
 };
 

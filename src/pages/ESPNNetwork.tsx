@@ -1,6 +1,7 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { StreamPlayer } from "@/components/StreamPlayer";
+import StreamTimeLimit from "@/components/StreamTimeLimit";
 import SEOHead from "@/components/SEOHead";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { motion } from "framer-motion";
 
 const ESPNNetwork = () => {
   return (
+    <StreamTimeLimit>
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
         title="ESPN Network Live - Watch ESPN Baseball Coverage | MetsXMFanZone"
@@ -186,6 +188,7 @@ const ESPNNetwork = () => {
       
       <Footer />
     </div>
+    </StreamTimeLimit>
   );
 };
 
