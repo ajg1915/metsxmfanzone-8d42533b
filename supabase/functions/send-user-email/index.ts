@@ -144,7 +144,7 @@ serve(async (req) => {
           .replace(/\{\{email\}\}/g, escapeHtml(recipient.email));
 
         await resend.emails.send({
-          from: "MetsXMFanZone <onboarding@resend.dev>",
+          from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
           to: [recipient.email],
           subject: subject,
           html: personalizedContent,

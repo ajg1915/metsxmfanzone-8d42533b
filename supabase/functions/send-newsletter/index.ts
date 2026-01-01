@@ -89,7 +89,7 @@ serve(async (req) => {
     for (const subscriber of subscribers) {
       try {
         await resend.emails.send({
-          from: "MetsXMFanZone <onboarding@resend.dev>",
+          from: "MetsXM Fanzone <noreply@metsxmfanzone.com>",
           to: [subscriber.email],
           subject: subject,
           html: sanitizedContent,
