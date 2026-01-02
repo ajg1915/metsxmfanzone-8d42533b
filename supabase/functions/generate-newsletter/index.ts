@@ -65,7 +65,15 @@ Generate a complete newsletter with:
 5. A strong call-to-action
 6. A professional closing
 
-Format the newsletter in HTML with proper styling for email clients.`;
+IMPORTANT FORMATTING RULES:
+- Use <br> tags for line breaks within paragraphs
+- Use <br><br> for paragraph spacing
+- Use <h2> and <h3> for section headings
+- Use <strong> for emphasis
+- Keep the content clean and readable with proper spacing using <br> tags
+- Do NOT include <html>, <head>, <body> tags - just the inner content
+
+Format the newsletter content in HTML for email clients.`;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
