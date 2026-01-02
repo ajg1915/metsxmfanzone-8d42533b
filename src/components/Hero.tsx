@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 
 interface HeroSlide {
   id: string;
@@ -218,6 +218,14 @@ const Hero = () => {
             </div>
           ))}
         </div>
+      </div>
+      
+      {/* Animated scroll indicator */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 animate-bounce">
+        <span className="text-[10px] sm:text-xs text-foreground/70 font-medium tracking-wide uppercase">
+          Explore
+        </span>
+        <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
       </div>
     </section>
   );
