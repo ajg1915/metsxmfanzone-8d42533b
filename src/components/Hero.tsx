@@ -146,6 +146,13 @@ const Hero = () => {
     }
   };
 
+  const scrollToContent = () => {
+    window.scrollTo({
+      top: window.innerHeight - 100,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <>
       <section className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] overflow-hidden">
@@ -223,12 +230,16 @@ const Hero = () => {
       </section>
       
       {/* Animated scroll indicator below hero */}
-      <div className="flex flex-col items-center gap-1 py-3 animate-bounce">
+      <button 
+        onClick={scrollToContent}
+        className="flex flex-col items-center gap-1 py-3 animate-bounce w-full cursor-pointer hover:opacity-80 transition-opacity"
+        aria-label="Scroll to content"
+      >
         <span className="text-[10px] sm:text-xs text-foreground/70 font-medium tracking-wide uppercase">
           Explore
         </span>
         <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-      </div>
+      </button>
     </>
   );
 };
