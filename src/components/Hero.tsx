@@ -227,13 +227,12 @@ const Hero = () => {
 
       {/* Animated Scroll Indicator - Inside Hero at Bottom */}
       <div 
-        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center cursor-pointer group"
+        className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center cursor-pointer group"
         onClick={handleScrollDown}
       >
         <span className="text-xs text-muted-foreground mb-1 group-hover:text-primary transition-colors">
           Explore
         </span>
-        <ChevronDown className="w-5 h-5 text-muted-foreground animate-bounce group-hover:text-primary transition-colors" />
       </div>
     </section>
   );
