@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 
 interface HeroSlide {
   id: string;
@@ -147,77 +147,97 @@ const Hero = () => {
     }
   };
 
+  const handleScrollDown = () => {
+    window.scrollBy({
+      top: window.innerHeight - 100,
+      behavior: 'smooth'
+    });
+  };
+
   return (
-    <section className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] overflow-hidden">
-      <div ref={emblaRef} className="overflow-hidden h-full embla-hero">
-        <div className="flex h-full touch-pan-y">
-          {slidesToShow.map((slide, index) => (
-            <div
-              key={index}
-              className="flex-[0_0_100%] min-w-0 relative"
-              style={{
-                opacity: selectedIndex === index ? 1 : 0,
-                transition: "opacity 0.5s ease-in-out",
-              }}
-            >
-              <div className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] flex items-center justify-center">
-                <div
-                  className="absolute inset-0 bg-cover bg-center z-0"
-                  style={{
-                    backgroundImage: `url(${slide.image})`,
-                    transform: selectedIndex === index ? "scale(1)" : "scale(1.05)",
-                    transition: "transform 0.7s ease-out",
-                  }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/75 to-background"></div>
-                </div>
-
-                <div
-                  className="container mx-auto px-4 sm:px-4 lg:px-8 relative z-10 text-center py-8 sm:py-10 md:py-14 max-w-6xl"
-                  style={{
-                    opacity: selectedIndex === index ? 1 : 0,
-                    transform: selectedIndex === index ? "translateY(0)" : "translateY(20px)",
-                    transition: "opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s",
-                  }}
-                >
-                  <div className="flex justify-center mb-4 sm:mb-5">
-                    <img
-                      src={logo}
-                      alt="MetsXMFanZone"
-                      className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain"
-                    />
+    <>
+      <section className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] overflow-hidden">
+        <div ref={emblaRef} className="overflow-hidden h-full embla-hero">
+          <div className="flex h-full touch-pan-y">
+            {slidesToShow.map((slide, index) => (
+              <div
+                key={index}
+                className="flex-[0_0_100%] min-w-0 relative"
+                style={{
+                  opacity: selectedIndex === index ? 1 : 0,
+                  transition: "opacity 0.5s ease-in-out",
+                }}
+              >
+                <div className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] flex items-center justify-center">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center z-0"
+                    style={{
+                      backgroundImage: `url(${slide.image})`,
+                      transform: selectedIndex === index ? "scale(1)" : "scale(1.05)",
+                      transition: "transform 0.7s ease-out",
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/75 to-background"></div>
                   </div>
-                  <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-primary mb-2 sm:mb-3 px-2 leading-tight">
-                    {slide.title}
-                  </h1>
-                  <p className="text-xs sm:text-sm md:text-base text-foreground/90 mb-4 sm:mb-5 max-w-lg md:max-w-xl lg:max-w-2xl mx-auto px-4 leading-relaxed">
-                    {slide.description}
-                  </p>
 
-                  {slide.link_url && slide.link_text && (
-                    <Button onClick={() => handleSlideClick(slide.link_url)} className="gap-2" size="sm">
-                      {slide.link_text}
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  )}
-
-                  {!user && !slide.link_url && (
-                    <div className="flex items-center justify-center px-4">
-                      <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-primary/80 rounded-lg bg-background/60 backdrop-blur-md hover-lift">
-                        <span className="text-[11px] sm:text-xs md:text-sm text-foreground text-center leading-snug">
-                          ⚡ Start your <span className="text-primary font-bold">7-day FREE trial</span> for unlimited
-                          access
-                        </span>
-                      </div>
+                  <div
+                    className="container mx-auto px-4 sm:px-4 lg:px-8 relative z-10 text-center py-8 sm:py-10 md:py-14 max-w-6xl"
+                    style={{
+                      opacity: selectedIndex === index ? 1 : 0,
+                      transform: selectedIndex === index ? "translateY(0)" : "translateY(20px)",
+                      transition: "opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s",
+                    }}
+                  >
+                    <div className="flex justify-center mb-4 sm:mb-5">
+                      <img
+                        src={logo}
+                        alt="MetsXMFanZone"
+                        className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain"
+                      />
                     </div>
-                  )}
+                    <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-primary mb-2 sm:mb-3 px-2 leading-tight">
+                      {slide.title}
+                    </h1>
+                    <p className="text-xs sm:text-sm md:text-base text-foreground/90 mb-4 sm:mb-5 max-w-lg md:max-w-xl lg:max-w-2xl mx-auto px-4 leading-relaxed">
+                      {slide.description}
+                    </p>
+
+                    {slide.link_url && slide.link_text && (
+                      <Button onClick={() => handleSlideClick(slide.link_url)} className="gap-2" size="sm">
+                        {slide.link_text}
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    )}
+
+                    {!user && !slide.link_url && (
+                      <div className="flex items-center justify-center px-4">
+                        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-primary/80 rounded-lg bg-background/60 backdrop-blur-md hover-lift">
+                          <span className="text-[11px] sm:text-xs md:text-sm text-foreground text-center leading-snug">
+                            ⚡ Start your <span className="text-primary font-bold">7-day FREE trial</span> for unlimited
+                            access
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+      </section>
+
+      {/* Animated Scroll Indicator - Below Hero */}
+      <div 
+        className="flex flex-col items-center py-4 bg-background cursor-pointer group"
+        onClick={handleScrollDown}
+      >
+        <span className="text-xs text-muted-foreground mb-1 group-hover:text-primary transition-colors">
+          Explore
+        </span>
+        <ChevronDown className="w-5 h-5 text-muted-foreground animate-bounce group-hover:text-primary transition-colors" />
       </div>
-    </section>
+    </>
   );
 };
 
