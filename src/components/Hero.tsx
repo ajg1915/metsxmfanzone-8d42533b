@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface HeroSlide {
   id: string;
@@ -147,15 +147,8 @@ const Hero = () => {
     }
   };
 
-  const handleScrollDown = () => {
-    window.scrollBy({
-      top: window.innerHeight - 100,
-      behavior: 'smooth'
-    });
-  };
-
   return (
-    <section className="relative min-h-[320px] sm:min-h-[360px] md:min-h-[420px] lg:min-h-[480px] overflow-hidden">
+    <section className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] overflow-hidden">
       <div ref={emblaRef} className="overflow-hidden h-full embla-hero">
         <div className="flex h-full touch-pan-y">
           {slidesToShow.map((slide, index) => (
@@ -167,7 +160,7 @@ const Hero = () => {
                 transition: "opacity 0.5s ease-in-out",
               }}
             >
-              <div className="relative min-h-[320px] sm:min-h-[360px] md:min-h-[420px] lg:min-h-[480px] flex items-center justify-center">
+              <div className="relative min-h-[280px] sm:min-h-[320px] md:min-h-[380px] lg:min-h-[420px] flex items-center justify-center">
                 <div
                   className="absolute inset-0 bg-cover bg-center z-0"
                   style={{
@@ -223,16 +216,6 @@ const Hero = () => {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Animated Scroll Indicator - Inside Hero at Bottom */}
-      <div 
-        className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center cursor-pointer group"
-        onClick={handleScrollDown}
-      >
-        <span className="text-xs text-muted-foreground mb-1 group-hover:text-primary transition-colors">
-          Explore
-        </span>
       </div>
     </section>
   );
