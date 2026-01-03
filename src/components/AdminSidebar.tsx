@@ -1,4 +1,4 @@
-import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers } from "lucide-react";
+import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers, Sparkles } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -21,6 +21,7 @@ const mainItems = [
 
 const mediaItems = [
   { title: "Blog", url: "/admin/blog", icon: FileText },
+  { title: "Stories", url: "/admin/stories", icon: Sparkles },
   { title: "Videos", url: "/admin/video-gallery-management", icon: Video },
   { title: "Podcasts", url: "/admin/podcasts", icon: Mic },
   { title: "Newsletter", url: "/admin/newsletter", icon: Mail },
