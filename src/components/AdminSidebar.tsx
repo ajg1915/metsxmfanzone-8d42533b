@@ -3,7 +3,7 @@ import {
   MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, 
   Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, 
   Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers, Sparkles, 
-  AlertCircle, Tv
+  Tv, Newspaper
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -45,7 +45,7 @@ const liveItems = [
   { title: "Replays", url: "/admin/stream-replays", icon: PlaySquare },
   { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
   { title: "TV Schedule", url: "/admin/tv-schedule", icon: Tv },
-  { title: "Live Alerts", url: "/admin/live-notification", icon: AlertCircle },
+  { title: "News Tracker", url: "/admin/news-tracker", icon: Newspaper },
 ];
 
 // Events & Schedules
