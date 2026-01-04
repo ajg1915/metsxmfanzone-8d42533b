@@ -17,6 +17,7 @@ interface HeroSlide {
   display_order: number;
   link_url: string | null;
   link_text: string | null;
+  show_watch_live: boolean | null;
 }
 
 const Hero = () => {
@@ -81,6 +82,7 @@ const Hero = () => {
       image: heroImage,
       link_url: null,
       link_text: null,
+      show_watch_live: true,
       badges: ["LIVE", "2025", "HD"],
     },
     {
@@ -91,6 +93,7 @@ const Hero = () => {
       image: heroImage,
       link_url: "/live",
       link_text: "Watch Now",
+      show_watch_live: true,
       badges: ["LIVE", "HD", "4K"],
     },
     {
@@ -100,6 +103,7 @@ const Hero = () => {
       image: heroImage,
       link_url: "/plans",
       link_text: "Subscribe",
+      show_watch_live: false,
       badges: ["PREMIUM", "EXCLUSIVE"],
     },
   ];
@@ -113,6 +117,7 @@ const Hero = () => {
       image: heroImage,
       link_url: null,
       link_text: null,
+      show_watch_live: true,
       badges: ["MEMBER", "LIVE"],
     },
     {
@@ -122,6 +127,7 @@ const Hero = () => {
       image: heroImage,
       link_url: "/live",
       link_text: "Watch",
+      show_watch_live: true,
       badges: ["LIVE", "HD"],
     },
     {
@@ -131,6 +137,7 @@ const Hero = () => {
       image: heroImage,
       link_url: null,
       link_text: null,
+      show_watch_live: false,
       badges: ["PREMIUM", "UNLIMITED"],
     },
   ];
@@ -145,6 +152,7 @@ const Hero = () => {
           image: s.image_url || heroImage,
           link_url: s.link_url,
           link_text: s.link_text,
+          show_watch_live: s.show_watch_live ?? true,
           badges: ["MEMBER", "EXCLUSIVE"],
         }))
       : defaultMemberSlides
@@ -220,7 +228,7 @@ const Hero = () => {
                   </span>
 
                   {/* Title */}
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-foreground mb-4 max-w-2xl leading-tight uppercase tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-3 max-w-2xl leading-tight uppercase tracking-tight">
                     {slide.title}
                   </h1>
 
@@ -238,20 +246,22 @@ const Hero = () => {
                   </div>
 
                   {/* Description */}
-                  <p className="text-sm sm:text-base md:text-lg text-foreground/80 mb-6 max-w-lg leading-relaxed">
+                  <p className="text-xs sm:text-sm md:text-base text-foreground/80 mb-5 max-w-md leading-relaxed">
                     {slide.description}
                   </p>
 
                   {/* Action Buttons */}
                   <div className="flex items-center gap-3 flex-wrap">
-                    <Button
-                      onClick={() => navigate("/live")}
-                      size="lg"
-                      className="gap-2 bg-foreground text-background hover:bg-foreground/90 font-bold px-6 sm:px-8"
-                    >
-                      <Play className="w-5 h-5 fill-current" />
-                      Watch Live
-                    </Button>
+                    {slide.show_watch_live && (
+                      <Button
+                        onClick={() => navigate("/live")}
+                        size="lg"
+                        className="gap-2 bg-foreground text-background hover:bg-foreground/90 font-bold px-6 sm:px-8"
+                      >
+                        <Play className="w-5 h-5 fill-current" />
+                        Watch Live
+                      </Button>
+                    )}
                     <Button
                       onClick={() => navigate(user ? "/community" : "/auth")}
                       size="lg"

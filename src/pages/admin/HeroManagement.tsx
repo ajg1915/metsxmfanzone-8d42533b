@@ -21,6 +21,7 @@ interface HeroSlide {
   blog_post_id: string | null;
   link_url: string | null;
   link_text: string | null;
+  show_watch_live: boolean;
 }
 
 interface BlogPost {
@@ -80,7 +81,8 @@ const HeroManagement = () => {
           description: "Enter slide description here",
           display_order: newOrder,
           is_for_members: true,
-          published: false
+          published: false,
+          show_watch_live: true
         })
         .select()
         .single();
@@ -141,7 +143,8 @@ const HeroManagement = () => {
           published: slide.published,
           blog_post_id: slide.blog_post_id,
           link_url: slide.link_url,
-          link_text: slide.link_text
+          link_text: slide.link_text,
+          show_watch_live: slide.show_watch_live
         })
         .eq("id", slide.id);
 
@@ -266,6 +269,13 @@ const HeroManagement = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={slide.show_watch_live}
+                        onCheckedChange={(checked) => updateSlide(slide.id, "show_watch_live", checked)}
+                      />
+                      <Label className="text-sm">Watch Live Button</Label>
+                    </div>
                     <div className="flex items-center gap-2">
                       <Switch
                         checked={slide.published}
