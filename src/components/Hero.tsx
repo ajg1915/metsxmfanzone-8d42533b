@@ -73,9 +73,29 @@ const Hero = () => {
     }
   }, [user]);
 
-  const publicSlides = [
+  const [publicSlides, setPublicSlides] = useState<HeroSlide[]>([]);
+
+  // Fetch public slides from database
+  useEffect(() => {
+    const fetchPublicSlides = async () => {
+      const { data, error } = await supabase
+        .from("hero_slides")
+        .select("*")
+        .eq("is_for_members", false)
+        .eq("published", true)
+        .order("display_order", { ascending: true });
+
+      if (!error && data) {
+        setPublicSlides(data);
+      }
+    };
+
+    fetchPublicSlides();
+  }, []);
+
+  const defaultPublicSlides = [
     {
-      title: "MetsXMFanZone",
+      title: "METSXMFANZONE.TV",
       subtitle: "LIVE HOME FOR METS FANS",
       description:
         "Connect with thousands of passionate Mets fans. Share your thoughts, predictions, and game reactions in the all new Live Home for Mets Fans.",
@@ -156,7 +176,18 @@ const Hero = () => {
           badges: ["MEMBER", "EXCLUSIVE"],
         }))
       : defaultMemberSlides
-    : publicSlides;
+    : publicSlides.length > 0
+      ? publicSlides.map((s) => ({
+          title: s.title,
+          subtitle: "PUBLIC CONTENT",
+          description: s.description,
+          image: s.image_url || heroImage,
+          link_url: s.link_url,
+          link_text: s.link_text,
+          show_watch_live: s.show_watch_live ?? true,
+          badges: ["LIVE", "2025", "HD"],
+        }))
+      : defaultPublicSlides;
 
   const handleSlideClick = (linkUrl: string | null) => {
     if (linkUrl) {
