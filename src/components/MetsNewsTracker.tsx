@@ -144,7 +144,7 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full">
               <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live Updates from MetsXMFanZone Newsroom</span>
+            <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live MetsXMFanZone Newsroom</span>
             </div>
             <h2 className="text-4xl font-bold text-foreground mb-4">MLB Live Tracker</h2>
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -185,7 +185,7 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live Updates from MetsXMFanZone Newsroom</span>
+            <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live MetsXMFanZone Newsroom</span>
           </div>
           <h2 className="text-4xl font-bold text-foreground mb-4">
             MLB Live Tracker
