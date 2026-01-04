@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Play, Users, Menu, Shield, User, LogOut, LayoutDashboard, X, Trophy, CalendarDays } from "lucide-react";
+import { Play, Users, Menu, Shield, User, LogOut, LayoutDashboard, X, Trophy, CalendarDays, ArrowLeft } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
@@ -30,10 +30,21 @@ const Navigation = () => {
   const { user, signOut } = useAuth();
   const { tier } = useSubscription();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isAdmin, setIsAdmin] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [userProfile, setUserProfile] = useState<{ full_name: string | null; avatar_url: string | null }>({ full_name: null, avatar_url: null });
+  
+  const isHomePage = location.pathname === "/";
+  
+  const handleGoBack = () => {
+    if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
 
   useEffect(() => {
     const checkAdminAndProfile = async () => {
@@ -93,15 +104,27 @@ const Navigation = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
         <div className="container mx-auto px-3 sm:px-4">
         <div className="flex items-center justify-between h-12">
-          <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => navigate("/")}>
-            <img 
-              src={logo} 
-              alt="MetsXMFanZone Logo" 
-              className="h-8 w-auto"
-            />
-            <div className="text-xs font-semibold">
-              <span className="text-foreground">MetsXMFanZone</span>
-              <span className="text-primary">.com</span>
+          <div className="flex items-center gap-2">
+            {!isHomePage && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleGoBack}
+                className="h-8 w-8 p-0"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
+            <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => navigate("/")}>
+              <img 
+                src={logo} 
+                alt="MetsXMFanZone Logo" 
+                className="h-8 w-auto"
+              />
+              <div className="text-xs font-semibold">
+                <span className="text-foreground">MetsXMFanZone</span>
+                <span className="text-primary">.com</span>
+              </div>
             </div>
           </div>
           
