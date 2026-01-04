@@ -121,7 +121,7 @@ const Hero = () => {
       subtitle: "Join Like a Super Fan",
       description: "Access exclusive podcasts, behind-the-scenes content, and premium features with your membership.",
       image: heroImage,
-      link_url: "/podcast,
+      link_url: "/podcast",
       link_text: "Subscribe",
       show_watch_live: false,
       badges: ["MetsXMFanZoneTV", "Podcast"],
