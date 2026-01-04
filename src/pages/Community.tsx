@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,8 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone } from "lucide-react";
+import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone, FileText } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import StoriesSection from "@/components/StoriesSection";
 import BusinessAdsSection from "@/components/BusinessAdsSection";
@@ -30,6 +31,27 @@ interface Post {
     email: string | null;
   } | null;
 }
+
+interface BlogPost {
+  id: string;
+  user_id: string;
+  title: string;
+  excerpt: string | null;
+  content: string;
+  slug: string;
+  featured_image_url: string | null;
+  category: string;
+  published_at: string | null;
+  created_at: string;
+  profiles: {
+    full_name: string | null;
+    email: string | null;
+  } | null;
+}
+
+type FeedItem = 
+  | (Post & { type: 'post' })
+  | (BlogPost & { type: 'blog' });
 
 const postSchema = z.object({
   content: z.string().min(1, "Post content is required").max(5000, "Post must be less than 5000 characters").trim(),
@@ -51,7 +73,7 @@ const Community = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [newPost, setNewPost] = useState("");
   const [uploading, setUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -63,12 +85,13 @@ const Community = () => {
     }
 
     if (user) {
-      fetchPosts();
+      fetchFeed();
     }
   }, [user, loading, navigate]);
 
-  const fetchPosts = async () => {
-    const { data, error } = await supabase
+  const fetchFeed = async () => {
+    // Fetch community posts
+    const { data: postsData, error: postsError } = await supabase
       .from("posts")
       .select(`
         *,
@@ -79,30 +102,74 @@ const Community = () => {
       `)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching posts:", error);
-    } else {
-      // Generate signed URLs for images
-      const postsWithSignedUrls = await Promise.all(
-        (data || []).map(async (post) => {
-          if (post.image_url) {
-            const fileName = post.image_url.split('/community_images/')[1];
-            if (fileName) {
-              const { data: signedUrlData } = await supabase.storage
-                .from('community_images')
-                .createSignedUrl(fileName, 3600); // 1 hour expiry
-              
-              return {
-                ...post,
-                image_url: signedUrlData?.signedUrl || post.image_url
-              };
-            }
-          }
-          return post;
-        })
-      );
-      setPosts(postsWithSignedUrls as any || []);
+    if (postsError) {
+      console.error("Error fetching posts:", postsError);
     }
+
+    // Fetch published blog posts
+    const { data: blogData, error: blogError } = await supabase
+      .from("blog_posts")
+      .select(`
+        id,
+        user_id,
+        title,
+        excerpt,
+        content,
+        slug,
+        featured_image_url,
+        category,
+        published_at,
+        created_at,
+        profiles (
+          full_name,
+          email
+        )
+      `)
+      .eq("published", true)
+      .order("published_at", { ascending: false });
+
+    if (blogError) {
+      console.error("Error fetching blog posts:", blogError);
+    }
+
+    // Generate signed URLs for community post images
+    const postsWithSignedUrls = await Promise.all(
+      (postsData || []).map(async (post) => {
+        if (post.image_url) {
+          const fileName = post.image_url.split('/community_images/')[1] || post.image_url;
+          if (fileName) {
+            const { data: signedUrlData } = await supabase.storage
+              .from('community_images')
+              .createSignedUrl(fileName, 3600);
+            
+            return {
+              ...post,
+              image_url: signedUrlData?.signedUrl || post.image_url,
+              type: 'post' as const
+            };
+          }
+        }
+        return { ...post, type: 'post' as const };
+      })
+    );
+
+    // Mark blog posts with type
+    const blogPostsWithType = (blogData || []).map(blog => ({
+      ...blog,
+      type: 'blog' as const
+    }));
+
+    // Combine and sort by created_at/published_at
+    const combinedFeed: FeedItem[] = [
+      ...postsWithSignedUrls,
+      ...blogPostsWithType
+    ].sort((a, b) => {
+      const dateA = a.type === 'blog' ? (a.published_at || a.created_at) : a.created_at;
+      const dateB = b.type === 'blog' ? (b.published_at || b.created_at) : b.created_at;
+      return new Date(dateB).getTime() - new Date(dateA).getTime();
+    });
+
+    setFeedItems(combinedFeed);
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,7 +252,7 @@ const Community = () => {
 
       setNewPost("");
       setSelectedImage(null);
-      fetchPosts();
+      fetchFeed();
 
       toast({
         title: "Success",
@@ -222,7 +289,7 @@ const Community = () => {
         description: "Post deleted successfully",
       });
 
-      fetchPosts();
+      fetchFeed();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -372,22 +439,30 @@ const Community = () => {
           )}
 
           <div className="space-y-4">
-            {posts.map((post) => (
-              <Card key={post.id}>
+            {feedItems.map((item) => (
+              <Card key={`${item.type}-${item.id}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <Avatar>
                         <AvatarFallback>
-                          {post.profiles?.full_name?.[0] || post.profiles?.email?.[0] || "U"}
+                          {item.profiles?.full_name?.[0] || item.profiles?.email?.[0] || "U"}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold">
-                          {post.profiles?.full_name || post.profiles?.email || "Anonymous"}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold">
+                            {item.profiles?.full_name || item.profiles?.email || "Anonymous"}
+                          </p>
+                          {item.type === 'blog' && (
+                            <Badge variant="secondary" className="text-xs">
+                              <FileText className="w-3 h-3 mr-1" />
+                              Blog
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(post.created_at).toLocaleDateString("en-US", {
+                          {new Date(item.type === 'blog' ? (item.published_at || item.created_at) : item.created_at).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
                             year: "numeric",
@@ -397,11 +472,11 @@ const Community = () => {
                         </p>
                       </div>
                     </div>
-                    {post.user_id === user?.id && (
+                    {item.type === 'post' && item.user_id === user?.id && (
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDeletePost(post.id)}
+                        onClick={() => handleDeletePost(item.id)}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -409,13 +484,40 @@ const Community = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="mb-4 whitespace-pre-wrap">{post.content}</p>
-                  {post.image_url && (
-                    <img
-                      src={post.image_url}
-                      alt="Post"
-                      className="rounded-lg max-w-full h-auto"
-                    />
+                  {item.type === 'blog' ? (
+                    <div className="space-y-3">
+                      <Link to={`/blog/${item.slug}`} className="block group">
+                        <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
+                          {item.title}
+                        </h3>
+                      </Link>
+                      {item.featured_image_url && (
+                        <Link to={`/blog/${item.slug}`}>
+                          <img
+                            src={item.featured_image_url}
+                            alt={item.title}
+                            className="rounded-lg w-full h-48 object-cover"
+                          />
+                        </Link>
+                      )}
+                      <p className="text-muted-foreground line-clamp-3">
+                        {item.excerpt || item.content.substring(0, 200)}...
+                      </p>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/blog/${item.slug}`}>Read Full Article</Link>
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="mb-4 whitespace-pre-wrap">{item.content}</p>
+                      {item.image_url && (
+                        <img
+                          src={item.image_url}
+                          alt="Post"
+                          className="rounded-lg max-w-full h-auto"
+                        />
+                      )}
+                    </>
                   )}
                   <div className="flex items-center gap-4 mt-4 pt-4 border-t">
                     <Button variant="ghost" size="sm">
@@ -427,7 +529,7 @@ const Community = () => {
               </Card>
             ))}
 
-            {posts.length === 0 && (
+            {feedItems.length === 0 && (
               <Card>
                 <CardContent className="p-8 text-center">
                   <p className="text-muted-foreground">
