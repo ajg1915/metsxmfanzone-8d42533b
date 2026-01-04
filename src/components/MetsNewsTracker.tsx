@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, Clock, Newspaper, AlertCircle, ExternalLink, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface NewsItem {
   id: string;
@@ -14,6 +16,7 @@ interface NewsItem {
   time_ago: string;
   image_url: string;
   link?: string | null;
+  is_mets_related?: boolean;
 }
 
 interface MetsNewsTrackerProps {
@@ -25,6 +28,7 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [metsOnly, setMetsOnly] = useState(false);
 
   const fetchNewsItems = async () => {
     setLoading(true);
@@ -126,6 +130,54 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
     return null;
   }
 
+  // Filter news based on toggle
+  const filteredNews = metsOnly 
+    ? newsItems.filter(item => item.is_mets_related)
+    : newsItems;
+
+  if (filteredNews.length === 0 && metsOnly && newsItems.length > 0) {
+    // Show message if no Mets news but there is MLB news
+    return (
+      <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="container mx-auto px-4 relative z-10 max-w-7xl">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live Updates from ESPN</span>
+            </div>
+            <h2 className="text-4xl font-bold text-foreground mb-4">MLB Live Tracker</h2>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Label htmlFor="mets-filter" className="text-sm font-medium">All MLB</Label>
+              <Switch 
+                id="mets-filter" 
+                checked={metsOnly} 
+                onCheckedChange={setMetsOnly}
+              />
+              <Label htmlFor="mets-filter" className="text-sm font-medium text-primary">Mets Only</Label>
+            </div>
+          </div>
+          <div className="text-center py-8">
+            <img 
+              src="https://a.espncdn.com/i/teamlogos/mlb/500/nym.png" 
+              alt="Mets Logo" 
+              className="w-20 h-20 mx-auto mb-4 opacity-50"
+            />
+            <p className="text-muted-foreground">No Mets-specific news at the moment.</p>
+            <Button 
+              onClick={() => setMetsOnly(false)} 
+              variant="outline" 
+              size="sm" 
+              className="mt-4"
+            >
+              View All MLB News
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background relative overflow-hidden">
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
@@ -133,23 +185,35 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-          <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live Updates from ESPN</span>
-        </div>
-        <h2 className="text-4xl font-bold text-foreground mb-4">
-          MLB Live Tracker
-        </h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto mb-2">
-          Real-time news, signings, trades, and updates from around the league
-        </p>
+            <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live Updates from ESPN</span>
+          </div>
+          <h2 className="text-4xl font-bold text-foreground mb-4">
+            MLB Live Tracker
+          </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-2">
+            Real-time news, signings, trades, and updates from around the league
+          </p>
+          
+          {/* Mets/MLB Toggle */}
+          <div className="flex items-center justify-center gap-3 mt-4 mb-2">
+            <Label htmlFor="mets-filter-main" className="text-sm font-medium cursor-pointer">All MLB</Label>
+            <Switch 
+              id="mets-filter-main" 
+              checked={metsOnly} 
+              onCheckedChange={setMetsOnly}
+            />
+            <Label htmlFor="mets-filter-main" className="text-sm font-medium text-primary cursor-pointer">Mets Only</Label>
+          </div>
+          
           {lastUpdated && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mt-2">
               Last updated: {lastUpdated.toLocaleTimeString()}
             </p>
           )}
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {newsItems.map((item) => {
+          {filteredNews.map((item) => {
             const typeConfig = getTypeConfig(item.type);
             const IconComponent = typeConfig.icon;
             

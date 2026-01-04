@@ -52,38 +52,24 @@ serve(async (req) => {
       }
     }
 
-    // If no Mets-specific news, get MLB general news and filter
-    if (allArticles.length === 0) {
-      console.log("No Mets-specific news, fetching MLB general news...");
-      try {
-        const mlbResponse = await fetch("https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news");
-        if (mlbResponse.ok) {
-          const mlbData: ESPNResponse = await mlbResponse.json();
-          const mlbArticles = mlbData.articles || [];
-          console.log(`Received ${mlbArticles.length} MLB general articles`);
-          
-          // Filter for Mets-related content
-          const metsKeywords = ['mets', 'new york mets', 'nym', 'citi field', 'lindor', 'alonso', 'nimmo', 'mcneil', 'senga', 'diaz', 'baty', 'alvarez', 'mendez', 'grimace'];
-          const metsArticles = mlbArticles.filter(article => {
-            const headline = article.headline?.toLowerCase() || '';
-            const description = article.description?.toLowerCase() || '';
-            return metsKeywords.some(keyword => 
-              headline.includes(keyword) || description.includes(keyword)
-            );
-          });
-          console.log(`Found ${metsArticles.length} Mets-related articles from MLB news`);
-          
-          // If still no Mets news, take all MLB news for offseason display
-          if (metsArticles.length === 0) {
-            console.log("No Mets-filtered news, using top MLB news");
-            allArticles.push(...mlbArticles.slice(0, 6));
-          } else {
-            allArticles.push(...metsArticles);
+    // Also fetch MLB general news
+    console.log("Fetching MLB general news...");
+    try {
+      const mlbResponse = await fetch("https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news");
+      if (mlbResponse.ok) {
+        const mlbData: ESPNResponse = await mlbResponse.json();
+        const mlbArticles = mlbData.articles || [];
+        console.log(`Received ${mlbArticles.length} MLB general articles`);
+        
+        // Add MLB articles that aren't duplicates
+        for (const article of mlbArticles) {
+          if (!allArticles.find(a => a.headline === article.headline)) {
+            allArticles.push(article);
           }
         }
-      } catch (e) {
-        console.log("Error fetching MLB general news:", e);
       }
+    } catch (e) {
+      console.log("Error fetching MLB general news:", e);
     }
 
     console.log(`Total articles collected: ${allArticles.length}`);
@@ -98,11 +84,19 @@ serve(async (req) => {
 
     console.log(`Unique articles: ${uniqueArticles.length}`);
 
+    // Mets-related keywords for filtering
+    const metsKeywords = ['mets', 'new york mets', 'nym', 'citi field', 'lindor', 'alonso', 'nimmo', 'mcneil', 'senga', 'diaz', 'baty', 'alvarez', 'mendez', 'grimace', 'manaea', 'megill', 'vientos', 'winker', 'francisco', 'pete alonso', 'jeff mcneil', 'mark vientos'];
+
     // Transform ESPN data to our format
-    const transformedNews = uniqueArticles.slice(0, 8).map((article, index) => {
+    const transformedNews = uniqueArticles.slice(0, 12).map((article, index) => {
       // Determine type based on article content
       const headline = article.headline?.toLowerCase() || '';
       const description = article.description?.toLowerCase() || '';
+      
+      // Check if article is Mets-related
+      const isMetsRelated = metsKeywords.some(keyword => 
+        headline.includes(keyword) || description.includes(keyword)
+      );
       
       let type: "signing" | "traded" | "news" | "injury" = "news";
       if (headline.includes('sign') || headline.includes('agree') || headline.includes('contract') || headline.includes('extension') || headline.includes('deal')) {
@@ -130,16 +124,14 @@ serve(async (req) => {
         timeAgo = diffMins === 1 ? "1 minute ago" : `${diffMins} minutes ago`;
       }
 
-      // Get image URL
+      // Get image URL - prefer ESPN image, fallback to Mets logo
       const imageUrl = article.images?.[0]?.url || 
-        "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png";
+        (isMetsRelated 
+          ? "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png"
+          : "https://a.espncdn.com/i/teamlogos/mlb/500/mlb.png");
 
       // Extract player name from headline if possible
-      let player = "MLB News";
-      // Check if it's Mets-specific
-      if (headline.includes('mets') || headline.includes('nym')) {
-        player = "New York Mets";
-      }
+      let player = isMetsRelated ? "New York Mets" : "MLB News";
       
       // Try to match common name patterns at the start of headlines
       const namePatterns = [
@@ -165,6 +157,7 @@ serve(async (req) => {
         image_url: imageUrl,
         link: article.links?.web?.href || null,
         published_at: article.published,
+        is_mets_related: isMetsRelated,
       };
     });
 
