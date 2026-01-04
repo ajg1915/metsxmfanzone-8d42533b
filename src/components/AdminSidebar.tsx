@@ -1,4 +1,10 @@
-import { Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers, Sparkles } from "lucide-react";
+import { 
+  Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, 
+  MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, 
+  Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, 
+  Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers, Sparkles, 
+  Newspaper, AlertCircle, Tv
+} from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -14,39 +20,67 @@ import {
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-const mainItems = [
-  { title: "Home", url: "/admin", icon: Home },
+// Home / Overview items
+const homeItems = [
+  { title: "Dashboard", url: "/admin", icon: Home },
   { title: "Hero Slides", url: "/admin/hero", icon: Layers },
+  { title: "Backgrounds", url: "/admin/backgrounds", icon: Wallpaper },
+  { title: "Tutorials", url: "/admin/tutorials", icon: BookOpen },
 ];
 
+// Content & Media items - Blog, Stories, Videos, Podcasts, Newsletter
 const mediaItems = [
   { title: "Blog", url: "/admin/blog", icon: FileText },
   { title: "Stories", url: "/admin/stories", icon: Sparkles },
   { title: "Videos", url: "/admin/video-gallery-management", icon: Video },
   { title: "Podcasts", url: "/admin/podcasts", icon: Mic },
   { title: "Newsletter", url: "/admin/newsletter", icon: Mail },
-  { title: "SEO", url: "/admin/seo", icon: Globe },
-  { title: "QR Codes", url: "/admin/qr-generator", icon: QrCode },
+  { title: "Email Editor", url: "/admin/email-editor", icon: Send },
+  { title: "Mets News", url: "/admin/mets-news-tracker", icon: Newspaper },
 ];
 
-const liveManagementItems = [
+// Live & Events - Live streams, TV, Spring Training, Events
+const liveItems = [
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
-  { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
+  { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
   { title: "Replays", url: "/admin/stream-replays", icon: PlaySquare },
-  { title: "TV Schedule", url: "/admin/tv-schedule", icon: Calendar },
+  { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
+  { title: "TV Schedule", url: "/admin/tv-schedule", icon: Tv },
+  { title: "Live Alerts", url: "/admin/live-notification", icon: AlertCircle },
+];
+
+// Events & Schedules
+const eventsItems = [
   { title: "Events", url: "/admin/events", icon: CalendarDays },
   { title: "Spring Training", url: "/admin/spring-training", icon: Trophy },
 ];
 
-const userItems = [
-  { title: "Feedback", url: "/admin/feedbacks", icon: MessageSquare },
-  { title: "Posts", url: "/admin/posts", icon: FileText },
-  { title: "Business Ads", url: "/admin/business-ads", icon: Megaphone },
-  { title: "Writer Apps", url: "/admin/writer-applications", icon: PenLine },
-  { title: "User Roles", url: "/admin/roles", icon: Shield },
+// Users & Community - Users, Roles, Subscriptions, Feedback, Posts, etc.
+const usersItems = [
   { title: "Users", url: "/admin/user-management", icon: UserCog },
+  { title: "User Roles", url: "/admin/roles", icon: Shield },
   { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
-  { title: "Website Stats", url: "/admin/realtime-analytics", icon: TrendingUp },
+  { title: "Writer Apps", url: "/admin/writer-applications", icon: PenLine },
+];
+
+// Community Content - Posts, Feedback, Business Ads
+const communityItems = [
+  { title: "Posts", url: "/admin/posts", icon: FileText },
+  { title: "Feedback", url: "/admin/feedbacks", icon: MessageSquare },
+  { title: "Business Ads", url: "/admin/business-ads", icon: Megaphone },
+];
+
+// Analytics & SEO
+const analyticsItems = [
+  { title: "Real-Time Stats", url: "/admin/realtime-analytics", icon: TrendingUp },
+  { title: "Activity Logs", url: "/admin/activity", icon: Activity },
+  { title: "SEO Settings", url: "/admin/seo", icon: Globe },
+  { title: "QR Codes", url: "/admin/qr-generator", icon: QrCode },
+];
+
+// Settings
+const settingsItems = [
+  { title: "Admin Settings", url: "/admin/settings", icon: Settings },
 ];
 
 export function AdminSidebar() {
@@ -54,9 +88,13 @@ export function AdminSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
   
+  const [homeOpen, setHomeOpen] = useState(true);
   const [mediaOpen, setMediaOpen] = useState(true);
-  const [liveManagementOpen, setLiveManagementOpen] = useState(true);
-  const [userOpen, setUserOpen] = useState(true);
+  const [liveOpen, setLiveOpen] = useState(true);
+  const [eventsOpen, setEventsOpen] = useState(true);
+  const [usersOpen, setUsersOpen] = useState(true);
+  const [communityOpen, setCommunityOpen] = useState(true);
+  const [analyticsOpen, setAnalyticsOpen] = useState(true);
 
   const isActive = (path: string) => {
     if (path === "/admin") {
@@ -65,14 +103,85 @@ export function AdminSidebar() {
     return currentPath.startsWith(path);
   };
 
+  const renderCollapsibleSection = (
+    title: string,
+    icon: React.ComponentType<{ className?: string }>,
+    items: typeof homeItems,
+    isOpen: boolean,
+    setIsOpen: (open: boolean) => void
+  ) => {
+    const Icon = icon;
+    return (
+      <SidebarGroup>
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+          <SidebarGroupLabel asChild>
+            <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1.5">
+              <div className="flex items-center gap-2">
+                <Icon className="h-4 w-4 flex-shrink-0" />
+                <span className="text-xs font-medium">{title}</span>
+              </div>
+              <ChevronDown 
+                className={`h-3 w-3 transition-transform flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
+              />
+            </CollapsibleTrigger>
+          </SidebarGroupLabel>
+          <CollapsibleContent>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild tooltip={item.title}>
+                      <NavLink
+                        to={item.url}
+                        className={({ isActive: active }) =>
+                          `flex items-center gap-2 pl-4 ${active || isActive(item.url)
+                            ? "bg-primary text-primary-foreground font-medium"
+                            : "hover:bg-muted/50"}`
+                        }
+                      >
+                        <item.icon className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span className="text-xs truncate">{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </CollapsibleContent>
+        </Collapsible>
+      </SidebarGroup>
+    );
+  };
+
   return (
     <Sidebar collapsible="icon">
       <SidebarContent className="gap-1 py-2">
-        {/* Main Items */}
+        {/* Home / Overview */}
+        {renderCollapsibleSection("Home", Home, homeItems, homeOpen, setHomeOpen)}
+
+        {/* Content & Media */}
+        {renderCollapsibleSection("Content", Film, mediaItems, mediaOpen, setMediaOpen)}
+
+        {/* Live & Streaming */}
+        {renderCollapsibleSection("Live", Radio, liveItems, liveOpen, setLiveOpen)}
+
+        {/* Events & Schedules */}
+        {renderCollapsibleSection("Events", CalendarDays, eventsItems, eventsOpen, setEventsOpen)}
+
+        {/* Users & Accounts */}
+        {renderCollapsibleSection("Users", Users, usersItems, usersOpen, setUsersOpen)}
+
+        {/* Community Content */}
+        {renderCollapsibleSection("Community", MessageSquare, communityItems, communityOpen, setCommunityOpen)}
+
+        {/* Analytics & SEO */}
+        {renderCollapsibleSection("Analytics", TrendingUp, analyticsItems, analyticsOpen, setAnalyticsOpen)}
+
+        {/* Settings - Single item, no collapsible needed */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainItems.map((item) => (
+              {settingsItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
                     <NavLink
@@ -91,126 +200,6 @@ export function AdminSidebar() {
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Media Section */}
-        <SidebarGroup>
-          <Collapsible open={mediaOpen} onOpenChange={setMediaOpen}>
-            <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1.5">
-                <div className="flex items-center gap-2">
-                  <Film className="h-4 w-4 flex-shrink-0" />
-                  <span className="text-xs font-medium">Media</span>
-                </div>
-                <ChevronDown 
-                  className={`h-3 w-3 transition-transform flex-shrink-0 ${mediaOpen ? "rotate-180" : ""}`}
-                />
-              </CollapsibleTrigger>
-            </SidebarGroupLabel>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {mediaItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild tooltip={item.title}>
-                        <NavLink
-                          to={item.url}
-                          className={({ isActive: active }) =>
-                            `flex items-center gap-2 pl-4 ${active || isActive(item.url)
-                              ? "bg-primary text-primary-foreground font-medium"
-                              : "hover:bg-muted/50"}`
-                          }
-                        >
-                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span className="text-xs truncate">{item.title}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </Collapsible>
-        </SidebarGroup>
-
-        {/* Live Management Section */}
-        <SidebarGroup>
-          <Collapsible open={liveManagementOpen} onOpenChange={setLiveManagementOpen}>
-            <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1.5">
-                <div className="flex items-center gap-2">
-                  <Radio className="h-4 w-4 flex-shrink-0" />
-                  <span className="text-xs font-medium">Live</span>
-                </div>
-                <ChevronDown 
-                  className={`h-3 w-3 transition-transform flex-shrink-0 ${liveManagementOpen ? "rotate-180" : ""}`}
-                />
-              </CollapsibleTrigger>
-            </SidebarGroupLabel>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {liveManagementItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild tooltip={item.title}>
-                        <NavLink
-                          to={item.url}
-                          className={({ isActive: active }) =>
-                            `flex items-center gap-2 pl-4 ${active || isActive(item.url)
-                              ? "bg-primary text-primary-foreground font-medium"
-                              : "hover:bg-muted/50"}`
-                          }
-                        >
-                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span className="text-xs truncate">{item.title}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </Collapsible>
-        </SidebarGroup>
-
-        {/* User Management Section */}
-        <SidebarGroup>
-          <Collapsible open={userOpen} onOpenChange={setUserOpen}>
-            <SidebarGroupLabel asChild>
-              <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1.5">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 flex-shrink-0" />
-                  <span className="text-xs font-medium">Users</span>
-                </div>
-                <ChevronDown 
-                  className={`h-3 w-3 transition-transform flex-shrink-0 ${userOpen ? "rotate-180" : ""}`}
-                />
-              </CollapsibleTrigger>
-            </SidebarGroupLabel>
-            <CollapsibleContent>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {userItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild tooltip={item.title}>
-                        <NavLink
-                          to={item.url}
-                          className={({ isActive: active }) =>
-                            `flex items-center gap-2 pl-4 ${active || isActive(item.url)
-                              ? "bg-primary text-primary-foreground font-medium"
-                              : "hover:bg-muted/50"}`
-                          }
-                        >
-                          <item.icon className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span className="text-xs truncate">{item.title}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </CollapsibleContent>
-          </Collapsible>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
