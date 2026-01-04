@@ -367,7 +367,7 @@ const Hero = () => {
                   if (tab.id === "community") navigate("/community");
                 }}
                 className={`
-                  flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all
+                  flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 px-2 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm font-medium transition-all
                   ${
                     activeTab === tab.id
                       ? "text-foreground border-b-2 border-primary"
@@ -376,11 +376,11 @@ const Hero = () => {
                 `}
               >
                 {tab.isImage ? (
-                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain" />
+                  <Icon className="w-4 h-4 sm:w-4 sm:h-4 object-contain" />
                 ) : (
-                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <Icon className="w-4 h-4 sm:w-4 sm:h-4" />
                 )}
-                <span className="hidden sm:inline">{tab.label}</span>
+                <span>{tab.label}</span>
               </button>
             );
           })}
