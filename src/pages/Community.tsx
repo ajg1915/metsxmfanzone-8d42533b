@@ -30,6 +30,7 @@ interface Post {
     full_name: string | null;
     email: string | null;
   } | null;
+  isAdmin?: boolean;
 }
 
 interface BlogPost {
@@ -47,6 +48,7 @@ interface BlogPost {
     full_name: string | null;
     email: string | null;
   } | null;
+  isAdmin?: boolean;
 }
 
 type FeedItem = 
@@ -90,6 +92,14 @@ const Community = () => {
   }, [user, loading, navigate]);
 
   const fetchFeed = async () => {
+    // Fetch admin user IDs first
+    const { data: adminRoles } = await supabase
+      .from("user_roles")
+      .select("user_id")
+      .eq("role", "admin");
+    
+    const adminUserIds = new Set((adminRoles || []).map(r => r.user_id));
+
     // Fetch community posts
     const { data: postsData, error: postsError } = await supabase
       .from("posts")
@@ -132,31 +142,33 @@ const Community = () => {
       console.error("Error fetching blog posts:", blogError);
     }
 
-    // Generate signed URLs for community post images
+    // Generate signed URLs for community post images and add admin flag
     const postsWithSignedUrls = await Promise.all(
       (postsData || []).map(async (post) => {
+        let imageUrl = post.image_url;
         if (post.image_url) {
           const fileName = post.image_url.split('/community_images/')[1] || post.image_url;
           if (fileName) {
             const { data: signedUrlData } = await supabase.storage
               .from('community_images')
               .createSignedUrl(fileName, 3600);
-            
-            return {
-              ...post,
-              image_url: signedUrlData?.signedUrl || post.image_url,
-              type: 'post' as const
-            };
+            imageUrl = signedUrlData?.signedUrl || post.image_url;
           }
         }
-        return { ...post, type: 'post' as const };
+        return {
+          ...post,
+          image_url: imageUrl,
+          type: 'post' as const,
+          isAdmin: adminUserIds.has(post.user_id)
+        };
       })
     );
 
-    // Mark blog posts with type
+    // Mark blog posts with type and admin flag
     const blogPostsWithType = (blogData || []).map(blog => ({
       ...blog,
-      type: 'blog' as const
+      type: 'blog' as const,
+      isAdmin: adminUserIds.has(blog.user_id)
     }));
 
     // Combine and sort by created_at/published_at
@@ -446,13 +458,13 @@ const Community = () => {
                     <div className="flex items-center gap-3">
                       <Avatar>
                         <AvatarFallback>
-                          {item.profiles?.full_name?.[0] || item.profiles?.email?.[0] || "U"}
+                          {item.isAdmin ? "A" : (item.profiles?.full_name?.[0] || item.profiles?.email?.[0] || "U")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <div className="flex items-center gap-2">
-                        <p className="font-semibold">
-                            {item.profiles?.full_name?.split(' ')[0] || item.profiles?.email || "Anonymous"}
+                          <p className="font-semibold">
+                            {item.isAdmin ? "Admin" : (item.profiles?.full_name?.split(' ')[0] || item.profiles?.email || "Anonymous")}
                           </p>
                           {item.type === 'blog' && (
                             <Badge variant="secondary" className="text-xs">
