@@ -45,40 +45,40 @@ const Index = () => {
         <LiveNotificationBar />
         
         <ScrollReveal>
-          <LiveNetworks className="py-2 sm:py-3" />
+          <LiveNetworks className="py-1 sm:py-2" />
         </ScrollReveal>
         
         <ScrollReveal delay={100}>
           <LiveStreamsSection />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8" />
+        <div className="section-divider my-3 sm:my-4" />
         
         <ScrollReveal delay={100}>
-          <HomeLineupCard className="py-4 sm:py-6" />
+          <HomeLineupCard className="py-2 sm:py-3" />
         </ScrollReveal>
         
         <ScrollReveal>
-          <SpringTraining className="py-4 sm:py-6" />
+          <SpringTraining className="py-2 sm:py-3" />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8" />
+        <div className="section-divider my-3 sm:my-4" />
         
         <ScrollReveal>
-          <MetsNewsTracker className="py-4 sm:py-px" />
+          <MetsNewsTracker className="py-2 sm:py-3" />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8" />
+        <div className="section-divider my-3 sm:my-4" />
         
         <ScrollReveal direction="left">
-          <BlogSection className="py-4 sm:py-6" />
+          <BlogSection className="py-2 sm:py-3" />
         </ScrollReveal>
         
         <ScrollReveal direction="right" delay={100}>
-          <PodcastSection className="py-4 sm:py-6" />
+          <PodcastSection className="py-2 sm:py-3" />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8" />
+        <div className="section-divider my-3 sm:my-4" />
         
         <ScrollReveal direction="scale">
           <FAQSection />
@@ -88,7 +88,7 @@ const Index = () => {
           <FeedbackSection />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8" />
+        <div className="section-divider my-3 sm:my-4" />
         
         <ScrollReveal>
           <AppInstallSection />
