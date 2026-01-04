@@ -117,6 +117,17 @@ const Maintenance = ({ message }: MaintenanceProps) => {
         >
           Thank you for your patience!
         </motion.p>
+
+        {/* Admin Login Link */}
+        <motion.a
+          href="/auth"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="mt-4 text-xs text-muted-foreground/60 hover:text-primary transition-colors"
+        >
+          Admin Login
+        </motion.a>
       </motion.div>
     </div>
   );
