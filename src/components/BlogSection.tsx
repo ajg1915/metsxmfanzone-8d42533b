@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { Clock, ArrowRight, Sparkles } from "lucide-react";
+import { Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/metsxmfanzone-logo.png";
 
 interface BlogPost {
   id: string;
@@ -83,8 +84,8 @@ const BlogSection = ({ className }: BlogSectionProps) => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
-              <Sparkles className="w-5 h-5 text-primary" />
+            <div className="p-1.5 rounded-xl bg-primary/10 border border-primary/20">
+              <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-foreground">
