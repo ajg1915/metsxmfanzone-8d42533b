@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, TrendingUp, Users, AlertCircle, Newspaper, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, TrendingUp, Users, AlertCircle, Newspaper, Eye, EyeOff, Upload, MessageSquare, RefreshCw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface NewsItem {
@@ -27,6 +27,7 @@ interface NewsItem {
 const NewsTrackerManagement = () => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<NewsItem | null>(null);
   const [formData, setFormData] = useState({
@@ -57,6 +58,48 @@ const NewsTrackerManagement = () => {
       toast.error("Failed to load news items");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be less than 5MB");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `news-${Date.now()}.${fileExt}`;
+      const filePath = `news-tracker/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("content_uploads")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("content_uploads")
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image_url: publicUrl });
+      toast.success("Image uploaded successfully");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast.error("Failed to upload image");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -156,6 +199,9 @@ const NewsTrackerManagement = () => {
       case "signing": return <TrendingUp className="w-4 h-4" />;
       case "traded": return <Users className="w-4 h-4" />;
       case "injury": return <AlertCircle className="w-4 h-4" />;
+      case "trade_talks": return <MessageSquare className="w-4 h-4" />;
+      case "discussions": return <MessageSquare className="w-4 h-4" />;
+      case "update_news": return <RefreshCw className="w-4 h-4" />;
       default: return <Newspaper className="w-4 h-4" />;
     }
   };
@@ -165,7 +211,19 @@ const NewsTrackerManagement = () => {
       case "signing": return "bg-green-500";
       case "traded": return "bg-blue-500";
       case "injury": return "bg-red-500";
+      case "trade_talks": return "bg-yellow-500";
+      case "discussions": return "bg-purple-500";
+      case "update_news": return "bg-cyan-500";
       default: return "bg-primary";
+    }
+  };
+
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case "trade_talks": return "TRADE TALKS";
+      case "discussions": return "DISCUSSIONS";
+      case "update_news": return "UPDATE";
+      default: return type.toUpperCase();
     }
   };
 
@@ -203,6 +261,9 @@ const NewsTrackerManagement = () => {
                       <SelectItem value="signing">New Signing</SelectItem>
                       <SelectItem value="traded">Trade News</SelectItem>
                       <SelectItem value="injury">Injury Update</SelectItem>
+                      <SelectItem value="trade_talks">Trade Talks</SelectItem>
+                      <SelectItem value="discussions">Discussions</SelectItem>
+                      <SelectItem value="update_news">Update News</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -249,15 +310,33 @@ const NewsTrackerManagement = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Image URL</Label>
-                  <Input
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="https://..."
-                    required
-                  />
+                  <Label>Upload Image</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                      className="flex-1"
+                    />
+                  </div>
+                  {uploading && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Uploading...
+                    </div>
+                  )}
+                  {formData.image_url && (
+                    <div className="mt-2">
+                      <img
+                        src={formData.image_url}
+                        alt="Preview"
+                        className="w-16 h-16 rounded-full object-cover border-2 border-border"
+                      />
+                    </div>
+                  )}
                   <p className="text-xs text-muted-foreground">
-                    Use MLB headshot URLs or team logos
+                    Upload player headshots or team logos (max 5MB)
                   </p>
                 </div>
 
@@ -313,7 +392,7 @@ const NewsTrackerManagement = () => {
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <Badge className={`${getTypeBadgeColor(item.type)} text-white text-xs gap-1`}>
                           {getTypeIcon(item.type)}
-                          {item.type.toUpperCase()}
+                          {getTypeLabel(item.type)}
                         </Badge>
                         {!item.published && (
                           <Badge variant="secondary" className="text-xs">Hidden</Badge>
