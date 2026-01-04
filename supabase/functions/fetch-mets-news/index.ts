@@ -19,6 +19,86 @@ interface ESPNResponse {
   articles?: ESPNArticle[];
 }
 
+interface TransactionItem {
+  id: string;
+  type: "signing" | "traded" | "news" | "injury";
+  title: string;
+  player: string;
+  details: string;
+  time_ago: string;
+  image_url: string;
+  link: string | null;
+  published_at: string;
+  is_mets_related: boolean;
+}
+
+// Fetch Mets transactions from ESPN
+async function fetchMetsTransactions(): Promise<TransactionItem[]> {
+  const transactions: TransactionItem[] = [];
+  
+  try {
+    console.log("Fetching Mets transactions from ESPN...");
+    
+    // ESPN Mets transactions endpoint
+    const response = await fetch("https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/21/roster/transactions");
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Transactions data received:", JSON.stringify(data).substring(0, 500));
+      
+      const items = data.items || data.transactions || [];
+      
+      for (let i = 0; i < Math.min(items.length, 6); i++) {
+        const item = items[i];
+        const description = item.description || item.text || item.longDescription || "";
+        const date = item.date || new Date().toISOString();
+        
+        // Determine transaction type
+        let type: "signing" | "traded" | "news" | "injury" = "news";
+        const descLower = description.toLowerCase();
+        if (descLower.includes('sign') || descLower.includes('contract') || descLower.includes('extension')) {
+          type = "signing";
+        } else if (descLower.includes('trade') || descLower.includes('acquire') || descLower.includes('designat')) {
+          type = "traded";
+        } else if (descLower.includes('injur') || descLower.includes('il ') || descLower.includes('disabled')) {
+          type = "injury";
+        }
+
+        // Calculate time ago
+        const publishedDate = new Date(date);
+        const now = new Date();
+        const diffMs = now.getTime() - publishedDate.getTime();
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffHours / 24);
+        
+        let timeAgo = "Recently";
+        if (diffDays > 0) {
+          timeAgo = diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
+        } else if (diffHours > 0) {
+          timeAgo = diffHours === 1 ? "1 hour ago" : `${diffHours} hours ago`;
+        }
+
+        transactions.push({
+          id: `transaction-${i}-${publishedDate.getTime()}`,
+          type,
+          title: description.length > 80 ? description.substring(0, 77) + "..." : description,
+          player: "New York Mets",
+          details: description,
+          time_ago: timeAgo,
+          image_url: "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png",
+          link: "https://www.mlb.com/mets/roster/transactions",
+          published_at: date,
+          is_mets_related: true,
+        });
+      }
+    }
+  } catch (e) {
+    console.log("Error fetching Mets transactions:", e);
+  }
+  
+  return transactions;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -163,10 +243,26 @@ serve(async (req) => {
 
     console.log("Transformed news items:", transformedNews.length);
 
+    // Check if there are any Mets-related news items
+    const metsNewsCount = transformedNews.filter(item => item.is_mets_related).length;
+    console.log("Mets-related news count:", metsNewsCount);
+
+    // If no Mets-specific news, fetch transactions as fallback
+    let finalNews = transformedNews;
+    if (metsNewsCount === 0) {
+      console.log("No Mets news found, fetching transactions...");
+      const transactions = await fetchMetsTransactions();
+      if (transactions.length > 0) {
+        console.log(`Added ${transactions.length} Mets transactions`);
+        // Add transactions at the beginning
+        finalNews = [...transactions, ...transformedNews];
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
-        news: transformedNews,
+        news: finalNews,
         fetched_at: new Date().toISOString()
       }),
       { 
