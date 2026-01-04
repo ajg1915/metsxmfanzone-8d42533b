@@ -1,5 +1,6 @@
 import heroImage from "@/assets/hero-mets.png";
 import logo from "@/assets/metsxmfanzone-logo.png";
+import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useCallback, useEffect, useState, useRef } from "react";
@@ -203,12 +204,8 @@ const Hero = () => {
     <img src={logo} alt="" className={className} />
   );
   
-  const BaseballIcon = ({ className }: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <circle cx="12" cy="12" r="10" />
-      <path d="M4.93 4.93c4.08 2.39 8.16 4.78 9.21 5.52 1.05.74 2.05 2.04 2.93 3.55" />
-      <path d="M19.07 19.07c-4.08-2.39-8.16-4.78-9.21-5.52-1.05-.74-2.05-2.04-2.93-3.55" />
-    </svg>
+  const LiveStreamIcon = ({ className }: { className?: string }) => (
+    <img src={liveStreamIcon} alt="" className={className} />
   );
   
   const SocialIcon = ({ className }: { className?: string }) => (
@@ -223,7 +220,7 @@ const Hero = () => {
 
   const tabs = [
     { id: "overview", label: "Overview", icon: LogoIcon, isImage: true },
-    { id: "live", label: "Live Streams", icon: BaseballIcon, isImage: false },
+    { id: "live", label: "Live Streams", icon: LiveStreamIcon, isImage: true },
     { id: "podcasts", label: "Podcasts", icon: LogoIcon, isImage: true },
     { id: "community", label: "Community", icon: SocialIcon, isImage: false },
   ];
