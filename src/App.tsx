@@ -37,7 +37,7 @@ import LiveStreamManagement from "./pages/admin/LiveStreamManagement";
 import LiveNotificationManagement from "./pages/admin/LiveNotificationManagement";
 import SubscriptionManagement from "./pages/admin/SubscriptionManagement";
 import StoriesManagement from "./pages/admin/StoriesManagement";
-import MetsNewsTrackerManagement from "./pages/admin/MetsNewsTrackerManagement";
+
 import TutorialManagement from "./pages/admin/TutorialManagement";
 import FeedbackManagement from "./pages/admin/FeedbackManagement";
 import TVScheduleManagement from "./pages/admin/TVScheduleManagement";
@@ -217,7 +217,7 @@ const AppContent = () => {
             <Route path="stream-replays" element={<StreamReplayEditor />} />
             <Route path="live-notifications" element={<LiveNotificationManagement />} />
             <Route path="stories" element={<StoriesManagement />} />
-            <Route path="mets-news" element={<MetsNewsTrackerManagement />} />
+            
             <Route path="tutorial" element={<TutorialManagement />} />
             <Route path="tv-schedule" element={<TVScheduleManagement />} />
             <Route path="newsletter" element={<NewsletterGenerator />} />

@@ -3,7 +3,7 @@ import {
   MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, 
   Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, 
   Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers, Sparkles, 
-  Newspaper, AlertCircle, Tv
+  AlertCircle, Tv
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -36,7 +36,6 @@ const mediaItems = [
   { title: "Podcasts", url: "/admin/podcasts", icon: Mic },
   { title: "Newsletter", url: "/admin/newsletter", icon: Mail },
   { title: "Email Editor", url: "/admin/email-editor", icon: Send },
-  { title: "Mets News", url: "/admin/mets-news-tracker", icon: Newspaper },
 ];
 
 // Live & Events - Live streams, TV, Spring Training, Events
