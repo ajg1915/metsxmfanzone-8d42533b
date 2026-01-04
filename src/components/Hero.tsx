@@ -152,7 +152,7 @@ const Hero = () => {
     },
     {
       title: "Your Benefits",
-      subtitle: "PREMIUM ACCESS",
+      subtitle: "Become A Member",
       description: "Enjoy your member-exclusive podcasts, behind-the-scenes content, and premium features.",
       image: heroImage,
       link_url: null,
