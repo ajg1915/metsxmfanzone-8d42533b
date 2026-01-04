@@ -35,19 +35,42 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
     setError(null);
     
     try {
-      const { data, error: fetchError } = await supabase.functions.invoke('fetch-mets-news');
+      // Fetch from API
+      const { data: apiData, error: fetchError } = await supabase.functions.invoke('fetch-mets-news');
       
-      if (fetchError) {
-        console.error("Error fetching Mets news:", fetchError);
-        throw fetchError;
+      // Fetch manual entries from database
+      const { data: manualData, error: dbError } = await supabase
+        .from("mets_news_tracker")
+        .select("*")
+        .eq("published", true)
+        .order("created_at", { ascending: false });
+      
+      let combinedNews: NewsItem[] = [];
+      
+      // Add API news if available
+      if (!fetchError && apiData?.success && apiData?.news) {
+        combinedNews = [...apiData.news];
+        setLastUpdated(new Date(apiData.fetched_at));
       }
       
-      if (data?.success && data?.news) {
-        setNewsItems(data.news);
-        setLastUpdated(new Date(data.fetched_at));
-      } else {
-        setNewsItems([]);
+      // Add manual database entries (mark as Mets-related)
+      if (!dbError && manualData && manualData.length > 0) {
+        const manualNews: NewsItem[] = manualData.map((item) => ({
+          id: item.id,
+          type: item.type as NewsItem["type"],
+          title: item.title,
+          player: item.player,
+          details: item.details,
+          time_ago: item.time_ago,
+          image_url: item.image_url,
+          is_mets_related: true, // Manual entries are always Mets-related
+        }));
+        
+        // Add manual entries at the beginning
+        combinedNews = [...manualNews, ...combinedNews];
       }
+      
+      setNewsItems(combinedNews);
     } catch (err) {
       console.error("Failed to fetch Mets news:", err);
       setError("Unable to load news. Please try again later.");
@@ -56,6 +79,7 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchNewsItems();
