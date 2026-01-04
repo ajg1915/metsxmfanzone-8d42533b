@@ -222,7 +222,7 @@ const Hero = () => {
     { id: "overview", label: "Overview", icon: LogoIcon, isImage: true },
     { id: "live", label: "Live Streams", icon: LiveStreamIcon, isImage: true },
     { id: "podcasts", label: "Podcasts", icon: LogoIcon, isImage: true },
-    { id: "community", label: "Community", icon: SocialIcon, isImage: false },
+    { id: "community", label: "Community", icon: LogoIcon, isImage: true },
   ];
 
   return (
