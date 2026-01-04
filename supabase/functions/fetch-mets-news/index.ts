@@ -28,40 +28,67 @@ serve(async (req) => {
   try {
     console.log("Fetching Mets news from ESPN API...");
     
-    // Fetch Mets team news from ESPN API
-    const newsUrl = "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/nym/news";
-    const newsResponse = await fetch(newsUrl);
+    const allArticles: ESPNArticle[] = [];
     
-    if (!newsResponse.ok) {
-      console.error("ESPN API error:", newsResponse.status, newsResponse.statusText);
-      throw new Error(`ESPN API error: ${newsResponse.status}`);
+    // Try Mets-specific endpoints first
+    const metsEndpoints = [
+      "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/21/news",
+      "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/nym/news"
+    ];
+    
+    for (const url of metsEndpoints) {
+      try {
+        console.log(`Fetching from: ${url}`);
+        const response = await fetch(url);
+        
+        if (response.ok) {
+          const data: ESPNResponse = await response.json();
+          const articles = data.articles || [];
+          console.log(`Received ${articles.length} articles from ${url}`);
+          allArticles.push(...articles);
+        }
+      } catch (e) {
+        console.log(`Error fetching from ${url}:`, e);
+      }
     }
 
-    const newsData: ESPNResponse = await newsResponse.json();
-    console.log("ESPN API response received, articles count:", newsData.articles?.length || 0);
-
-    // Also fetch transactions from ESPN
-    const transactionsUrl = "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news";
-    const transactionsResponse = await fetch(transactionsUrl);
-    let transactionsData: ESPNResponse = { articles: [] };
-    
-    if (transactionsResponse.ok) {
-      transactionsData = await transactionsResponse.json();
-      console.log("MLB general news fetched, articles count:", transactionsData.articles?.length || 0);
+    // If no Mets-specific news, get MLB general news and filter
+    if (allArticles.length === 0) {
+      console.log("No Mets-specific news, fetching MLB general news...");
+      try {
+        const mlbResponse = await fetch("https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news");
+        if (mlbResponse.ok) {
+          const mlbData: ESPNResponse = await mlbResponse.json();
+          const mlbArticles = mlbData.articles || [];
+          console.log(`Received ${mlbArticles.length} MLB general articles`);
+          
+          // Filter for Mets-related content
+          const metsKeywords = ['mets', 'new york mets', 'nym', 'citi field', 'lindor', 'alonso', 'nimmo', 'mcneil', 'senga', 'diaz', 'baty', 'alvarez', 'mendez', 'grimace'];
+          const metsArticles = mlbArticles.filter(article => {
+            const headline = article.headline?.toLowerCase() || '';
+            const description = article.description?.toLowerCase() || '';
+            return metsKeywords.some(keyword => 
+              headline.includes(keyword) || description.includes(keyword)
+            );
+          });
+          console.log(`Found ${metsArticles.length} Mets-related articles from MLB news`);
+          
+          // If still no Mets news, take all MLB news for offseason display
+          if (metsArticles.length === 0) {
+            console.log("No Mets-filtered news, using top MLB news");
+            allArticles.push(...mlbArticles.slice(0, 6));
+          } else {
+            allArticles.push(...metsArticles);
+          }
+        }
+      } catch (e) {
+        console.log("Error fetching MLB general news:", e);
+      }
     }
 
-    // Filter for Mets-related articles from general MLB news
-    const metsKeywords = ['mets', 'new york mets', 'nym', 'citi field'];
-    const metsTransactions = transactionsData.articles?.filter(article => {
-      const headline = article.headline?.toLowerCase() || '';
-      const description = article.description?.toLowerCase() || '';
-      return metsKeywords.some(keyword => 
-        headline.includes(keyword) || description.includes(keyword)
-      );
-    }) || [];
+    console.log(`Total articles collected: ${allArticles.length}`);
 
-    // Combine and deduplicate articles
-    const allArticles = [...(newsData.articles || []), ...metsTransactions];
+    // Deduplicate by headline
     const uniqueArticles = allArticles.reduce((acc: ESPNArticle[], article) => {
       if (!acc.find(a => a.headline === article.headline)) {
         acc.push(article);
@@ -69,18 +96,20 @@ serve(async (req) => {
       return acc;
     }, []);
 
+    console.log(`Unique articles: ${uniqueArticles.length}`);
+
     // Transform ESPN data to our format
-    const transformedNews = uniqueArticles.slice(0, 10).map((article, index) => {
+    const transformedNews = uniqueArticles.slice(0, 8).map((article, index) => {
       // Determine type based on article content
       const headline = article.headline?.toLowerCase() || '';
       const description = article.description?.toLowerCase() || '';
       
       let type: "signing" | "traded" | "news" | "injury" = "news";
-      if (headline.includes('sign') || headline.includes('agree') || headline.includes('contract')) {
+      if (headline.includes('sign') || headline.includes('agree') || headline.includes('contract') || headline.includes('extension') || headline.includes('deal')) {
         type = "signing";
-      } else if (headline.includes('trade') || headline.includes('acquire') || headline.includes('dealt')) {
+      } else if (headline.includes('trade') || headline.includes('acquire') || headline.includes('dealt') || headline.includes('swap')) {
         type = "traded";
-      } else if (headline.includes('injur') || headline.includes('il') || headline.includes('hurt')) {
+      } else if (headline.includes('injur') || headline.includes(' il ') || headline.includes('hurt') || headline.includes('surgery') || headline.includes('rehab')) {
         type = "injury";
       }
 
@@ -88,6 +117,7 @@ serve(async (req) => {
       const publishedDate = new Date(article.published);
       const now = new Date();
       const diffMs = now.getTime() - publishedDate.getTime();
+      const diffMins = Math.floor(diffMs / (1000 * 60));
       const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
       const diffDays = Math.floor(diffHours / 24);
       
@@ -96,6 +126,8 @@ serve(async (req) => {
         timeAgo = diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
       } else if (diffHours > 0) {
         timeAgo = diffHours === 1 ? "1 hour ago" : `${diffHours} hours ago`;
+      } else if (diffMins > 0) {
+        timeAgo = diffMins === 1 ? "1 minute ago" : `${diffMins} minutes ago`;
       }
 
       // Get image URL
@@ -103,16 +135,30 @@ serve(async (req) => {
         "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png";
 
       // Extract player name from headline if possible
-      let player = "New York Mets";
-      const playerMatch = headline.match(/^([A-Z][a-z]+ [A-Z][a-z]+)/);
-      if (playerMatch) {
-        player = playerMatch[1];
+      let player = "MLB News";
+      // Check if it's Mets-specific
+      if (headline.includes('mets') || headline.includes('nym')) {
+        player = "New York Mets";
+      }
+      
+      // Try to match common name patterns at the start of headlines
+      const namePatterns = [
+        /^([A-Z][a-z]+(?:\s[A-Z][a-z]+)+)(?:'s|\s|,)/,
+        /Mets[''']?\s+([A-Z][a-z]+\s+[A-Z][a-z]+)/,
+      ];
+      
+      for (const pattern of namePatterns) {
+        const match = article.headline?.match(pattern);
+        if (match && match[1]) {
+          player = match[1];
+          break;
+        }
       }
 
       return {
         id: `espn-${index}-${publishedDate.getTime()}`,
         type,
-        title: article.headline || "Mets News Update",
+        title: article.headline || "MLB News Update",
         player,
         details: article.description || "",
         time_ago: timeAgo,
