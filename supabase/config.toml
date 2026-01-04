@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.fetch-mets-lineup]
 verify_jwt = false
+
+[functions.fetch-mets-news]
+verify_jwt = false
