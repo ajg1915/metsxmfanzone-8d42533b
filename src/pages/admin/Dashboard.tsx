@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, BarChart3, Globe } from "lucide-react";
+import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Globe, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -25,8 +25,7 @@ export default function AdminDashboard() {
     totalBlogs: 0,
     activeStreams: 0,
     totalStreams: 0,
-    totalVideos: 0,
-    totalPodcasts: 0,
+    totalStories: 0,
   });
 
   useEffect(() => {
@@ -34,12 +33,11 @@ export default function AdminDashboard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) setAdminUserId(user.id);
 
-      const [usersResult, streamsResult, blogsResult, videosResult, podcastsResult] = await Promise.all([
+      const [usersResult, streamsResult, blogsResult, storiesResult] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("live_streams").select("status"),
         supabase.from("blog_posts").select("*", { count: "exact", head: true }),
-        supabase.from("videos").select("*", { count: "exact", head: true }),
-        supabase.from("podcasts").select("*", { count: "exact", head: true }),
+        supabase.from("stories").select("*", { count: "exact", head: true }),
       ]);
 
       const activeStreams = streamsResult.data?.filter(s => s.status === "live").length || 0;
@@ -50,8 +48,7 @@ export default function AdminDashboard() {
         totalBlogs: blogsResult.count || 0,
         activeStreams,
         totalStreams,
-        totalVideos: videosResult.count || 0,
-        totalPodcasts: podcastsResult.count || 0,
+        totalStories: storiesResult.count || 0,
       });
     };
 
@@ -200,14 +197,14 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="min-w-0">
+        <Card className="min-w-0 cursor-pointer hover:border-primary transition-colors" onClick={() => navigate("/admin/stories")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
-            <CardTitle className="text-[10px] sm:text-xs font-medium truncate">Website Stats</CardTitle>
-            <BarChart3 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground flex-shrink-0" />
+            <CardTitle className="text-[10px] sm:text-xs font-medium truncate">Stories</CardTitle>
+            <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-xl font-bold">{stats.totalBlogs + stats.totalVideos + stats.totalPodcasts}</div>
-            <p className="text-[10px] text-muted-foreground">Total Content</p>
+            <div className="text-lg sm:text-xl font-bold">{stats.totalStories}</div>
+            <p className="text-[10px] text-muted-foreground">Total Stories</p>
           </CardContent>
         </Card>
 
