@@ -8,7 +8,24 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Trash2, Save, Image, FileText } from "lucide-react";
+import { Plus, Trash2, Save, Image, FileText, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface HeroSlide {
   id: string;
@@ -32,11 +49,216 @@ interface BlogPost {
   excerpt: string | null;
 }
 
+interface SortableSlideProps {
+  slide: HeroSlide;
+  index: number;
+  slidesCount: number;
+  blogPosts: BlogPost[];
+  saving: boolean;
+  onUpdate: (id: string, field: keyof HeroSlide, value: string | boolean | number | null) => void;
+  onLinkBlog: (slideId: string, blogId: string | null) => void;
+  onSave: (slide: HeroSlide) => void;
+  onDelete: (id: string) => void;
+}
+
+const SortableSlide = ({
+  slide,
+  index,
+  blogPosts,
+  saving,
+  onUpdate,
+  onLinkBlog,
+  onSave,
+  onDelete,
+}: SortableSlideProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: slide.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <Card ref={setNodeRef} style={style} className={`border-border ${isDragging ? 'shadow-lg ring-2 ring-primary' : ''}`}>
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab active:cursor-grabbing p-2 hover:bg-muted rounded-md transition-colors"
+            >
+              <GripVertical className="w-5 h-5 text-muted-foreground" />
+            </div>
+            <div>
+              <CardTitle className="text-lg flex items-center gap-2">
+                Slide {index + 1}
+                {slide.blog_post_id && (
+                  <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <FileText className="w-3 h-3" />
+                    Blog
+                  </span>
+                )}
+                <span className={`text-xs px-2 py-0.5 rounded-full ${slide.is_for_members ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400'}`}>
+                  {slide.is_for_members ? 'Members' : 'Public'}
+                </span>
+              </CardTitle>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={slide.is_for_members}
+                onCheckedChange={(checked) => onUpdate(slide.id, "is_for_members", checked)}
+              />
+              <Label className="text-sm">{slide.is_for_members ? "Members Only" : "Public"}</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={slide.show_watch_live}
+                onCheckedChange={(checked) => onUpdate(slide.id, "show_watch_live", checked)}
+              />
+              <Label className="text-sm">Watch Live Button</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={slide.published}
+                onCheckedChange={(checked) => onUpdate(slide.id, "published", checked)}
+              />
+              <Label className="text-sm">{slide.published ? "Published" : "Draft"}</Label>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDelete(slide.id)}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Blog Post Selection */}
+        <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+          <Label className="text-sm font-medium flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            Link to Blog Post (optional)
+          </Label>
+          <Select
+            value={slide.blog_post_id || "none"}
+            onValueChange={(value) => onLinkBlog(slide.id, value === "none" ? null : value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a blog post..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No blog link (custom content)</SelectItem>
+              {blogPosts.map((blog) => (
+                <SelectItem key={blog.id} value={blog.id}>
+                  {blog.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Selecting a blog post will auto-fill the title, description, and image from the blog.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor={`title-${slide.id}`}>Title</Label>
+            <Input
+              id={`title-${slide.id}`}
+              value={slide.title}
+              onChange={(e) => onUpdate(slide.id, "title", e.target.value)}
+              placeholder="Slide title"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={`image-${slide.id}`}>Image URL (optional)</Label>
+            <div className="flex gap-2">
+              <Input
+                id={`image-${slide.id}`}
+                value={slide.image_url || ""}
+                onChange={(e) => onUpdate(slide.id, "image_url", e.target.value)}
+                placeholder="https://example.com/image.jpg"
+              />
+              <Button variant="outline" size="icon" title="Preview image">
+                <Image className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor={`desc-${slide.id}`}>Description</Label>
+          <Textarea
+            id={`desc-${slide.id}`}
+            value={slide.description}
+            onChange={(e) => onUpdate(slide.id, "description", e.target.value)}
+            placeholder="Slide description"
+            rows={3}
+          />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor={`link-${slide.id}`}>Link URL (optional)</Label>
+            <Input
+              id={`link-${slide.id}`}
+              value={slide.link_url || ""}
+              onChange={(e) => onUpdate(slide.id, "link_url", e.target.value)}
+              placeholder="/blog/my-post or https://..."
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={`linktext-${slide.id}`}>Link Button Text</Label>
+            <Input
+              id={`linktext-${slide.id}`}
+              value={slide.link_text || ""}
+              onChange={(e) => onUpdate(slide.id, "link_text", e.target.value)}
+              placeholder="Read More"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Button onClick={() => onSave(slide)} disabled={saving} className="gap-2">
+            <Save className="w-4 h-4" />
+            Save Changes
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 const HeroManagement = () => {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const fetchData = async () => {
     try {
@@ -69,6 +291,39 @@ const HeroManagement = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = slides.findIndex((s) => s.id === active.id);
+      const newIndex = slides.findIndex((s) => s.id === over.id);
+
+      const newSlides = arrayMove(slides, oldIndex, newIndex).map((slide, index) => ({
+        ...slide,
+        display_order: index + 1,
+      }));
+
+      setSlides(newSlides);
+
+      // Update all display orders in database
+      try {
+        await Promise.all(
+          newSlides.map((slide) =>
+            supabase
+              .from("hero_slides")
+              .update({ display_order: slide.display_order })
+              .eq("id", slide.id)
+          )
+        );
+        toast.success("Slide order updated");
+      } catch (error) {
+        console.error("Error updating order:", error);
+        toast.error("Failed to update order");
+        fetchData(); // Revert on error
+      }
+    }
+  };
 
   const addSlide = async () => {
     try {
@@ -177,31 +432,6 @@ const HeroManagement = () => {
     }
   };
 
-  const moveSlide = async (id: string, direction: "up" | "down") => {
-    const index = slides.findIndex(s => s.id === id);
-    if ((direction === "up" && index === 0) || (direction === "down" && index === slides.length - 1)) return;
-
-    const newSlides = [...slides];
-    const swapIndex = direction === "up" ? index - 1 : index + 1;
-    
-    const tempOrder = newSlides[index].display_order;
-    newSlides[index].display_order = newSlides[swapIndex].display_order;
-    newSlides[swapIndex].display_order = tempOrder;
-    
-    [newSlides[index], newSlides[swapIndex]] = [newSlides[swapIndex], newSlides[index]];
-    
-    setSlides(newSlides);
-
-    try {
-      await Promise.all([
-        supabase.from("hero_slides").update({ display_order: newSlides[index].display_order }).eq("id", newSlides[index].id),
-        supabase.from("hero_slides").update({ display_order: newSlides[swapIndex].display_order }).eq("id", newSlides[swapIndex].id)
-      ]);
-    } catch (error) {
-      console.error("Error reordering:", error);
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -215,7 +445,7 @@ const HeroManagement = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Hero Slides Management</h1>
-          <p className="text-muted-foreground">Manage hero carousel slides for both public visitors and logged-in members. Link to blog posts or add custom content.</p>
+          <p className="text-muted-foreground">Manage hero carousel slides for both public visitors and logged-in members. Drag and drop to reorder slides.</p>
         </div>
         <Button onClick={addSlide} className="gap-2">
           <Plus className="w-4 h-4" />
@@ -231,171 +461,28 @@ const HeroManagement = () => {
             </CardContent>
           </Card>
         ) : (
-          slides.map((slide, index) => (
-            <Card key={slide.id} className="border-border">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => moveSlide(slide.id, "up")}
-                        disabled={index === 0}
-                        className="h-6 w-6 p-0"
-                      >
-                        ▲
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => moveSlide(slide.id, "down")}
-                        disabled={index === slides.length - 1}
-                        className="h-6 w-6 p-0"
-                      >
-                        ▼
-                      </Button>
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        Slide {index + 1}
-                        {slide.blog_post_id && (
-                          <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <FileText className="w-3 h-3" />
-                            Blog
-                          </span>
-                        )}
-                      </CardTitle>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={slide.is_for_members}
-                        onCheckedChange={(checked) => updateSlide(slide.id, "is_for_members", checked)}
-                      />
-                      <Label className="text-sm">{slide.is_for_members ? "Members Only" : "Public"}</Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={slide.show_watch_live}
-                        onCheckedChange={(checked) => updateSlide(slide.id, "show_watch_live", checked)}
-                      />
-                      <Label className="text-sm">Watch Live Button</Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={slide.published}
-                        onCheckedChange={(checked) => updateSlide(slide.id, "published", checked)}
-                      />
-                      <Label className="text-sm">{slide.published ? "Published" : "Draft"}</Label>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteSlide(slide.id)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Blog Post Selection */}
-                <div className="p-4 bg-muted/50 rounded-lg space-y-3">
-                  <Label className="text-sm font-medium flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    Link to Blog Post (optional)
-                  </Label>
-                  <Select
-                    value={slide.blog_post_id || "none"}
-                    onValueChange={(value) => linkBlogPost(slide.id, value === "none" ? null : value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a blog post..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">No blog link (custom content)</SelectItem>
-                      {blogPosts.map((blog) => (
-                        <SelectItem key={blog.id} value={blog.id}>
-                          {blog.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Selecting a blog post will auto-fill the title, description, and image from the blog.
-                  </p>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor={`title-${slide.id}`}>Title</Label>
-                    <Input
-                      id={`title-${slide.id}`}
-                      value={slide.title}
-                      onChange={(e) => updateSlide(slide.id, "title", e.target.value)}
-                      placeholder="Slide title"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor={`image-${slide.id}`}>Image URL (optional)</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id={`image-${slide.id}`}
-                        value={slide.image_url || ""}
-                        onChange={(e) => updateSlide(slide.id, "image_url", e.target.value)}
-                        placeholder="https://example.com/image.jpg"
-                      />
-                      <Button variant="outline" size="icon" title="Preview image">
-                        <Image className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor={`desc-${slide.id}`}>Description</Label>
-                  <Textarea
-                    id={`desc-${slide.id}`}
-                    value={slide.description}
-                    onChange={(e) => updateSlide(slide.id, "description", e.target.value)}
-                    placeholder="Slide description"
-                    rows={3}
-                  />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor={`link-${slide.id}`}>Link URL (optional)</Label>
-                    <Input
-                      id={`link-${slide.id}`}
-                      value={slide.link_url || ""}
-                      onChange={(e) => updateSlide(slide.id, "link_url", e.target.value)}
-                      placeholder="/blog/my-post or https://..."
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor={`linktext-${slide.id}`}>Link Button Text</Label>
-                    <Input
-                      id={`linktext-${slide.id}`}
-                      value={slide.link_text || ""}
-                      onChange={(e) => updateSlide(slide.id, "link_text", e.target.value)}
-                      placeholder="Read More"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <Button onClick={() => saveSlide(slide)} disabled={saving} className="gap-2">
-                    <Save className="w-4 h-4" />
-                    Save Changes
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={slides.map(s => s.id)} strategy={verticalListSortingStrategy}>
+              {slides.map((slide, index) => (
+                <SortableSlide
+                  key={slide.id}
+                  slide={slide}
+                  index={index}
+                  slidesCount={slides.length}
+                  blogPosts={blogPosts}
+                  saving={saving}
+                  onUpdate={updateSlide}
+                  onLinkBlog={linkBlogPost}
+                  onSave={saveSlide}
+                  onDelete={deleteSlide}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
         )}
       </div>
     </div>
