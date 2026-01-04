@@ -87,7 +87,7 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
       default:
         return {
           icon: Newspaper,
-          label: "METS NEWS",
+          label: "MLB NEWS",
           color: "bg-primary hover:bg-primary/90",
           iconBg: "bg-primary"
         };
@@ -100,7 +100,7 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-primary mb-4" />
-            <p className="text-muted-foreground">Loading Mets news...</p>
+            <p className="text-muted-foreground">Loading MLB news...</p>
           </div>
         </div>
       </section>
@@ -133,14 +133,14 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live Updates from ESPN</span>
-          </div>
-          <h2 className="text-4xl font-bold text-foreground mb-4">
-            Mets Live Tracker
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto mb-2">
-            Real-time news, signings, trades, and updates from the Mets front office
-          </p>
+          <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live Updates from ESPN</span>
+        </div>
+        <h2 className="text-4xl font-bold text-foreground mb-4">
+          MLB Live Tracker
+        </h2>
+        <p className="text-muted-foreground max-w-2xl mx-auto mb-2">
+          Real-time news, signings, trades, and updates from around the league
+        </p>
           {lastUpdated && (
             <p className="text-xs text-muted-foreground">
               Last updated: {lastUpdated.toLocaleTimeString()}
