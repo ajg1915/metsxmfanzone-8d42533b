@@ -301,7 +301,7 @@ const Hero = () => {
                 key={tab.id}
                 onClick={() => {
                   setActiveTab(tab.id);
-                  if (tab.id === "live") navigate("/live");
+                  if (tab.id === "live") navigate("/metsxmfanzone");
                   if (tab.id === "podcasts") navigate("/podcast");
                   if (tab.id === "community") navigate("/community");
                 }}
