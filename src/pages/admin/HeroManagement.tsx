@@ -215,7 +215,7 @@ const HeroManagement = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Hero Slides Management</h1>
-          <p className="text-muted-foreground">Manage hero carousel slides for logged-in members. Link to blog posts or add custom content.</p>
+          <p className="text-muted-foreground">Manage hero carousel slides for both public visitors and logged-in members. Link to blog posts or add custom content.</p>
         </div>
         <Button onClick={addSlide} className="gap-2">
           <Plus className="w-4 h-4" />
@@ -268,7 +268,14 @@ const HeroManagement = () => {
                       </CardTitle>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={slide.is_for_members}
+                        onCheckedChange={(checked) => updateSlide(slide.id, "is_for_members", checked)}
+                      />
+                      <Label className="text-sm">{slide.is_for_members ? "Members Only" : "Public"}</Label>
+                    </div>
                     <div className="flex items-center gap-2">
                       <Switch
                         checked={slide.show_watch_live}
