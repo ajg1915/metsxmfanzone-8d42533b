@@ -120,7 +120,7 @@ const Maintenance = ({ message }: MaintenanceProps) => {
 
         {/* Admin Login Link */}
         <motion.a
-          href="/auth"
+          href="/admin"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
