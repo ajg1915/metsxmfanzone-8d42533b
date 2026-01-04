@@ -113,7 +113,7 @@ const Hero = () => {
       image: heroImage,
       link_url: "/metsxmfanzone-tv",
       link_text: "Watch Now",
-      show_watch_live: true,
+      show_watch_live: false,
       badges: ["SNY", "HD", "4K"],
     },
     {
