@@ -17,6 +17,7 @@ interface NewsItem {
   image_url: string;
   link?: string | null;
   is_mets_related?: boolean;
+  is_manual?: boolean;
 }
 
 interface MetsNewsTrackerProps {
@@ -45,17 +46,18 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
         .eq("published", true)
         .order("created_at", { ascending: false });
       
-      let combinedNews: NewsItem[] = [];
+      let apiNews: NewsItem[] = [];
+      let manualNews: NewsItem[] = [];
       
       // Add API news if available
       if (!fetchError && apiData?.success && apiData?.news) {
-        combinedNews = [...apiData.news];
+        apiNews = [...apiData.news];
         setLastUpdated(new Date(apiData.fetched_at));
       }
       
-      // Add manual database entries (mark as Mets-related)
+      // Add manual database entries (mark as Mets-related and manual)
       if (!dbError && manualData && manualData.length > 0) {
-        const manualNews: NewsItem[] = manualData.map((item) => ({
+        manualNews = manualData.map((item) => ({
           id: item.id,
           type: item.type as NewsItem["type"],
           title: item.title,
@@ -64,13 +66,12 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
           time_ago: item.time_ago,
           image_url: item.image_url,
           is_mets_related: true, // Manual entries are always Mets-related
+          is_manual: true, // Mark as manual entry
         }));
-        
-        // Add manual entries at the beginning
-        combinedNews = [...manualNews, ...combinedNews];
       }
       
-      setNewsItems(combinedNews);
+      // Combine: manual entries first, then API entries
+      setNewsItems([...manualNews, ...apiNews]);
     } catch (err) {
       console.error("Failed to fetch Mets news:", err);
       setError("Unable to load news. Please try again later.");
@@ -155,9 +156,11 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
   }
 
   // Filter news based on toggle
+  // When "All MLB" is selected, exclude manual entries (they're Mets-specific)
+  // When "Mets Only" is selected, show only Mets-related items (includes manual entries)
   const filteredNews = metsOnly 
     ? newsItems.filter(item => item.is_mets_related)
-    : newsItems;
+    : newsItems.filter(item => !item.is_manual);
 
   if (filteredNews.length === 0 && metsOnly && newsItems.length > 0) {
     // Show message if no Mets news but there is MLB news
