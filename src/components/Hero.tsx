@@ -103,7 +103,7 @@ const Hero = () => {
       link_url: null,
       link_text: null,
       show_watch_live: true,
-      badges: ["SNY Live", "2025", "Live"],
+      badges: ["SNY", "2025", "Live"],
     },
     {
       title: "Live Game Coverage",
@@ -111,38 +111,38 @@ const Hero = () => {
       description:
         "Watch exclusive live streams, game highlights, and expert analysis. Never miss a moment of Mets action.",
       image: heroImage,
-      link_url: "/live",
+      link_url: "/metsxmfanzone-tv",
       link_text: "Watch Now",
       show_watch_live: true,
-      badges: ["LIVE", "HD", "4K"],
+      badges: ["SNY", "HD", "4K"],
     },
     {
-      title: "Premium Content",
-      subtitle: "EXCLUSIVE ACCESS",
+      title: "MetsXMFanZone Live Podcast",
+      subtitle: "Join Like a Super Fan",
       description: "Access exclusive podcasts, behind-the-scenes content, and premium features with your membership.",
       image: heroImage,
-      link_url: "/plans",
+      link_url: "/podcast,
       link_text: "Subscribe",
       show_watch_live: false,
-      badges: ["PREMIUM", "EXCLUSIVE"],
+      badges: ["MetsXMFanZoneTV", "Podcast"],
     },
   ];
 
   const defaultMemberSlides = [
     {
       title: "Welcome Back!",
-      subtitle: "MEMBER EXCLUSIVE",
+      subtitle: "The Ultimate Destination Where the Fans Go!",
       description:
-        "Your home for live Mets coverage, exclusive content, and community discussions. Dive into today's action!",
+        "Your Go to Stop For Live exclusive content, and community discussions. Dive into today's action!",
       image: heroImage,
       link_url: null,
       link_text: null,
       show_watch_live: true,
-      badges: ["MEMBER", "LIVE"],
+      badges: ["MetsXMFanZoneTV", "LIVE"],
     },
     {
       title: "Live Now",
-      subtitle: "STREAMING",
+      subtitle: "MetsXMFanZone.TV Streams",
       description: "Check out our live streams, game highlights, and real-time updates. Stay connected to every play!",
       image: heroImage,
       link_url: "/live",
@@ -151,14 +151,13 @@ const Hero = () => {
       badges: ["LIVE", "HD"],
     },
     {
-      title: "Your Benefits",
-      subtitle: "Become A Member",
-      description: "Enjoy your member-exclusive podcasts, behind-the-scenes content, and premium features.",
+      title: "Join Mets Fans Discusing Mets News Daily",
+      description: "Join Anthony and The Mets Universe on his daily Show The MetsXMFanZone podcast",
       image: heroImage,
-      link_url: null,
-      link_text: null,
+      link_url: "/plans",
+      link_text: "Membership",
       show_watch_live: false,
-      badges: ["PREMIUM", "UNLIMITED"],
+      badges: ["Podcasts", "UNLIMITED"],
     },
   ];
 
