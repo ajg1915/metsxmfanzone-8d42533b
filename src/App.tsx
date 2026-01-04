@@ -89,6 +89,7 @@ import RealtimeAnalytics from "./pages/admin/RealtimeAnalytics";
 import StreamHealthDashboard from "./pages/admin/StreamHealthDashboard";
 import SEOManagement from "./pages/admin/SEOManagement";
 import HeroManagement from "./pages/admin/HeroManagement";
+import NewsTrackerManagement from "./pages/admin/NewsTrackerManagement";
 import WriterRegister from "./pages/WriterRegister";
 import CreateAccount from "./pages/help/CreateAccount";
 import BiometricLogin from "./pages/help/BiometricLogin";
@@ -237,6 +238,7 @@ const AppContent = () => {
             <Route path="realtime-analytics" element={<RealtimeAnalytics />} />
             <Route path="stream-health" element={<StreamHealthDashboard />} />
             <Route path="seo" element={<SEOManagement />} />
+            <Route path="news-tracker" element={<NewsTrackerManagement />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
           {/* Writer Portal Routes */}
