@@ -213,13 +213,40 @@ const SortableSlide = ({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor={`link-${slide.id}`}>Link URL (optional)</Label>
-            <Input
-              id={`link-${slide.id}`}
-              value={slide.link_url || ""}
-              onChange={(e) => onUpdate(slide.id, "link_url", e.target.value)}
-              placeholder="/blog/my-post or https://..."
-            />
+            <Label htmlFor={`link-${slide.id}`}>Link to Page (optional)</Label>
+            <Select
+              value={slide.link_url || "none"}
+              onValueChange={(value) => onUpdate(slide.id, "link_url", value === "none" ? null : value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a page..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No link</SelectItem>
+                <SelectItem value="/">Home</SelectItem>
+                <SelectItem value="/metsxmfanzone-tv">MetsXMFanZone TV</SelectItem>
+                <SelectItem value="/live">Live</SelectItem>
+                <SelectItem value="/community">Community</SelectItem>
+                <SelectItem value="/podcast">Podcast</SelectItem>
+                <SelectItem value="/blog">Blog</SelectItem>
+                <SelectItem value="/plans">Plans</SelectItem>
+                <SelectItem value="/merch">Merch</SelectItem>
+                <SelectItem value="/events">Events</SelectItem>
+                <SelectItem value="/mets-schedule-2026">Mets Schedule 2026</SelectItem>
+                <SelectItem value="/mets-lineup-card">Lineup Card</SelectItem>
+                <SelectItem value="/mets-scores">Mets Scores</SelectItem>
+                <SelectItem value="/mets-roster">Mets Roster</SelectItem>
+                <SelectItem value="/video-gallery">Video Gallery</SelectItem>
+                <SelectItem value="/spring-training-live">Spring Training Live</SelectItem>
+                <SelectItem value="/nl-scores">NL Scores</SelectItem>
+                <SelectItem value="/social">Social Hub</SelectItem>
+                <SelectItem value="/faqs">FAQs</SelectItem>
+                <SelectItem value="/help-center">Help Center</SelectItem>
+                <SelectItem value="/contact">Contact</SelectItem>
+                <SelectItem value="/feedback">Feedback</SelectItem>
+                <SelectItem value="/business-partner">Business Partner</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor={`linktext-${slide.id}`}>Link Button Text</Label>
@@ -248,6 +275,7 @@ const HeroManagement = () => {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [filter, setFilter] = useState<"all" | "members" | "public">("all");
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -432,6 +460,13 @@ const HeroManagement = () => {
     }
   };
 
+  const filteredSlides = slides.filter(slide => {
+    if (filter === "all") return true;
+    if (filter === "members") return slide.is_for_members;
+    if (filter === "public") return !slide.is_for_members;
+    return true;
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -453,11 +488,42 @@ const HeroManagement = () => {
         </Button>
       </div>
 
+      {/* Filter Tabs */}
+      <div className="flex gap-2">
+        <Button
+          variant={filter === "all" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setFilter("all")}
+        >
+          All ({slides.length})
+        </Button>
+        <Button
+          variant={filter === "public" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setFilter("public")}
+          className={filter === "public" ? "" : "border-green-500/50 text-green-400 hover:bg-green-500/10"}
+        >
+          Public ({slides.filter(s => !s.is_for_members).length})
+        </Button>
+        <Button
+          variant={filter === "members" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setFilter("members")}
+          className={filter === "members" ? "" : "border-blue-500/50 text-blue-400 hover:bg-blue-500/10"}
+        >
+          Members ({slides.filter(s => s.is_for_members).length})
+        </Button>
+      </div>
+
       <div className="space-y-4">
-        {slides.length === 0 ? (
+        {filteredSlides.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">No slides yet. Click "Add Slide" to create one.</p>
+              <p className="text-muted-foreground">
+                {filter === "all" 
+                  ? 'No slides yet. Click "Add Slide" to create one.'
+                  : `No ${filter} slides found.`}
+              </p>
             </CardContent>
           </Card>
         ) : (
@@ -466,13 +532,13 @@ const HeroManagement = () => {
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={slides.map(s => s.id)} strategy={verticalListSortingStrategy}>
-              {slides.map((slide, index) => (
+            <SortableContext items={filteredSlides.map(s => s.id)} strategy={verticalListSortingStrategy}>
+              {filteredSlides.map((slide, index) => (
                 <SortableSlide
                   key={slide.id}
                   slide={slide}
                   index={index}
-                  slidesCount={slides.length}
+                  slidesCount={filteredSlides.length}
                   blogPosts={blogPosts}
                   saving={saving}
                   onUpdate={updateSlide}

@@ -19,7 +19,7 @@ export const useMaintenanceMode = () => {
         const { data, error } = await supabase
           .from("site_settings")
           .select("setting_key, setting_value")
-          .in("setting_key", ["maintenance_enabled", "maintenance_message"]);
+          .in("setting_key", ["maintenance_enabled", "maintenance_message", "maintenance_mode"]);
 
         if (error) {
           console.error("Error fetching maintenance settings:", error);
@@ -33,8 +33,19 @@ export const useMaintenanceMode = () => {
         };
 
         data?.forEach((setting) => {
+          // Handle the combined maintenance_mode key (new format)
+          if (setting.setting_key === "maintenance_mode" && typeof setting.setting_value === "object" && setting.setting_value !== null) {
+            const modeValue = setting.setting_value as { enabled?: boolean; message?: string };
+            if (typeof modeValue.enabled === "boolean") {
+              settings.isEnabled = modeValue.enabled;
+            }
+            if (typeof modeValue.message === "string" && modeValue.message) {
+              settings.message = modeValue.message;
+            }
+          }
+          // Handle legacy separate keys (old format)
           if (setting.setting_key === "maintenance_enabled") {
-            settings.isEnabled = setting.setting_value === true;
+            settings.isEnabled = setting.setting_value === true || setting.setting_value === "true";
           }
           if (setting.setting_key === "maintenance_message" && setting.setting_value) {
             settings.message = String(setting.setting_value);
@@ -60,7 +71,7 @@ export const useMaintenanceMode = () => {
           event: "*",
           schema: "public",
           table: "site_settings",
-          filter: "setting_key=in.(maintenance_enabled,maintenance_message)",
+          filter: "setting_key=in.(maintenance_enabled,maintenance_message,maintenance_mode)",
         },
         () => {
           fetchMaintenanceSettings();

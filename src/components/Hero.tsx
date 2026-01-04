@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Play, Plus, Info, Tv, Radio, Users } from "lucide-react";
+import { Play, Plus, Info } from "lucide-react";
 
 interface HeroSlide {
   id: string;
@@ -198,11 +198,32 @@ const Hero = () => {
     }
   };
 
+  // Custom icon components for tabs
+  const LogoIcon = ({ className }: { className?: string }) => (
+    <img src={logo} alt="" className={className} />
+  );
+  
+  const BaseballIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M4.93 4.93c4.08 2.39 8.16 4.78 9.21 5.52 1.05.74 2.05 2.04 2.93 3.55" />
+      <path d="M19.07 19.07c-4.08-2.39-8.16-4.78-9.21-5.52-1.05-.74-2.05-2.04-2.93-3.55" />
+    </svg>
+  );
+  
+  const BatIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M3 21L21 3" />
+      <path d="M18 6c1.5-1.5 3-3 3-3s-1.5 1.5-3 3" />
+      <ellipse cx="5" cy="19" rx="2" ry="3" transform="rotate(-45 5 19)" />
+    </svg>
+  );
+
   const tabs = [
-    { id: "overview", label: "Overview", icon: Info },
-    { id: "live", label: "Live Streams", icon: Tv },
-    { id: "podcasts", label: "Podcasts", icon: Radio },
-    { id: "community", label: "Community", icon: Users },
+    { id: "overview", label: "Overview", icon: LogoIcon, isImage: true },
+    { id: "live", label: "Live Streams", icon: BaseballIcon, isImage: false },
+    { id: "podcasts", label: "Podcasts", icon: LogoIcon, isImage: true },
+    { id: "community", label: "Community", icon: BatIcon, isImage: false },
   ];
 
   return (
@@ -284,7 +305,7 @@ const Hero = () => {
                   <div className="flex items-center gap-3 flex-wrap">
                     {slide.show_watch_live && (
                       <Button
-                        onClick={() => navigate("/live")}
+                        onClick={() => navigate("/metsxmfanzone-tv")}
                         size="lg"
                         className="gap-2 bg-foreground text-background hover:bg-foreground/90 font-bold px-6 sm:px-8"
                       >
@@ -355,7 +376,11 @@ const Hero = () => {
                   }
                 `}
               >
-                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                {tab.isImage ? (
+                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain" />
+                ) : (
+                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                )}
                 <span className="hidden sm:inline">{tab.label}</span>
               </button>
             );
