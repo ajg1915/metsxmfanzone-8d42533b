@@ -451,8 +451,8 @@ const Community = () => {
                       </Avatar>
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-semibold">
-                            {item.profiles?.full_name || item.profiles?.email || "Anonymous"}
+                        <p className="font-semibold">
+                            {item.profiles?.full_name?.split(' ')[0] || item.profiles?.email || "Anonymous"}
                           </p>
                           {item.type === 'blog' && (
                             <Badge variant="secondary" className="text-xs">
