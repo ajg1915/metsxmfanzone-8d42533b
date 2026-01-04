@@ -211,11 +211,13 @@ const Hero = () => {
     </svg>
   );
   
-  const BatIcon = ({ className }: { className?: string }) => (
+  const SocialIcon = ({ className }: { className?: string }) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M3 21L21 3" />
-      <path d="M18 6c1.5-1.5 3-3 3-3s-1.5 1.5-3 3" />
-      <ellipse cx="5" cy="19" rx="2" ry="3" transform="rotate(-45 5 19)" />
+      <path d="M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+      <path d="M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+      <path d="M18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+      <path d="m8.59 13.51 6.83 3.98" />
+      <path d="m15.41 6.51-6.82 3.98" />
     </svg>
   );
 
@@ -223,7 +225,7 @@ const Hero = () => {
     { id: "overview", label: "Overview", icon: LogoIcon, isImage: true },
     { id: "live", label: "Live Streams", icon: BaseballIcon, isImage: false },
     { id: "podcasts", label: "Podcasts", icon: LogoIcon, isImage: true },
-    { id: "community", label: "Community", icon: BatIcon, isImage: false },
+    { id: "community", label: "Community", icon: SocialIcon, isImage: false },
   ];
 
   return (
