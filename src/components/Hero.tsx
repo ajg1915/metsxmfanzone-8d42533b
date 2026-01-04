@@ -103,7 +103,7 @@ const Hero = () => {
       link_url: null,
       link_text: null,
       show_watch_live: true,
-      badges: ["LIVE", "2025", "HD"],
+      badges: ["SNY Live", "2025", "Live"],
     },
     {
       title: "Live Game Coverage",
@@ -229,7 +229,7 @@ const Hero = () => {
                     transition: "transform 0.7s ease-out",
                   }}
                 />
-                
+
                 {/* Netflix-style gradient overlays */}
                 <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
@@ -320,7 +320,8 @@ const Hero = () => {
                     <div className="mt-6">
                       <div className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary/20 border border-primary/40">
                         <span className="text-xs sm:text-sm text-foreground">
-                          ⚡ Start your <span className="text-primary font-bold">7-day FREE trial</span> for unlimited access
+                          ⚡ Start your <span className="text-primary font-bold">7-day FREE trial</span> for unlimited
+                          access
                         </span>
                       </div>
                     </div>
@@ -348,9 +349,10 @@ const Hero = () => {
                 }}
                 className={`
                   flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium transition-all
-                  ${activeTab === tab.id
-                    ? "text-foreground border-b-2 border-primary"
-                    : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
+                  ${
+                    activeTab === tab.id
+                      ? "text-foreground border-b-2 border-primary"
+                      : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
                   }
                 `}
               >
@@ -368,9 +370,7 @@ const Hero = () => {
               key={index}
               onClick={() => emblaApi?.scrollTo(index)}
               className={`h-1 rounded-full transition-all duration-300 ${
-                selectedIndex === index
-                  ? "w-8 bg-primary"
-                  : "w-2 bg-muted-foreground/40 hover:bg-muted-foreground/60"
+                selectedIndex === index ? "w-8 bg-primary" : "w-2 bg-muted-foreground/40 hover:bg-muted-foreground/60"
               }`}
             />
           ))}
