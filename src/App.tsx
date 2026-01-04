@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { useSessionExpiryWarning } from "@/hooks/useSessionExpiryWarning";
@@ -11,8 +11,10 @@ import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import { usePresenceTracking } from "@/hooks/usePresenceTracking";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { StreamExitDialog } from "@/components/StreamExitDialog";
+import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
 import Index from "./pages/Index";
 import Live from "./pages/Live";
+import Maintenance from "./pages/Maintenance";
 import Community from "./pages/Community";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentError from "./pages/PaymentError";
@@ -113,7 +115,11 @@ import WriterArticleEditor from "./pages/writer/WriterArticleEditor";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+// Wrapper to access maintenance mode inside router context
+const AppContent = () => {
+  const location = useLocation();
+  const { isEnabled: maintenanceEnabled, message: maintenanceMessage, isLoading } = useMaintenanceMode();
+  
   useAutoRefresh();
   useSessionExpiryWarning();
   usePresenceTracking();
@@ -134,16 +140,24 @@ const App = () => {
     document.addEventListener("contextmenu", handleContextMenu);
     return () => document.removeEventListener("contextmenu", handleContextMenu);
   }, []);
+
+  // Check if current route is admin route (admins should bypass maintenance)
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  const isAuthRoute = location.pathname === "/auth" || location.pathname === "/logout";
+
+  // Show maintenance page for non-admin routes when enabled
+  if (!isLoading && maintenanceEnabled && !isAdminRoute && !isAuthRoute) {
+    return <Maintenance message={maintenanceMessage} />;
+  }
   
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <PullToRefresh>
-          <Toaster />
-          <Sonner />
-          <ExitIntentPopup />
-          <StreamExitDialog />
-          <Routes>
+    <TooltipProvider>
+      <PullToRefresh>
+        <Toaster />
+        <Sonner />
+        <ExitIntentPopup />
+        <StreamExitDialog />
+        <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/live" element={<Live />} />
         <Route path="/community" element={<Community />} />
@@ -251,6 +265,13 @@ const App = () => {
           </Routes>
         </PullToRefresh>
       </TooltipProvider>
+  );
+};
+
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppContent />
     </QueryClientProvider>
   );
 };
