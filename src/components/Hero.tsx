@@ -134,8 +134,7 @@ const Hero = () => {
     {
       title: "Welcome Back!",
       subtitle: "The Ultimate Destination Where the Fans Go!",
-      description:
-        "Your Go to Stop For Live exclusive content, and community discussions. Dive into today's action!",
+      description: "Your Go to Stop For Live exclusive content, and community discussions. Dive into today's action!",
       image: heroImage,
       link_url: null,
       link_text: null,
@@ -174,7 +173,7 @@ const Hero = () => {
           link_url: s.link_url,
           link_text: s.link_text,
           show_watch_live: s.show_watch_live ?? true,
-          badges: ["MEMBER", "EXCLUSIVE"],
+          badges: ["MEtsXMFanTV", "Watch Live"],
         }))
       : defaultMemberSlides
     : publicSlides.length > 0
@@ -201,20 +200,24 @@ const Hero = () => {
   };
 
   // Custom icon components for tabs
-  const LogoIcon = ({ className }: { className?: string }) => (
-    <img src={logo} alt="" className={className} />
-  );
-  
+  const LogoIcon = ({ className }: { className?: string }) => <img src={logo} alt="" className={className} />;
+
   const LiveStreamIcon = ({ className }: { className?: string }) => (
     <img src={liveStreamIcon} alt="" className={className} />
   );
-  
-  const PodcastIcon = ({ className }: { className?: string }) => (
-    <img src={podcastIcon} alt="" className={className} />
-  );
-  
+
+  const PodcastIcon = ({ className }: { className?: string }) => <img src={podcastIcon} alt="" className={className} />;
+
   const SocialIcon = ({ className }: { className?: string }) => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
       <path d="M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
       <path d="M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
       <path d="M18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
