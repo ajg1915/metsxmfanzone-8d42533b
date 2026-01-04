@@ -1,6 +1,7 @@
 import heroImage from "@/assets/hero-mets.png";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import liveStreamIcon from "@/assets/live-streaming-icon.png";
+import podcastIcon from "@/assets/podcast-icon.png";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useCallback, useEffect, useState, useRef } from "react";
@@ -208,6 +209,10 @@ const Hero = () => {
     <img src={liveStreamIcon} alt="" className={className} />
   );
   
+  const PodcastIcon = ({ className }: { className?: string }) => (
+    <img src={podcastIcon} alt="" className={className} />
+  );
+  
   const SocialIcon = ({ className }: { className?: string }) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <path d="M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
@@ -221,7 +226,7 @@ const Hero = () => {
   const tabs = [
     { id: "overview", label: "Overview", icon: LogoIcon, isImage: true },
     { id: "live", label: "Live Streams", icon: LiveStreamIcon, isImage: true },
-    { id: "podcasts", label: "Podcasts", icon: LogoIcon, isImage: true },
+    { id: "podcasts", label: "Podcast", icon: PodcastIcon, isImage: true },
     { id: "community", label: "Community", icon: LogoIcon, isImage: true },
   ];
 
