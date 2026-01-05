@@ -113,6 +113,7 @@ import Logout from "./pages/Logout";
 import WriterAuth from "./pages/WriterAuth";
 import WriterDashboard from "./pages/writer/WriterDashboard";
 import WriterArticleEditor from "./pages/writer/WriterArticleEditor";
+import AdminPortal from "./pages/AdminPortal";
 
 const queryClient = new QueryClient();
 
@@ -206,6 +207,7 @@ const AppContent = () => {
           <Route path="/community-podcast" element={<CommunityPodcast />} />
           <Route path="/business-partner" element={<BusinessPartner />} />
           <Route path="/legal/admin-setup" element={<AdminSetup />} />
+          <Route path="/admin-portal" element={<AdminPortal />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="hero" element={<HeroManagement />} />
