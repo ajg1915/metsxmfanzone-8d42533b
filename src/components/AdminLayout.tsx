@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Home, ArrowLeft } from "lucide-react";
 import { AdminPinVerification } from "@/components/AdminPinVerification";
+import { generateDeviceFingerprint } from "@/utils/deviceFingerprint";
 
 function AdminHeader({ navigate }: { navigate: (path: string | number) => void }) {
   const location = useLocation();
@@ -59,11 +60,14 @@ export function AdminLayout() {
   const [checking, setChecking] = useState(true);
   const [needsPinVerification, setNeedsPinVerification] = useState(false);
   const [pinVerified, setPinVerified] = useState(false);
+  const [pinOnlyAuth, setPinOnlyAuth] = useState(false);
 
   useEffect(() => {
-    // Check if already verified this session
+    // Check if already verified this session (either via PIN-only or traditional auth)
     const verified = sessionStorage.getItem("admin_verified");
     const verifiedAt = sessionStorage.getItem("admin_verified_at");
+    const adminUserId = sessionStorage.getItem("admin_user_id");
+    const storedFingerprint = sessionStorage.getItem("admin_device_fingerprint");
     
     if (verified === "true" && verifiedAt) {
       // Check if verification is still valid (24 hour max)
@@ -72,18 +76,72 @@ export function AdminLayout() {
       
       if (hoursSinceVerification < 24) {
         setPinVerified(true);
+        
+        // If using PIN-only auth (no Supabase user), verify device fingerprint
+        if (adminUserId && !user) {
+          setPinOnlyAuth(true);
+          // Validate device fingerprint matches
+          generateDeviceFingerprint().then(currentFp => {
+            if (storedFingerprint && storedFingerprint !== currentFp) {
+              // Device mismatch - clear session and require re-auth
+              sessionStorage.removeItem("admin_verified");
+              sessionStorage.removeItem("admin_verified_at");
+              sessionStorage.removeItem("admin_user_id");
+              sessionStorage.removeItem("admin_session_token");
+              sessionStorage.removeItem("admin_device_fingerprint");
+              navigate("/admin-portal");
+            }
+          });
+        }
       } else {
         // Expired, clear it
         sessionStorage.removeItem("admin_verified");
         sessionStorage.removeItem("admin_verified_at");
+        sessionStorage.removeItem("admin_user_id");
+        sessionStorage.removeItem("admin_session_token");
+        sessionStorage.removeItem("admin_device_fingerprint");
       }
     }
-  }, []);
+  }, [navigate, user]);
 
   useEffect(() => {
     const checkAdmin = async () => {
+      // Check for PIN-only authentication first
+      const adminUserId = sessionStorage.getItem("admin_user_id");
+      const pinVerifiedSession = sessionStorage.getItem("admin_verified") === "true";
+      
+      if (adminUserId && pinVerifiedSession && !user) {
+        // PIN-only auth - verify the user is still an admin in database
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", adminUserId)
+          .eq("role", "admin")
+          .single();
+
+        if (!roleData) {
+          toast({
+            title: "Access Denied",
+            description: "Admin privileges have been revoked",
+            variant: "destructive",
+          });
+          sessionStorage.removeItem("admin_verified");
+          sessionStorage.removeItem("admin_user_id");
+          navigate("/admin-portal");
+          return;
+        }
+
+        setIsAdmin(true);
+        setPinOnlyAuth(true);
+        setPinVerified(true);
+        setChecking(false);
+        return;
+      }
+
+      // Traditional auth flow
       if (!loading && !user) {
-        navigate("/auth");
+        // No user and no PIN auth - redirect to portal
+        navigate("/admin-portal");
         return;
       }
 
@@ -124,7 +182,7 @@ export function AdminLayout() {
   };
 
   const handlePinCancel = () => {
-    navigate("/");
+    navigate("/admin-portal");
   };
 
   if (loading || checking) {
@@ -135,15 +193,21 @@ export function AdminLayout() {
     );
   }
 
-  if (!isAdmin) {
+  // For PIN-only auth, we don't have a Supabase user
+  if (!isAdmin && !pinOnlyAuth) {
     return null;
   }
 
-  // Show PIN verification if needed
+  // Show PIN verification if needed (only for traditional auth flow)
   if (needsPinVerification && !pinVerified && user) {
+    const userId = user?.id || sessionStorage.getItem("admin_user_id");
+    if (!userId) {
+      navigate("/admin-portal");
+      return null;
+    }
     return (
       <AdminPinVerification
-        userId={user.id}
+        userId={userId}
         onVerified={handlePinVerified}
         onCancel={handlePinCancel}
       />

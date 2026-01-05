@@ -1,0 +1,264 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Server-side salt - matches admin-pin-verify
+const SERVER_SALT = Deno.env.get('ADMIN_PIN_SALT') || 'metsxm_secure_admin_salt_2024_server_side';
+
+// Rate limiting constants
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MINUTES = 30;
+
+// Secure hash function using SHA-256 with server salt
+async function hashPin(pin: string, userSalt: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin + SERVER_SALT + userSalt);
+  
+  let hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  for (let i = 0; i < 10000; i++) {
+    hashBuffer = await crypto.subtle.digest("SHA-256", hashBuffer);
+  }
+  
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Generate device fingerprint hash for consistent storage
+async function hashFingerprint(fingerprint: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(fingerprint + SERVER_SALT);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    // Use service role for admin operations (no JWT required for PIN login)
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    const { action, pin, deviceFingerprint, deviceName } = await req.json();
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                     req.headers.get('cf-connecting-ip') || 
+                     'unknown';
+
+    // Hash the device fingerprint for storage
+    const hashedFingerprint = await hashFingerprint(deviceFingerprint || 'unknown');
+
+    console.log(`Admin PIN login attempt from IP: ${clientIP.substring(0, 10)}... Device: ${hashedFingerprint.substring(0, 16)}...`);
+
+    // Check rate limiting by device fingerprint and IP
+    const thirtyMinutesAgo = new Date(Date.now() - LOCKOUT_MINUTES * 60 * 1000).toISOString();
+    
+    const { data: recentAttempts } = await supabase
+      .from('admin_login_attempts')
+      .select('id, success')
+      .or(`device_fingerprint.eq.${hashedFingerprint},ip_address.eq.${clientIP}`)
+      .gte('attempted_at', thirtyMinutesAgo)
+      .eq('success', false);
+
+    const failedAttempts = recentAttempts?.length || 0;
+
+    if (failedAttempts >= MAX_ATTEMPTS) {
+      console.log(`Rate limit exceeded for device/IP. Failed attempts: ${failedAttempts}`);
+      
+      // Calculate remaining lockout time
+      const { data: lastAttempt } = await supabase
+        .from('admin_login_attempts')
+        .select('attempted_at')
+        .or(`device_fingerprint.eq.${hashedFingerprint},ip_address.eq.${clientIP}`)
+        .eq('success', false)
+        .order('attempted_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      const lockoutEndsAt = lastAttempt 
+        ? new Date(new Date(lastAttempt.attempted_at).getTime() + LOCKOUT_MINUTES * 60 * 1000)
+        : new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000);
+      
+      const remainingMinutes = Math.ceil((lockoutEndsAt.getTime() - Date.now()) / 60000);
+
+      return new Response(JSON.stringify({ 
+        error: 'Too many failed attempts',
+        locked: true,
+        remainingMinutes: Math.max(1, remainingMinutes),
+        message: `Account locked for ${remainingMinutes} minutes due to too many failed attempts`
+      }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (action === 'login') {
+      if (!pin || pin.length < 6) {
+        return new Response(JSON.stringify({ error: 'Invalid PIN format' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Find all admins with verification codes set up
+      const { data: adminCodes, error: codesError } = await supabase
+        .from('admin_verification_codes')
+        .select('user_id, code_hash');
+
+      if (codesError || !adminCodes || adminCodes.length === 0) {
+        // Log failed attempt
+        await supabase.from('admin_login_attempts').insert({
+          device_fingerprint: hashedFingerprint,
+          ip_address: clientIP,
+          success: false
+        });
+        
+        return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Check PIN against all admins
+      let matchedUserId: string | null = null;
+      
+      for (const adminCode of adminCodes) {
+        const userSalt = adminCode.user_id.substring(0, 16);
+        const hashedInput = await hashPin(pin, userSalt);
+        
+        if (hashedInput === adminCode.code_hash) {
+          matchedUserId = adminCode.user_id;
+          break;
+        }
+      }
+
+      if (!matchedUserId) {
+        // Log failed attempt
+        await supabase.from('admin_login_attempts').insert({
+          device_fingerprint: hashedFingerprint,
+          ip_address: clientIP,
+          success: false
+        });
+
+        const attemptsRemaining = MAX_ATTEMPTS - failedAttempts - 1;
+        console.log(`Invalid PIN. Attempts remaining: ${attemptsRemaining}`);
+        
+        return new Response(JSON.stringify({ 
+          error: 'Invalid PIN',
+          attemptsRemaining: Math.max(0, attemptsRemaining)
+        }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Verify user is still an admin
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', matchedUserId)
+        .eq('role', 'admin')
+        .single();
+
+      if (!roleData) {
+        return new Response(JSON.stringify({ error: 'Admin access revoked' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Check if this is a trusted device
+      const { data: trustedDevice } = await supabase
+        .from('admin_trusted_devices')
+        .select('id, is_active')
+        .eq('user_id', matchedUserId)
+        .eq('device_fingerprint', hashedFingerprint)
+        .single();
+
+      const isTrustedDevice = trustedDevice?.is_active === true;
+
+      // Log successful attempt
+      await supabase.from('admin_login_attempts').insert({
+        device_fingerprint: hashedFingerprint,
+        ip_address: clientIP,
+        success: true
+      });
+
+      // If trusted device, update last used
+      if (trustedDevice) {
+        await supabase
+          .from('admin_trusted_devices')
+          .update({ last_used_at: new Date().toISOString() })
+          .eq('id', trustedDevice.id);
+      } else {
+        // If not trusted, add as new device
+        await supabase.from('admin_trusted_devices').insert({
+          user_id: matchedUserId,
+          device_fingerprint: hashedFingerprint,
+          device_name: deviceName || 'Unknown Device',
+          is_active: true
+        });
+      }
+
+      // Get user email for the session token
+      const { data: userData } = await supabase.auth.admin.getUserById(matchedUserId);
+      
+      if (!userData?.user?.email) {
+        return new Response(JSON.stringify({ error: 'User not found' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      console.log(`Admin PIN login successful for user: ${matchedUserId.substring(0, 8)}...`);
+
+      // Generate a session token for this admin
+      // We'll use a secure random token that maps to the user ID
+      const sessionToken = crypto.randomUUID() + '-' + Date.now();
+      const tokenHash = await hashFingerprint(sessionToken);
+
+      // Store the session in a temporary way (will be validated on admin routes)
+      // We return the user ID and a verification token
+      return new Response(JSON.stringify({ 
+        success: true,
+        userId: matchedUserId,
+        email: userData.user.email,
+        fullName: userData.user.user_metadata?.full_name || 'Admin',
+        sessionToken: tokenHash,
+        isTrustedDevice,
+        isNewDevice: !trustedDevice
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (action === 'check-lockout') {
+      return new Response(JSON.stringify({ 
+        locked: failedAttempts >= MAX_ATTEMPTS,
+        attemptsRemaining: Math.max(0, MAX_ATTEMPTS - failedAttempts)
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    return new Response(JSON.stringify({ error: 'Invalid action' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error('Error in admin-pin-login:', error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+});
