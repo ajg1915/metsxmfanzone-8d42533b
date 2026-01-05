@@ -38,14 +38,19 @@ const mediaItems = [
   { title: "Email Editor", url: "/admin/email-editor", icon: Send },
 ];
 
-// Live & Events - Live streams, TV, Spring Training, Events
+// Settings items (moved to prominent position)
+const settingsNavItems = [
+  { title: "Admin Settings", url: "/admin/settings", icon: Settings },
+  { title: "News Tracker", url: "/admin/news-tracker", icon: Newspaper },
+  { title: "TV Schedule", url: "/admin/tv-schedule", icon: Tv },
+];
+
+// Live & Streaming
 const liveItems = [
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
   { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
   { title: "Replays", url: "/admin/stream-replays", icon: PlaySquare },
   { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
-  { title: "TV Schedule", url: "/admin/tv-schedule", icon: Tv },
-  { title: "News Tracker", url: "/admin/news-tracker", icon: Newspaper },
 ];
 
 // Events & Schedules
@@ -77,10 +82,6 @@ const analyticsItems = [
   { title: "QR Codes", url: "/admin/qr-generator", icon: QrCode },
 ];
 
-// Settings
-const settingsItems = [
-  { title: "Admin Settings", url: "/admin/settings", icon: Settings },
-];
 
 export function AdminSidebar() {
   const { open } = useSidebar();
@@ -158,11 +159,14 @@ export function AdminSidebar() {
         {/* Home / Overview */}
         {renderCollapsibleSection("Home", Home, homeItems, homeOpen, setHomeOpen)}
 
+        {/* Settings (prominent position) */}
+        {renderCollapsibleSection("Settings", Settings, settingsNavItems, liveOpen, setLiveOpen)}
+
         {/* Content & Media */}
         {renderCollapsibleSection("Content", Film, mediaItems, mediaOpen, setMediaOpen)}
 
         {/* Live & Streaming */}
-        {renderCollapsibleSection("Live", Radio, liveItems, liveOpen, setLiveOpen)}
+        {renderCollapsibleSection("Live", Radio, liveItems, eventsOpen, setEventsOpen)}
 
         {/* Events & Schedules */}
         {renderCollapsibleSection("Events", CalendarDays, eventsItems, eventsOpen, setEventsOpen)}
@@ -176,30 +180,6 @@ export function AdminSidebar() {
         {/* Analytics & SEO */}
         {renderCollapsibleSection("Analytics", TrendingUp, analyticsItems, analyticsOpen, setAnalyticsOpen)}
 
-        {/* Settings - Single item, no collapsible needed */}
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {settingsItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
-                    <NavLink
-                      to={item.url}
-                      className={({ isActive: active }) =>
-                        `flex items-center gap-2 ${active || isActive(item.url)
-                          ? "bg-primary text-primary-foreground font-medium"
-                          : "hover:bg-muted/50"}`
-                      }
-                    >
-                      <item.icon className="h-4 w-4 flex-shrink-0" />
-                      <span className="truncate">{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
