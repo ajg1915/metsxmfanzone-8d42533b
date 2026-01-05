@@ -152,9 +152,9 @@ export const setupNotificationListeners = () => {
         
         if (stream.status === 'live') {
           const title = '🔴 LIVE NOW!';
-          await sendPushNotification(title, stream.title, '/live', 'live-stream');
+          await sendPushNotification(title, stream.title, '/metsxmfanzone-tv', 'live-stream');
           await sendSMSNotification(`🔴 LIVE NOW: ${stream.title}`);
-          await sendEmailNotification(title, stream.description || stream.title, 'live_stream', '/live');
+          await sendEmailNotification(title, stream.description || stream.title, 'live_stream', '/metsxmfanzone-tv');
           showBrowserNotification(title, stream.title);
         }
       }
@@ -178,9 +178,9 @@ export const setupNotificationListeners = () => {
         // Check if stream just went live
         if (oldStream.status !== 'live' && newStream.status === 'live' && newStream.published) {
           const title = '🔴 LIVE NOW!';
-          await sendPushNotification(title, newStream.title, '/live', 'live-stream');
+          await sendPushNotification(title, newStream.title, '/metsxmfanzone-tv', 'live-stream');
           await sendSMSNotification(`🔴 LIVE NOW: ${newStream.title}`);
-          await sendEmailNotification(title, newStream.description || newStream.title, 'live_stream', '/live');
+          await sendEmailNotification(title, newStream.description || newStream.title, 'live_stream', '/metsxmfanzone-tv');
           showBrowserNotification(title, newStream.title);
         }
       }

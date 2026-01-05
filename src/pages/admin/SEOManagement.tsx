@@ -31,7 +31,7 @@ interface SEOSetting {
 
 const defaultPages = [
   { name: "Home", path: "/" },
-  { name: "Live", path: "/live" },
+  { name: "Spring Training Live", path: "/spring-training-live" },
   { name: "Blog", path: "/blog" },
   { name: "Podcast", path: "/podcast" },
   { name: "Community", path: "/community" },
