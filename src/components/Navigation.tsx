@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Play, Users, Menu, Shield, User, LogOut, LayoutDashboard, X, Trophy, CalendarDays, ArrowLeft } from "lucide-react";
+import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
+import liveStreamIcon from "@/assets/live-streaming-icon.png";
+import podcastIcon from "@/assets/podcast-icon.png";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -252,7 +254,7 @@ const Navigation = () => {
                     className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg touch-target"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Trophy className="w-4 h-4" />
+                    <img src={logo} alt="" className="w-5 h-5 object-contain" />
                     Home
                   </NavLink>
                   <button
@@ -262,7 +264,7 @@ const Navigation = () => {
                     }}
                     className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
-                    <Play className="w-4 h-4" />
+                    <img src={liveStreamIcon} alt="" className="w-5 h-5 object-contain" />
                     Spring Training
                   </button>
                   <button
@@ -272,7 +274,7 @@ const Navigation = () => {
                     }}
                     className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
-                    <Users className="w-4 h-4" />
+                    <img src={logo} alt="" className="w-5 h-5 object-contain" />
                     Community
                   </button>
                   <button
@@ -282,7 +284,7 @@ const Navigation = () => {
                     }}
                     className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
-                    <Menu className="w-4 h-4" />
+                    <img src={logo} alt="" className="w-5 h-5 object-contain" />
                     Blog
                   </button>
                   <button
@@ -292,7 +294,7 @@ const Navigation = () => {
                     }}
                     className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
-                    <Play className="w-4 h-4" />
+                    <img src={podcastIcon} alt="" className="w-5 h-5 object-contain" />
                     Podcast
                   </button>
                   <button
@@ -302,7 +304,7 @@ const Navigation = () => {
                     }}
                     className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
-                    <CalendarDays className="w-4 h-4" />
+                    <img src={logo} alt="" className="w-5 h-5 object-contain" />
                     Events
                   </button>
                   {!user && (
