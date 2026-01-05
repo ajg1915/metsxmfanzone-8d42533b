@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Globe, Sparkles } from "lucide-react";
+import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Globe, Sparkles, Settings } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -208,14 +208,14 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="min-w-0">
+        <Card className="min-w-0 cursor-pointer hover:border-primary transition-colors" onClick={() => navigate("/admin/settings")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3 px-3">
-            <CardTitle className="text-[10px] sm:text-xs font-medium truncate">Streams</CardTitle>
-            <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground flex-shrink-0" />
+            <CardTitle className="text-[10px] sm:text-xs font-medium truncate">Settings</CardTitle>
+            <Settings className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent className="px-3 pb-3">
-            <div className="text-lg sm:text-xl font-bold">{stats.activeStreams}/{stats.totalStreams}</div>
-            <p className="text-[10px] text-muted-foreground">Active/Total</p>
+            <div className="text-lg sm:text-xl font-bold text-primary">Manage</div>
+            <p className="text-[10px] text-muted-foreground">Site Settings</p>
           </CardContent>
         </Card>
 
