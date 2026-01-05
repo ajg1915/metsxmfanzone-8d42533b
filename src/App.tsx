@@ -13,7 +13,7 @@ import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { StreamExitDialog } from "@/components/StreamExitDialog";
 import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
 import Index from "./pages/Index";
-import Live from "./pages/Live";
+
 import Maintenance from "./pages/Maintenance";
 import Community from "./pages/Community";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -161,7 +161,7 @@ const AppContent = () => {
         <StreamExitDialog />
         <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/live" element={<Live />} />
+        
         <Route path="/community" element={<Community />} />
         <Route path="/gallery" element={<Gallery />} />
           <Route path="/plans" element={<Plans />} />

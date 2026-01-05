@@ -18,7 +18,7 @@ const Sitemap = () => {
       // Static pages
       const staticPages = [
         { url: '/', changefreq: 'daily', priority: '1.0' },
-        { url: '/live', changefreq: 'daily', priority: '0.9' },
+        { url: '/spring-training-live', changefreq: 'daily', priority: '0.9' },
         { url: '/community', changefreq: 'weekly', priority: '0.8' },
         { url: '/gallery', changefreq: 'weekly', priority: '0.7' },
         { url: '/plans', changefreq: 'monthly', priority: '0.8' },
