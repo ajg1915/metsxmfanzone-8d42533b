@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Radio } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Radio, Copy, ExternalLink, Video, Mic, RefreshCw } from "lucide-react";
 
 interface PodcastLiveStream {
   id: string;
@@ -22,10 +23,17 @@ const PodcastLiveStreamManagement = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [stream, setStream] = useState<PodcastLiveStream | null>(null);
+  const [roomId, setRoomId] = useState("");
 
   useEffect(() => {
     fetchStream();
+    // Generate a random room ID if none exists
+    setRoomId(generateRoomId());
   }, []);
+
+  const generateRoomId = () => {
+    return `metsxm-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8)}`;
+  };
 
   const fetchStream = async () => {
     try {
@@ -36,6 +44,14 @@ const PodcastLiveStreamManagement = () => {
 
       if (error) throw error;
       setStream(data);
+      
+      // Extract room ID from existing URL if present
+      if (data?.vdo_ninja_url) {
+        const match = data.vdo_ninja_url.match(/view=([^&]+)/);
+        if (match) {
+          setRoomId(match[1]);
+        }
+      }
     } catch (error) {
       console.error("Error fetching stream:", error);
       toast({
@@ -81,6 +97,105 @@ const PodcastLiveStreamManagement = () => {
     }
   };
 
+  const generateBroadcastLink = () => {
+    const newRoomId = generateRoomId();
+    setRoomId(newRoomId);
+    
+    // VDO.Ninja push URL (for broadcasting from phone)
+    const pushUrl = `https://vdo.ninja/?push=${newRoomId}&webcam&quality=2`;
+    // VDO.Ninja view URL (for viewers)
+    const viewUrl = `https://vdo.ninja/?view=${newRoomId}`;
+    
+    setStream(prev => prev ? { ...prev, vdo_ninja_url: viewUrl } : null);
+    
+    toast({
+      title: "Broadcast Link Generated",
+      description: "Open the broadcast link on your phone to start streaming",
+    });
+    
+    return { pushUrl, viewUrl };
+  };
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: `${label} copied to clipboard`,
+    });
+  };
+
+  const openBroadcastLink = () => {
+    const pushUrl = `https://vdo.ninja/?push=${roomId}&webcam&quality=2`;
+    window.open(pushUrl, "_blank");
+  };
+
+  const goLive = async () => {
+    if (!stream) return;
+    
+    setSaving(true);
+    try {
+      const viewUrl = `https://vdo.ninja/?view=${roomId}`;
+      
+      const { error } = await supabase
+        .from("podcast_live_stream")
+        .update({
+          vdo_ninja_url: viewUrl,
+          is_live: true,
+        })
+        .eq("id", stream.id);
+
+      if (error) throw error;
+
+      setStream(prev => prev ? { ...prev, vdo_ninja_url: viewUrl, is_live: true } : null);
+      
+      toast({
+        title: "🔴 You're Live!",
+        description: "Your podcast is now streaming. Open the broadcast link on your phone.",
+      });
+    } catch (error) {
+      console.error("Error going live:", error);
+      toast({
+        title: "Error",
+        description: "Failed to go live",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const endStream = async () => {
+    if (!stream) return;
+    
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("podcast_live_stream")
+        .update({
+          is_live: false,
+        })
+        .eq("id", stream.id);
+
+      if (error) throw error;
+
+      setStream(prev => prev ? { ...prev, is_live: false } : null);
+      
+      toast({
+        title: "Stream Ended",
+        description: "Your podcast stream has been stopped",
+      });
+    } catch (error) {
+      console.error("Error ending stream:", error);
+      toast({
+        title: "Error",
+        description: "Failed to end stream",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -101,17 +216,133 @@ const PodcastLiveStreamManagement = () => {
     );
   }
 
+  const pushUrl = `https://vdo.ninja/?push=${roomId}&webcam&quality=2`;
+  const viewUrl = `https://vdo.ninja/?view=${roomId}`;
+
   return (
     <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
-      <div>
-        <h1 className="text-lg sm:text-xl font-bold">Podcast Stream</h1>
-        <p className="text-xs text-muted-foreground">VDO.Ninja configuration</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-lg sm:text-xl font-bold">Podcast Live Stream</h1>
+          <p className="text-xs text-muted-foreground">Go live from your phone</p>
+        </div>
+        {stream.is_live && (
+          <Badge variant="destructive" className="animate-pulse">
+            <Radio className="w-3 h-3 mr-1" />
+            LIVE
+          </Badge>
+        )}
       </div>
 
+      {/* Quick Go Live Section */}
+      <Card className="border-primary/50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-1.5">
+            <Video className="w-4 h-4 text-primary" />
+            Quick Start
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Start streaming in 3 steps
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 px-3">
+          {/* Step 1: Generate Link */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">1</span>
+              <Label className="text-xs font-medium">Generate Broadcast Link</Label>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={generateBroadcastLink}
+                className="h-8 text-xs"
+              >
+                <RefreshCw className="w-3 h-3 mr-1" />
+                New Link
+              </Button>
+              <Input 
+                value={roomId} 
+                readOnly 
+                className="h-8 text-xs flex-1 font-mono"
+              />
+            </div>
+          </div>
+
+          {/* Step 2: Open on Phone */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">2</span>
+              <Label className="text-xs font-medium">Open on Your Phone</Label>
+            </div>
+            <div className="bg-muted/50 p-2 rounded-lg space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <code className="text-[10px] text-muted-foreground break-all flex-1">
+                  {pushUrl}
+                </code>
+                <div className="flex gap-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => copyToClipboard(pushUrl, "Broadcast link")}
+                    className="h-7 w-7 p-0"
+                  >
+                    <Copy className="w-3 h-3" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={openBroadcastLink}
+                    className="h-7 w-7 p-0"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                📱 Copy this link and open it in your phone's browser. Allow camera & mic access.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3: Go Live */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">3</span>
+              <Label className="text-xs font-medium">Go Live!</Label>
+            </div>
+            {stream.is_live ? (
+              <Button 
+                variant="destructive" 
+                size="sm" 
+                onClick={endStream} 
+                disabled={saving}
+                className="w-full h-10"
+              >
+                {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Radio className="w-4 h-4 mr-2" />}
+                End Stream
+              </Button>
+            ) : (
+              <Button 
+                size="sm" 
+                onClick={goLive} 
+                disabled={saving}
+                className="w-full h-10 bg-red-600 hover:bg-red-700"
+              >
+                {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Radio className="w-4 h-4 mr-2" />}
+                Go Live
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Stream Settings */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-1.5">
-            <Radio className="w-3.5 h-3.5" />
+            <Mic className="w-3.5 h-3.5" />
             Stream Settings
           </CardTitle>
         </CardHeader>
@@ -122,23 +353,33 @@ const PodcastLiveStreamManagement = () => {
               value={stream.title}
               onChange={(e) => setStream({ ...stream, title: e.target.value })}
               className="h-8 text-xs"
+              placeholder="MetsXMFanZone Live Podcast"
             />
           </div>
 
           <div className="space-y-1">
-            <Label className="text-xs">VDO.Ninja URL</Label>
+            <Label className="text-xs">Description</Label>
+            <Textarea
+              value={stream.description || ""}
+              onChange={(e) => setStream({ ...stream, description: e.target.value })}
+              className="text-xs min-h-[60px]"
+              placeholder="What's today's show about?"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Viewer URL (auto-generated)</Label>
             <Input
-              value={stream.vdo_ninja_url || ""}
-              onChange={(e) => setStream({ ...stream, vdo_ninja_url: e.target.value })}
-              placeholder="https://vdo.ninja/?view=XXXXX"
-              className="h-8 text-xs"
+              value={stream.vdo_ninja_url || viewUrl}
+              readOnly
+              className="h-8 text-xs font-mono bg-muted/50"
             />
           </div>
 
           <div className="flex items-center justify-between p-2 border rounded-lg">
             <div>
               <Label className="text-xs">Live Status</Label>
-              <p className="text-[10px] text-muted-foreground">Show on Live page</p>
+              <p className="text-[10px] text-muted-foreground">Show on Podcast page</p>
             </div>
             <Switch
               checked={stream.is_live}
@@ -152,11 +393,30 @@ const PodcastLiveStreamManagement = () => {
             </Button>
             <Button onClick={handleSave} disabled={saving} size="sm" className="h-8 text-xs">
               {saving && <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />}
-              Save
+              Save Settings
             </Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Preview */}
+      {stream.is_live && stream.vdo_ninja_url && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Live Preview</CardTitle>
+          </CardHeader>
+          <CardContent className="px-3">
+            <div className="aspect-video bg-black rounded-lg overflow-hidden">
+              <iframe
+                src={stream.vdo_ninja_url}
+                className="w-full h-full"
+                allow="camera; microphone; autoplay; fullscreen"
+                allowFullScreen
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

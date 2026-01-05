@@ -3,12 +3,13 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Mic, Radio, Music2, Facebook, Headphones, Music, Podcast as PodcastIcon } from "lucide-react";
+import { Play, Mic, Radio, Music2, Facebook, Headphones, Music, Podcast as PodcastIcon, Video } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import SEOHead, { generatePodcastSchema } from "@/components/SEOHead";
+import { Badge } from "@/components/ui/badge";
 
 interface PodcastEpisode {
   id: string;
@@ -18,6 +19,14 @@ interface PodcastEpisode {
   duration: number | null;
   published_at: string | null;
   created_at: string;
+}
+
+interface PodcastLiveStream {
+  id: string;
+  title: string;
+  description: string | null;
+  vdo_ninja_url: string | null;
+  is_live: boolean;
 }
 
 const platforms = [
@@ -63,9 +72,34 @@ const Podcast = () => {
   const navigate = useNavigate();
   const [episodes, setEpisodes] = useState<PodcastEpisode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [liveStream, setLiveStream] = useState<PodcastLiveStream | null>(null);
 
   useEffect(() => {
     fetchEpisodes();
+    fetchLiveStream();
+    
+    // Subscribe to live stream changes
+    const channel = supabase
+      .channel('podcast-live-stream')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'podcast_live_stream'
+        },
+        (payload) => {
+          console.log('Podcast stream update:', payload);
+          if (payload.new) {
+            setLiveStream(payload.new as PodcastLiveStream);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchEpisodes = async () => {
@@ -82,6 +116,20 @@ const Podcast = () => {
       console.error("Error fetching podcasts:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchLiveStream = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("podcast_live_stream")
+        .select("*")
+        .single();
+
+      if (error) throw error;
+      setLiveStream(data);
+    } catch (error) {
+      console.error("Error fetching live stream:", error);
     }
   };
 
@@ -200,11 +248,46 @@ const Podcast = () => {
             </div>
           </section>
 
+          {/* Live Podcast Stream */}
+          {liveStream?.is_live && liveStream.vdo_ninja_url && (
+            <section className="mb-8 sm:mb-12">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 animate-pulse" />
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">🔴 Live Now</h2>
+                <Badge variant="destructive" className="animate-pulse ml-2">LIVE</Badge>
+              </div>
+              <Card className="border-2 border-red-500/50 bg-gradient-to-br from-red-500/5 to-orange-500/5">
+                <CardHeader>
+                  <CardTitle className="text-base sm:text-lg md:text-xl flex items-center gap-2">
+                    <Video className="w-5 h-5 text-red-500" />
+                    {liveStream.title}
+                  </CardTitle>
+                  {liveStream.description && (
+                    <CardDescription className="text-xs sm:text-sm">{liveStream.description}</CardDescription>
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <div className="aspect-video bg-black rounded-lg overflow-hidden mb-4">
+                    <iframe
+                      src={liveStream.vdo_ninja_url}
+                      className="w-full h-full"
+                      allow="camera; microphone; autoplay; fullscreen"
+                      allowFullScreen
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground text-center">
+                    📺 You're watching the live podcast stream
+                  </p>
+                </CardContent>
+              </Card>
+            </section>
+          )}
+
           {/* Live Streams Section */}
           <section className="mb-8 sm:mb-12">
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-primary animate-pulse" />
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Live Now</h2>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Live Shows</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {liveShows.map((show, index) => (
