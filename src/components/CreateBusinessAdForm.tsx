@@ -8,18 +8,19 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Megaphone, Upload, Loader2, Image } from "lucide-react";
-
 interface CreateBusinessAdFormProps {
   userId: string;
 }
-
-const CreateBusinessAdForm = ({ userId }: CreateBusinessAdFormProps) => {
-  const { toast } = useToast();
+const CreateBusinessAdForm = ({
+  userId
+}: CreateBusinessAdFormProps) => {
+  const {
+    toast
+  } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
   const [formData, setFormData] = useState({
     business_name: "",
     ad_title: "",
@@ -27,99 +28,92 @@ const CreateBusinessAdForm = ({ userId }: CreateBusinessAdFormProps) => {
     ad_image_url: "",
     website_url: "",
     contact_email: "",
-    contact_phone: "",
+    contact_phone: ""
   });
-
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
       toast({
         title: "Invalid File Type",
         description: "Please upload a JPG, PNG, WebP, or GIF image.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "File Too Large",
         description: "Please upload an image smaller than 5MB.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setUploadingImage(true);
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${userId}/ad-${Date.now()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('content_uploads')
-        .upload(fileName, file, { upsert: true });
-
+      const {
+        error: uploadError
+      } = await supabase.storage.from('content_uploads').upload(fileName, file, {
+        upsert: true
+      });
       if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('content_uploads')
-        .getPublicUrl(fileName);
-
-      setFormData(prev => ({ ...prev, ad_image_url: publicUrl }));
+      const {
+        data: {
+          publicUrl
+        }
+      } = supabase.storage.from('content_uploads').getPublicUrl(fileName);
+      setFormData(prev => ({
+        ...prev,
+        ad_image_url: publicUrl
+      }));
       toast({
         title: "Image Uploaded",
-        description: "Your ad image has been uploaded.",
+        description: "Your ad image has been uploaded."
       });
     } catch (error) {
       console.error('Error uploading image:', error);
       toast({
         title: "Upload Failed",
         description: "Failed to upload image. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setUploadingImage(false);
     }
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!formData.business_name || !formData.ad_title || !formData.ad_description || !formData.contact_email) {
       toast({
         title: "Missing Fields",
         description: "Please fill in all required fields.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setSubmitting(true);
     try {
-      const { error } = await supabase
-        .from('business_ads')
-        .insert({
-          user_id: userId,
-          business_name: formData.business_name,
-          ad_title: formData.ad_title,
-          ad_description: formData.ad_description,
-          ad_image_url: formData.ad_image_url || null,
-          website_url: formData.website_url || null,
-          contact_email: formData.contact_email,
-          contact_phone: formData.contact_phone || null,
-          status: 'pending',
-        });
-
+      const {
+        error
+      } = await supabase.from('business_ads').insert({
+        user_id: userId,
+        business_name: formData.business_name,
+        ad_title: formData.ad_title,
+        ad_description: formData.ad_description,
+        ad_image_url: formData.ad_image_url || null,
+        website_url: formData.website_url || null,
+        contact_email: formData.contact_email,
+        contact_phone: formData.contact_phone || null,
+        status: 'pending'
+      });
       if (error) throw error;
-
       toast({
         title: "Ad Submitted!",
-        description: "Your business ad has been submitted for review. It will appear once approved.",
+        description: "Your business ad has been submitted for review. It will appear once approved."
       });
-      
       setFormData({
         business_name: "",
         ad_title: "",
@@ -127,7 +121,7 @@ const CreateBusinessAdForm = ({ userId }: CreateBusinessAdFormProps) => {
         ad_image_url: "",
         website_url: "",
         contact_email: "",
-        contact_phone: "",
+        contact_phone: ""
       });
       setDialogOpen(false);
     } catch (error) {
@@ -135,13 +129,12 @@ const CreateBusinessAdForm = ({ userId }: CreateBusinessAdFormProps) => {
       toast({
         title: "Submission Failed",
         description: "Failed to submit your ad. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setSubmitting(false);
     }
   };
-
   const resetForm = () => {
     setFormData({
       business_name: "",
@@ -150,29 +143,25 @@ const CreateBusinessAdForm = ({ userId }: CreateBusinessAdFormProps) => {
       ad_image_url: "",
       website_url: "",
       contact_email: "",
-      contact_phone: "",
+      contact_phone: ""
     });
   };
-
-  return (
-    <Card className="border-2 border-primary">
+  return <Card className="border-2 border-primary">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-primary">
           <Megaphone className="w-5 h-5" />
           Business Advertising
         </CardTitle>
-        <CardDescription>
-          Promote your business to the MetsXM community
-        </CardDescription>
+        <CardDescription>Promote your business to the MetsXMFanZone community</CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground mb-4">
           Create an ad to showcase your business in our Community page. Ads are reviewed before going live.
         </p>
-        <Dialog open={dialogOpen} onOpenChange={(open) => {
-          setDialogOpen(open);
-          if (!open) resetForm();
-        }}>
+        <Dialog open={dialogOpen} onOpenChange={open => {
+        setDialogOpen(open);
+        if (!open) resetForm();
+      }}>
           <DialogTrigger asChild>
             <Button className="w-full gap-2">
               <Megaphone className="w-4 h-4" />
@@ -189,79 +178,44 @@ const CreateBusinessAdForm = ({ userId }: CreateBusinessAdFormProps) => {
             <form onSubmit={handleSubmit} className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="business_name">Business Name *</Label>
-                <Input
-                  id="business_name"
-                  value={formData.business_name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, business_name: e.target.value }))}
-                  placeholder="Your Business Name"
-                  required
-                />
+                <Input id="business_name" value={formData.business_name} onChange={e => setFormData(prev => ({
+                ...prev,
+                business_name: e.target.value
+              }))} placeholder="Your Business Name" required />
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="ad_title">Ad Title *</Label>
-                <Input
-                  id="ad_title"
-                  value={formData.ad_title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, ad_title: e.target.value }))}
-                  placeholder="Catchy headline for your ad"
-                  required
-                />
+                <Input id="ad_title" value={formData.ad_title} onChange={e => setFormData(prev => ({
+                ...prev,
+                ad_title: e.target.value
+              }))} placeholder="Catchy headline for your ad" required />
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="ad_description">Description *</Label>
-                <Textarea
-                  id="ad_description"
-                  value={formData.ad_description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, ad_description: e.target.value }))}
-                  placeholder="Describe your business and what you're offering..."
-                  rows={3}
-                  required
-                />
+                <Textarea id="ad_description" value={formData.ad_description} onChange={e => setFormData(prev => ({
+                ...prev,
+                ad_description: e.target.value
+              }))} placeholder="Describe your business and what you're offering..." rows={3} required />
               </div>
               
               <div className="space-y-2">
                 <Label>Ad Image (Optional)</Label>
                 <div className="flex items-center gap-4">
-                  {formData.ad_image_url ? (
-                    <img 
-                      src={formData.ad_image_url} 
-                      alt="Ad preview" 
-                      className="w-20 h-20 object-cover rounded-lg border"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center">
+                  {formData.ad_image_url ? <img src={formData.ad_image_url} alt="Ad preview" className="w-20 h-20 object-cover rounded-lg border" /> : <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center">
                       <Image className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                  )}
+                    </div>}
                   <div className="flex-1">
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleImageUpload}
-                      accept="image/jpeg,image/png,image/webp,image/gif"
-                      className="hidden"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploadingImage}
-                      className="w-full"
-                    >
-                      {uploadingImage ? (
-                        <>
+                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" />
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploadingImage} className="w-full">
+                      {uploadingImage ? <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                           Uploading...
-                        </>
-                      ) : (
-                        <>
+                        </> : <>
                           <Upload className="w-4 h-4 mr-2" />
                           Upload Image
-                        </>
-                      )}
+                        </>}
                     </Button>
                     <p className="text-xs text-muted-foreground mt-1">
                       JPG, PNG, WebP or GIF. Max 5MB.
@@ -272,65 +226,44 @@ const CreateBusinessAdForm = ({ userId }: CreateBusinessAdFormProps) => {
               
               <div className="space-y-2">
                 <Label htmlFor="website_url">Website URL (Optional)</Label>
-                <Input
-                  id="website_url"
-                  type="url"
-                  value={formData.website_url}
-                  onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
-                  placeholder="https://yourbusiness.com"
-                />
+                <Input id="website_url" type="url" value={formData.website_url} onChange={e => setFormData(prev => ({
+                ...prev,
+                website_url: e.target.value
+              }))} placeholder="https://yourbusiness.com" />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="contact_email">Contact Email *</Label>
-                  <Input
-                    id="contact_email"
-                    type="email"
-                    value={formData.contact_email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, contact_email: e.target.value }))}
-                    placeholder="email@business.com"
-                    required
-                  />
+                  <Input id="contact_email" type="email" value={formData.contact_email} onChange={e => setFormData(prev => ({
+                  ...prev,
+                  contact_email: e.target.value
+                }))} placeholder="email@business.com" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="contact_phone">Phone (Optional)</Label>
-                  <Input
-                    id="contact_phone"
-                    type="tel"
-                    value={formData.contact_phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, contact_phone: e.target.value }))}
-                    placeholder="(555) 123-4567"
-                  />
+                  <Input id="contact_phone" type="tel" value={formData.contact_phone} onChange={e => setFormData(prev => ({
+                  ...prev,
+                  contact_phone: e.target.value
+                }))} placeholder="(555) 123-4567" />
                 </div>
               </div>
               
               <div className="flex justify-end gap-2 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setDialogOpen(false)}
-                  disabled={submitting}
-                >
+                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} disabled={submitting}>
                   Cancel
                 </Button>
                 <Button type="submit" disabled={submitting}>
-                  {submitting ? (
-                    <>
+                  {submitting ? <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Submitting...
-                    </>
-                  ) : (
-                    "Submit Ad for Review"
-                  )}
+                    </> : "Submit Ad for Review"}
                 </Button>
               </div>
             </form>
           </DialogContent>
         </Dialog>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
-
 export default CreateBusinessAdForm;
