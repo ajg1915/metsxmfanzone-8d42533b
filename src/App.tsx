@@ -146,8 +146,13 @@ const AppContent = () => {
   // Check if current route is admin route (admins should bypass maintenance)
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isAuthRoute = location.pathname === "/auth" || location.pathname === "/logout";
+  const isMaintenancePreview = location.pathname === "/maintenance-preview";
 
-  // Show maintenance page for non-admin routes when enabled
+  // Show maintenance page for non-admin routes when enabled (or preview route)
+  if (isMaintenancePreview) {
+    return <Maintenance message={maintenanceMessage || "Preview: We're currently performing scheduled maintenance. Please check back soon!"} />;
+  }
+  
   if (!isLoading && maintenanceEnabled && !isAdminRoute && !isAuthRoute) {
     return <Maintenance message={maintenanceMessage} />;
   }
