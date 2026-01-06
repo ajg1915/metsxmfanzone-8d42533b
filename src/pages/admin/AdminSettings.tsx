@@ -28,8 +28,10 @@ import {
   BookOpen,
   Film,
   ShoppingBag,
-  Tv
+  Tv,
+  Eye
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -448,6 +450,21 @@ export default function AdminSettings() {
                 <p className="text-xs text-muted-foreground">
                   This message will be displayed to visitors when maintenance mode is active
                 </p>
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                <div className="space-y-0.5">
+                  <Label className="font-medium">Preview Maintenance Page</Label>
+                  <p className="text-sm text-muted-foreground">
+                    See how the maintenance page looks with your custom message
+                  </p>
+                </div>
+                <Button asChild variant="outline" size="sm" className="gap-2">
+                  <Link to="/maintenance-preview" target="_blank">
+                    <Eye className="h-4 w-4" />
+                    Preview
+                  </Link>
+                </Button>
               </div>
 
               {maintenance.enabled && (
