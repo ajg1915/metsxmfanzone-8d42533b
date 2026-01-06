@@ -1,4 +1,8 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { Mail, CheckCircle, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
 interface MaintenanceProps {
@@ -45,7 +49,47 @@ const socialLinks = [
 ];
 
 const Maintenance = ({ message }: MaintenanceProps) => {
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  
   const displayMessage = message || "We're currently performing scheduled maintenance. Please check back soon!";
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from("newsletter_subscribers")
+        .upsert({ email: email.trim().toLowerCase() }, { onConflict: "email" });
+
+      if (error) throw error;
+
+      setIsSubscribed(true);
+      toast({
+        title: "Subscribed!",
+        description: "We'll notify you when the site is back online.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Subscription failed",
+        description: error.message || "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/10 flex flex-col">
@@ -148,19 +192,62 @@ const Maintenance = ({ message }: MaintenanceProps) => {
             ))}
           </motion.div>
 
+          {/* Email Subscription Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.85 }}
+            className="mt-8 px-4"
+          >
+            {isSubscribed ? (
+              <div className="flex items-center justify-center gap-2 text-green-500">
+                <CheckCircle className="w-5 h-5" />
+                <span className="text-sm">You'll be notified when we're back!</span>
+              </div>
+            ) : (
+              <form onSubmit={handleSubscribe} className="max-w-sm mx-auto">
+                <p className="text-sm text-muted-foreground mb-3">
+                  Get notified when we're back online
+                </p>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      className="w-full pl-10 pr-4 py-2 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Notify Me"
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </motion.div>
+
           {/* Thank you message */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="mt-12 text-sm text-muted-foreground"
+            transition={{ delay: 0.9 }}
+            className="mt-8 text-sm text-muted-foreground"
           >
             Thank you for your patience!
           </motion.p>
         </motion.div>
       </div>
-
-      {/* Footer with Social Media */}
       <motion.footer
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
