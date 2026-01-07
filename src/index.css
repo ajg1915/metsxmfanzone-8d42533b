@@ -645,3 +645,25 @@ All colors MUST be HSL.
     text-shadow: 0 0 20px hsl(24 100% 50% / 0.5);
   }
 }
+
+/* Lightweight CSS animations for background orbs */
+@keyframes orb-float-slow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(20px, -30px) scale(1.05); }
+  66% { transform: translate(-15px, 15px) scale(0.98); }
+}
+
+@keyframes orb-float-medium {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-25px, 20px) scale(1.03); }
+}
+
+.animate-orb-slow {
+  animation: orb-float-slow 25s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-orb-medium {
+  animation: orb-float-medium 18s ease-in-out infinite;
+  will-change: transform;
+}
