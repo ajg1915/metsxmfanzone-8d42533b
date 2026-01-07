@@ -228,7 +228,7 @@ const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[550px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[700px] overflow-hidden">
+    <section className="group/hero relative min-h-[550px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[700px] overflow-hidden">
       {/* Immersive background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div 
@@ -368,19 +368,19 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Arrow Navigation */}
+      {/* Arrow Navigation - Show on hover only, positioned outside content area */}
       {slidesToShow.length > 1 && (
         <>
           <button
             onClick={() => emblaApi?.scrollPrev()}
-            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full glass-light flex items-center justify-center text-foreground/70 hover:text-primary hover:border-primary/50 transition-all duration-300"
+            className="absolute left-2 sm:left-3 top-1/3 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full glass-light flex items-center justify-center text-foreground/70 hover:text-primary hover:border-primary/50 transition-all duration-300 opacity-0 group-hover/hero:opacity-100"
             aria-label="Previous slide"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => emblaApi?.scrollNext()}
-            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full glass-light flex items-center justify-center text-foreground/70 hover:text-primary hover:border-primary/50 transition-all duration-300"
+            className="absolute right-2 sm:right-3 top-1/3 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full glass-light flex items-center justify-center text-foreground/70 hover:text-primary hover:border-primary/50 transition-all duration-300 opacity-0 group-hover/hero:opacity-100"
             aria-label="Next slide"
           >
             <ChevronRight className="w-4 h-4" />
