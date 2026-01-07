@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Play, Film, ChevronRight, ChevronLeft } from "lucide-react";
+import { Play, Film, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -25,8 +25,6 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [loading, setLoading] = useState(true);
-  const [scrollPosition, setScrollPosition] = useState(0);
-
   useEffect(() => {
     fetchHighlights();
   }, []);
@@ -55,22 +53,6 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const scroll = (direction: 'left' | 'right') => {
-    const container = document.getElementById('highlights-scroll');
-    if (container) {
-      const scrollAmount = container.clientWidth * 0.8;
-      const newPosition = direction === 'left' 
-        ? Math.max(0, scrollPosition - scrollAmount)
-        : scrollPosition + scrollAmount;
-      container.scrollTo({ left: newPosition, behavior: 'smooth' });
-      setScrollPosition(newPosition);
-    }
-  };
-
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    setScrollPosition(e.currentTarget.scrollLeft);
   };
 
   if (loading || videos.length === 0) {
@@ -105,24 +87,9 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
         </div>
 
         {/* Netflix-style carousel container */}
-        <div className="relative group/carousel">
-          {/* Left scroll button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => scroll('left')}
-            className={cn(
-              "absolute left-2 top-1/2 -translate-y-1/2 z-20 h-full w-10 sm:w-12 rounded-none bg-gradient-to-r from-background via-background/80 to-transparent opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300",
-              scrollPosition <= 0 && "hidden"
-            )}
-          >
-            <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
-          </Button>
-
+        <div className="relative">
           {/* Scrollable content */}
           <div
-            id="highlights-scroll"
-            onScroll={handleScroll}
             className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-6 lg:px-8"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
@@ -190,16 +157,6 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
             {/* Add right padding spacer */}
             <div className="flex-shrink-0 w-0 lg:w-[calc((100vw-1280px)/2)]" />
           </div>
-
-          {/* Right scroll button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => scroll('right')}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 h-full w-10 sm:w-12 rounded-none bg-gradient-to-l from-background via-background/80 to-transparent opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300"
-          >
-            <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
-          </Button>
         </div>
       </section>
 
