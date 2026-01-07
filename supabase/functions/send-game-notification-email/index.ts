@@ -1,8 +1,5 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,7 +16,7 @@ interface GameNotificationRequest {
     location?: string;
   };
   notificationType: 'game_alert' | 'score_update' | 'lineup' | 'news' | 'live_stream' | 'event' | 'general';
-  targetUsers?: string[]; // Optional: specific user IDs to notify
+  targetUsers?: string[];
   url?: string;
 }
 
@@ -44,88 +41,69 @@ const getEmailTemplate = (
     </div>
   ` : '';
 
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body style="margin: 0; padding: 0; background-color: #002D72; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-      <div style="max-width: 320px; margin: 0 auto; padding: 15px;">
-        <!-- Header with Logo -->
-        <div style="text-align: center; padding: 20px 0;">
-          <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle;" />
-          <span style="color: #FF4500; font-size: 16px; font-weight: bold; margin-left: 6px; vertical-align: middle;">MetsXMFanZone</span>
-          <p style="color: #6B7280; margin: 8px 0 0 0; font-size: 11px;">Your Ultimate Mets Experience</p>
-        </div>
-        
-        <!-- Main Content -->
-        <div style="background: linear-gradient(180deg, #1a1f2e 0%, #0f1420 100%); border: 1px solid rgba(255, 69, 0, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 15px;">
-          <div style="text-align: center; margin-bottom: 15px;">
-            <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 15px; height: 15px;" />
-          </div>
-          
-          <h2 style="color: #FF4500; font-size: 18px; text-align: center; margin: 0 0 15px 0;">${title}</h2>
-          
-          <p style="color: #D1D5DB; font-size: 13px; line-height: 1.5; text-align: center; margin: 0 0 15px 0;">
-            ${message}
-          </p>
-          
-          ${gameInfoHtml}
-          
-          <div style="text-align: center; margin-top: 20px;">
-            <a href="${actionUrl}" style="display: inline-block; background: linear-gradient(135deg, #FF4500 0%, #FF6A33 100%); color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 13px;">
-              View on <span style="color: #002D72; background: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">MetsXMFanZone</span>
-            </a>
-          </div>
-        </div>
-        
-        <!-- Social Media Footer -->
-        <div style="text-align: center; padding: 15px 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-          <div style="margin-bottom: 10px;">
-            <a href="https://facebook.com/metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">Facebook</a>
-            <a href="https://twitter.com/metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">Twitter</a>
-            <a href="https://instagram.com/metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">Instagram</a>
-            <a href="https://youtube.com/@metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">YouTube</a>
-          </div>
-          <p style="color: #6B7280; font-size: 10px; margin: 0 0 8px 0;">
-            You're receiving this because you enabled notifications on <span style="color: #FF4500; font-weight: bold;">MetsXMFanZone</span>.
-          </p>
-          <p style="color: #6B7280; font-size: 10px; margin: 0;">
-            <a href="${baseUrl}/dashboard" style="color: #FF4500; text-decoration: none;">Manage notification preferences</a>
-          </p>
-          <p style="color: #4B5563; font-size: 10px; margin: 10px 0 0 0;">
-            © ${new Date().getFullYear()} <span style="color: #FF4500;">MetsXMFanZone</span>. All rights reserved.
-          </p>
-          <p style="margin: 8px 0 0 0;">
-            <a href="${baseUrl}" style="color: #002D72; background: #FF4500; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 10px; font-weight: bold;">metsxmfanzone.com</a>
-          </p>
-        </div>
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #002D72; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+  <div style="max-width: 320px; margin: 0 auto; padding: 15px;">
+    <div style="text-align: center; padding: 20px 0;">
+      <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle;" />
+      <span style="color: #FF4500; font-size: 16px; font-weight: bold; margin-left: 6px; vertical-align: middle;">MetsXMFanZone</span>
+      <p style="color: #6B7280; margin: 8px 0 0 0; font-size: 11px;">Your Ultimate Mets Experience</p>
+    </div>
+    <div style="background: linear-gradient(180deg, #1a1f2e 0%, #0f1420 100%); border: 1px solid rgba(255, 69, 0, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+      <div style="text-align: center; margin-bottom: 15px;">
+        <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 15px; height: 15px;" />
       </div>
-    </body>
-    </html>
-  `;
+      <h2 style="color: #FF4500; font-size: 18px; text-align: center; margin: 0 0 15px 0;">${title}</h2>
+      <p style="color: #D1D5DB; font-size: 13px; line-height: 1.5; text-align: center; margin: 0 0 15px 0;">${message}</p>
+      ${gameInfoHtml}
+      <div style="text-align: center; margin-top: 20px;">
+        <a href="${actionUrl}" style="display: inline-block; background: linear-gradient(135deg, #FF4500 0%, #FF6A33 100%); color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 13px;">
+          View on <span style="color: #002D72; background: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">MetsXMFanZone</span>
+        </a>
+      </div>
+    </div>
+    <div style="text-align: center; padding: 15px 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+      <div style="margin-bottom: 10px;">
+        <a href="https://facebook.com/metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">Facebook</a>
+        <a href="https://twitter.com/metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">Twitter</a>
+        <a href="https://instagram.com/metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">Instagram</a>
+        <a href="https://youtube.com/@metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">YouTube</a>
+      </div>
+      <p style="color: #6B7280; font-size: 10px; margin: 0 0 8px 0;">
+        You're receiving this because you enabled notifications on <span style="color: #FF4500; font-weight: bold;">MetsXMFanZone</span>.
+      </p>
+      <p style="color: #6B7280; font-size: 10px; margin: 0;">
+        <a href="${baseUrl}/dashboard" style="color: #FF4500; text-decoration: none;">Manage notification preferences</a>
+      </p>
+      <p style="color: #4B5563; font-size: 10px; margin: 10px 0 0 0;">
+        © ${new Date().getFullYear()} <span style="color: #FF4500;">MetsXMFanZone</span>. All rights reserved.
+      </p>
+      <p style="margin: 8px 0 0 0;">
+        <a href="${baseUrl}" style="color: #002D72; background: #FF4500; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 10px; font-weight: bold;">metsxmfanzone.com</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
 };
 
-const handler = async (req: Request): Promise<Response> => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { 
-      title, 
-      message, 
-      gameInfo, 
-      notificationType = 'general',
-      targetUsers,
-      url 
-    }: GameNotificationRequest = await req.json();
+    const { title, message, gameInfo, notificationType = 'general', targetUsers, url }: GameNotificationRequest = await req.json();
 
     if (!title || !message) {
       return new Response(
@@ -134,18 +112,15 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Get users who have email notifications enabled
     let query = supabase
       .from('profiles')
       .select('id, email, full_name, email_notifications_enabled, game_notifications_enabled')
       .eq('email_notifications_enabled', true);
 
-    // Filter for game notifications if applicable
     if (['game_alert', 'score_update', 'lineup'].includes(notificationType)) {
       query = query.eq('game_notifications_enabled', true);
     }
 
-    // Filter by specific users if provided
     if (targetUsers && targetUsers.length > 0) {
       query = query.in('id', targetUsers);
     }
@@ -165,10 +140,8 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log(`Sending email notifications to ${users.length} users`);
-
     const emailHtml = getEmailTemplate(title, message, gameInfo, notificationType, url);
 
-    // Send emails to all eligible users
     const emailPromises = users.map(async (user) => {
       if (!user.email) return { success: false, userId: user.id, error: 'No email' };
 
@@ -176,15 +149,14 @@ const handler = async (req: Request): Promise<Response> => {
         const emailResponse = await resend.emails.send({
           from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
           to: [user.email],
-          subject: `${title} - MetsXM FanZone`,
+          subject: `${title} - MetsXMFanZone`,
           html: emailHtml,
         });
-
-        console.log(`Email sent to ${user.email}:`, emailResponse);
-        return { success: true, userId: user.id, email: user.email };
+        console.log(`Email sent to ${user.email}:`, { id: emailResponse?.data?.id || '[REDACTED]' });
+        return { success: true, userId: user.id };
       } catch (error: any) {
-        console.error(`Failed to send email to ${user.email}:`, error);
-        return { success: false, userId: user.id, email: user.email, error: error.message };
+        console.error(`Failed to send email to ${user.email}:`, error.message);
+        return { success: false, userId: user.id, error: error.message };
       }
     });
 
@@ -209,6 +181,4 @@ const handler = async (req: Request): Promise<Response> => {
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
-};
-
-serve(handler);
+});
