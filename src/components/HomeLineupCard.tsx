@@ -231,8 +231,15 @@ export default function HomeLineupCard({
         <ChevronDown className="w-4 h-4" />
       </div>
     </div>;
-  return <section className="py-10 sm:py-12 md:py-16">
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+  return <section className="py-10 sm:py-12 md:py-16 relative">
+      {/* Blue glow effect */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse 80% 50% at 50% 50%, hsl(220 80% 50% / 0.08), transparent 70%)",
+        }}
+      />
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
       {/* Top Scroll Indicator */}
       
 
