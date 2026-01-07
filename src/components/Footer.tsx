@@ -1,23 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 const Footer = () => {
   const navigate = useNavigate();
-  const [clickCount, setClickCount] = useState(0);
 
   const handleSecretClick = () => {
-    const newCount = clickCount + 1;
-    setClickCount(newCount);
-    
-    // Triple-click to access admin portal
-    if (newCount >= 3) {
-      setClickCount(0);
-      navigate("/admin-portal");
-    }
-    
-    // Reset after 2 seconds of inactivity
-    setTimeout(() => setClickCount(0), 2000);
+    navigate("/admin-portal");
   };
 
   return (
