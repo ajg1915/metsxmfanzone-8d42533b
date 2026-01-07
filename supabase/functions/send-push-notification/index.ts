@@ -115,15 +115,19 @@ function concatBytes(...arrays: Uint8Array[]): Uint8Array {
   return out;
 }
 
+type U8AB = Uint8Array<ArrayBuffer>;
+const toU8AB = (bytes: Uint8Array): U8AB => new Uint8Array(bytes) as unknown as U8AB;
+const toArrayBuffer = (bytes: Uint8Array): ArrayBuffer => toU8AB(bytes).buffer;
+
 async function hmacSha256(keyBytes: Uint8Array, dataBytes: Uint8Array): Promise<Uint8Array> {
   const key = await crypto.subtle.importKey(
     'raw',
-    keyBytes,
+    toArrayBuffer(keyBytes),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign']
   );
-  const sig = await crypto.subtle.sign('HMAC', key, dataBytes);
+  const sig = await crypto.subtle.sign('HMAC', key, toArrayBuffer(dataBytes));
   return new Uint8Array(sig);
 }
 
@@ -134,8 +138,8 @@ async function hkdfExtract(salt: Uint8Array, ikm: Uint8Array): Promise<Uint8Arra
 
 async function hkdfExpand(prk: Uint8Array, info: Uint8Array, length: number): Promise<Uint8Array> {
   // HKDF-Expand(PRK, info, L)
-  let t = new Uint8Array(0);
-  let okm = new Uint8Array(0);
+  let t: Uint8Array = new Uint8Array(0);
+  let okm: Uint8Array = new Uint8Array(0);
   let counter = 1;
 
   while (okm.length < length) {
@@ -167,7 +171,7 @@ async function encryptWebPushPayloadAes128gcm(
 
   const clientPublicKey = await crypto.subtle.importKey(
     'raw',
-    clientPublicKeyRaw,
+    toArrayBuffer(clientPublicKeyRaw),
     { name: 'ECDH', namedCurve: 'P-256' },
     false,
     []
@@ -198,12 +202,12 @@ async function encryptWebPushPayloadAes128gcm(
   const cek = await hkdfExpand(prk2, enc.encode('Content-Encoding: aes128gcm\0'), 16);
   const nonce = await hkdfExpand(prk2, enc.encode('Content-Encoding: nonce\0'), 12);
 
-  const aesKey = await crypto.subtle.importKey('raw', cek, { name: 'AES-GCM' }, false, ['encrypt']);
+  const aesKey = await crypto.subtle.importKey('raw', toArrayBuffer(cek), { name: 'AES-GCM' }, false, ['encrypt']);
 
   // RFC8291: append padding delimiter 0x02
   const plaintext = concatBytes(enc.encode(payloadText), new Uint8Array([0x02]));
   const ciphertext = new Uint8Array(
-    await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce }, aesKey, plaintext)
+    await crypto.subtle.encrypt({ name: 'AES-GCM', iv: toU8AB(nonce) }, aesKey, toArrayBuffer(plaintext))
   );
 
   const rs = 4096;
@@ -314,20 +318,22 @@ async function sendPushNotification(
 
     const vapidJwt = await createVapidJwt(audience);
 
+    const body = toU8AB(encrypted.body);
+
     const headers: Record<string, string> = {
       'TTL': '86400',
       'Urgency': 'high',
       'Content-Encoding': 'aes128gcm',
       'Content-Type': 'application/octet-stream',
-      'Content-Length': String(encrypted.body.byteLength),
-      'Authorization': `WebPush ${vapidJwt}`,
+      'Content-Length': String(body.byteLength),
+      'Authorization': `vapid t=${vapidJwt}, k=${VAPID_PUBLIC_KEY}`,
       'Crypto-Key': `p256ecdsa=${VAPID_PUBLIC_KEY}`,
     };
 
     const response = await fetch(subscription.endpoint, {
       method: 'POST',
       headers,
-      body: encrypted.body,
+      body,
     });
 
     const statusCode = response.status;
