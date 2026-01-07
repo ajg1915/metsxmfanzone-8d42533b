@@ -256,12 +256,43 @@ export const setupNotificationListeners = () => {
       },
       async (payload) => {
         const post = payload.new as any;
-        const title = '📰 New Blog Post';
+        const title = '📰 New Article Published!';
+        const blogUrl = `/blog/${post.slug}`;
+        const message = `${post.title}\n\n${post.excerpt || 'Check out our latest article!'}\n\nRead it now on MetsXMFanZone Blog!`;
         
-        await sendPushNotification(title, post.title, `/blog/${post.slug}`, 'blog-post');
-        await sendSMSNotification(`📰 New Blog Post: ${post.title}`);
-        await sendEmailNotification(title, post.excerpt || post.title, 'news', `/blog/${post.slug}`);
+        await sendPushNotification(title, post.title, blogUrl, 'blog-post');
+        await sendSMSNotification(`📰 New Article: ${post.title} - Read it at metsxmfanzone.com${blogUrl}`);
+        await sendEmailNotification(title, message, 'news', blogUrl);
         showBrowserNotification(title, post.title);
+      }
+    )
+    .subscribe();
+
+  // Listen for blog post updates (when unpublished becomes published)
+  const blogUpdateChannel = supabase
+    .channel('blog-update-notifications')
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'blog_posts'
+      },
+      async (payload) => {
+        const oldPost = payload.old as any;
+        const newPost = payload.new as any;
+        
+        // Check if post just became published
+        if (!oldPost.published && newPost.published) {
+          const title = '📰 New Article Published!';
+          const blogUrl = `/blog/${newPost.slug}`;
+          const message = `${newPost.title}\n\n${newPost.excerpt || 'Check out our latest article!'}\n\nRead it now on MetsXMFanZone Blog!`;
+          
+          await sendPushNotification(title, newPost.title, blogUrl, 'blog-post');
+          await sendSMSNotification(`📰 New Article: ${newPost.title} - Read it at metsxmfanzone.com${blogUrl}`);
+          await sendEmailNotification(title, message, 'news', blogUrl);
+          showBrowserNotification(title, newPost.title);
+        }
       }
     )
     .subscribe();
@@ -459,6 +490,7 @@ export const setupNotificationListeners = () => {
     supabase.removeChannel(streamHealthChannel);
     supabase.removeChannel(streamAlertChannel);
     supabase.removeChannel(blogChannel);
+    supabase.removeChannel(blogUpdateChannel);
     supabase.removeChannel(eventsChannel);
     supabase.removeChannel(storiesChannel);
     supabase.removeChannel(videosChannel);

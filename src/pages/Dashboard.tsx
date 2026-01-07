@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
-import NotificationSettings from "@/components/NotificationSettings";
+import NotificationPreferencesCard from "@/components/NotificationPreferencesCard";
 import PasskeyManager from "@/components/PasskeyManager";
 import { Badge } from "@/components/ui/badge";
 import { User, CreditCard, Calendar, ArrowUpCircle, Upload, Loader2 } from "lucide-react";
@@ -447,7 +447,7 @@ const Dashboard = () => {
               </Card>
             </div>
 
-            <NotificationSettings />
+            <NotificationPreferencesCard />
             
             <PasskeyManager />
 
