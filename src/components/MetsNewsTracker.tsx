@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, Clock, Newspaper, AlertCircle, ExternalLink, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { motion } from "framer-motion";
+import GlassCard from "@/components/GlassCard";
 
 interface NewsItem {
   id: string;
@@ -20,10 +21,6 @@ interface NewsItem {
   is_manual?: boolean;
 }
 
-interface MetsNewsTrackerProps {
-  className?: string;
-}
-
 const MetsNewsTracker = () => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,10 +33,7 @@ const MetsNewsTracker = () => {
     setError(null);
     
     try {
-      // Fetch from API
       const { data: apiData, error: fetchError } = await supabase.functions.invoke('fetch-mets-news');
-      
-      // Fetch manual entries from database
       const { data: manualData, error: dbError } = await supabase
         .from("mets_news_tracker")
         .select("*")
@@ -49,13 +43,11 @@ const MetsNewsTracker = () => {
       let apiNews: NewsItem[] = [];
       let manualNews: NewsItem[] = [];
       
-      // Add API news if available
       if (!fetchError && apiData?.success && apiData?.news) {
         apiNews = [...apiData.news];
         setLastUpdated(new Date(apiData.fetched_at));
       }
       
-      // Add manual database entries (mark as Mets-related and manual)
       if (!dbError && manualData && manualData.length > 0) {
         manualNews = manualData.map((item) => ({
           id: item.id,
@@ -65,12 +57,11 @@ const MetsNewsTracker = () => {
           details: item.details,
           time_ago: item.time_ago,
           image_url: item.image_url,
-          is_mets_related: true, // Manual entries are always Mets-related
-          is_manual: true, // Mark as manual entry
+          is_mets_related: true,
+          is_manual: true,
         }));
       }
       
-      // Combine: manual entries first, then API entries
       setNewsItems([...manualNews, ...apiNews]);
     } catch (err) {
       console.error("Failed to fetch Mets news:", err);
@@ -81,11 +72,8 @@ const MetsNewsTracker = () => {
     }
   };
 
-
   useEffect(() => {
     fetchNewsItems();
-    
-    // Refresh news every 5 minutes
     const interval = setInterval(fetchNewsItems, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
@@ -93,39 +81,19 @@ const MetsNewsTracker = () => {
   const getTypeConfig = (type: NewsItem["type"]) => {
     switch (type) {
       case "signing":
-        return {
-          icon: TrendingUp,
-          label: "NEW SIGNING",
-          color: "bg-green-500 hover:bg-green-600",
-          iconBg: "bg-green-500"
-        };
+        return { icon: TrendingUp, label: "NEW SIGNING", color: "bg-green-500/90 hover:bg-green-600/90", iconBg: "bg-green-500" };
       case "traded":
-        return {
-          icon: Users,
-          label: "TRADE NEWS",
-          color: "bg-blue-500 hover:bg-blue-600",
-          iconBg: "bg-blue-500"
-        };
+        return { icon: Users, label: "TRADE NEWS", color: "bg-blue-500/90 hover:bg-blue-600/90", iconBg: "bg-blue-500" };
       case "injury":
-        return {
-          icon: AlertCircle,
-          label: "INJURY UPDATE",
-          color: "bg-red-500 hover:bg-red-600",
-          iconBg: "bg-red-500"
-        };
+        return { icon: AlertCircle, label: "INJURY UPDATE", color: "bg-red-500/90 hover:bg-red-600/90", iconBg: "bg-red-500" };
       default:
-        return {
-          icon: Newspaper,
-          label: "MLB NEWS",
-          color: "bg-primary hover:bg-primary/90",
-          iconBg: "bg-primary"
-        };
+        return { icon: Newspaper, label: "MLB NEWS", color: "bg-primary/90 hover:bg-primary", iconBg: "bg-primary" };
     }
   };
 
   if (loading) {
     return (
-      <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-br from-background via-secondary/10 to-background">
+      <section className="py-10 sm:py-12 md:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-primary mb-4" />
@@ -138,11 +106,11 @@ const MetsNewsTracker = () => {
 
   if (error) {
     return (
-      <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-br from-background via-secondary/10 to-background">
+      <section className="py-10 sm:py-12 md:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center">
           <AlertCircle className="w-12 h-12 mx-auto text-destructive mb-4" />
           <p className="text-muted-foreground mb-4">{error}</p>
-          <Button onClick={fetchNewsItems} variant="outline" size="sm">
+          <Button onClick={fetchNewsItems} variant="outline" size="sm" className="glass-card">
             <RefreshCw className="w-4 h-4 mr-2" />
             Try Again
           </Button>
@@ -151,52 +119,38 @@ const MetsNewsTracker = () => {
     );
   }
 
-  if (newsItems.length === 0) {
-    return null;
-  }
+  if (newsItems.length === 0) return null;
 
-  // Filter news based on toggle
-  // When "All MLB" is selected, exclude manual entries (they're Mets-specific)
-  // When "Mets Only" is selected, show only Mets-related items (includes manual entries)
   const filteredNews = metsOnly 
     ? newsItems.filter(item => item.is_mets_related)
     : newsItems.filter(item => !item.is_manual);
 
   if (filteredNews.length === 0 && metsOnly && newsItems.length > 0) {
-    // Show message if no Mets news but there is MLB news
     return (
-      <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-br from-background via-secondary/10 to-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <section className="py-10 sm:py-12 md:py-16 relative overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
-          <div className="text-center mb-6 sm:mb-8">
-            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-6 sm:mb-8"
+          >
+            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 glass-card rounded-full">
               <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live MetsXMFanZone Newsroom</span>
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live MetsXMFanZone Newsroom</span>
             </div>
             <h2 className="text-4xl font-bold text-foreground mb-4">MLB Live Tracker</h2>
             <div className="flex items-center justify-center gap-3 mb-4">
               <Label htmlFor="mets-filter" className="text-sm font-medium">All MLB</Label>
-              <Switch 
-                id="mets-filter" 
-                checked={metsOnly} 
-                onCheckedChange={setMetsOnly}
-              />
+              <Switch id="mets-filter" checked={metsOnly} onCheckedChange={setMetsOnly} />
               <Label htmlFor="mets-filter" className="text-sm font-medium text-primary">Mets Only</Label>
             </div>
-          </div>
+          </motion.div>
           <div className="text-center py-8">
-            <img 
-              src="https://a.espncdn.com/i/teamlogos/mlb/500/nym.png" 
-              alt="Mets Logo" 
-              className="w-20 h-20 mx-auto mb-4 opacity-50"
-            />
+            <img src="https://a.espncdn.com/i/teamlogos/mlb/500/nym.png" alt="Mets Logo" className="w-20 h-20 mx-auto mb-4 opacity-50" />
             <p className="text-muted-foreground">No Mets-specific news at the moment.</p>
-            <Button 
-              onClick={() => setMetsOnly(false)} 
-              variant="outline" 
-              size="sm" 
-              className="mt-4"
-            >
+            <Button onClick={() => setMetsOnly(false)} variant="outline" size="sm" className="mt-4 glass-card">
               View All MLB News
             </Button>
           </div>
@@ -206,11 +160,16 @@ const MetsNewsTracker = () => {
   }
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-br from-background via-secondary/10 to-background relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+    <section className="py-10 sm:py-12 md:py-16 relative overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
-        <div className="text-center mb-8 sm:mb-10 md:mb-12">
-          <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-4 py-2 bg-primary/10 rounded-full">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-8 sm:mb-10 md:mb-12"
+        >
+          <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-4 py-2 glass-card rounded-full">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
             <span className="text-xs sm:text-sm font-semibold text-primary uppercase tracking-wider">Live MetsXMFanZone Newsroom</span>
           </div>
@@ -221,14 +180,9 @@ const MetsNewsTracker = () => {
             Real-time news, signings, trades, and updates from around the league
           </p>
           
-          {/* Mets/MLB Toggle */}
           <div className="flex items-center justify-center gap-3 mt-4 mb-2">
             <Label htmlFor="mets-filter-main" className="text-sm font-medium cursor-pointer">All MLB</Label>
-            <Switch 
-              id="mets-filter-main" 
-              checked={metsOnly} 
-              onCheckedChange={setMetsOnly}
-            />
+            <Switch id="mets-filter-main" checked={metsOnly} onCheckedChange={setMetsOnly} />
             <Label htmlFor="mets-filter-main" className="text-sm font-medium text-primary cursor-pointer">Mets Only</Label>
           </div>
           
@@ -237,22 +191,26 @@ const MetsNewsTracker = () => {
               Last updated: {lastUpdated.toLocaleTimeString()}
             </p>
           )}
-        </div>
+        </motion.div>
 
         <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-          {filteredNews.map((item) => {
+          {filteredNews.map((item, index) => {
             const typeConfig = getTypeConfig(item.type);
             const IconComponent = typeConfig.icon;
             
             return (
-              <Card 
-                key={item.id} 
-                className="border-2 border-border bg-card overflow-hidden hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group cursor-pointer"
-                onClick={() => item.link && window.open(item.link, '_blank')}
+              <GlassCard
+                key={item.id}
+                variant="interactive"
+                delay={index * 0.1}
+                className="cursor-pointer group"
               >
-                <div className="flex gap-4 p-6">
+                <div 
+                  className="flex gap-4 p-6"
+                  onClick={() => item.link && window.open(item.link, '_blank')}
+                >
                   <div className="relative flex-shrink-0">
-                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 group-hover:border-primary transition-colors">
+                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 group-hover:border-primary/50 transition-colors">
                       <img 
                         src={item.image_url} 
                         alt={item.player} 
@@ -262,27 +220,23 @@ const MetsNewsTracker = () => {
                         }}
                       />
                     </div>
-                    <div className={`absolute -top-1 -right-1 p-2 rounded-full ${typeConfig.iconBg}`}>
+                    <div className={`absolute -top-1 -right-1 p-2 rounded-full ${typeConfig.iconBg} backdrop-blur-sm`}>
                       <IconComponent className="w-4 h-4 text-white" />
                     </div>
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <CardHeader className="p-0 mb-3">
-                      <Badge className={`w-fit mb-2 ${typeConfig.color} text-white`}>
+                    <div className="mb-3">
+                      <Badge className={`w-fit mb-2 ${typeConfig.color} text-white backdrop-blur-sm`}>
                         {typeConfig.label}
                       </Badge>
                       <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
                         {item.title}
                       </h3>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <p className="text-base font-semibold text-primary mb-2">
-                        {item.player}
-                      </p>
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {item.details}
-                      </p>
+                    </div>
+                    <div>
+                      <p className="text-base font-semibold text-primary mb-2">{item.player}</p>
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{item.details}</p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Clock className="w-3 h-3" />
@@ -295,25 +249,26 @@ const MetsNewsTracker = () => {
                           </div>
                         )}
                       </div>
-                    </CardContent>
+                    </div>
                   </div>
                 </div>
-              </Card>
+              </GlassCard>
             );
           })}
         </div>
 
-        <div className="mt-8 sm:mt-10 text-center">
-          <Button 
-            onClick={fetchNewsItems} 
-            variant="outline" 
-            size="sm"
-            className="gap-2"
-          >
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-8 sm:mt-10 text-center"
+        >
+          <Button onClick={fetchNewsItems} variant="outline" size="sm" className="gap-2 glass-card">
             <RefreshCw className="w-4 h-4" />
             Refresh News
           </Button>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
