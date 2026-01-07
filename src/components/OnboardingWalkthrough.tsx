@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X, Sparkles, Rocket } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Sparkles, Rocket, UserPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-stadium.jpg";
 import logoIcon from "@/assets/metsxmfanzone-logo.png";
 import { motion, AnimatePresence } from "framer-motion";
-
 interface OnboardingStep {
   id: string;
   step_number: number;
@@ -22,6 +22,7 @@ interface OnboardingWalkthroughProps {
 }
 
 const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps = [] }: OnboardingWalkthroughProps) => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [open, setOpen] = useState(false);
   const [steps, setSteps] = useState<OnboardingStep[]>([]);
@@ -72,10 +73,16 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   const handleNext = () => {
     if (currentStep === steps.length - 1) {
       handleComplete();
+      navigate('/auth?mode=login');
       return;
     }
     setDirection(1);
     setCurrentStep(currentStep + 1);
+  };
+
+  const handleSignUp = () => {
+    handleSkip();
+    navigate('/auth?mode=signup');
   };
 
   const handlePrevious = () => {
@@ -271,7 +278,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
                 {isLastStep ? (
                   <>
                     <Rocket className="w-4 h-4 mr-1.5" />
-                    Get Started
+                    Login
                   </>
                 ) : (
                   <>
@@ -282,12 +289,13 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
               </Button>
             </div>
 
-            {/* Skip link */}
+            {/* Sign Up link */}
             <button
-              onClick={handleSkip}
-              className="w-full text-center text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors py-1"
+              onClick={handleSignUp}
+              className="w-full flex items-center justify-center gap-1.5 text-xs text-muted-foreground/80 hover:text-primary transition-colors py-1"
             >
-              Skip tutorial
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>New here? <span className="font-medium text-primary hover:underline">Sign Up</span></span>
             </button>
           </div>
         </div>
