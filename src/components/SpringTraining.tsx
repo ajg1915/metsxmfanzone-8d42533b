@@ -54,20 +54,20 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
         </motion.div>
 
         {isLoading ? (
-          <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="aspect-[4/3] bg-muted/50 rounded-xl animate-pulse" />
+          <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="aspect-video bg-muted/50 rounded-xl animate-pulse" />
             ))}
           </div>
         ) : games && games.length > 0 ? (
-          <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {games.slice(0, 8).map((game, index) => (
+          <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {games.slice(0, 6).map((game, index) => (
               <Link key={game.id} to="/spring-training-live">
                 <GlassCard
                   variant="interactive"
                   glow="blue"
                   delay={index * 0.08}
-                  className="group aspect-[4/3] overflow-hidden"
+                  className="group aspect-video overflow-hidden"
                 >
                   <div className="relative w-full h-full">
                     <img 
@@ -79,17 +79,17 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
                     
                     {/* Play button overlay */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-primary/30">
-                        <Play className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground ml-0.5" />
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-primary/30">
+                        <Play className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground ml-0.5" />
                       </div>
                     </div>
                     
                     {/* Content */}
-                    <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
-                      <h3 className="text-sm sm:text-base font-bold text-foreground mb-0.5 line-clamp-1 drop-shadow-lg">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
+                      <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 line-clamp-1 drop-shadow-lg">
                         vs {game.opponent}
                       </h3>
-                      <p className="text-[10px] sm:text-xs text-foreground/80 drop-shadow">Spring Training</p>
+                      <p className="text-xs sm:text-sm text-foreground/80 drop-shadow">Spring Training</p>
                     </div>
                   </div>
                 </GlassCard>
