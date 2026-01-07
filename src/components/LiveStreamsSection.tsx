@@ -5,9 +5,9 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Radio, Users, Play } from "lucide-react";
+import { Radio, Users, Play, ChevronRight, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
-import GlassCard from "@/components/GlassCard";
+import { cn } from "@/lib/utils";
 
 interface LiveStream {
   id: string;
@@ -27,6 +27,7 @@ const LiveStreamsSection = () => {
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
     fetchStreams();
@@ -52,7 +53,7 @@ const LiveStreamsSection = () => {
         .eq("published", true)
         .in("status", ["live", "scheduled"])
         .order("scheduled_start", { ascending: true })
-        .limit(4);
+        .limit(8);
       
       if (error) throw error;
 
@@ -106,9 +107,25 @@ const LiveStreamsSection = () => {
     }
   };
 
+  const scroll = (direction: 'left' | 'right') => {
+    const container = document.getElementById('streams-scroll');
+    if (container) {
+      const scrollAmount = container.clientWidth * 0.8;
+      const newPosition = direction === 'left' 
+        ? Math.max(0, scrollPosition - scrollAmount)
+        : scrollPosition + scrollAmount;
+      container.scrollTo({ left: newPosition, behavior: 'smooth' });
+      setScrollPosition(newPosition);
+    }
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    setScrollPosition(e.currentTarget.scrollLeft);
+  };
+
   if (loading) {
     return (
-      <section className="py-8 sm:py-10 md:py-12">
+      <section className="py-6 sm:py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="text-center text-muted-foreground">Loading live streams...</div>
         </div>
@@ -123,85 +140,146 @@ const LiveStreamsSection = () => {
   return (
     <>
       <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
-      <section className="py-8 sm:py-10 md:py-12 relative overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+      <section className="py-6 sm:py-8 relative">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8"
+            transition={{ duration: 0.5 }}
+            className="flex items-center justify-between mb-4"
           >
-            <h2 className="font-bold text-lg sm:text-xl md:text-2xl text-foreground">
-              Live & Upcoming Streams
-            </h2>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/mets-gamecast")}
-              size="sm"
-              className="text-xs sm:text-sm glass-card border-border/30 hover:border-primary/50"
+            <div className="flex items-center gap-2">
+              <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 animate-pulse" />
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+                Live & Upcoming Streams
+              </h2>
+            </div>
+            <a
+              href="/mets-gamecast"
+              className="flex items-center gap-1 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
             >
-              View Mets Gamecast
-            </Button>
+              Mets Gamecast
+              <ChevronRight className="w-4 h-4" />
+            </a>
           </motion.div>
+        </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+        {/* Netflix-style carousel container */}
+        <div className="relative group/carousel">
+          {/* Left scroll button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => scroll('left')}
+            className={cn(
+              "absolute left-2 top-1/2 -translate-y-1/2 z-20 h-full w-10 sm:w-12 rounded-none bg-gradient-to-r from-background via-background/80 to-transparent opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300",
+              scrollPosition <= 0 && "hidden"
+            )}
+          >
+            <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
+          </Button>
+
+          {/* Scrollable content */}
+          <div
+            id="streams-scroll"
+            onScroll={handleScroll}
+            className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-6 lg:px-8"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {/* Add left padding spacer */}
+            <div className="flex-shrink-0 w-0 lg:w-[calc((100vw-1280px)/2)]" />
+            
             {streams.map((stream, index) => (
-              <GlassCard
+              <motion.div
                 key={stream.id}
-                variant="interactive"
-                glow="blue"
-                delay={index * 0.1}
-                className="cursor-pointer group"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                onClick={() => handleStreamClick(stream)}
+                className="flex-shrink-0 w-[160px] sm:w-[200px] md:w-[240px] lg:w-[280px] cursor-pointer group"
               >
-                <div onClick={() => handleStreamClick(stream)}>
-                  {stream.thumbnail_url && (
-                    <div className="aspect-video overflow-hidden relative">
-                      <img 
-                        src={stream.thumbnail_url} 
-                        alt={stream.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                <div className="relative overflow-hidden rounded-md sm:rounded-lg transition-all duration-300 group-hover:scale-105 group-hover:z-10 group-hover:shadow-2xl group-hover:shadow-primary/20">
+                  {/* Thumbnail */}
+                  <div className="aspect-video relative">
+                    {stream.thumbnail_url ? (
+                      <img
+                        src={stream.thumbnail_url}
+                        alt={stream.title}
+                        className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center">
-                          <Play className="w-3 h-3 sm:w-4 sm:h-4 text-primary-foreground ml-0.5" />
-                        </div>
+                    ) : (
+                      <div className="w-full h-full bg-muted flex items-center justify-center">
+                        <Radio className="w-8 h-8 text-muted-foreground" />
                       </div>
-                      <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2">
-                        <Badge className={`text-[8px] sm:text-[10px] px-1.5 py-0.5 font-semibold backdrop-blur-sm ${
-                          stream.status === 'live' 
-                            ? 'bg-red-600/90 text-white shadow-lg shadow-red-600/50' 
-                            : 'bg-secondary/80 text-secondary-foreground'
-                        }`}>
-                          {stream.status === 'live' && <Radio className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5 animate-pulse" />}
-                          {stream.status === 'live' ? 'LIVE' : 'UPCOMING'}
-                        </Badge>
+                    )}
+                    
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+                    
+                    {/* Play button */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center shadow-lg transform scale-75 group-hover:scale-100 transition-transform">
+                        <Play className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground ml-0.5" fill="currentColor" />
                       </div>
                     </div>
-                  )}
-                  <div className="p-2 sm:p-2.5">
-                    <h3 className="line-clamp-1 text-xs sm:text-sm font-semibold group-hover:text-primary transition-colors">
-                      {stream.title}
-                    </h3>
+
+                    {/* Status badge */}
+                    <div className="absolute top-2 right-2">
+                      <Badge className={cn(
+                        "text-[10px] sm:text-xs px-1.5 py-0.5 font-semibold backdrop-blur-sm",
+                        stream.status === 'live' 
+                          ? 'bg-red-600/90 text-white shadow-lg shadow-red-600/50' 
+                          : 'bg-secondary/80 text-secondary-foreground'
+                      )}>
+                        {stream.status === 'live' && <Radio className="w-2.5 h-2.5 mr-1 animate-pulse" />}
+                        {stream.status === 'live' ? 'LIVE' : 'UPCOMING'}
+                      </Badge>
+                    </div>
+
+                    {/* Viewer count */}
+                    {stream.viewers_count > 0 && (
+                      <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-background/90 backdrop-blur-sm text-[10px] sm:text-xs font-medium text-foreground flex items-center gap-1">
+                        <Users className="w-3 h-3 text-primary" />
+                        {stream.viewers_count}
+                      </div>
+                    )}
                   </div>
-                  <div className="px-2 pb-2 sm:px-2.5 sm:pb-2.5">
-                    <div className="flex items-center text-[10px] sm:text-xs text-muted-foreground">
-                      <Users className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary mr-1" />
-                      {stream.viewers_count > 0 ? `${stream.viewers_count}` : 'Soon'}
-                    </div>
+
+                  {/* Title overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-gradient-to-t from-background to-transparent">
+                    <p className="text-foreground text-xs sm:text-sm font-semibold line-clamp-2">
+                      {stream.title}
+                    </p>
                   </div>
                 </div>
-              </GlassCard>
+              </motion.div>
             ))}
+            
+            {/* Add right padding spacer */}
+            <div className="flex-shrink-0 w-0 lg:w-[calc((100vw-1280px)/2)]" />
           </div>
-          
+
+          {/* Right scroll button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => scroll('right')}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 h-full w-10 sm:w-12 rounded-none bg-gradient-to-l from-background via-background/80 to-transparent opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300"
+          >
+            <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+          </Button>
+        </div>
+
+        {/* View All button */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex justify-center mt-4 sm:mt-6"
+            className="flex justify-center mt-4"
           >
             <Button 
               variant="outline" 

@@ -1,17 +1,10 @@
 import { useState, useEffect } from "react";
-import { Play, Film, ChevronRight } from "lucide-react";
+import { Play, Film, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import GlassCard from "@/components/GlassCard";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
 
 interface Video {
   id: string;
@@ -32,6 +25,7 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [loading, setLoading] = useState(true);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
     fetchHighlights();
@@ -45,7 +39,7 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
         .eq("published", true)
         .eq("video_type", "highlight")
         .order("published_at", { ascending: false })
-        .limit(8);
+        .limit(12);
 
       if (error) throw error;
       setVideos(data || []);
@@ -63,20 +57,36 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const scroll = (direction: 'left' | 'right') => {
+    const container = document.getElementById('highlights-scroll');
+    if (container) {
+      const scrollAmount = container.clientWidth * 0.8;
+      const newPosition = direction === 'left' 
+        ? Math.max(0, scrollPosition - scrollAmount)
+        : scrollPosition + scrollAmount;
+      container.scrollTo({ left: newPosition, behavior: 'smooth' });
+      setScrollPosition(newPosition);
+    }
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    setScrollPosition(e.currentTarget.scrollLeft);
+  };
+
   if (loading || videos.length === 0) {
     return null;
   }
 
   return (
     <>
-      <section className={cn("py-6 sm:py-8", className)}>
+      <section className={cn("py-6 sm:py-8 relative", className)}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="flex items-center justify-between mb-4 sm:mb-6"
+            className="flex items-center justify-between mb-4"
           >
             <div className="flex items-center gap-2">
               <Film className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
@@ -92,76 +102,104 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
               <ChevronRight className="w-4 h-4" />
             </a>
           </motion.div>
+        </div>
 
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-            className="w-full"
+        {/* Netflix-style carousel container */}
+        <div className="relative group/carousel">
+          {/* Left scroll button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => scroll('left')}
+            className={cn(
+              "absolute left-2 top-1/2 -translate-y-1/2 z-20 h-full w-10 sm:w-12 rounded-none bg-gradient-to-r from-background via-background/80 to-transparent opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300",
+              scrollPosition <= 0 && "hidden"
+            )}
           >
-            <CarouselContent className="-ml-3 md:-ml-4">
-              {videos.map((video, index) => (
-                <CarouselItem
-                  key={video.id}
-                  className="pl-3 md:pl-4 basis-1/2 sm:basis-1/3 lg:basis-1/4"
-                >
-                  <GlassCard
-                    variant="interactive"
-                    glow="blue"
-                    delay={index * 0.05}
-                    className="h-48 sm:h-56 md:h-64 cursor-pointer group overflow-hidden"
-                  >
-                    <div
-                      className="relative w-full h-full"
-                      onClick={() => setSelectedVideo(video)}
-                    >
-                      {video.thumbnail_url ? (
-                        <img
-                          src={video.thumbnail_url}
-                          alt={video.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <Film className="w-12 h-12 text-muted-foreground" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+            <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
+          </Button>
 
-                      {/* Play button overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="w-12 h-12 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
-                          <Play className="w-5 h-5 text-primary-foreground ml-0.5" fill="currentColor" />
-                        </div>
+          {/* Scrollable content */}
+          <div
+            id="highlights-scroll"
+            onScroll={handleScroll}
+            className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-6 lg:px-8"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {/* Add left padding spacer */}
+            <div className="flex-shrink-0 w-0 lg:w-[calc((100vw-1280px)/2)]" />
+            
+            {videos.map((video, index) => (
+              <motion.div
+                key={video.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                onClick={() => setSelectedVideo(video)}
+                className="flex-shrink-0 w-[160px] sm:w-[200px] md:w-[240px] lg:w-[280px] cursor-pointer group"
+              >
+                <div className="relative overflow-hidden rounded-md sm:rounded-lg transition-all duration-300 group-hover:scale-105 group-hover:z-10 group-hover:shadow-2xl group-hover:shadow-primary/20">
+                  {/* Thumbnail */}
+                  <div className="aspect-video relative">
+                    {video.thumbnail_url ? (
+                      <img
+                        src={video.thumbnail_url}
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-muted flex items-center justify-center">
+                        <Film className="w-8 h-8 text-muted-foreground" />
                       </div>
-
-                      {/* Duration badge */}
-                      {video.duration && (
-                        <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-background/80 backdrop-blur-sm text-[10px] sm:text-xs font-medium text-foreground">
-                          {formatDuration(video.duration)}
-                        </div>
-                      )}
-
-                      {/* Title overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
-                        <p className="text-foreground text-xs sm:text-sm font-semibold line-clamp-2">
-                          {video.title}
-                        </p>
-                        {video.views !== null && video.views > 0 && (
-                          <p className="text-muted-foreground text-[10px] sm:text-xs mt-0.5">
-                            {video.views.toLocaleString()} views
-                          </p>
-                        )}
+                    )}
+                    
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+                    
+                    {/* Play button */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center shadow-lg transform scale-75 group-hover:scale-100 transition-transform">
+                        <Play className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground ml-0.5" fill="currentColor" />
                       </div>
                     </div>
-                  </GlassCard>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-4 h-8 w-8 glass-card border-border/30 hover:border-primary/50" />
-            <CarouselNext className="hidden md:flex -right-4 h-8 w-8 glass-card border-border/30 hover:border-primary/50" />
-          </Carousel>
+
+                    {/* Duration badge */}
+                    {video.duration && (
+                      <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-background/90 backdrop-blur-sm text-[10px] sm:text-xs font-medium text-foreground">
+                        {formatDuration(video.duration)}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Title overlay - appears on hover */}
+                  <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-gradient-to-t from-background to-transparent">
+                    <p className="text-foreground text-xs sm:text-sm font-semibold line-clamp-2 group-hover:line-clamp-none transition-all">
+                      {video.title}
+                    </p>
+                    {video.views !== null && video.views > 0 && (
+                      <p className="text-muted-foreground text-[10px] sm:text-xs mt-0.5">
+                        {video.views.toLocaleString()} views
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+            
+            {/* Add right padding spacer */}
+            <div className="flex-shrink-0 w-0 lg:w-[calc((100vw-1280px)/2)]" />
+          </div>
+
+          {/* Right scroll button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => scroll('right')}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 h-full w-10 sm:w-12 rounded-none bg-gradient-to-l from-background via-background/80 to-transparent opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300"
+          >
+            <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+          </Button>
         </div>
       </section>
 
