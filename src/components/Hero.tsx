@@ -29,8 +29,7 @@ const Hero = () => {
     {
       loop: true,
       dragFree: false,
-      containScroll: "trimSnaps",
-      align: "center",
+      watchDrag: false,
     },
     [autoplayRef.current],
   );
@@ -252,15 +251,17 @@ const Hero = () => {
         />
       </div>
       
-      <div ref={emblaRef} className="overflow-hidden h-full">
-        <div className="flex h-full touch-pan-y">
+      <div ref={emblaRef} className="overflow-hidden h-full absolute inset-0">
+        <div className="flex h-full">
           {slidesToShow.map((slide, index) => (
             <div
               key={index}
-              className="flex-[0_0_100%] min-w-0 relative"
+              className="flex-[0_0_100%] min-w-0 absolute inset-0"
               style={{
                 opacity: selectedIndex === index ? 1 : 0,
-                transition: "opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+                zIndex: selectedIndex === index ? 10 : 0,
+                transition: "opacity 0.8s ease-in-out",
+                pointerEvents: selectedIndex === index ? "auto" : "none",
               }}
             >
               <div className="relative min-h-[550px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[700px]">
