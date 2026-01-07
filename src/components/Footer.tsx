@@ -1,7 +1,25 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const [clickCount, setClickCount] = useState(0);
+
+  const handleSecretClick = () => {
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+    
+    // Triple-click to access admin portal
+    if (newCount >= 3) {
+      setClickCount(0);
+      navigate("/admin-portal");
+    }
+    
+    // Reset after 2 seconds of inactivity
+    setTimeout(() => setClickCount(0), 2000);
+  };
+
   return (
     <motion.footer 
       initial={{ opacity: 0 }}
@@ -26,7 +44,11 @@ const Footer = () => {
           </div>
           <div className="border-t border-border/30 pt-2 text-center">
             <p className="text-[10px] text-muted-foreground">
-              © 2024 MetsXMFanZone.com. All rights reserved.
+              © <span 
+                onClick={handleSecretClick} 
+                className="cursor-default select-none"
+                aria-hidden="true"
+              >2024</span> MetsXMFanZone.com. All rights reserved.
             </p>
           </div>
         </div>
