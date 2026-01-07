@@ -5,9 +5,11 @@ import podcastIcon from "@/assets/podcast-icon.png";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { Play, Info, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface HeroSlide {
@@ -32,7 +34,9 @@ const Hero = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [activeTab, setActiveTab] = useState("overview");
   const { user } = useAuth();
+  const { isPremium, loading: subscriptionLoading } = useSubscription();
   const [memberSlides, setMemberSlides] = useState<HeroSlide[]>([]);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const navigate = useNavigate();
 
   const onSelect = useCallback(() => {
@@ -183,13 +187,34 @@ const Hero = () => {
         }))
       : defaultPublicSlides;
 
+  // Check if a URL requires premium access
+  const requiresPremium = (url: string) => {
+    const premiumRoutes = ['/live', '/metsxmfanzone-tv', '/mlb-network', '/espn-network', '/pix11-network', '/spring-training-live'];
+    return premiumRoutes.some(route => url.toLowerCase().includes(route.toLowerCase().replace('/', '')));
+  };
+
+  const handleProtectedNavigation = (linkUrl: string) => {
+    // If not logged in, redirect to auth
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    // If logged in but not premium, show upgrade prompt
+    if (!isPremium && requiresPremium(linkUrl)) {
+      setShowUpgradePrompt(true);
+      return;
+    }
+    // Otherwise, navigate
+    if (linkUrl.startsWith("http")) {
+      window.open(linkUrl, "_blank");
+    } else {
+      navigate(linkUrl);
+    }
+  };
+
   const handleSlideClick = (linkUrl: string | null) => {
     if (linkUrl) {
-      if (linkUrl.startsWith("http")) {
-        window.open(linkUrl, "_blank");
-      } else {
-        navigate(linkUrl);
-      }
+      handleProtectedNavigation(linkUrl);
     }
   };
 
@@ -329,7 +354,7 @@ const Hero = () => {
                   <div className="flex items-center gap-3 flex-wrap">
                     {slide.show_watch_live && (
                       <Button
-                        onClick={() => navigate("/metsxmfanzone-tv")}
+                        onClick={() => handleProtectedNavigation("/metsxmfanzone-tv")}
                         size="lg"
                         className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-6 sm:px-8 shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all duration-300"
                       >
@@ -398,9 +423,9 @@ const Hero = () => {
                 key={tab.id}
                 onClick={() => {
                   setActiveTab(tab.id);
-                  if (tab.id === "live") navigate("/metsxmfanzone-tv");
-                  if (tab.id === "podcasts") navigate("/podcast");
-                  if (tab.id === "community") navigate("/community");
+                  if (tab.id === "live") handleProtectedNavigation("/metsxmfanzone-tv");
+                  if (tab.id === "podcasts") handleProtectedNavigation("/podcast");
+                  if (tab.id === "community") handleProtectedNavigation("/community");
                 }}
                 className={`
                   flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 text-[10px] sm:text-sm font-medium transition-all duration-300 rounded-xl
@@ -437,6 +462,8 @@ const Hero = () => {
           ))}
         </div>
       </div>
+
+      <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
     </section>
   );
 };
