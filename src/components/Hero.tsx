@@ -23,13 +23,14 @@ interface HeroSlide {
 }
 
 const Hero = () => {
-  const autoplayRef = useRef(Autoplay({ delay: 10000, stopOnInteraction: false }));
+  const autoplayRef = useRef(Autoplay({ delay: 5000, stopOnInteraction: false }));
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       loop: true,
       dragFree: false,
       watchDrag: false,
+      duration: 30,
     },
     [autoplayRef.current],
   );
@@ -260,7 +261,7 @@ const Hero = () => {
               style={{
                 opacity: selectedIndex === index ? 1 : 0,
                 zIndex: selectedIndex === index ? 10 : 0,
-                transition: "opacity 0.8s ease-in-out",
+                transition: "opacity 0.5s ease-out",
                 pointerEvents: selectedIndex === index ? "auto" : "none",
               }}
             >
@@ -270,8 +271,8 @@ const Hero = () => {
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                   style={{
                     backgroundImage: `url(${slide.image})`,
-                    transform: selectedIndex === index ? "scale(1.02)" : "scale(1.1)",
-                    transition: "transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                    transform: selectedIndex === index ? "scale(1)" : "scale(1.05)",
+                    transition: "transform 0.6s ease-out",
                   }}
                 />
 
@@ -288,8 +289,8 @@ const Hero = () => {
                   className="absolute inset-0 flex flex-col justify-center px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 pt-8 pb-28"
                   style={{
                     opacity: selectedIndex === index ? 1 : 0,
-                    transform: selectedIndex === index ? "translateX(0) translateY(0)" : "translateX(-40px) translateY(10px)",
-                    transition: "opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s",
+                    transform: selectedIndex === index ? "translateY(0)" : "translateY(20px)",
+                    transition: "opacity 0.4s ease-out 0.1s, transform 0.4s ease-out 0.1s",
                   }}
                 >
                   {/* Logo */}
@@ -412,9 +413,9 @@ const Hero = () => {
             <button
               key={index}
               onClick={() => emblaApi?.scrollTo(index)}
-              className={`h-1.5 rounded-full transition-all duration-500 ${
+              className={`h-1.5 rounded-full transition-all duration-300 ${
                 selectedIndex === index 
-                  ? "w-10 bg-primary shadow-lg shadow-primary/50" 
+                  ? "w-8 bg-primary shadow-lg shadow-primary/50" 
                   : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
               }`}
             />
