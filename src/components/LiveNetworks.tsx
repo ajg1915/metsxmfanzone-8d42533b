@@ -1,14 +1,10 @@
 import StoriesSection from "./StoriesSection";
 
-interface LiveNetworksProps {
-  className?: string;
-}
-
-const LiveNetworks = ({ className }: LiveNetworksProps) => {
+const LiveNetworks = () => {
   return (
-    <div className={className}>
+    <section className="py-6 sm:py-8 md:py-10">
       <StoriesSection />
-    </div>
+    </section>
   );
 };
 

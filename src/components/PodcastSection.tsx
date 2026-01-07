@@ -46,9 +46,7 @@ const platforms = [{
 interface PodcastSectionProps {
   className?: string;
 }
-const PodcastSection = ({
-  className
-}: PodcastSectionProps) => {
+const PodcastSection = () => {
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
   useEffect(() => {
     fetchPodcasts();
@@ -63,9 +61,9 @@ const PodcastSection = ({
       setPodcasts(data);
     }
   };
-  return <section className={`py-8 sm:py-10 md:py-12 bg-gradient-to-b from-background to-muted/20 ${className || ''}`}>
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="text-center mb-6 sm:mb-10">
+  return <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-b from-background to-muted/20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="text-center mb-8 sm:mb-10">
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
@@ -77,14 +75,14 @@ game analysis, and fan discussions</p>
         </div>
 
         {/* Listen Live Section */}
-        <div className="mb-8 sm:mb-10">
+        <div className="mb-8 sm:mb-10 md:mb-12">
           <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">Listen Live On</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1.5 sm:gap-2 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 max-w-5xl mx-auto">
             {platforms.map(platform => {
             const IconComponent = platform.icon;
             return <a key={platform.name} href={platform.url} target="_blank" rel="noopener noreferrer" className="group">
                   <Card className="hover:shadow-lg transition-all duration-300 border hover:border-primary">
-                    <CardContent className="p-2 sm:p-2.5 text-center">
+                    <CardContent className="p-3 sm:p-4 text-center">
                       <div className="flex justify-center mb-0.5 sm:mb-1">
                         <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                       </div>

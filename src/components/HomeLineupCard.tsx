@@ -231,7 +231,8 @@ export default function HomeLineupCard({
         <ChevronDown className="w-4 h-4" />
       </div>
     </div>;
-  return <div className={`container mx-auto px-4 py-6 ${className || ''}`}>
+  return <section className="py-10 sm:py-12 md:py-16">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
       {/* Top Scroll Indicator */}
       
 
@@ -608,5 +609,6 @@ export default function HomeLineupCard({
 
       {/* Bottom Scroll Indicator */}
       
-    </div>;
+    </div>
+  </section>;
 }
