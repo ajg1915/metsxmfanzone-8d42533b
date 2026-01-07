@@ -6,6 +6,7 @@ import LiveNotificationBar from "@/components/LiveNotificationBar";
 import LiveGameTicker from "@/components/LiveGameTicker";
 import LiveNetworks from "@/components/LiveNetworks";
 import LiveStreamsSection from "@/components/LiveStreamsSection";
+import HighlightsSection from "@/components/HighlightsSection";
 import SpringTraining from "@/components/SpringTraining";
 import MetsNewsTracker from "@/components/MetsNewsTracker";
 import BlogSection from "@/components/BlogSection";
@@ -61,6 +62,12 @@ const Index = () => {
         
         <ScrollReveal delay={150}>
           <StoriesSection />
+        </ScrollReveal>
+        
+        <div className="section-divider my-4 sm:my-6" />
+        
+        <ScrollReveal delay={100}>
+          <HighlightsSection />
         </ScrollReveal>
         
         <div className="section-divider my-4 sm:my-6" />
