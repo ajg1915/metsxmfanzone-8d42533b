@@ -3,13 +3,12 @@ import logo from "@/assets/metsxmfanzone-logo.png";
 import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import podcastIcon from "@/assets/podcast-icon.png";
 import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Play, Plus, Info } from "lucide-react";
+import { Play, Info, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface HeroSlide {
   id: string;
@@ -23,17 +22,12 @@ interface HeroSlide {
 }
 
 const Hero = () => {
-  const autoplayRef = useRef(Autoplay({ delay: 5000, stopOnInteraction: false }));
-
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      loop: true,
-      dragFree: false,
-      watchDrag: false,
-      duration: 30,
-    },
-    [autoplayRef.current],
-  );
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    dragFree: false,
+    watchDrag: true,
+    duration: 20,
+  });
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [activeTab, setActiveTab] = useState("overview");
@@ -373,6 +367,26 @@ const Hero = () => {
           ))}
         </div>
       </div>
+
+      {/* Arrow Navigation */}
+      {slidesToShow.length > 1 && (
+        <>
+          <button
+            onClick={() => emblaApi?.scrollPrev()}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-strong flex items-center justify-center text-foreground hover:text-primary hover:border-primary/50 transition-all duration-300"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+          <button
+            onClick={() => emblaApi?.scrollNext()}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full glass-strong flex items-center justify-center text-foreground hover:text-primary hover:border-primary/50 transition-all duration-300"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        </>
+      )}
 
       {/* Bottom Navigation Tabs - Glass styled */}
       <div className="absolute bottom-0 left-0 right-0 z-20">
