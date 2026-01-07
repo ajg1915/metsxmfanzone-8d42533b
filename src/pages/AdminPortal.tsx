@@ -97,14 +97,38 @@ export default function AdminPortal() {
       }
 
       if (data.success) {
-        // Store admin session securely
+        // Store admin session info
         sessionStorage.setItem("admin_verified", "true");
         sessionStorage.setItem("admin_verified_at", new Date().toISOString());
         sessionStorage.setItem("admin_user_id", data.userId);
-        sessionStorage.setItem("admin_session_token", data.sessionToken);
         sessionStorage.setItem("admin_device_fingerprint", deviceFingerprint);
 
         setIsNewDevice(data.isNewDevice);
+
+        // If we have a verification URL, use it to create a proper Supabase session
+        if (data.verificationUrl) {
+          try {
+            // Extract the token from the URL and verify it
+            const url = new URL(data.verificationUrl);
+            const token = url.searchParams.get('token');
+            const type = url.searchParams.get('type') || 'magiclink';
+            
+            if (token) {
+              // Verify the OTP to establish a proper session
+              const { error: verifyError } = await supabase.auth.verifyOtp({
+                token_hash: data.tokenHash,
+                type: type as 'magiclink'
+              });
+
+              if (verifyError) {
+                console.error('Session verification failed:', verifyError);
+                // Continue anyway - limited functionality mode
+              }
+            }
+          } catch (err) {
+            console.error('Error establishing session:', err);
+          }
+        }
 
         toast({
           title: "Welcome, Admin",
@@ -227,16 +251,6 @@ export default function AdminPortal() {
                   </span>
                 )}
               </Button>
-
-              <div className="text-center">
-                <Button 
-                  variant="link" 
-                  onClick={() => navigate("/auth")}
-                  className="text-xs text-muted-foreground"
-                >
-                  Use email/password login instead
-                </Button>
-              </div>
 
               <div className="bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground space-y-1">
                 <p className="font-medium flex items-center gap-1">
