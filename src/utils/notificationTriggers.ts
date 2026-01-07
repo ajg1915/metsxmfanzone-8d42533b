@@ -161,7 +161,7 @@ export const setupNotificationListeners = () => {
     )
     .subscribe();
 
-  // Listen for live stream status changes (going live)
+  // Listen for live stream status changes (going live, offline, ended)
   const liveStreamUpdateChannel = supabase
     .channel('livestream-update-notifications')
     .on(
@@ -182,6 +182,62 @@ export const setupNotificationListeners = () => {
           await sendSMSNotification(`🔴 LIVE NOW: ${newStream.title}`);
           await sendEmailNotification(title, newStream.description || newStream.title, 'live_stream', '/metsxmfanzone-tv');
           showBrowserNotification(title, newStream.title);
+        }
+        
+        // Check if stream just ended or went offline
+        if (oldStream.status === 'live' && (newStream.status === 'ended' || newStream.status === 'offline')) {
+          const title = '📴 Stream Ended';
+          const message = `${newStream.title} has ended. Thanks for watching!`;
+          await sendPushNotification(title, message, '/', 'stream-ended');
+          showBrowserNotification(title, message);
+        }
+      }
+    )
+    .subscribe();
+
+  // Listen for stream health issues
+  const streamHealthChannel = supabase
+    .channel('stream-health-notifications')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'stream_health_reports'
+      },
+      async (payload) => {
+        const report = payload.new as any;
+        
+        // Only notify for high severity issues
+        if (report.severity === 'high' || report.severity === 'critical') {
+          const title = '⚠️ Stream Issue Detected';
+          const message = report.description || 'We are experiencing technical difficulties. Please standby.';
+          await sendPushNotification(title, message, '/metsxmfanzone-tv', 'stream-issue');
+          showBrowserNotification(title, message);
+        }
+      }
+    )
+    .subscribe();
+
+  // Listen for stream alerts (admin-triggered alerts)
+  const streamAlertChannel = supabase
+    .channel('stream-alert-notifications')
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'stream_alerts'
+      },
+      async (payload) => {
+        const oldAlert = payload.old as any;
+        const newAlert = payload.new as any;
+        
+        // Check if alert just became active
+        if (!oldAlert.is_active && newAlert.is_active) {
+          const title = '⚠️ Stream Alert';
+          await sendPushNotification(title, newAlert.message, '/metsxmfanzone-tv', 'stream-alert');
+          showBrowserNotification(title, newAlert.message);
         }
       }
     )
@@ -400,6 +456,8 @@ export const setupNotificationListeners = () => {
     supabase.removeChannel(newsChannel);
     supabase.removeChannel(liveStreamChannel);
     supabase.removeChannel(liveStreamUpdateChannel);
+    supabase.removeChannel(streamHealthChannel);
+    supabase.removeChannel(streamAlertChannel);
     supabase.removeChannel(blogChannel);
     supabase.removeChannel(eventsChannel);
     supabase.removeChannel(storiesChannel);
