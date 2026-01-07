@@ -4,27 +4,28 @@ import { Card } from "@/components/ui/card";
 import { Download, Bell, Smartphone, Monitor, Check } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
+import { useNotifications } from "@/hooks/useNotifications";
+
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{
     outcome: "accepted" | "dismissed";
   }>;
 }
+
 const AppInstallSection = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const isMobile = useIsMobile();
+  const { permission, isSubscribed, requestPermission } = useNotifications();
+
+  const notificationsEnabled = permission === 'granted' && isSubscribed;
+
   useEffect(() => {
-    // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
     }
 
-    // Check notification permission
-    if ('Notification' in window) {
-      setNotificationsEnabled(Notification.permission === 'granted');
-    }
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -32,43 +33,41 @@ const AppInstallSection = () => {
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
+
   const handleInstall = async () => {
     if (!deferredPrompt) {
       toast.info("App is already installed or installation is not available");
       return;
     }
     deferredPrompt.prompt();
-    const {
-      outcome
-    } = await deferredPrompt.userChoice;
+    const { outcome } = await deferredPrompt.userChoice;
     if (outcome === "accepted") {
       setIsInstalled(true);
       setDeferredPrompt(null);
       toast.success("App installed successfully!");
     }
   };
+
   const handleNotifications = async () => {
     if (!('Notification' in window)) {
       toast.error("Notifications not supported in this browser");
       return;
     }
-    if (Notification.permission === 'granted') {
-      toast.success("Notifications already enabled!");
-      return;
-    }
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-      setNotificationsEnabled(true);
-      toast.success("Notifications enabled!");
+    
+    // Use the hook to properly subscribe to push notifications
+    const success = await requestPermission();
+    
+    if (success) {
+      // Show a local notification as confirmation
       new Notification("MetsXMFanZone", {
         body: "You'll now receive updates about live games and exclusive content!",
         icon: "/logo-192.png"
       });
-    } else {
-      toast.error("Notification permission denied");
     }
   };
-  return <section className="py-10 sm:py-12 md:py-16 px-4 relative overflow-hidden">
+
+  return (
+    <section className="py-10 sm:py-12 md:py-16 px-4 relative overflow-hidden">
       {/* Blue glow effect */}
       <div 
         className="absolute inset-0 pointer-events-none"
@@ -132,6 +131,8 @@ const AppInstallSection = () => {
           </Card>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default AppInstallSection;
