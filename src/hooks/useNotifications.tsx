@@ -59,23 +59,31 @@ export const useNotifications = () => {
       // Register service worker for push notifications
       const registration = await navigator.serviceWorker.ready;
 
-      // Get or create push subscription
+      // Get VAPID public key from environment variable
+      const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+      
+      if (!vapidPublicKey) {
+        console.warn('VAPID public key not configured. Push notifications will not work.');
+        return;
+      }
+
+      // Always unsubscribe existing and create fresh subscription with current VAPID key
+      // This ensures the subscription matches the server's VAPID credentials
       let subscription = await registration.pushManager.getSubscription();
       
-      if (!subscription) {
-        // Get VAPID public key from environment variable for better key management
-        const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-        
-        if (!vapidPublicKey) {
-          console.warn('VAPID public key not configured. Push notifications will not work. Set VITE_VAPID_PUBLIC_KEY environment variable.');
-          return;
-        }
-        
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-        });
+      if (subscription) {
+        // Unsubscribe old subscription to ensure fresh key match
+        await subscription.unsubscribe();
+        console.log('Unsubscribed old push subscription');
       }
+      
+      // Create new subscription with current VAPID key
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+      });
+      
+      console.log('Created new push subscription');
 
       // Get subscription data
       const subscriptionJSON = subscription.toJSON();
