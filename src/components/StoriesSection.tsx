@@ -91,7 +91,7 @@ const StoriesSection = () => {
             transition={{ duration: 0.5 }}
             className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6"
           >
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold gradient-text">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
               MetsXMFanZone Stories
             </h2>
             <Link 

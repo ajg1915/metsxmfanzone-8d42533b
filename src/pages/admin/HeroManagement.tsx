@@ -211,18 +211,47 @@ const SortableSlide = ({
           />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        {/* Custom Button Section */}
+        <div className="p-4 bg-muted/30 rounded-lg space-y-4">
+          <Label className="text-sm font-medium">Custom Button (appears on slide)</Label>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor={`linktext-${slide.id}`}>Button Text</Label>
+              <Input
+                id={`linktext-${slide.id}`}
+                value={slide.link_text || ""}
+                onChange={(e) => onUpdate(slide.id, "link_text", e.target.value)}
+                placeholder="e.g., Learn More, Subscribe, Watch Now"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`customlink-${slide.id}`}>Button URL</Label>
+              <Input
+                id={`customlink-${slide.id}`}
+                value={slide.link_url || ""}
+                onChange={(e) => onUpdate(slide.id, "link_url", e.target.value || null)}
+                placeholder="/plans or https://external-link.com"
+              />
+            </div>
+          </div>
           <div className="space-y-2">
-            <Label htmlFor={`link-${slide.id}`}>Link to Page (optional)</Label>
+            <Label htmlFor={`link-${slide.id}`}>Quick Select Page (or type custom URL above)</Label>
             <Select
-              value={slide.link_url || "none"}
-              onValueChange={(value) => onUpdate(slide.id, "link_url", value === "none" ? null : value)}
+              value={slide.link_url && slide.link_url.startsWith('/') ? slide.link_url : "custom"}
+              onValueChange={(value) => {
+                if (value === "none") {
+                  onUpdate(slide.id, "link_url", null);
+                } else if (value !== "custom") {
+                  onUpdate(slide.id, "link_url", value);
+                }
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a page..." />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">No link</SelectItem>
+                <SelectItem value="custom">Custom URL (enter above)</SelectItem>
                 <SelectItem value="/">Home</SelectItem>
                 <SelectItem value="/metsxmfanzone-tv">MetsXMFanZone TV</SelectItem>
                 <SelectItem value="/spring-training-live">Spring Training Live</SelectItem>
@@ -237,7 +266,6 @@ const SortableSlide = ({
                 <SelectItem value="/mets-scores">Mets Scores</SelectItem>
                 <SelectItem value="/mets-roster">Mets Roster</SelectItem>
                 <SelectItem value="/video-gallery">Video Gallery</SelectItem>
-                <SelectItem value="/spring-training-live">Spring Training Live</SelectItem>
                 <SelectItem value="/nl-scores">NL Scores</SelectItem>
                 <SelectItem value="/social">Social Hub</SelectItem>
                 <SelectItem value="/faqs">FAQs</SelectItem>
@@ -248,15 +276,9 @@ const SortableSlide = ({
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor={`linktext-${slide.id}`}>Link Button Text</Label>
-            <Input
-              id={`linktext-${slide.id}`}
-              value={slide.link_text || ""}
-              onChange={(e) => onUpdate(slide.id, "link_text", e.target.value)}
-              placeholder="Read More"
-            />
-          </div>
+          <p className="text-xs text-muted-foreground">
+            Leave both fields empty for no custom button. Use full URLs (https://...) for external links.
+          </p>
         </div>
 
         <div className="flex justify-end">
