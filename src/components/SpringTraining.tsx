@@ -56,6 +56,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
               <Link key={game.id} to="/spring-training-live">
                 <GlassCard
                   variant="interactive"
+                  glow="blue"
                   delay={index * 0.1}
                   className="group"
                 >

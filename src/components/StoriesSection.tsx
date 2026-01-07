@@ -128,6 +128,7 @@ const StoriesSection = () => {
                   >
                     <GlassCard
                       variant="interactive"
+                      glow="blue"
                       delay={index * 0.05}
                       className="h-56 sm:h-72 md:h-80 lg:h-96 cursor-pointer group"
                     >

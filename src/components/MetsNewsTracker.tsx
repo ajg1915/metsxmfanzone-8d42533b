@@ -202,6 +202,7 @@ const MetsNewsTracker = () => {
               <GlassCard
                 key={item.id}
                 variant="interactive"
+                glow="blue"
                 delay={index * 0.1}
                 className="cursor-pointer group"
               >

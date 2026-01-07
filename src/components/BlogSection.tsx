@@ -112,6 +112,7 @@ const BlogSection = () => {
             <GlassCard
               key={post.id}
               variant="interactive"
+              glow="blue"
               delay={index * 0.1}
               className="cursor-pointer"
             >
