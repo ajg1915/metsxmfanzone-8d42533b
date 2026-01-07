@@ -132,7 +132,7 @@ const LiveStreamsSection = () => {
             transition={{ duration: 0.6 }}
             className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8"
           >
-            <h2 className="font-bold text-lg sm:text-xl md:text-2xl gradient-text">
+            <h2 className="font-bold text-lg sm:text-xl md:text-2xl text-foreground">
               Live & Upcoming Streams
             </h2>
             <Button 

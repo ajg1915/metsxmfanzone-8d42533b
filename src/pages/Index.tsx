@@ -12,7 +12,8 @@ import BlogSection from "@/components/BlogSection";
 import HomeLineupCard from "@/components/HomeLineupCard";
 import PodcastSection from "@/components/PodcastSection";
 import HotStoveGuide from "@/components/HotStoveGuide";
-import FeedbackSection from "@/components/FeedbackSection";
+import StoriesSection from "@/components/StoriesSection";
+
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
@@ -58,55 +59,53 @@ const Index = () => {
           <LiveStreamsSection />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8 md:my-10" />
+        <ScrollReveal delay={150}>
+          <StoriesSection />
+        </ScrollReveal>
+        
+        <div className="section-divider my-4 sm:my-6" />
         
         <ScrollReveal delay={100}>
           <HomeLineupCard />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8 md:my-10" />
+        <div className="section-divider my-4 sm:my-6" />
         
         <ScrollReveal>
           <SpringTraining />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8 md:my-10" />
+        <div className="section-divider my-4 sm:my-6" />
         
         <ScrollReveal>
           <MetsNewsTracker />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8 md:my-10" />
+        <div className="section-divider my-4 sm:my-6" />
         
         <ScrollReveal direction="left">
           <BlogSection />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8 md:my-10" />
+        <div className="section-divider my-4 sm:my-6" />
         
         <ScrollReveal direction="right" delay={100}>
           <PodcastSection />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8 md:my-10" />
+        <div className="section-divider my-4 sm:my-6" />
         
         <ScrollReveal direction="scale">
           <FAQSection />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8 md:my-10" />
-        
-        <ScrollReveal>
-          <FeedbackSection />
-        </ScrollReveal>
-        
-        <div className="section-divider my-6 sm:my-8 md:my-10" />
+        <div className="section-divider my-4 sm:my-6" />
         
         <ScrollReveal>
           <AppInstallSection />
         </ScrollReveal>
         
-        <div className="section-divider my-6 sm:my-8 md:my-10" />
+        <div className="section-divider my-4 sm:my-6" />
         
         <ScrollReveal delay={100}>
           <HotStoveGuide />

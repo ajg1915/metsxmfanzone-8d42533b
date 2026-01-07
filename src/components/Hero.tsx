@@ -230,7 +230,6 @@ const Hero = () => {
     { id: "overview", label: "Overview", icon: LogoIcon, isImage: true },
     { id: "live", label: "Live Streams", icon: LiveStreamIcon, isImage: true },
     { id: "podcasts", label: "Podcast", icon: PodcastIcon, isImage: true },
-    { id: "community", label: "Community", icon: LogoIcon, isImage: true },
   ];
 
   return (
@@ -341,15 +340,6 @@ const Hero = () => {
                         Watch Live
                       </Button>
                     )}
-                    <Button
-                      onClick={() => navigate(user ? "/community" : "/auth")}
-                      size="lg"
-                      variant="secondary"
-                      className="gap-2 glass-light hover:bg-secondary/40 text-foreground font-bold px-6 sm:px-8 transition-all duration-300"
-                    >
-                      <Plus className="w-5 h-5" />
-                      {user ? "Community" : "Join Free"}
-                    </Button>
                     {slide.link_url && slide.link_text && (
                       <Button
                         onClick={() => handleSlideClick(slide.link_url)}
