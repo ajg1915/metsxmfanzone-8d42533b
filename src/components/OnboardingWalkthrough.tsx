@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Sparkles, Rocket } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-stadium.jpg";
 import logoIcon from "@/assets/metsxmfanzone-logo.png";
-import { Progress } from "@/components/ui/progress";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface OnboardingStep {
   id: string;
@@ -21,14 +21,12 @@ interface OnboardingWalkthroughProps {
   previewSteps?: OnboardingStep[];
 }
 
-
-
 const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps = [] }: OnboardingWalkthroughProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [open, setOpen] = useState(false);
   const [steps, setSteps] = useState<OnboardingStep[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [direction, setDirection] = useState(0);
 
   useEffect(() => {
     if (previewMode && previewSteps.length > 0) {
@@ -51,13 +49,11 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       if (error) throw error;
       
       if (data && data.length > 0) {
-        // Get the most recent update time from tutorial steps
         const latestUpdate = data.reduce((latest, step) => {
           const stepTime = new Date(step.updated_at).getTime();
           return stepTime > latest ? stepTime : latest;
         }, 0);
 
-        // Check if user has seen this version
         const lastSeenTime = localStorage.getItem('tutorialLastSeen');
         const lastSeen = lastSeenTime ? parseInt(lastSeenTime, 10) : 0;
 
@@ -75,28 +71,17 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
 
   const handleNext = () => {
     if (currentStep === steps.length - 1) {
-      // Last step - close immediately
       handleComplete();
       return;
     }
-    
-    if (isAnimating) return;
-    setIsAnimating(true);
-    
-    setTimeout(() => {
-      setCurrentStep(currentStep + 1);
-      setIsAnimating(false);
-    }, 150);
+    setDirection(1);
+    setCurrentStep(currentStep + 1);
   };
 
   const handlePrevious = () => {
-    if (isAnimating || currentStep === 0) return;
-    setIsAnimating(true);
-    
-    setTimeout(() => {
-      setCurrentStep(currentStep - 1);
-      setIsAnimating(false);
-    }, 150);
+    if (currentStep === 0) return;
+    setDirection(-1);
+    setCurrentStep(currentStep - 1);
   };
 
   const handleComplete = () => {
@@ -111,124 +96,199 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
     setOpen(false);
   };
 
+  const goToStep = (index: number) => {
+    setDirection(index > currentStep ? 1 : -1);
+    setCurrentStep(index);
+  };
+
   if (loading || steps.length === 0) {
     return null;
   }
 
   const step = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
+  const isLastStep = currentStep === steps.length - 1;
+
+  const slideVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 100 : -100,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? 100 : -100,
+      opacity: 0,
+    }),
+  };
 
   return (
     <Dialog open={open} onOpenChange={() => handleSkip()}>
       <DialogContent 
-        className="max-w-[75vw] sm:max-w-[280px] p-0 gap-0 overflow-hidden border-2 border-primary rounded-lg [&>button]:hidden"
+        className="max-w-[90vw] sm:max-w-[380px] p-0 gap-0 overflow-hidden border-0 rounded-2xl bg-transparent shadow-2xl [&>button]:hidden"
         onPointerDownOutside={() => handleSkip()}
         onEscapeKeyDown={() => handleSkip()}
       >
-        <div className="relative">
-          {/* Progress bar */}
-          <div className="absolute top-0 left-0 right-0 z-20">
-            <Progress value={progress} className="h-0.5 rounded-none bg-muted" />
+        {/* Outer glow effect */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-blue-500/30 to-primary/30 rounded-2xl blur-xl opacity-60" />
+        
+        <div className="relative bg-gradient-to-b from-background/95 to-background backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+          {/* Animated progress bar */}
+          <div className="absolute top-0 left-0 right-0 z-20 h-1 bg-muted/30">
+            <motion.div 
+              className="h-full bg-gradient-to-r from-primary via-orange-400 to-primary"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            />
           </div>
 
-          {/* Close button - larger touch target */}
+          {/* Close button */}
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-2 z-30 bg-background hover:bg-destructive hover:text-destructive-foreground h-8 w-8 rounded-full shadow-md border border-border"
+            className="absolute right-3 top-3 z-30 bg-black/40 hover:bg-black/60 text-white h-8 w-8 rounded-full backdrop-blur-sm border border-white/10 transition-all hover:scale-105"
             onClick={() => handleSkip()}
           >
             <X className="w-4 h-4" />
           </Button>
 
-          {/* Image section */}
-          <div className="relative aspect-[16/10] overflow-hidden">
-            <img 
-              src={step.image_url || heroImage} 
-              alt={step.title}
-              className={`w-full h-full object-cover transition-all duration-200 ${isAnimating ? 'scale-105 opacity-80' : 'scale-100 opacity-100'}`}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          {/* Step counter */}
+          <div className="absolute left-3 top-3 z-30 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/10">
+            <span className="text-xs font-medium text-white/90">
+              {currentStep + 1} / {steps.length}
+            </span>
+          </div>
+
+          {/* Image section with animation */}
+          <div className="relative h-48 sm:h-56 overflow-hidden">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={currentStep}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <img 
+                  src={step.image_url || heroImage} 
+                  alt={step.title}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            </AnimatePresence>
             
-            {/* Logo badge */}
-            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-background border-2 border-primary flex items-center justify-center shadow-md overflow-hidden">
-              <img src={logoIcon} alt="MetsXMFanZone" className="w-5 h-5 object-contain" />
-            </div>
+            {/* Gradient overlays */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent h-20" />
+            
+            {/* Floating logo */}
+            <motion.div 
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-10"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-orange-600 p-0.5 shadow-lg shadow-primary/30">
+                <div className="w-full h-full rounded-2xl bg-background flex items-center justify-center overflow-hidden">
+                  <img src={logoIcon} alt="MetsXMFanZone" className="w-9 h-9 object-contain" />
+                </div>
+              </div>
+            </motion.div>
           </div>
 
           {/* Content */}
-          <div className="p-2.5 space-y-1.5">
-            {/* Title and description */}
-            <div className={`text-center space-y-0.5 transition-all duration-200 ${isAnimating ? 'opacity-50' : 'opacity-100'}`}>
-              <h2 className="text-xs font-semibold text-primary">
-                {step.title}
-              </h2>
-              <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2">
-                {step.description}
-              </p>
-            </div>
+          <div className="px-5 pt-10 pb-5 space-y-4">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div 
+                key={`content-${currentStep}`}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="text-center space-y-2"
+              >
+                <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary via-orange-400 to-primary bg-clip-text text-transparent">
+                  {step.title}
+                </h2>
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                  {step.description}
+                </p>
+              </motion.div>
+            </AnimatePresence>
 
-            {/* Step dots */}
-            <div className="flex items-center justify-center gap-1 py-0.5">
+            {/* Step indicators */}
+            <div className="flex items-center justify-center gap-2 py-2">
               {steps.map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => !isAnimating && setCurrentStep(index)}
-                  className={`transition-all duration-200 rounded-full ${
-                    index === currentStep 
-                      ? 'w-3 h-1 bg-primary' 
-                      : index < currentStep
-                        ? 'w-1 h-1 bg-primary/60'
-                        : 'w-1 h-1 bg-muted hover:bg-muted-foreground'
-                  }`}
+                  onClick={() => goToStep(index)}
+                  className="group relative p-1"
                   aria-label={`Go to step ${index + 1}`}
-                />
+                >
+                  <motion.div
+                    className={`rounded-full transition-all duration-300 ${
+                      index === currentStep 
+                        ? 'w-6 h-2 bg-gradient-to-r from-primary to-orange-400' 
+                        : index < currentStep
+                          ? 'w-2 h-2 bg-primary/50 group-hover:bg-primary/70'
+                          : 'w-2 h-2 bg-muted-foreground/30 group-hover:bg-muted-foreground/50'
+                    }`}
+                    layout
+                    transition={{ duration: 0.2 }}
+                  />
+                </button>
               ))}
             </div>
 
-            {/* Navigation */}
-            <div className="flex items-center gap-1.5">
+            {/* Navigation buttons */}
+            <div className="flex items-center gap-3">
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={handlePrevious}
-                disabled={currentStep === 0 || isAnimating}
-                className="flex-1 h-6 text-[10px]"
-                size="sm"
+                disabled={currentStep === 0}
+                className="flex-1 h-11 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30"
               >
-                <ChevronLeft className="w-2.5 h-2.5 mr-0.5" />
+                <ChevronLeft className="w-4 h-4 mr-1" />
                 Back
               </Button>
 
               <Button
                 onClick={handleNext}
-                disabled={isAnimating}
-                className="flex-1 h-6 text-[10px]"
-                size="sm"
+                className={`flex-1 h-11 rounded-xl font-medium transition-all ${
+                  isLastStep 
+                    ? 'bg-gradient-to-r from-primary via-orange-500 to-primary hover:opacity-90 shadow-lg shadow-primary/30' 
+                    : 'bg-gradient-to-r from-primary to-orange-500 hover:opacity-90'
+                }`}
               >
-                {currentStep === steps.length - 1 ? (
+                {isLastStep ? (
                   <>
-                    <span>View Site</span>
-                    <Sparkles className="w-2.5 h-2.5 ml-0.5" />
+                    <Rocket className="w-4 h-4 mr-1.5" />
+                    Get Started
                   </>
                 ) : (
                   <>
-                    <span>Next</span>
-                    <ChevronRight className="w-2.5 h-2.5 ml-0.5" />
+                    Next
+                    <ChevronRight className="w-4 h-4 ml-1" />
                   </>
                 )}
               </Button>
             </div>
 
-            {/* Skip */}
-            <div className="text-center">
-              <Button
-                variant="link"
-                onClick={handleSkip}
-                className="text-[9px] text-muted-foreground hover:text-foreground h-auto p-0"
-              >
-                Skip tutorial
-              </Button>
-            </div>
+            {/* Skip link */}
+            <button
+              onClick={handleSkip}
+              className="w-full text-center text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors py-1"
+            >
+              Skip tutorial
+            </button>
           </div>
         </div>
       </DialogContent>
