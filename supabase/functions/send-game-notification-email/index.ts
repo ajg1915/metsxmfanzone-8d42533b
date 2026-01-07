@@ -32,28 +32,17 @@ const getEmailTemplate = (
 ) => {
   const baseUrl = Deno.env.get('SITE_URL') || 'https://metsxmfanzone.com';
   const actionUrl = url ? `${baseUrl}${url}` : baseUrl;
+  const logoUrl = 'https://metsxmfanzone.com/logo-192.png';
   
   const gameInfoHtml = gameInfo ? `
-    <div style="background: linear-gradient(135deg, #002D72 0%, #FF5910 100%); padding: 20px; border-radius: 12px; margin: 20px 0; color: white;">
-      <h3 style="margin: 0 0 10px 0; font-size: 18px;">Game Details</h3>
-      ${gameInfo.opponent ? `<p style="margin: 5px 0;"><strong>Opponent:</strong> ${gameInfo.opponent}</p>` : ''}
-      ${gameInfo.date ? `<p style="margin: 5px 0;"><strong>Date:</strong> ${gameInfo.date}</p>` : ''}
-      ${gameInfo.time ? `<p style="margin: 5px 0;"><strong>Time:</strong> ${gameInfo.time}</p>` : ''}
-      ${gameInfo.location ? `<p style="margin: 5px 0;"><strong>Location:</strong> ${gameInfo.location}</p>` : ''}
+    <div style="background: linear-gradient(135deg, #002D72 0%, #FF4500 100%); padding: 20px; border-radius: 12px; margin: 20px 0; color: white;">
+      <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #FF4500;">Game Details</h3>
+      ${gameInfo.opponent ? `<p style="margin: 5px 0;"><strong style="color: #FF4500;">Opponent:</strong> ${gameInfo.opponent}</p>` : ''}
+      ${gameInfo.date ? `<p style="margin: 5px 0;"><strong style="color: #FF4500;">Date:</strong> ${gameInfo.date}</p>` : ''}
+      ${gameInfo.time ? `<p style="margin: 5px 0;"><strong style="color: #FF4500;">Time:</strong> ${gameInfo.time}</p>` : ''}
+      ${gameInfo.location ? `<p style="margin: 5px 0;"><strong style="color: #FF4500;">Location:</strong> ${gameInfo.location}</p>` : ''}
     </div>
   ` : '';
-
-  const getNotificationIcon = () => {
-    switch (notificationType) {
-      case 'game_alert': return '⚾';
-      case 'score_update': return '📊';
-      case 'lineup': return '📋';
-      case 'news': return '📰';
-      case 'live_stream': return '🔴';
-      case 'event': return '📅';
-      default: return '🔔';
-    }
-  };
 
   return `
     <!DOCTYPE html>
@@ -62,45 +51,55 @@ const getEmailTemplate = (
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body style="margin: 0; padding: 0; background-color: #0A0F1C; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <!-- Header -->
-        <div style="text-align: center; padding: 30px 0;">
-          <h1 style="color: #FF5910; font-size: 28px; margin: 0;">MetsXM FanZone</h1>
-          <p style="color: #6B7280; margin: 10px 0 0 0;">Your Ultimate Mets Experience</p>
+    <body style="margin: 0; padding: 0; background-color: #002D72; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+      <div style="max-width: 320px; margin: 0 auto; padding: 15px;">
+        <!-- Header with Logo -->
+        <div style="text-align: center; padding: 20px 0;">
+          <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 15px; height: 15px; display: inline-block; vertical-align: middle;" />
+          <span style="color: #FF4500; font-size: 16px; font-weight: bold; margin-left: 6px; vertical-align: middle;">MetsXMFanZone</span>
+          <p style="color: #6B7280; margin: 8px 0 0 0; font-size: 11px;">Your Ultimate Mets Experience</p>
         </div>
         
         <!-- Main Content -->
-        <div style="background: linear-gradient(180deg, #1a1f2e 0%, #0f1420 100%); border: 1px solid rgba(255, 89, 16, 0.3); border-radius: 16px; padding: 30px; margin-bottom: 20px;">
-          <div style="text-align: center; margin-bottom: 20px;">
-            <span style="font-size: 48px;">${getNotificationIcon()}</span>
+        <div style="background: linear-gradient(180deg, #1a1f2e 0%, #0f1420 100%); border: 1px solid rgba(255, 69, 0, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+          <div style="text-align: center; margin-bottom: 15px;">
+            <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 15px; height: 15px;" />
           </div>
           
-          <h2 style="color: #FFFFFF; font-size: 24px; text-align: center; margin: 0 0 20px 0;">${title}</h2>
+          <h2 style="color: #FF4500; font-size: 18px; text-align: center; margin: 0 0 15px 0;">${title}</h2>
           
-          <p style="color: #D1D5DB; font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 20px 0;">
+          <p style="color: #D1D5DB; font-size: 13px; line-height: 1.5; text-align: center; margin: 0 0 15px 0;">
             ${message}
           </p>
           
           ${gameInfoHtml}
           
-          <div style="text-align: center; margin-top: 30px;">
-            <a href="${actionUrl}" style="display: inline-block; background: linear-gradient(135deg, #FF5910 0%, #FF7A3D 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
-              View on MetsXM FanZone
+          <div style="text-align: center; margin-top: 20px;">
+            <a href="${actionUrl}" style="display: inline-block; background: linear-gradient(135deg, #FF4500 0%, #FF6A33 100%); color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 13px;">
+              View on <span style="color: #002D72; background: white; padding: 2px 4px; border-radius: 3px; font-weight: bold;">MetsXMFanZone</span>
             </a>
           </div>
         </div>
         
-        <!-- Footer -->
-        <div style="text-align: center; padding: 20px 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-          <p style="color: #6B7280; font-size: 12px; margin: 0 0 10px 0;">
-            You're receiving this because you enabled game notifications on MetsXM FanZone.
+        <!-- Social Media Footer -->
+        <div style="text-align: center; padding: 15px 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+          <div style="margin-bottom: 10px;">
+            <a href="https://facebook.com/metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">Facebook</a>
+            <a href="https://twitter.com/metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">Twitter</a>
+            <a href="https://instagram.com/metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">Instagram</a>
+            <a href="https://youtube.com/@metsxmfanzone" style="color: #FF4500; text-decoration: none; margin: 0 8px; font-size: 11px;">YouTube</a>
+          </div>
+          <p style="color: #6B7280; font-size: 10px; margin: 0 0 8px 0;">
+            You're receiving this because you enabled notifications on <span style="color: #FF4500; font-weight: bold;">MetsXMFanZone</span>.
           </p>
-          <p style="color: #6B7280; font-size: 12px; margin: 0;">
-            <a href="${baseUrl}/dashboard" style="color: #FF5910; text-decoration: none;">Manage notification preferences</a>
+          <p style="color: #6B7280; font-size: 10px; margin: 0;">
+            <a href="${baseUrl}/dashboard" style="color: #FF4500; text-decoration: none;">Manage notification preferences</a>
           </p>
-          <p style="color: #4B5563; font-size: 11px; margin: 15px 0 0 0;">
-            © ${new Date().getFullYear()} MetsXM FanZone. All rights reserved.
+          <p style="color: #4B5563; font-size: 10px; margin: 10px 0 0 0;">
+            © ${new Date().getFullYear()} <span style="color: #FF4500;">MetsXMFanZone</span>. All rights reserved.
+          </p>
+          <p style="margin: 8px 0 0 0;">
+            <a href="${baseUrl}" style="color: #002D72; background: #FF4500; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 10px; font-weight: bold;">metsxmfanzone.com</a>
           </p>
         </div>
       </div>
