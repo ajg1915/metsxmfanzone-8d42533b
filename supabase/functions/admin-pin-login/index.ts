@@ -208,7 +208,7 @@ serve(async (req) => {
         });
       }
 
-      // Get user email for the session token
+      // Get user data
       const { data: userData } = await supabase.auth.admin.getUserById(matchedUserId);
       
       if (!userData?.user?.email) {
@@ -220,19 +220,42 @@ serve(async (req) => {
 
       console.log(`Admin PIN login successful for user: ${matchedUserId.substring(0, 8)}...`);
 
-      // Generate a session token for this admin
-      // We'll use a secure random token that maps to the user ID
-      const sessionToken = crypto.randomUUID() + '-' + Date.now();
-      const tokenHash = await hashFingerprint(sessionToken);
+      // Generate a magic link token for the admin - this creates a proper Supabase session
+      // that respects RLS policies
+      const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email: userData.user.email,
+        options: {
+          redirectTo: `${req.headers.get('origin') || 'https://metsxmfanzone.com'}/admin`
+        }
+      });
 
-      // Store the session in a temporary way (will be validated on admin routes)
-      // We return the user ID and a verification token
+      if (linkError || !linkData?.properties?.hashed_token) {
+        console.error('Failed to generate session link:', linkError);
+        
+        // Fallback: return session info without full auth (limited functionality)
+        return new Response(JSON.stringify({ 
+          success: true,
+          userId: matchedUserId,
+          email: userData.user.email,
+          fullName: userData.user.user_metadata?.full_name || 'Admin',
+          sessionToken: await hashFingerprint(crypto.randomUUID()),
+          isTrustedDevice,
+          isNewDevice: !trustedDevice,
+          requiresReauth: true
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Return the verification token so frontend can complete the auth
       return new Response(JSON.stringify({ 
         success: true,
         userId: matchedUserId,
         email: userData.user.email,
         fullName: userData.user.user_metadata?.full_name || 'Admin',
-        sessionToken: tokenHash,
+        tokenHash: linkData.properties.hashed_token,
+        verificationUrl: linkData.properties.action_link,
         isTrustedDevice,
         isNewDevice: !trustedDevice
       }), {
