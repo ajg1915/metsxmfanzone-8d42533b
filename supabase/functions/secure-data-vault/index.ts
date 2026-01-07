@@ -99,7 +99,7 @@ async function decryptRecord(record: Record<string, any>, fields: string[]): Pro
   return result;
 }
 
-serve(async (req) => {
+Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }

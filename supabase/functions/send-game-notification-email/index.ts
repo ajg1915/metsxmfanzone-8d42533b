@@ -1,5 +1,4 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,6 +18,29 @@ interface GameNotificationRequest {
   targetUsers?: string[];
   url?: string;
 }
+
+const sendEmail = async (apiKey: string, to: string, subject: string, html: string) => {
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Resend API error: ${error}`);
+  }
+  
+  return await response.json();
+};
 
 const getEmailTemplate = (
   title: string, 
@@ -98,7 +120,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendApiKey) {
+      throw new Error("RESEND_API_KEY not configured");
+    }
+    
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -146,13 +172,13 @@ Deno.serve(async (req) => {
       if (!user.email) return { success: false, userId: user.id, error: 'No email' };
 
       try {
-        const emailResponse = await resend.emails.send({
-          from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
-          to: [user.email],
-          subject: `${title} - MetsXMFanZone`,
-          html: emailHtml,
-        });
-        console.log(`Email sent to ${user.email}:`, { id: emailResponse?.data?.id || '[REDACTED]' });
+        const emailResponse = await sendEmail(
+          resendApiKey,
+          user.email,
+          `${title} - MetsXMFanZone`,
+          emailHtml
+        );
+        console.log(`Email sent to ${user.email}:`, { id: emailResponse?.id ? '[REDACTED]' : 'unknown' });
         return { success: true, userId: user.id };
       } catch (error: any) {
         console.error(`Failed to send email to ${user.email}:`, error.message);
