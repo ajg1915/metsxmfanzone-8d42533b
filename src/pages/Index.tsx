@@ -52,16 +52,16 @@ const Index = () => {
         <Hero />
         <LiveNotificationBar />
         
+        <ScrollReveal delay={100}>
+          <StoriesSection />
+        </ScrollReveal>
+        
         <ScrollReveal>
           <LiveNetworks />
         </ScrollReveal>
         
         <ScrollReveal delay={100}>
           <LiveStreamsSection />
-        </ScrollReveal>
-        
-        <ScrollReveal delay={150}>
-          <StoriesSection />
         </ScrollReveal>
         
         <div className="section-divider my-4 sm:my-6" />
