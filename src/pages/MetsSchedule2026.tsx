@@ -1,72 +1,312 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar, MapPin, Home, Plane, Loader2, RefreshCw } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
+import { supabase } from "@/integrations/supabase/client";
+import { format, parseISO } from "date-fns";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-const schedule = [
-  { date: "March 27, 2026", opponent: "vs Miami Marlins", venue: "Citi Field" },
-  { date: "March 28, 2026", opponent: "vs Miami Marlins", venue: "Citi Field" },
-  { date: "March 29, 2026", opponent: "vs Miami Marlins", venue: "Citi Field" },
-  { date: "March 31, 2026", opponent: "@ Washington Nationals", venue: "Nationals Park" },
-  { date: "April 1, 2026", opponent: "@ Washington Nationals", venue: "Nationals Park" },
-  { date: "April 2, 2026", opponent: "@ Washington Nationals", venue: "Nationals Park" },
-  { date: "April 3, 2026", opponent: "vs Philadelphia Phillies", venue: "Citi Field" },
-  { date: "April 4, 2026", opponent: "vs Philadelphia Phillies", venue: "Citi Field" },
-  { date: "April 5, 2026", opponent: "vs Philadelphia Phillies", venue: "Citi Field" },
-  { date: "April 7, 2026", opponent: "@ Atlanta Braves", venue: "Truist Park" },
-  { date: "April 8, 2026", opponent: "@ Atlanta Braves", venue: "Truist Park" },
-  { date: "April 9, 2026", opponent: "@ Atlanta Braves", venue: "Truist Park" },
-  { date: "April 10, 2026", opponent: "vs San Francisco Giants", venue: "Citi Field" },
-  { date: "April 11, 2026", opponent: "vs San Francisco Giants", venue: "Citi Field" },
-  { date: "April 12, 2026", opponent: "vs San Francisco Giants", venue: "Citi Field" },
-  { date: "April 14, 2026", opponent: "@ Los Angeles Dodgers", venue: "Dodger Stadium" },
-  { date: "April 15, 2026", opponent: "@ Los Angeles Dodgers", venue: "Dodger Stadium" },
-  { date: "April 16, 2026", opponent: "@ Los Angeles Dodgers", venue: "Dodger Stadium" },
-];
+interface Game {
+  gameId: number;
+  date: string;
+  gameType: string;
+  gameTypeLabel: string;
+  status: string;
+  isHome: boolean;
+  opponent: string;
+  venue: string;
+  homeScore?: number;
+  awayScore?: number;
+  metsScore?: number;
+  opponentScore?: number;
+  seriesDescription?: string;
+}
+
+interface GroupedGames {
+  [month: string]: Game[];
+}
 
 export default function MetsSchedule2026() {
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("all");
+
+  useEffect(() => {
+    fetchSchedule();
+  }, []);
+
+  const fetchSchedule = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('fetch-mets-schedule', {
+        body: { year: 2026, gameTypes: ['S', 'R'] }
+      });
+
+      if (fnError) throw fnError;
+      
+      if (data?.success && data?.games) {
+        setGames(data.games);
+      } else {
+        throw new Error(data?.error || 'Failed to fetch schedule');
+      }
+    } catch (err: any) {
+      console.error('Error fetching schedule:', err);
+      setError(err.message || 'Failed to load schedule');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterGames = (type: string) => {
+    if (type === 'all') return games;
+    if (type === 'spring') return games.filter(g => g.gameType === 'S');
+    if (type === 'regular') return games.filter(g => g.gameType === 'R');
+    if (type === 'home') return games.filter(g => g.isHome);
+    if (type === 'away') return games.filter(g => !g.isHome);
+    return games;
+  };
+
+  const groupGamesByMonth = (gamesList: Game[]): GroupedGames => {
+    return gamesList.reduce((acc, game) => {
+      const month = format(parseISO(game.date), 'MMMM yyyy');
+      if (!acc[month]) acc[month] = [];
+      acc[month].push(game);
+      return acc;
+    }, {} as GroupedGames);
+  };
+
+  const filteredGames = filterGames(activeTab);
+  const groupedGames = groupGamesByMonth(filteredGames);
+  const springTrainingCount = games.filter(g => g.gameType === 'S').length;
+  const regularSeasonCount = games.filter(g => g.gameType === 'R').length;
+
+  const getTeamLogo = (teamName: string) => {
+    const teamAbbrevs: { [key: string]: string } = {
+      'New York Yankees': 'NYY', 'Boston Red Sox': 'BOS', 'Atlanta Braves': 'ATL',
+      'Philadelphia Phillies': 'PHI', 'Miami Marlins': 'MIA', 'Washington Nationals': 'WSH',
+      'Los Angeles Dodgers': 'LAD', 'San Diego Padres': 'SD', 'San Francisco Giants': 'SF',
+      'Arizona Diamondbacks': 'ARI', 'Colorado Rockies': 'COL', 'Chicago Cubs': 'CHC',
+      'Milwaukee Brewers': 'MIL', 'St. Louis Cardinals': 'STL', 'Pittsburgh Pirates': 'PIT',
+      'Cincinnati Reds': 'CIN', 'Houston Astros': 'HOU', 'Texas Rangers': 'TEX',
+      'Seattle Mariners': 'SEA', 'Los Angeles Angels': 'LAA', 'Oakland Athletics': 'OAK',
+      'Minnesota Twins': 'MIN', 'Cleveland Guardians': 'CLE', 'Detroit Tigers': 'DET',
+      'Chicago White Sox': 'CWS', 'Kansas City Royals': 'KC', 'Toronto Blue Jays': 'TOR',
+      'Baltimore Orioles': 'BAL', 'Tampa Bay Rays': 'TB',
+    };
+    const abbrev = teamAbbrevs[teamName] || 'MLB';
+    return `https://www.mlbstatic.com/team-logos/${getTeamId(teamName)}.svg`;
+  };
+
+  const getTeamId = (teamName: string): number => {
+    const teamIds: { [key: string]: number } = {
+      'New York Yankees': 147, 'Boston Red Sox': 111, 'Atlanta Braves': 144,
+      'Philadelphia Phillies': 143, 'Miami Marlins': 146, 'Washington Nationals': 120,
+      'Los Angeles Dodgers': 119, 'San Diego Padres': 135, 'San Francisco Giants': 137,
+      'Arizona Diamondbacks': 109, 'Colorado Rockies': 115, 'Chicago Cubs': 112,
+      'Milwaukee Brewers': 158, 'St. Louis Cardinals': 138, 'Pittsburgh Pirates': 134,
+      'Cincinnati Reds': 113, 'Houston Astros': 117, 'Texas Rangers': 140,
+      'Seattle Mariners': 136, 'Los Angeles Angels': 108, 'Oakland Athletics': 133,
+      'Minnesota Twins': 142, 'Cleveland Guardians': 114, 'Detroit Tigers': 116,
+      'Chicago White Sox': 145, 'Kansas City Royals': 118, 'Toronto Blue Jays': 141,
+      'Baltimore Orioles': 110, 'Tampa Bay Rays': 139, 'New York Mets': 121,
+    };
+    return teamIds[teamName] || 121;
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Helmet>
         <title>2026 NY Mets Schedule | MetsXMFanZone</title>
-        <meta name="description" content="View the complete 2026 New York Mets regular season schedule with game dates and venues." />
+        <meta name="description" content="View the complete 2026 New York Mets schedule including Spring Training and Regular Season games." />
       </Helmet>
       
       <Navigation />
       
-      <main className="flex-1 container mx-auto px-4 pt-12 pb-8 max-w-6xl">
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">
+      <main className="flex-1 container mx-auto px-4 pt-12 pb-8 max-w-7xl">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 text-center"
+        >
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
             2026 New York Mets Schedule
           </h1>
-          <p className="text-muted-foreground text-center text-lg">
-            Regular Season Games - Subject to Change
+          <p className="text-muted-foreground text-lg mb-4">
+            Full Season Schedule - Spring Training & Regular Season
           </p>
-        </div>
+          
+          {!loading && games.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-3 mb-4">
+              <Badge variant="outline" className="text-sm px-3 py-1">
+                {springTrainingCount} Spring Training Games
+              </Badge>
+              <Badge variant="outline" className="text-sm px-3 py-1">
+                {regularSeasonCount} Regular Season Games
+              </Badge>
+              <Badge variant="outline" className="text-sm px-3 py-1">
+                {games.length} Total Games
+              </Badge>
+            </div>
+          )}
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchSchedule}
+            disabled={loading}
+            className="gap-2"
+          >
+            <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
+            Refresh Schedule
+          </Button>
+        </motion.div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {schedule.map((game, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Calendar className="w-5 h-5 text-primary" />
-                  {game.date}
-                </CardTitle>
-                <CardDescription className="text-base font-semibold text-foreground">
-                  {game.opponent}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{game.venue}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+            <p className="text-muted-foreground">Loading 2026 Mets schedule...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <p className="text-destructive mb-4">{error}</p>
+            <Button onClick={fetchSchedule}>Try Again</Button>
+          </div>
+        ) : (
+          <>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+              <TabsList className="grid w-full grid-cols-5 max-w-2xl mx-auto">
+                <TabsTrigger value="all">All Games</TabsTrigger>
+                <TabsTrigger value="spring">Spring</TabsTrigger>
+                <TabsTrigger value="regular">Regular</TabsTrigger>
+                <TabsTrigger value="home">Home</TabsTrigger>
+                <TabsTrigger value="away">Away</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            <div className="space-y-8">
+              {Object.entries(groupedGames).map(([month, monthGames]) => (
+                <motion.div
+                  key={month}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <h2 className="text-xl sm:text-2xl font-bold mb-4 flex items-center gap-2 sticky top-16 bg-background/95 backdrop-blur-sm py-2 z-10">
+                    <Calendar className="w-5 h-5 text-primary" />
+                    {month}
+                    <Badge variant="secondary" className="ml-2">
+                      {monthGames.length} games
+                    </Badge>
+                  </h2>
+                  
+                  <div className="grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {monthGames.map((game, index) => (
+                      <motion.div
+                        key={game.gameId}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.02 }}
+                      >
+                        <Card className={cn(
+                          "hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4",
+                          game.gameType === 'S' ? "border-l-green-500" : "border-l-primary",
+                          game.isHome && "bg-primary/5"
+                        )}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge 
+                                    variant={game.gameType === 'S' ? 'secondary' : 'default'}
+                                    className="text-[10px] shrink-0"
+                                  >
+                                    {game.gameTypeLabel}
+                                  </Badge>
+                                  <Badge 
+                                    variant="outline" 
+                                    className={cn(
+                                      "text-[10px]",
+                                      game.isHome ? "border-green-500 text-green-600" : "border-blue-500 text-blue-600"
+                                    )}
+                                  >
+                                    {game.isHome ? (
+                                      <><Home className="w-3 h-3 mr-1" />Home</>
+                                    ) : (
+                                      <><Plane className="w-3 h-3 mr-1" />Away</>
+                                    )}
+                                  </Badge>
+                                </div>
+                                
+                                <div className="flex items-center gap-2 mb-2">
+                                  <img 
+                                    src={getTeamLogo(game.opponent)}
+                                    alt={game.opponent}
+                                    className="w-8 h-8 object-contain"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src = 'https://www.mlbstatic.com/team-logos/league-on-dark.svg';
+                                    }}
+                                  />
+                                  <div>
+                                    <p className="font-semibold text-sm line-clamp-1">
+                                      {game.isHome ? 'vs' : '@'} {game.opponent}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {format(parseISO(game.date), 'EEE, MMM d')} • {format(parseISO(game.date), 'h:mm a')}
+                                    </p>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <MapPin className="w-3 h-3" />
+                                  <span className="line-clamp-1">{game.venue}</span>
+                                </div>
+                              </div>
+                              
+                              {game.metsScore !== undefined && game.opponentScore !== undefined && (
+                                <div className="text-right shrink-0">
+                                  <div className={cn(
+                                    "text-lg font-bold",
+                                    game.metsScore > game.opponentScore ? "text-green-600" : 
+                                    game.metsScore < game.opponentScore ? "text-red-500" : "text-muted-foreground"
+                                  )}>
+                                    {game.metsScore} - {game.opponentScore}
+                                  </div>
+                                  <Badge variant="outline" className="text-[10px]">
+                                    {game.status}
+                                  </Badge>
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {filteredGames.length === 0 && (
+              <div className="text-center py-20">
+                <p className="text-muted-foreground">No games found for the selected filter.</p>
+              </div>
+            )}
+          </>
+        )}
 
         <div className="mt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            * Schedule is subject to change. Check official MLB sources for the most up-to-date information.
+            * Schedule data from MLB Stats API. Subject to change.
           </p>
         </div>
       </main>
