@@ -231,7 +231,7 @@ export default function HomeLineupCard({
         <ChevronDown className="w-4 h-4" />
       </div>
     </div>;
-  return <section className="py-10 sm:py-12 md:py-16 relative">
+  return <section className="py-10 sm:py-12 md:py-16 relative overflow-hidden">
       {/* Blue glow effect */}
       <div 
         className="absolute inset-0 pointer-events-none"
