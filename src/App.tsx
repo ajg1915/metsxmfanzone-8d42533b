@@ -90,6 +90,7 @@ import StreamHealthDashboard from "./pages/admin/StreamHealthDashboard";
 import SEOManagement from "./pages/admin/SEOManagement";
 import HeroManagement from "./pages/admin/HeroManagement";
 import NewsTrackerManagement from "./pages/admin/NewsTrackerManagement";
+import GameNotifications from "./pages/admin/GameNotifications";
 import WriterRegister from "./pages/WriterRegister";
 import CreateAccount from "./pages/help/CreateAccount";
 import BiometricLogin from "./pages/help/BiometricLogin";
@@ -246,7 +247,9 @@ const AppContent = () => {
             <Route path="stream-health" element={<StreamHealthDashboard />} />
             <Route path="seo" element={<SEOManagement />} />
             <Route path="news-tracker" element={<NewsTrackerManagement />} />
+            <Route path="game-notifications" element={<GameNotifications />} />
             <Route path="settings" element={<AdminSettings />} />
+            <Route path="tutorials" element={<TutorialManagement />} />
           </Route>
           {/* Writer Portal Routes */}
           <Route path="/writer" element={<WriterDashboard />} />
