@@ -59,13 +59,8 @@ export const useNotifications = () => {
       // Register service worker for push notifications
       const registration = await navigator.serviceWorker.ready;
 
-      // Get VAPID public key from environment variable
-      const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-      
-      if (!vapidPublicKey) {
-        console.warn('VAPID public key not configured. Push notifications will not work.');
-        return;
-      }
+      // VAPID public key for push notifications (safe to expose - it's a public key)
+      const vapidPublicKey = 'BJJcuX6EN038ibxQ4jDGqDYh3x6zmdjz17mcHeFi0VUt5KcQSWvn9zTI-_-n5EW1Iog1yqHzGS7zFz0DPeu9_qg';
 
       // Always unsubscribe existing and create fresh subscription with current VAPID key
       // This ensures the subscription matches the server's VAPID credentials
