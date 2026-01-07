@@ -1,6 +1,5 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-import { jwtDecode } from "https://esm.sh/jwt-decode@4.0.0";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { jwtDecode } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,7 +14,7 @@ const PLAN_PRICES = {
   annual: 129.99
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
