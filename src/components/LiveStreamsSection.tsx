@@ -5,7 +5,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Radio, Users, Play, ChevronRight } from "lucide-react";
+import { Radio, Users, Play, ChevronRight, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,7 @@ const LiveStreamsSection = () => {
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
     fetchStreams();
@@ -106,6 +107,22 @@ const LiveStreamsSection = () => {
     }
   };
 
+  const scroll = (direction: 'left' | 'right') => {
+    const container = document.getElementById('streams-scroll');
+    if (container) {
+      const scrollAmount = container.clientWidth * 0.8;
+      const newPosition = direction === 'left' 
+        ? Math.max(0, scrollPosition - scrollAmount)
+        : scrollPosition + scrollAmount;
+      container.scrollTo({ left: newPosition, behavior: 'smooth' });
+      setScrollPosition(newPosition);
+    }
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    setScrollPosition(e.currentTarget.scrollLeft);
+  };
+
   if (loading) {
     return (
       <section className="py-6 sm:py-8">
@@ -149,9 +166,21 @@ const LiveStreamsSection = () => {
         </div>
 
         {/* Netflix-style carousel container */}
-        <div className="relative">
+        <div className="relative group/carousel">
+          {/* Left arrow */}
+          {scrollPosition > 0 && (
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-1 opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300"
+            >
+              <ChevronLeft className="w-8 h-8 text-foreground" />
+            </button>
+          )}
+
           {/* Scrollable content */}
           <div
+            id="streams-scroll"
+            onScroll={handleScroll}
             className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide scroll-smooth px-4 sm:px-6 lg:px-8"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
@@ -228,6 +257,14 @@ const LiveStreamsSection = () => {
             {/* Add right padding spacer */}
             <div className="flex-shrink-0 w-0 lg:w-[calc((100vw-1280px)/2)]" />
           </div>
+
+          {/* Right arrow */}
+          <button
+            onClick={() => scroll('right')}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-1 opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300"
+          >
+            <ChevronRight className="w-8 h-8 text-foreground" />
+          </button>
         </div>
 
         {/* View All button */}
