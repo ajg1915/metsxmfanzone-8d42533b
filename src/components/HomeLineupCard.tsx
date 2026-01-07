@@ -441,8 +441,8 @@ export default function HomeLineupCard({
         {/* Right Column - Spring Training & Standings */}
         <div className="space-y-4">
           {/* Upcoming Games with Probable Pitchers */}
-          <Card className="border-orange-500/20">
-            <div className="bg-gradient-to-r from-orange-600 to-orange-500 p-2.5 text-white">
+          <Card className="border-primary/20">
+            <div className="p-2.5 text-white" style={{ background: "linear-gradient(to right, #ff4500, #ff6a33)" }}>
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4" />
                 <span className="font-bold text-sm">Probable Pitchers</span>
@@ -490,7 +490,7 @@ export default function HomeLineupCard({
           </Card>
 
           {/* Spring Training Preview */}
-          <Card className="border-orange-500/20">
+          <Card className="border-primary/20">
             <div className="bg-gradient-to-r from-primary/80 to-primary p-2.5 text-primary-foreground">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
