@@ -1,5 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { jwtDecode } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
+import { decode } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,8 +32,8 @@ Deno.serve(async (req) => {
     let userId: string;
     
     try {
-      const decoded = jwtDecode<{ sub: string }>(token);
-      userId = decoded.sub;
+      const [_header, payload, _signature] = decode(token);
+      userId = (payload as { sub: string }).sub;
       console.log('Decoded user ID:', userId);
     } catch (decodeError) {
       console.error('JWT decode error:', decodeError);
