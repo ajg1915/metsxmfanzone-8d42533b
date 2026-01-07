@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import logo from "@/assets/metsxmfanzone-logo.png";
+import GlassCard from "@/components/GlassCard";
 
 interface BlogPost {
   id: string;
@@ -14,10 +16,6 @@ interface BlogPost {
   featured_image_url?: string;
   category: string;
   published_at: string;
-}
-
-interface BlogSectionProps {
-  className?: string;
 }
 
 const BlogSection = () => {
@@ -60,7 +58,7 @@ const BlogSection = () => {
 
   if (loading) {
     return (
-      <section className="py-10 sm:py-12 md:py-16">
+      <section className="py-10 sm:py-12 md:py-16 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex items-center justify-center gap-2 text-muted-foreground">
             <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -77,14 +75,17 @@ const BlogSection = () => {
 
   return (
     <section className="py-10 sm:py-12 md:py-16 relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/5 to-background pointer-events-none" />
-      
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8"
+        >
           <div className="flex items-center gap-3">
-            <div className="p-1.5 rounded-xl bg-primary/10 border border-primary/20">
+            <div className="p-2 rounded-xl glass-card">
               <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 object-contain" />
             </div>
             <div>
@@ -98,70 +99,74 @@ const BlogSection = () => {
             variant="outline" 
             size="sm" 
             onClick={() => navigate("/blog")} 
-            className="group border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300"
+            className="group glass-card border-border/30 hover:border-primary/50 transition-all duration-300"
           >
             View All
             <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
-        </div>
+        </motion.div>
         
         {/* Posts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
           {posts.map((post, index) => (
-            <article
+            <GlassCard
               key={post.id}
-              className="group relative rounded-2xl overflow-hidden bg-card/50 backdrop-blur-sm border border-border/30 hover:border-primary/40 transition-all duration-500 cursor-pointer hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1"
-              style={{ animationDelay: `${index * 100}ms` }}
-              onClick={() => navigate(`/blog/${post.slug}`)}
+              variant="interactive"
+              delay={index * 0.1}
+              className="cursor-pointer"
             >
-              {/* Image Container */}
-              {post.featured_image_url && (
-                <div className="aspect-[16/9] overflow-hidden relative">
-                  <img
-                    src={post.featured_image_url}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent opacity-80" />
-                  
-                  {/* Category Badge - Floating */}
-                  <Badge className="absolute top-3 left-3 text-xs px-2.5 py-1 bg-primary/90 text-primary-foreground border-0 backdrop-blur-sm shadow-lg">
-                    {post.category}
-                  </Badge>
-                </div>
-              )}
-              
-              {/* Content */}
-              <div className="p-4 sm:p-5 space-y-3">
-                {!post.featured_image_url && (
-                  <Badge className="text-xs px-2.5 py-1 bg-primary/10 text-primary border border-primary/20">
-                    {post.category}
-                  </Badge>
-                )}
-                
-                <h3 className="text-base sm:text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-2 leading-tight">
-                  {post.title}
-                </h3>
-                
-                {post.excerpt && (
-                  <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                    {post.excerpt}
-                  </p>
-                )}
-                
-                {/* Footer */}
-                <div className="flex items-center justify-between pt-2 border-t border-border/20">
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>{getTimeAgo(post.published_at)}</span>
+              <article
+                onClick={() => navigate(`/blog/${post.slug}`)}
+              >
+                {/* Image Container */}
+                {post.featured_image_url && (
+                  <div className="aspect-[16/9] overflow-hidden relative">
+                    <img
+                      src={post.featured_image_url}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent opacity-80" />
+                    
+                    {/* Category Badge - Floating */}
+                    <Badge className="absolute top-3 left-3 text-xs px-2.5 py-1 bg-primary/90 text-primary-foreground border-0 backdrop-blur-sm shadow-lg">
+                      {post.category}
+                    </Badge>
                   </div>
-                  <span className="text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
-                    Read more
-                    <ArrowRight className="w-3 h-3" />
-                  </span>
+                )}
+                
+                {/* Content */}
+                <div className="p-4 sm:p-5 space-y-3">
+                  {!post.featured_image_url && (
+                    <Badge className="text-xs px-2.5 py-1 bg-primary/10 text-primary border border-primary/20">
+                      {post.category}
+                    </Badge>
+                  )}
+                  
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground hover:text-primary transition-colors duration-300 line-clamp-2 leading-tight">
+                    {post.title}
+                  </h3>
+                  
+                  {post.excerpt && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                      {post.excerpt}
+                    </p>
+                  )}
+                  
+                  {/* Footer */}
+                  <div className="flex items-center justify-between pt-2 border-t border-border/20">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>{getTimeAgo(post.published_at)}</span>
+                    </div>
+                    <span className="text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
+                      Read more
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </article>
+              </article>
+            </GlassCard>
           ))}
         </div>
       </div>

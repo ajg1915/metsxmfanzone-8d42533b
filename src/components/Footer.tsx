@@ -1,10 +1,16 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-b from-card to-muted/30 border-t border-border">
+    <motion.footer 
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      className="relative glass-nav border-t border-border/30"
+    >
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-7xl">
-        {/* Compact Footer - All Views */}
         <div>
           <div className="flex flex-col items-center gap-2 mb-2">
             <h3 className="font-bold text-primary text-base">MetsXMFanZone.com</h3>
@@ -18,14 +24,14 @@ const Footer = () => {
               <Link to="/feedback" className="text-muted-foreground hover:text-primary transition-colors">Feedback</Link>
             </div>
           </div>
-          <div className="border-t border-border pt-2 text-center">
+          <div className="border-t border-border/30 pt-2 text-center">
             <p className="text-[10px] text-muted-foreground">
               © 2024 MetsXMFanZone.com. All rights reserved.
             </p>
           </div>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 
