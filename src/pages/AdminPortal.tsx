@@ -52,7 +52,7 @@ export default function AdminPortal() {
   };
 
   const handleLogin = useCallback(async () => {
-    if (pin.length < 6 || loading) return;
+    if (pin.length !== 8 || loading) return;
 
     setLoading(true);
     try {
@@ -152,9 +152,9 @@ export default function AdminPortal() {
     }
   }, [pin, deviceFingerprint, loading, navigate, toast, attemptsRemaining]);
 
-  // Auto-submit when PIN is complete
+  // Auto-submit when PIN is complete (8 digits)
   useEffect(() => {
-    if (pin.length === 6 && !loading && !isLocked) {
+    if (pin.length === 8 && !loading && !isLocked) {
       handleLogin();
     }
   }, [pin, loading, isLocked, handleLogin]);
@@ -179,7 +179,7 @@ export default function AdminPortal() {
           </div>
           <CardTitle className="text-2xl font-bold">Admin Portal</CardTitle>
           <CardDescription className="text-base">
-            Enter your 6-digit security PIN to access the admin dashboard
+            Enter your 8-digit security PIN to access the admin dashboard
           </CardDescription>
         </CardHeader>
 
@@ -215,16 +215,18 @@ export default function AdminPortal() {
                 <InputOTP
                   value={pin}
                   onChange={setPin}
-                  maxLength={6}
+                  maxLength={8}
                   disabled={loading}
                 >
                   <InputOTPGroup>
-                    <InputOTPSlot index={0} className="w-12 h-14 text-xl" />
-                    <InputOTPSlot index={1} className="w-12 h-14 text-xl" />
-                    <InputOTPSlot index={2} className="w-12 h-14 text-xl" />
-                    <InputOTPSlot index={3} className="w-12 h-14 text-xl" />
-                    <InputOTPSlot index={4} className="w-12 h-14 text-xl" />
-                    <InputOTPSlot index={5} className="w-12 h-14 text-xl" />
+                    <InputOTPSlot index={0} className="w-10 h-12 text-lg" />
+                    <InputOTPSlot index={1} className="w-10 h-12 text-lg" />
+                    <InputOTPSlot index={2} className="w-10 h-12 text-lg" />
+                    <InputOTPSlot index={3} className="w-10 h-12 text-lg" />
+                    <InputOTPSlot index={4} className="w-10 h-12 text-lg" />
+                    <InputOTPSlot index={5} className="w-10 h-12 text-lg" />
+                    <InputOTPSlot index={6} className="w-10 h-12 text-lg" />
+                    <InputOTPSlot index={7} className="w-10 h-12 text-lg" />
                   </InputOTPGroup>
                 </InputOTP>
               </div>
@@ -236,7 +238,7 @@ export default function AdminPortal() {
 
               <Button
                 onClick={handleLogin}
-                disabled={pin.length < 6 || loading}
+                disabled={pin.length !== 8 || loading}
                 className="w-full h-12 text-base"
               >
                 {loading ? (
