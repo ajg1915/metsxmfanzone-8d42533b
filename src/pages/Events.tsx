@@ -1,12 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, MapPin, ExternalLink } from "lucide-react";
+import { Calendar, MapPin, ExternalLink, Radio, Podcast, Video, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
+
+const weeklyShows = [
+  {
+    day: "Monday, Wednesday & Friday",
+    shows: [
+      { time: "6:00 AM", title: "Radio Show", icon: Radio, description: "Start your morning with Mets talk and analysis" },
+      { time: "8:30 AM", title: "Live Show", icon: Video, description: "Interactive live show with fan call-ins" },
+      { time: "5:30 PM", title: "Podcast Stream Live", icon: Podcast, description: "Evening podcast stream with the latest news" },
+    ]
+  }
+];
 
 export default function Events() {
   const { data: events, isLoading } = useQuery({
@@ -57,8 +68,63 @@ export default function Events() {
         </div>
       )}
 
+      {/* Weekly Podcast Shows Schedule */}
+      <section className={isStandalone ? "container mx-auto px-4 py-8" : "mb-8"}>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
+            <Podcast className="w-6 h-6 text-primary" />
+            Weekly Podcast <span className="text-primary">Shows</span>
+          </h2>
+          <p className="text-muted-foreground">
+            Catch us live every week on Mondays, Wednesdays & Fridays!
+          </p>
+        </div>
+
+        <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-background">
+          <CardContent className="pt-6">
+            {weeklyShows.map((schedule, idx) => (
+              <div key={idx}>
+                <div className="flex items-center gap-2 mb-4">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  <h3 className="font-semibold text-lg text-foreground">{schedule.day}</h3>
+                </div>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {schedule.shows.map((show, showIdx) => {
+                    const IconComponent = show.icon;
+                    return (
+                      <div 
+                        key={showIdx}
+                        className="flex items-start gap-4 p-4 rounded-lg bg-background/50 border border-border hover:border-primary/50 transition-colors"
+                      >
+                        <div className="p-3 rounded-full bg-primary/10">
+                          <IconComponent className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Clock className="w-4 h-4 text-muted-foreground" />
+                            <span className="font-bold text-primary">{show.time}</span>
+                          </div>
+                          <h4 className="font-semibold text-foreground">{show.title}</h4>
+                          <p className="text-sm text-muted-foreground mt-1">{show.description}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </section>
+
       {/* Events Grid */}
       <section className={isStandalone ? "container mx-auto px-4 py-12" : ""}>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
+            Special <span className="text-primary">Events</span>
+          </h2>
+        </div>
+        
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -67,7 +133,7 @@ export default function Events() {
           <Card className="max-w-2xl mx-auto">
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
               <Calendar className="w-16 h-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Upcoming Events</h3>
+              <h3 className="text-xl font-semibold mb-2">No Special Events Scheduled</h3>
               <p className="text-muted-foreground">
                 Check back soon for exciting events and community gatherings!
               </p>
