@@ -1,7 +1,4 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,12 +16,15 @@ interface EmailRequest {
   amount?: string;
 }
 
-const handler = async (req: Request): Promise<Response> => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const { Resend } = await import("https://esm.sh/resend@4.0.0");
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    
     const { type, email, name, planType, amount }: EmailRequest = await req.json();
 
     let emailContent = "";
@@ -73,20 +73,6 @@ const handler = async (req: Request): Promise<Response> => {
               <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
                 The MetsXMFanZone Team
               </p>
-              <div style="text-align: center; margin-bottom: 8px;">
-                <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-                <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-                <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-                <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-              </div>
               <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
                 <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
               </p>
@@ -123,16 +109,16 @@ const handler = async (req: Request): Promise<Response> => {
             </p>
             
             <div style="background: #002D72; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                <span style="color: #a0a0a0; font-size: 11px;">Plan:</span>
+              <div style="margin-bottom: 6px;">
+                <span style="color: #a0a0a0; font-size: 11px;">Plan: </span>
                 <span style="color: #ffffff; font-size: 11px; font-weight: bold;">${planName}</span>
               </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                <span style="color: #a0a0a0; font-size: 11px;">Amount:</span>
+              <div style="margin-bottom: 6px;">
+                <span style="color: #a0a0a0; font-size: 11px;">Amount: </span>
                 <span style="color: #ffffff; font-size: 11px; font-weight: bold;">$${amount}</span>
               </div>
-              <div style="display: flex; justify-content: space-between;">
-                <span style="color: #a0a0a0; font-size: 11px;">Status:</span>
+              <div>
+                <span style="color: #a0a0a0; font-size: 11px;">Status: </span>
                 <span style="color: #4ade80; font-size: 11px; font-weight: bold;">Active</span>
               </div>
             </div>
@@ -148,20 +134,6 @@ const handler = async (req: Request): Promise<Response> => {
               <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
                 The MetsXMFanZone Team
               </p>
-              <div style="text-align: center; margin-bottom: 8px;">
-                <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-                <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-                <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-                <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-                  <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
-                </a>
-              </div>
               <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
                 <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
               </p>
@@ -183,10 +155,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
     console.error("Error sending email:", error);
@@ -195,6 +164,4 @@ const handler = async (req: Request): Promise<Response> => {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   }
-};
-
-serve(handler);
+});

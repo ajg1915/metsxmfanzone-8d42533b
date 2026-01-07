@@ -1,7 +1,3 @@
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -17,12 +13,14 @@ interface EmailConfirmationRequest {
   token: string;
 }
 
-const handler = async (req: Request): Promise<Response> => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const { Resend } = await import("https://esm.sh/resend@4.0.0");
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     const { email, name, userId, token }: EmailConfirmationRequest = await req.json();
 
     if (!email || !userId || !token) {
@@ -137,5 +135,4 @@ const handler = async (req: Request): Promise<Response> => {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   }
-};
-Deno.serve(handler);
+});

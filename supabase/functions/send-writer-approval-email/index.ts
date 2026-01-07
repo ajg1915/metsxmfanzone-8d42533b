@@ -1,12 +1,8 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface WriterApprovalEmailRequest {
@@ -16,13 +12,15 @@ interface WriterApprovalEmailRequest {
   adminNotes?: string;
 }
 
-const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const { Resend } = await import("https://esm.sh/resend@4.0.0");
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    
     const { email, name, status, adminNotes }: WriterApprovalEmailRequest = await req.json();
 
     console.log(`Sending writer ${status} email to ${email}`);
@@ -78,8 +76,7 @@ const handler = async (req: Request): Promise<Response> => {
             <p>Thank you for your interest in becoming a writer at MetsXMFanZone.</p>
             <p>After careful review, we've decided not to move forward with your application at this time.</p>
             ${adminNotes ? `<p style="background: #fef3c7; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b;"><strong>Feedback:</strong> ${adminNotes}</p>` : ''}
-            <p>This doesn't mean you can't apply again in the future. We encourage you to continue engaging with our community and consider reapplying when you have more writing samples to share.</p>
-            <p>You can still enjoy all the great content on MetsXMFanZone as a fan!</p>
+            <p>This doesn't mean you can't apply again in the future.</p>
             <div style="text-align: center; margin: 30px 0;">
               <a href="https://metsxmfanzone.com" style="background: #002D72; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Visit MetsXMFanZone</a>
             </div>
@@ -104,21 +101,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify({ success: true, data: emailResponse }), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
     console.error("Error in send-writer-approval-email function:", error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
-};
-
-serve(handler);
+});

@@ -1,7 +1,4 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,12 +23,15 @@ interface WriterRevokedEmailRequest {
   reasons: string[];
 }
 
-const handler = async (req: Request): Promise<Response> => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const { Resend } = await import("https://esm.sh/resend@4.0.0");
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    
     const { email, name, articleTitle, reasons }: WriterRevokedEmailRequest = await req.json();
 
     console.log(`Sending writer revocation email to ${email}`);
@@ -70,17 +70,15 @@ const handler = async (req: Request): Promise<Response> => {
             <h3 style="margin: 0 0 10px 0; color: #c2410c;">Our Content Policy</h3>
             <p style="margin: 0;">At MetsXMFanZone, we maintain strict standards for original, authentic content:</p>
             <ul style="margin: 10px 0 0 0; padding-left: 20px;">
-              <li><strong>No AI-Generated Content:</strong> All articles must be written entirely by the author. AI tools like ChatGPT, Claude, or similar are not permitted.</li>
-              <li><strong>Original Work Only:</strong> Content must not be copied or plagiarized from other sources.</li>
-              <li><strong>Proper Citations Required:</strong> Any quotes, statistics, or information from external sources must include proper citations and attributions.</li>
+              <li><strong>No AI-Generated Content:</strong> All articles must be written entirely by the author.</li>
+              <li><strong>Original Work Only:</strong> Content must not be copied or plagiarized.</li>
+              <li><strong>Proper Citations Required:</strong> Any quotes or statistics must include proper citations.</li>
             </ul>
           </div>
           
           <p>The article "${safeTitle}" has been removed from our platform.</p>
           
-          <p>If you believe this decision was made in error, you may contact our support team with evidence that your content was original and properly attributed. However, please note that we have a zero-tolerance policy for AI-generated or plagiarized content.</p>
-          
-          <p>You may still access MetsXMFanZone as a regular member to enjoy content from other contributors.</p>
+          <p>If you believe this decision was made in error, you may contact our support team.</p>
           
           <div style="text-align: center; margin: 30px 0;">
             <a href="mailto:support@metsxmfanzone.com" style="background: #002D72; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Contact Support</a>
@@ -115,6 +113,4 @@ const handler = async (req: Request): Promise<Response> => {
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
-};
-
-serve(handler);
+});
