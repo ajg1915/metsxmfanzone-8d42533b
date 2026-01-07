@@ -218,9 +218,23 @@ export function AdminLayout() {
     <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full overflow-x-hidden">
         <AdminSidebar />
-        <div className="flex-1 flex flex-col min-w-0 w-full">
+        <div className="flex-1 flex flex-col min-w-0 w-full max-w-full">
           <AdminHeader navigate={navigate} />
-          <main className="flex-1 overflow-x-hidden overflow-y-auto p-2 sm:p-3 [&_h1]:text-lg [&_h1]:sm:text-xl [&_h2]:text-base [&_h2]:sm:text-lg [&_h3]:text-sm [&_h3]:sm:text-base [&_.container]:px-0 [&_.container]:sm:px-2 [&_.container]:py-2 [&_.container]:sm:py-3 [&_.container]:max-w-full">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto p-2 sm:p-3 md:p-4 max-w-full
+            [&_h1]:text-base [&_h1]:sm:text-lg [&_h1]:md:text-xl
+            [&_h2]:text-sm [&_h2]:sm:text-base [&_h2]:md:text-lg
+            [&_h3]:text-xs [&_h3]:sm:text-sm [&_h3]:md:text-base
+            [&_.container]:px-0 [&_.container]:sm:px-2 [&_.container]:max-w-full
+            [&_.card]:text-sm [&_.card-header]:p-3 [&_.card-content]:p-3
+            [&_input]:text-sm [&_input]:h-8
+            [&_textarea]:text-sm
+            [&_select]:text-sm
+            [&_button]:text-xs [&_button]:sm:text-sm
+            [&_label]:text-xs
+            [&_.badge]:text-xs
+            [&_table]:text-xs [&_table]:sm:text-sm
+            [&_th]:p-2 [&_td]:p-2
+          ">
             <Outlet />
           </main>
         </div>
