@@ -86,6 +86,7 @@ const PodcastSection = () => {
                 <GlassCard
                   key={platform.name}
                   variant="interactive"
+                  glow="blue"
                   delay={index * 0.05}
                   className="group"
                 >
@@ -123,6 +124,7 @@ const PodcastSection = () => {
                 <GlassCard
                   key={podcast.id}
                   variant="default"
+                  glow="blue"
                   delay={index * 0.1}
                 >
                   <div className="p-6">
