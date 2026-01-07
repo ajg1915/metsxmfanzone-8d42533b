@@ -234,7 +234,25 @@ const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[500px] sm:min-h-[550px] md:min-h-[600px] lg:min-h-[650px] overflow-hidden">
+    <section className="relative min-h-[550px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[700px] overflow-hidden">
+      {/* Immersive background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div 
+          className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full opacity-30"
+          style={{
+            background: "radial-gradient(circle, hsl(220 80% 40% / 0.5), transparent 70%)",
+            filter: "blur(100px)",
+          }}
+        />
+        <div 
+          className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 rounded-full opacity-20"
+          style={{
+            background: "radial-gradient(circle, hsl(24 100% 50% / 0.4), transparent 70%)",
+            filter: "blur(100px)",
+          }}
+        />
+      </div>
+      
       <div ref={emblaRef} className="overflow-hidden h-full">
         <div className="flex h-full touch-pan-y">
           {slidesToShow.map((slide, index) => (
@@ -243,32 +261,35 @@ const Hero = () => {
               className="flex-[0_0_100%] min-w-0 relative"
               style={{
                 opacity: selectedIndex === index ? 1 : 0,
-                transition: "opacity 0.5s ease-in-out",
+                transition: "opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
               }}
             >
-              <div className="relative min-h-[500px] sm:min-h-[550px] md:min-h-[600px] lg:min-h-[650px]">
-                {/* Background Image */}
+              <div className="relative min-h-[550px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[700px]">
+                {/* Background Image with parallax effect */}
                 <div
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                   style={{
                     backgroundImage: `url(${slide.image})`,
-                    transform: selectedIndex === index ? "scale(1)" : "scale(1.05)",
-                    transition: "transform 0.7s ease-out",
+                    transform: selectedIndex === index ? "scale(1.02)" : "scale(1.1)",
+                    transition: "transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
                   }}
                 />
 
-                {/* Netflix-style gradient overlays */}
-                <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+                {/* Enhanced gradient overlays for glass depth */}
+                <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/40" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background via-background/80 to-transparent" />
+                
+                {/* Glass panel for content */}
+                <div className="absolute inset-y-0 left-0 w-full lg:w-3/4 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
 
                 {/* Content - Left Aligned */}
                 <div
-                  className="absolute inset-0 flex flex-col justify-center px-6 sm:px-8 md:px-12 lg:px-16 pt-8 pb-24"
+                  className="absolute inset-0 flex flex-col justify-center px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 pt-8 pb-28"
                   style={{
                     opacity: selectedIndex === index ? 1 : 0,
-                    transform: selectedIndex === index ? "translateX(0)" : "translateX(-30px)",
-                    transition: "opacity 0.6s ease-out 0.2s, transform 0.6s ease-out 0.2s",
+                    transform: selectedIndex === index ? "translateX(0) translateY(0)" : "translateX(-40px) translateY(10px)",
+                    transition: "opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s",
                   }}
                 >
                   {/* Logo */}
@@ -308,13 +329,13 @@ const Hero = () => {
                     {slide.description}
                   </p>
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons - Glass styled */}
                   <div className="flex items-center gap-3 flex-wrap">
                     {slide.show_watch_live && (
                       <Button
                         onClick={() => navigate("/metsxmfanzone-tv")}
                         size="lg"
-                        className="gap-2 bg-foreground text-background hover:bg-foreground/90 font-bold px-6 sm:px-8"
+                        className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-6 sm:px-8 shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all duration-300"
                       >
                         <Play className="w-5 h-5 fill-current" />
                         Watch Live
@@ -324,7 +345,7 @@ const Hero = () => {
                       onClick={() => navigate(user ? "/community" : "/auth")}
                       size="lg"
                       variant="secondary"
-                      className="gap-2 bg-muted/80 hover:bg-muted text-foreground font-bold px-6 sm:px-8"
+                      className="gap-2 glass-light hover:bg-secondary/40 text-foreground font-bold px-6 sm:px-8 transition-all duration-300"
                     >
                       <Plus className="w-5 h-5" />
                       {user ? "Community" : "Join Free"}
@@ -334,7 +355,7 @@ const Hero = () => {
                         onClick={() => handleSlideClick(slide.link_url)}
                         size="lg"
                         variant="outline"
-                        className="gap-2 border-border/50 bg-background/20 hover:bg-background/40"
+                        className="gap-2 glass-light border-border/30 hover:border-primary/50 transition-all duration-300"
                       >
                         <Info className="w-5 h-5" />
                         {slide.link_text}
@@ -342,10 +363,10 @@ const Hero = () => {
                     )}
                   </div>
 
-                  {/* Free Trial Banner for non-users */}
+                  {/* Free Trial Banner for non-users - Glass styled */}
                   {!user && (
                     <div className="mt-6">
-                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary/20 border border-primary/40">
+                      <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl glass-light glow-pulse">
                         <span className="text-xs sm:text-sm text-foreground">
                           ⚡ Start your <span className="text-primary font-bold">7-day FREE trial</span> for unlimited
                           access
@@ -360,7 +381,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Bottom Navigation Tabs */}
+      {/* Bottom Navigation Tabs - Glass styled */}
       <div className="absolute bottom-0 left-0 right-0 z-20">
         <div className="flex items-center justify-center gap-1 sm:gap-2 px-4 pb-4">
           {tabs.map((tab) => {
@@ -375,11 +396,11 @@ const Hero = () => {
                   if (tab.id === "community") navigate("/community");
                 }}
                 className={`
-                  flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 px-2 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm font-medium transition-all
+                  flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 text-[10px] sm:text-sm font-medium transition-all duration-300 rounded-xl
                   ${
                     activeTab === tab.id
-                      ? "text-foreground border-b-2 border-primary"
-                      : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"
+                      ? "text-foreground glass-strong border-primary/50 shadow-lg"
+                      : "text-muted-foreground hover:text-foreground glass-light hover:border-border/50"
                   }
                 `}
               >
@@ -394,14 +415,16 @@ const Hero = () => {
           })}
         </div>
 
-        {/* Slide Indicators */}
-        <div className="flex justify-center gap-2 pb-4">
+        {/* Slide Indicators - Enhanced */}
+        <div className="flex justify-center gap-2 pb-5">
           {slidesToShow.map((_, index) => (
             <button
               key={index}
               onClick={() => emblaApi?.scrollTo(index)}
-              className={`h-1 rounded-full transition-all duration-300 ${
-                selectedIndex === index ? "w-8 bg-primary" : "w-2 bg-muted-foreground/40 hover:bg-muted-foreground/60"
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                selectedIndex === index 
+                  ? "w-10 bg-primary shadow-lg shadow-primary/50" 
+                  : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
               }`}
             />
           ))}
