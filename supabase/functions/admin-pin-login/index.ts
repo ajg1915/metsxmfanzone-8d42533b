@@ -48,7 +48,9 @@ serve(async (req) => {
     // Use service role for admin operations (no JWT required for PIN login)
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    const { action, pin, deviceFingerprint, deviceName } = await req.json();
+    const body = await req.json();
+    const { action, pin, deviceFingerprint, deviceName, userId: setupUserId, newPin: setupPin } = body;
+    
     const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
                      req.headers.get('cf-connecting-ip') || 
                      'unknown';
@@ -258,6 +260,62 @@ serve(async (req) => {
         verificationUrl: linkData.properties.action_link,
         isTrustedDevice,
         isNewDevice: !trustedDevice
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (action === 'setup-pin') {
+      if (!setupUserId || !setupPin || setupPin.length < 6) {
+        return new Response(JSON.stringify({ error: 'Invalid setup parameters' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Verify user is an admin
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', setupUserId)
+        .eq('role', 'admin')
+        .single();
+
+      if (!roleData) {
+        return new Response(JSON.stringify({ error: 'User is not an admin' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Hash the new PIN
+      const userSalt = setupUserId.substring(0, 16);
+      const hashedPin = await hashPin(setupPin, userSalt);
+
+      // Upsert the PIN in admin_verification_codes
+      const { error: upsertError } = await supabase
+        .from('admin_verification_codes')
+        .upsert({
+          user_id: setupUserId,
+          code_hash: hashedPin,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (upsertError) {
+        console.error('Failed to save PIN:', upsertError);
+        return new Response(JSON.stringify({ error: 'Failed to save PIN' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      console.log(`Admin PIN setup successful for user: ${setupUserId.substring(0, 8)}...`);
+      
+      return new Response(JSON.stringify({ 
+        success: true,
+        message: 'PIN configured successfully'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
