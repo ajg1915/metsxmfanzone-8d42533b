@@ -68,13 +68,13 @@ const AppInstallSection = () => {
       toast.error("Notification permission denied");
     }
   };
-  return <section className="py-8 sm:py-10 px-4 bg-gradient-to-b from-background to-secondary/20">
+  return <section className="py-10 sm:py-12 md:py-16 px-4 bg-gradient-to-b from-background to-secondary/20">
       <div className="container max-w-6xl mx-auto px-0 sm:px-4">
-        <div className="text-center mb-6 sm:mb-9">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
+        <div className="text-center mb-8 sm:mb-10">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
             Get the Best Experience
           </h2>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
             Install our app and enable notifications for instant access to live games and updates
           </p>
         </div>

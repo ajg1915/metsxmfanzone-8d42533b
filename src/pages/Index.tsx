@@ -40,59 +40,67 @@ const Index = () => {
       </Helmet>
       <Navigation />
       <LiveGameTicker />
-      <main className="pt-12 sm:pt-14">
+      <main className="pt-14 sm:pt-16">
         <Hero />
         <LiveNotificationBar />
         
         <ScrollReveal>
-          <LiveNetworks className="py-1 sm:py-2" />
+          <LiveNetworks />
         </ScrollReveal>
         
         <ScrollReveal delay={100}>
           <LiveStreamsSection />
         </ScrollReveal>
         
-        <div className="section-divider my-3 sm:my-4" />
+        <div className="section-divider my-6 sm:my-8 md:my-10" />
         
         <ScrollReveal delay={100}>
-          <HomeLineupCard className="py-2 sm:py-3" />
+          <HomeLineupCard />
         </ScrollReveal>
+        
+        <div className="section-divider my-6 sm:my-8 md:my-10" />
         
         <ScrollReveal>
-          <SpringTraining className="py-2 sm:py-3" />
+          <SpringTraining />
         </ScrollReveal>
         
-        <div className="section-divider my-3 sm:my-4" />
+        <div className="section-divider my-6 sm:my-8 md:my-10" />
         
         <ScrollReveal>
-          <MetsNewsTracker className="py-2 sm:py-3" />
+          <MetsNewsTracker />
         </ScrollReveal>
         
-        <div className="section-divider my-3 sm:my-4" />
+        <div className="section-divider my-6 sm:my-8 md:my-10" />
         
         <ScrollReveal direction="left">
-          <BlogSection className="py-2 sm:py-3" />
+          <BlogSection />
         </ScrollReveal>
+        
+        <div className="section-divider my-6 sm:my-8 md:my-10" />
         
         <ScrollReveal direction="right" delay={100}>
-          <PodcastSection className="py-2 sm:py-3" />
+          <PodcastSection />
         </ScrollReveal>
         
-        <div className="section-divider my-3 sm:my-4" />
+        <div className="section-divider my-6 sm:my-8 md:my-10" />
         
         <ScrollReveal direction="scale">
           <FAQSection />
         </ScrollReveal>
         
+        <div className="section-divider my-6 sm:my-8 md:my-10" />
+        
         <ScrollReveal>
           <FeedbackSection />
         </ScrollReveal>
         
-        <div className="section-divider my-3 sm:my-4" />
+        <div className="section-divider my-6 sm:my-8 md:my-10" />
         
         <ScrollReveal>
           <AppInstallSection />
         </ScrollReveal>
+        
+        <div className="section-divider my-6 sm:my-8 md:my-10" />
         
         <ScrollReveal delay={100}>
           <HotStoveGuide />

@@ -24,7 +24,7 @@ interface MetsNewsTrackerProps {
   className?: string;
 }
 
-const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
+const MetsNewsTracker = () => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -125,8 +125,8 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
 
   if (loading) {
     return (
-      <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background">
-        <div className="container mx-auto px-4">
+      <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-br from-background via-secondary/10 to-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-primary mb-4" />
             <p className="text-muted-foreground">Loading MLB news...</p>
@@ -138,8 +138,8 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
 
   if (error) {
     return (
-      <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background">
-        <div className="container mx-auto px-4 text-center">
+      <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-br from-background via-secondary/10 to-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center">
           <AlertCircle className="w-12 h-12 mx-auto text-destructive mb-4" />
           <p className="text-muted-foreground mb-4">{error}</p>
           <Button onClick={fetchNewsItems} variant="outline" size="sm">
@@ -165,10 +165,10 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
   if (filteredNews.length === 0 && metsOnly && newsItems.length > 0) {
     // Show message if no Mets news but there is MLB news
     return (
-      <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background relative overflow-hidden">
+      <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-br from-background via-secondary/10 to-background relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="container mx-auto px-4 relative z-10 max-w-7xl">
-          <div className="text-center mb-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+          <div className="text-center mb-6 sm:mb-8">
             <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full">
               <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
             <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live MetsXMFanZone Newsroom</span>
@@ -206,18 +206,18 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
   }
 
   return (
-    <section className="py-16 bg-gradient-to-br from-background via-secondary/10 to-background relative overflow-hidden">
+    <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-br from-background via-secondary/10 to-background relative overflow-hidden">
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      <div className="container mx-auto px-4 relative z-10 max-w-7xl">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+        <div className="text-center mb-8 sm:mb-10 md:mb-12">
+          <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-4 py-2 bg-primary/10 rounded-full">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">Live MetsXMFanZone Newsroom</span>
+            <span className="text-xs sm:text-sm font-semibold text-primary uppercase tracking-wider">Live MetsXMFanZone Newsroom</span>
           </div>
-          <h2 className="text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">
             MLB Live Tracker
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto mb-2">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mb-2">
             Real-time news, signings, trades, and updates from around the league
           </p>
           
@@ -239,7 +239,7 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
           )}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
           {filteredNews.map((item) => {
             const typeConfig = getTypeConfig(item.type);
             const IconComponent = typeConfig.icon;
@@ -303,7 +303,7 @@ const MetsNewsTracker = ({ className }: MetsNewsTrackerProps) => {
           })}
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-8 sm:mt-10 text-center">
           <Button 
             onClick={fetchNewsItems} 
             variant="outline" 

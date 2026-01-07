@@ -1,6 +1,7 @@
 import { TrendingUp, Users, Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import logo from "@/assets/metsxmfanzone-logo.png";
+
 const HotStoveGuide = () => {
   const hotStoveItems = [{
     icon: Users,
@@ -15,27 +16,36 @@ const HotStoveGuide = () => {
     title: "Key Dates",
     description: "Important offseason deadlines and events"
   }];
-  return <section className="py-8 md:py-12 bg-gradient-to-br from-orange-500/10 via-background to-red-500/5">
+
+  return (
+    <section className="py-10 sm:py-12 md:py-16 bg-gradient-to-br from-orange-500/10 via-background to-red-500/5">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 mb-5">
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 mb-4 sm:mb-5">
             <img src={logo} alt="MetsXMFanZone" className="w-full h-full object-contain" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground mb-3 md:text-xl">MetsXMFanZone Hot Stove </h2>
-          <p className="text-muted-foreground mb-8 max-w-xl mx-auto text-xs">Your source for the latest MetsXMFanZone  
-offseason news, trades, and free agent signings.</p>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-3 sm:mb-4">
+            MetsXMFanZone Hot Stove
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 max-w-xl mx-auto">
+            Your source for the latest MetsXMFanZone offseason news, trades, and free agent signings.
+          </p>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {hotStoveItems.map((item, index) => <Card key={index} className="bg-card/50 border-orange-500/20 hover:border-orange-500/40 transition-colors">
-                <CardContent className="p-4 text-center">
-                  <item.icon className="w-6 h-6 text-orange-500 mx-auto mb-2" />
-                  <h3 className="font-semibold text-foreground text-sm mb-1">{item.title}</h3>
-                  <p className="text-xs text-muted-foreground">{item.description}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            {hotStoveItems.map((item, index) => (
+              <Card key={index} className="bg-card/50 border-orange-500/20 hover:border-orange-500/40 transition-colors">
+                <CardContent className="p-4 sm:p-6 text-center">
+                  <item.icon className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500 mx-auto mb-2 sm:mb-3" />
+                  <h3 className="font-semibold text-foreground text-sm sm:text-base mb-1 sm:mb-2">{item.title}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{item.description}</p>
                 </CardContent>
-              </Card>)}
+              </Card>
+            ))}
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default HotStoveGuide;

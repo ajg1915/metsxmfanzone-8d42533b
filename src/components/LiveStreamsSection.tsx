@@ -105,8 +105,8 @@ const LiveStreamsSection = () => {
   };
 
   if (loading) {
-    return <section className="py-8 bg-secondary/20">
-        <div className="container mx-auto px-4">
+    return <section className="py-8 sm:py-10 md:py-12 bg-secondary/20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="text-center">Loading live streams...</div>
         </div>
       </section>;
@@ -118,9 +118,9 @@ const LiveStreamsSection = () => {
   return (
     <>
       <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
-      <section className="py-6 sm:py-8 md:py-10 bg-gradient-to-b from-secondary/30 to-background">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
+      <section className="py-8 sm:py-10 md:py-12 bg-gradient-to-b from-secondary/30 to-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
             <h2 className="font-bold text-lg sm:text-xl md:text-2xl gradient-text">Live & Upcoming Streams</h2>
             <Button 
               variant="outline" 

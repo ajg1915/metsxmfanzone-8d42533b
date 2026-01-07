@@ -83,8 +83,8 @@ const StoriesSection = () => {
   return (
     <>
       <ScrollReveal direction="up">
-        <section className="py-4 sm:py-6 md:py-8">
-          <div className="container mx-auto px-4">
+        <div className="w-full">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
             <ScrollReveal direction="left" delay={100}>
               <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold gradient-text">
@@ -163,7 +163,7 @@ const StoriesSection = () => {
               <CarouselNext className="hidden md:flex -right-4 h-8 w-8 border-border/50 bg-background/80 hover:bg-background" />
             </Carousel>
           </div>
-        </section>
+        </div>
       </ScrollReveal>
 
       <Dialog open={!!selectedStory} onOpenChange={() => setSelectedStory(null)}>
