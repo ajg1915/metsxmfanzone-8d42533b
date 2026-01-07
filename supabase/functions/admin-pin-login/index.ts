@@ -103,8 +103,8 @@ serve(async (req) => {
     }
 
     if (action === 'login') {
-      if (!pin || pin.length < 6) {
-        return new Response(JSON.stringify({ error: 'Invalid PIN format' }), {
+      if (!pin || pin.length !== 8 || !/^\d{8}$/.test(pin)) {
+        return new Response(JSON.stringify({ error: 'PIN must be exactly 8 digits' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -266,8 +266,8 @@ serve(async (req) => {
     }
 
     if (action === 'setup-pin') {
-      if (!setupUserId || !setupPin || setupPin.length < 6) {
-        return new Response(JSON.stringify({ error: 'Invalid setup parameters' }), {
+      if (!setupUserId || !setupPin || setupPin.length !== 8 || !/^\d{8}$/.test(setupPin)) {
+        return new Response(JSON.stringify({ error: 'PIN must be exactly 8 digits' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
