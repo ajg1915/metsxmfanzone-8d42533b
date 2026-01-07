@@ -1,7 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,13 +13,15 @@ interface OtpEmailRequest {
   otp: string;
 }
 
-serve(async (req) => {
-  // Handle CORS preflight requests
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const { Resend } = await import("https://esm.sh/resend@4.0.0");
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    
     const { to, otp }: OtpEmailRequest = await req.json();
 
     if (!to || !otp) {
@@ -36,7 +35,7 @@ serve(async (req) => {
       from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
       to: [to],
       subject: "Your MetsXMFanZone Verification Code",
-      text: `Your MetsXMFanZone verification code is ${otp}. It expires in 5 minutes. IMPORTANT: If another company asks for this PIN, do not share it. We will never ask for your PIN and we will never call you.`,
+      text: `Your MetsXMFanZone verification code is ${otp}. It expires in 5 minutes. IMPORTANT: If another company asks for this PIN, do not share it.`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -72,7 +71,7 @@ serve(async (req) => {
                 ⚠️ SECURITY WARNING
               </p>
               <p style="color: #ffffff; font-size: 10px; margin: 0; text-align: center; line-height: 1.4;">
-                If another company asks for this PIN, do not share it. We will never ask for your PIN and we will never call you.
+                If another company asks for this PIN, do not share it. We will never ask for your PIN.
               </p>
             </div>
             
@@ -95,31 +94,17 @@ serve(async (req) => {
       throw new Error((emailResponse as any).error?.message || "Email provider error");
     }
 
-    if (!(emailResponse as any)?.data?.id) {
-      console.error("Unexpected email provider response:", emailResponse);
-      throw new Error("Email provider did not return a message id");
-    }
-
     console.log("OTP email sent successfully:", emailResponse);
 
     return new Response(
-      JSON.stringify({
-        success: true,
-        messageId: (emailResponse as any).data.id,
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      JSON.stringify({ success: true, messageId: (emailResponse as any).data?.id }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error: any) {
     console.error("Error in send-otp-email function:", error);
     return new Response(
       JSON.stringify({ error: error.message || "Failed to send OTP email" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 });
