@@ -22,11 +22,18 @@ const STREAM_TIME_LIMIT_MS = 20 * 60 * 1000; // 20 minutes
 const STORAGE_KEY = "stream_viewing_start";
 
 const StreamTimeLimit = ({ children }: StreamTimeLimitProps) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [userPlan, setUserPlan] = useState<"free" | "premium" | "annual" | null>(null);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Redirect unauthenticated users to login
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth", { replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   // Fetch user's subscription plan
   useEffect(() => {
@@ -61,17 +68,26 @@ const StreamTimeLimit = ({ children }: StreamTimeLimitProps) => {
           .limit(1)
           .maybeSingle();
 
-        setUserPlan((subData?.plan_type as "free" | "premium" | "annual") || "free");
+        const plan = (subData?.plan_type as "free" | "premium" | "annual") || "free";
+        setUserPlan(plan);
+
+        // Immediately redirect free users to plans page (no 20-min preview for streams)
+        if (plan === "free") {
+          navigate("/plans", { replace: true });
+        }
       } catch (error) {
         console.error("Error fetching plan:", error);
         setUserPlan("free");
+        navigate("/plans", { replace: true });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPlan();
-  }, [user]);
+    if (user) {
+      fetchPlan();
+    }
+  }, [user, navigate]);
 
   // Start/check timer for free users
   useEffect(() => {
@@ -112,14 +128,25 @@ const StreamTimeLimit = ({ children }: StreamTimeLimitProps) => {
     window.location.href = "/";
   };
 
-  if (loading) {
-    return <>{children}</>;
+  // Show loading state while checking auth/subscription
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <img src={metsLogo} alt="MetsXMFanZone" className="w-16 h-16 mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Checking access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If no user or free plan, they should have been redirected already
+  if (!user || userPlan === "free") {
+    return null;
   }
 
   // Premium and annual users get unlimited access
-  if (userPlan !== "free") {
-    return <>{children}</>;
-  }
+  return <>{children}</>;
 
   return (
     <>
