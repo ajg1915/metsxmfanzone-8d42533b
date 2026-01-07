@@ -1,6 +1,4 @@
-import { memo } from "react";
-
-const ImmersiveBackground = memo(() => {
+const ImmersiveBackground = () => {
   return (
     <div 
       className="fixed inset-0 pointer-events-none overflow-hidden"
@@ -94,8 +92,6 @@ const ImmersiveBackground = memo(() => {
       />
     </div>
   );
-});
-
-ImmersiveBackground.displayName = "ImmersiveBackground";
+};
 
 export default ImmersiveBackground;
