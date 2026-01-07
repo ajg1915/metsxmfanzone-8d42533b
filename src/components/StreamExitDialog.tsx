@@ -58,7 +58,7 @@ export function StreamExitDialog({
   const handleBackToStreams = () => {
     setIsOpen(false);
     sessionStorage.removeItem('stream_exit_shown');
-    navigate('/live');
+    navigate('/metsxmfanzone-tv');
   };
 
   return (
