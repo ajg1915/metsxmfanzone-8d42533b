@@ -33,10 +33,10 @@ const Footer = () => {
           <div className="border-t border-border/30 pt-2 text-center">
             <p 
               onClick={handleSecretClick}
-              className="text-[10px] text-muted-foreground cursor-default select-none"
+              className="text-[10px] text-muted-foreground cursor-pointer select-none hover:text-foreground/70 transition-colors"
               aria-hidden="true"
             >
-              © 2024 MetsXMFanZone.com. All rights reserved.
+              © 2025 MetsXMFanZone.com. All rights reserved.
             </p>
           </div>
         </div>
