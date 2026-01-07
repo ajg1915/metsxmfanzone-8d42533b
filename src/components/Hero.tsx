@@ -226,16 +226,10 @@ const Hero = () => {
     </svg>
   );
 
-  const HighlightsIcon = ({ className }: { className?: string }) => <img src={logo} alt="" className={className} />;
-
-  const MetsHistoryIcon = ({ className }: { className?: string }) => <img src={logo} alt="" className={className} />;
-
   const tabs = [
     { id: "overview", label: "Overview", icon: LogoIcon, isImage: true },
     { id: "live", label: "Live Streams", icon: LiveStreamIcon, isImage: true },
     { id: "podcasts", label: "Podcast", icon: PodcastIcon, isImage: true },
-    { id: "highlights", label: "Highlights", icon: HighlightsIcon, isImage: true },
-    { id: "history", label: "Mets Past", icon: MetsHistoryIcon, isImage: true },
     { id: "community", label: "Community", icon: SocialIcon, isImage: false },
   ];
 
@@ -392,8 +386,6 @@ const Hero = () => {
                   setActiveTab(tab.id);
                   if (tab.id === "live") navigate("/metsxmfanzone-tv");
                   if (tab.id === "podcasts") navigate("/podcast");
-                  if (tab.id === "highlights") navigate("/video-gallery");
-                  if (tab.id === "history") navigate("/mets-history");
                   if (tab.id === "community") navigate("/community");
                 }}
                 className={`
