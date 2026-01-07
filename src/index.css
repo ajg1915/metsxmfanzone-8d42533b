@@ -8,26 +8,26 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Mets Blue and Orange Sports Theme */
-    --background: 220 70% 8%;
-    --foreground: 0 0% 100%;
+    /* Mets Blue and Orange Sports Theme - Enhanced for Glass Morphism */
+    --background: 220 70% 5%;
+    --foreground: 0 0% 98%;
 
-    --card: 220 60% 12%;
-    --card-foreground: 0 0% 100%;
+    --card: 220 60% 8%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 220 60% 12%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 220 60% 10%;
+    --popover-foreground: 0 0% 98%;
 
     /* Mets Orange - Primary */
     --primary: 24 100% 50%;
     --primary-foreground: 0 0% 100%;
 
     /* Mets Blue - Secondary */
-    --secondary: 220 80% 25%;
+    --secondary: 220 80% 30%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 40% 20%;
-    --muted-foreground: 220 20% 65%;
+    --muted: 220 40% 15%;
+    --muted-foreground: 220 20% 60%;
 
     --accent: 24 100% 50%;
     --accent-foreground: 0 0% 100%;
@@ -37,61 +37,85 @@ All colors MUST be HSL.
 
     /* Mets Orange border accents */
     --border: 24 100% 50%;
-    --input: 220 50% 25%;
+    --input: 220 50% 20%;
     --ring: 24 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     /* Custom design tokens - Mets Theme */
-    --mets-blue: 220 80% 30%;
-    --mets-blue-light: 220 70% 45%;
-    --mets-blue-dark: 220 85% 15%;
+    --mets-blue: 220 80% 35%;
+    --mets-blue-light: 220 70% 50%;
+    --mets-blue-dark: 220 85% 12%;
     --mets-orange: 24 100% 50%;
     --mets-orange-light: 24 100% 60%;
     
-    --hero-overlay: 220 80% 6% / 0.8;
-    --card-border: 220 80% 35%;
-    --gradient-hero: linear-gradient(135deg, hsl(220 80% 8%), hsl(220 70% 15%));
-    --gradient-card: linear-gradient(180deg, hsl(220 60% 14%), hsl(220 70% 10%));
-    --gradient-blue: linear-gradient(135deg, hsl(220 80% 25%), hsl(220 70% 35%));
-    --glow-blue: 0 0 30px hsl(220 80% 40% / 0.4);
-    --glow-orange: 0 0 30px hsl(24 100% 50% / 0.3);
+    /* Glass morphism tokens */
+    --glass-bg: 220 60% 8% / 0.6;
+    --glass-border: 220 80% 40% / 0.2;
+    --glass-blur: 20px;
+    --glass-highlight: 0 0% 100% / 0.05;
     
-    --sidebar-background: 220 70% 10%;
+    /* Depth & Shadow tokens */
+    --shadow-color: 220 80% 5%;
+    --shadow-elevation-low: 
+      0 1px 2px hsl(var(--shadow-color) / 0.3),
+      0 2px 4px hsl(var(--shadow-color) / 0.2);
+    --shadow-elevation-medium: 
+      0 2px 4px hsl(var(--shadow-color) / 0.3),
+      0 4px 8px hsl(var(--shadow-color) / 0.25),
+      0 8px 16px hsl(var(--shadow-color) / 0.2);
+    --shadow-elevation-high: 
+      0 4px 8px hsl(var(--shadow-color) / 0.25),
+      0 8px 16px hsl(var(--shadow-color) / 0.2),
+      0 16px 32px hsl(var(--shadow-color) / 0.15),
+      0 32px 64px hsl(var(--shadow-color) / 0.1);
+    
+    --hero-overlay: 220 80% 4% / 0.85;
+    --card-border: 220 80% 35%;
+    --gradient-hero: linear-gradient(135deg, hsl(220 80% 5%), hsl(220 70% 12%));
+    --gradient-card: linear-gradient(180deg, hsl(220 60% 10%), hsl(220 70% 6%));
+    --gradient-blue: linear-gradient(135deg, hsl(220 80% 30%), hsl(220 70% 40%));
+    --gradient-radial-blue: radial-gradient(ellipse at center, hsl(220 80% 25% / 0.4), transparent 70%);
+    --gradient-radial-orange: radial-gradient(ellipse at center, hsl(24 100% 50% / 0.2), transparent 70%);
+    --glow-blue: 0 0 60px hsl(220 80% 50% / 0.4);
+    --glow-orange: 0 0 60px hsl(24 100% 50% / 0.3);
+    --glow-subtle: 0 0 120px hsl(220 80% 40% / 0.15);
+    
+    --sidebar-background: 220 70% 8%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 24 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 80% 25%;
+    --sidebar-accent: 220 80% 30%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 24 100% 50%;
     --sidebar-ring: 24 100% 50%;
   }
 
   .dark {
-    --background: 220 70% 8%;
-    --foreground: 0 0% 100%;
-    --card: 220 60% 12%;
-    --card-foreground: 0 0% 100%;
-    --popover: 220 60% 12%;
-    --popover-foreground: 0 0% 100%;
+    --background: 220 70% 5%;
+    --foreground: 0 0% 98%;
+    --card: 220 60% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 60% 10%;
+    --popover-foreground: 0 0% 98%;
     --primary: 24 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 80% 25%;
+    --secondary: 220 80% 30%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 220 40% 20%;
-    --muted-foreground: 220 20% 65%;
+    --muted: 220 40% 15%;
+    --muted-foreground: 220 20% 60%;
     --accent: 24 100% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
     --border: 24 100% 50%;
-    --input: 220 50% 25%;
+    --input: 220 50% 20%;
     --ring: 24 100% 50%;
-    --sidebar-background: 220 70% 10%;
+    --sidebar-background: 220 70% 8%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 24 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 80% 25%;
+    --sidebar-accent: 220 80% 30%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 24 100% 50%;
     --sidebar-ring: 24 100% 50%;
@@ -113,15 +137,220 @@ All colors MUST be HSL.
     margin: 0;
     padding: 0;
     width: 100%;
+    /* Subtle noise texture for depth */
+    background-image: 
+      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(220 80% 20% / 0.3), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 100%, hsl(24 100% 50% / 0.08), transparent);
   }
 }
 
 @layer utilities {
-  /* Scroll-triggered reveal animations */
+  /* ========================================
+     GLASS MORPHISM SYSTEM
+     ======================================== */
+  
+  .glass {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: 
+      inset 0 1px 0 0 hsl(var(--glass-highlight)),
+      var(--shadow-elevation-medium);
+  }
+  
+  .glass-light {
+    background: hsl(220 60% 12% / 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(220 80% 45% / 0.15);
+  }
+  
+  .glass-strong {
+    background: hsl(220 60% 8% / 0.85);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid hsl(220 80% 40% / 0.3);
+    box-shadow: 
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.08),
+      var(--shadow-elevation-high);
+  }
+  
+  .glass-card {
+    background: linear-gradient(
+      135deg,
+      hsl(220 60% 10% / 0.7),
+      hsl(220 70% 8% / 0.5)
+    );
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(220 80% 40% / 0.2);
+    box-shadow: 
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.05),
+      0 8px 32px hsl(220 80% 5% / 0.4);
+  }
+  
+  .glass-nav {
+    background: hsl(220 70% 6% / 0.8);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid hsl(24 100% 50% / 0.3);
+    box-shadow: 0 4px 30px hsl(220 80% 5% / 0.5);
+  }
+
+  /* ========================================
+     DEPTH & FLOATING EFFECTS
+     ======================================== */
+  
+  .floating {
+    animation: floating 6s ease-in-out infinite;
+    will-change: transform;
+  }
+  
+  .floating-slow {
+    animation: floating 8s ease-in-out infinite;
+  }
+  
+  .floating-fast {
+    animation: floating 4s ease-in-out infinite;
+  }
+  
+  @keyframes floating {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+  
+  .depth-layer-1 {
+    transform: translateZ(10px);
+    transform-style: preserve-3d;
+  }
+  
+  .depth-layer-2 {
+    transform: translateZ(30px);
+    transform-style: preserve-3d;
+  }
+  
+  .depth-layer-3 {
+    transform: translateZ(50px);
+    transform-style: preserve-3d;
+  }
+
+  /* ========================================
+     GLOW EFFECTS
+     ======================================== */
+  
+  .glow-blue {
+    box-shadow: var(--glow-blue);
+  }
+  
+  .glow-orange {
+    box-shadow: var(--glow-orange);
+  }
+  
+  .glow-subtle {
+    box-shadow: var(--glow-subtle);
+  }
+  
+  .glow-pulse {
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+  
+  @keyframes glowPulse {
+    0%, 100% {
+      box-shadow: 0 0 30px hsl(24 100% 50% / 0.2);
+    }
+    50% {
+      box-shadow: 0 0 60px hsl(24 100% 50% / 0.4), 0 0 100px hsl(24 100% 50% / 0.2);
+    }
+  }
+
+  /* ========================================
+     ANIMATED GRADIENTS
+     ======================================== */
+  
+  .gradient-animated {
+    background: linear-gradient(
+      -45deg,
+      hsl(220 80% 15%),
+      hsl(220 70% 20%),
+      hsl(220 80% 25%),
+      hsl(24 80% 30%)
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+  }
+  
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(0 0% 100% / 0.05),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* ========================================
+     PARALLAX SUPPORT
+     ======================================== */
+  
+  .parallax-container {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    overflow: hidden;
+  }
+  
+  .parallax-layer {
+    will-change: transform;
+    transform-style: preserve-3d;
+  }
+  
+  .parallax-bg {
+    transform: translateZ(-100px) scale(1.1);
+  }
+  
+  .parallax-mid {
+    transform: translateZ(-50px) scale(1.05);
+  }
+  
+  .parallax-front {
+    transform: translateZ(0);
+  }
+
+  /* ========================================
+     SCROLL-TRIGGERED ANIMATIONS
+     ======================================== */
+  
   .scroll-reveal {
     opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .scroll-reveal.visible {
@@ -131,8 +360,8 @@ All colors MUST be HSL.
 
   .scroll-reveal-left {
     opacity: 0;
-    transform: translateX(-40px);
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-60px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .scroll-reveal-left.visible {
@@ -142,8 +371,8 @@ All colors MUST be HSL.
 
   .scroll-reveal-right {
     opacity: 0;
-    transform: translateX(40px);
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(60px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .scroll-reveal-right.visible {
@@ -153,8 +382,8 @@ All colors MUST be HSL.
 
   .scroll-reveal-scale {
     opacity: 0;
-    transform: scale(0.9);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(0.85);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .scroll-reveal-scale.visible {
@@ -162,21 +391,24 @@ All colors MUST be HSL.
     transform: scale(1);
   }
 
-  /* Page transition animations */
+  /* ========================================
+     PAGE TRANSITIONS
+     ======================================== */
+  
   .animate-fade-in {
-    animation: fadeIn 0.6s ease-out;
+    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .animate-slide-up {
-    animation: slideUp 0.5s ease-out;
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .animate-slide-in-right {
-    animation: slideInRight 0.4s ease-out;
+    animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .animate-scale-in {
-    animation: scaleIn 0.4s ease-out;
+    animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .animate-float {
@@ -190,7 +422,7 @@ All colors MUST be HSL.
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(15px);
+      transform: translateY(20px);
     }
     to {
       opacity: 1;
@@ -201,7 +433,7 @@ All colors MUST be HSL.
   @keyframes slideUp {
     from {
       opacity: 0;
-      transform: translateY(30px);
+      transform: translateY(40px);
     }
     to {
       opacity: 1;
@@ -212,7 +444,7 @@ All colors MUST be HSL.
   @keyframes slideInRight {
     from {
       opacity: 0;
-      transform: translateX(30px);
+      transform: translateX(40px);
     }
     to {
       opacity: 1;
@@ -223,7 +455,7 @@ All colors MUST be HSL.
   @keyframes scaleIn {
     from {
       opacity: 0;
-      transform: scale(0.92);
+      transform: scale(0.9);
     }
     to {
       opacity: 1;
@@ -236,7 +468,7 @@ All colors MUST be HSL.
       transform: translateY(0);
     }
     50% {
-      transform: translateY(-8px);
+      transform: translateY(-10px);
     }
   }
 
@@ -245,7 +477,7 @@ All colors MUST be HSL.
       box-shadow: 0 0 20px hsl(220 80% 40% / 0.3);
     }
     50% {
-      box-shadow: 0 0 40px hsl(220 80% 50% / 0.5);
+      box-shadow: 0 0 50px hsl(220 80% 50% / 0.5);
     }
   }
 
@@ -260,45 +492,83 @@ All colors MUST be HSL.
       opacity: 0.7;
     }
     50% {
-      transform: translateY(6px);
+      transform: translateY(8px);
       opacity: 1;
     }
   }
 
   /* Stagger children animation helper */
   .stagger-children > * {
-    animation: fadeIn 0.5s ease-out backwards;
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
-  .stagger-children > *:nth-child(1) { animation-delay: 0.08s; }
-  .stagger-children > *:nth-child(2) { animation-delay: 0.16s; }
-  .stagger-children > *:nth-child(3) { animation-delay: 0.24s; }
-  .stagger-children > *:nth-child(4) { animation-delay: 0.32s; }
-  .stagger-children > *:nth-child(5) { animation-delay: 0.4s; }
-  .stagger-children > *:nth-child(6) { animation-delay: 0.48s; }
+  .stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+  .stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
 
-  /* Smooth hover transitions */
+  /* ========================================
+     HOVER EFFECTS
+     ======================================== */
+  
   .hover-lift {
-    @apply transition-all duration-300;
+    @apply transition-all duration-500;
   }
   .hover-lift:hover {
-    @apply -translate-y-2;
-    box-shadow: 0 12px 40px hsl(220 80% 30% / 0.3);
+    transform: translateY(-8px);
+    box-shadow: 
+      0 20px 40px hsl(220 80% 10% / 0.4),
+      0 0 60px hsl(24 100% 50% / 0.1);
   }
 
-  /* Card hover with blue glow */
   .hover-glow {
-    @apply transition-all duration-300;
+    @apply transition-all duration-500;
   }
   .hover-glow:hover {
-    box-shadow: 0 0 30px hsl(220 80% 40% / 0.4), 0 8px 30px hsl(0 0% 0% / 0.3);
+    box-shadow: 
+      0 0 40px hsl(220 80% 45% / 0.4), 
+      0 0 80px hsl(220 80% 40% / 0.2),
+      0 10px 40px hsl(0 0% 0% / 0.3);
+  }
+  
+  .hover-glow-orange:hover {
+    box-shadow: 
+      0 0 40px hsl(24 100% 50% / 0.4), 
+      0 0 80px hsl(24 100% 50% / 0.2);
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-300;
+  }
+  .hover-scale:hover {
+    transform: scale(1.03);
+  }
+  
+  .hover-border-glow {
+    @apply transition-all duration-300;
+    position: relative;
+  }
+  .hover-border-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(24 100% 50% / 0), hsl(24 100% 50% / 0));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: all 0.5s;
+  }
+  .hover-border-glow:hover::before {
+    background: linear-gradient(135deg, hsl(24 100% 50% / 0.8), hsl(220 80% 50% / 0.4));
   }
 
-  /* Glass morphism effect */
-  .glass {
-    background: hsl(220 60% 12% / 0.8);
-    backdrop-filter: blur(12px);
-    border: 1px solid hsl(220 80% 35% / 0.3);
-  }
+  /* ========================================
+     UTILITY CLASSES
+     ======================================== */
 
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -325,7 +595,14 @@ All colors MUST be HSL.
 
   /* Gradient text */
   .gradient-text {
-    background: linear-gradient(135deg, hsl(24 100% 55%), hsl(24 100% 65%));
+    background: linear-gradient(135deg, hsl(24 100% 55%), hsl(24 100% 70%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .gradient-text-blue {
+    background: linear-gradient(135deg, hsl(220 80% 50%), hsl(220 70% 65%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -339,6 +616,32 @@ All colors MUST be HSL.
   /* Section divider with gradient */
   .section-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, hsl(220 80% 35%), transparent);
+    background: linear-gradient(90deg, transparent, hsl(24 100% 50% / 0.4), hsl(220 80% 40% / 0.3), transparent);
+  }
+  
+  /* Orb decorations */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  
+  .orb-blue {
+    background: radial-gradient(circle, hsl(220 80% 50% / 0.4), transparent 70%);
+  }
+  
+  .orb-orange {
+    background: radial-gradient(circle, hsl(24 100% 50% / 0.3), transparent 70%);
+  }
+  
+  /* Text shadows for depth */
+  .text-shadow-soft {
+    text-shadow: 0 2px 10px hsl(220 80% 10% / 0.5);
+  }
+  
+  .text-shadow-glow {
+    text-shadow: 0 0 20px hsl(24 100% 50% / 0.5);
   }
 }

@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
+import ImmersiveBackground from "@/components/ImmersiveBackground";
 import LiveNotificationBar from "@/components/LiveNotificationBar";
 import LiveGameTicker from "@/components/LiveGameTicker";
 import LiveNetworks from "@/components/LiveNetworks";
@@ -31,7 +32,12 @@ const Index = () => {
     const cleanup = setupNotificationListeners();
     return cleanup;
   }, []);
-  return <div className="min-h-screen bg-background">
+  
+  return (
+    <div className="min-h-screen bg-background relative">
+      {/* Immersive animated background */}
+      <ImmersiveBackground />
+      
       <Helmet>
         <title>MetsXMFanZone - Watch Mets Live Streams, Highlights & Exclusive Coverage</title>
         <meta name="description" content="The ultimate Mets fan community. Watch live game streams, highlights, podcasts, and exclusive Mets coverage. Join thousands of passionate New York Mets fans." />
@@ -40,7 +46,7 @@ const Index = () => {
       </Helmet>
       <Navigation />
       <LiveGameTicker />
-      <main className="pt-14 sm:pt-16">
+      <main className="pt-14 sm:pt-16 relative z-10">
         <Hero />
         <LiveNotificationBar />
         
@@ -110,6 +116,8 @@ const Index = () => {
       <InstallPrompt />
       <NotificationPrompt />
       <OnboardingWalkthrough onComplete={() => {}} />
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
