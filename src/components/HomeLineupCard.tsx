@@ -518,8 +518,8 @@ export default function HomeLineupCard({
           </Card>
 
           {/* NL East Standings - Real-time from MLB API */}
-          <Card className="border-orange-500/20">
-            <div className="bg-gradient-to-r from-orange-600 to-orange-500 p-2.5 text-white">
+          <Card className="border-primary/20">
+            <div className="p-2.5 text-white" style={{ background: "linear-gradient(to right, #ff4500, #ff6a33)" }}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Trophy className="w-4 h-4" />
