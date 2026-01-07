@@ -43,12 +43,12 @@ const Footer = () => {
             </div>
           </div>
           <div className="border-t border-border/30 pt-2 text-center">
-            <p className="text-[10px] text-muted-foreground">
-              © <span 
-                onClick={handleSecretClick} 
-                className="cursor-default select-none"
-                aria-hidden="true"
-              >2024</span> MetsXMFanZone.com. All rights reserved.
+            <p 
+              onClick={handleSecretClick}
+              className="text-[10px] text-muted-foreground cursor-default select-none"
+              aria-hidden="true"
+            >
+              © 2024 MetsXMFanZone.com. All rights reserved.
             </p>
           </div>
         </div>
