@@ -154,7 +154,7 @@ export default function MatchupPage({
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-[#002D72]/20 backdrop-blur-sm flex items-center justify-center border-2 border-[#002D72]/50 p-3">
+                  <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-[#ff4500]/20 backdrop-blur-sm flex items-center justify-center border-2 border-[#ff4500]/50 p-3">
                     <img 
                       src={MLB_LOGO_URL(metsData.teamId)} 
                       alt="Mets" 
@@ -219,7 +219,7 @@ export default function MatchupPage({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
                 <p className="text-xs text-muted-foreground">Mets Record</p>
-                <p className="text-lg font-bold text-[#002D72]">{metsData.record}</p>
+                <p className="text-lg font-bold text-[#ff4500]">{metsData.record}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{opponent.abbr} Record</p>
@@ -273,14 +273,14 @@ export default function MatchupPage({
                   <CardContent>
                     <div className="space-y-4">
                       <div className="flex justify-between text-sm mb-2">
-                        <span className="font-bold text-[#002D72]">Mets: {headToHead.metsWins} Wins</span>
+                        <span className="font-bold text-[#ff4500]">Mets: {headToHead.metsWins} Wins</span>
                         <span className="font-bold" style={{ color: opponent.primaryColor }}>
                           {opponent.abbr}: {headToHead.opponentWins} Wins
                         </span>
                       </div>
                       <div className="relative h-8 rounded-full overflow-hidden bg-muted">
                         <motion.div 
-                          className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#002D72] to-[#FF5910]"
+                          className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#ff4500] to-[#FF5910]"
                           initial={{ width: 0 }}
                           animate={{ width: `${metsWinPct}%` }}
                           transition={{ duration: 1, delay: 0.5 }}
@@ -306,7 +306,7 @@ export default function MatchupPage({
                 </Card>
 
                 {/* Mets Key Stats */}
-                <Card className="border-[#002D72]/30">
+                <Card className="border-[#ff4500]/30">
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-3">
                       <img 
@@ -316,16 +316,16 @@ export default function MatchupPage({
                         onError={(e) => (e.currentTarget.src = '/placeholder.svg')}
                       />
                       <div>
-                        <CardTitle className="text-[#002D72]">New York Mets</CardTitle>
+                        <CardTitle className="text-[#ff4500]">New York Mets</CardTitle>
                         <p className="text-sm text-muted-foreground">{metsData.record} | Spring: {metsData.springRecord}</p>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <StatBar label="Team AVG" value=".265" pct={75} color="#002D72" />
-                    <StatBar label="Team ERA" value="3.45" pct={80} color="#002D72" />
-                    <StatBar label="Home Runs" value="185" pct={70} color="#002D72" />
-                    <StatBar label="Run Differential" value="+45" pct={85} color="#002D72" />
+                    <StatBar label="Team AVG" value=".265" pct={75} color="#ff4500" />
+                    <StatBar label="Team ERA" value="3.45" pct={80} color="#ff4500" />
+                    <StatBar label="Home Runs" value="185" pct={70} color="#ff4500" />
+                    <StatBar label="Run Differential" value="+45" pct={85} color="#ff4500" />
                   </CardContent>
                 </Card>
 
@@ -366,7 +366,7 @@ export default function MatchupPage({
                   </h3>
                   <div className="space-y-3">
                     {metsData.keyPlayers.map((player, idx) => (
-                      <PlayerCard key={idx} player={player} teamColor="#002D72" />
+                      <PlayerCard key={idx} player={player} teamColor="#ff4500" />
                     ))}
                   </div>
                   <h4 className="font-bold text-md mt-6 mb-4 flex items-center gap-2">
@@ -375,7 +375,7 @@ export default function MatchupPage({
                   </h4>
                   <div className="space-y-3">
                     {metsData.keyPitchers.map((player, idx) => (
-                      <PitcherCard key={idx} player={player} teamColor="#002D72" />
+                      <PitcherCard key={idx} player={player} teamColor="#ff4500" />
                     ))}
                   </div>
                 </div>

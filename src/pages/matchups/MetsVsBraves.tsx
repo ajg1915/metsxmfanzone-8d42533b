@@ -4,7 +4,7 @@ import springImage from "@/assets/spring-mets-braves.jpg";
 const metsData = {
   name: "New York Mets",
   abbr: "NYM",
-  primaryColor: "#002D72",
+  primaryColor: "#ff4500",
   secondaryColor: "#FF5910",
   logo: "",
   teamId: 121,
