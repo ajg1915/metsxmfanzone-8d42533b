@@ -73,7 +73,7 @@ const typeConfig = {
   "coming-soon": {
     icon: Wrench,
     label: "In Progress",
-    color: "bg-purple-500/20 text-purple-400 border-purple-500/30"
+    color: "bg-[#ff4500]/20 text-[#ff4500] border-[#ff4500]/30"
   }
 };
 
@@ -189,7 +189,7 @@ const WhatsNew = () => {
           {/* In Progress Section */}
           <div className="mb-12">
             <div className="flex items-center gap-2 mb-6">
-              <Wrench className="h-5 w-5 text-purple-400" />
+              <Wrench className="h-5 w-5 text-[#ff4500]" />
               <h2 className="text-xl font-semibold">Currently Working On</h2>
             </div>
             <div className="space-y-4">
@@ -204,8 +204,8 @@ const WhatsNew = () => {
                       className="p-4 rounded-lg bg-card/50 border border-border/50 backdrop-blur-sm"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="p-2 rounded-lg bg-purple-500/10">
-                          <Icon className="h-4 w-4 text-purple-400" />
+                        <div className="p-2 rounded-lg bg-[#ff4500]/10">
+                          <Icon className="h-4 w-4 text-[#ff4500]" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
