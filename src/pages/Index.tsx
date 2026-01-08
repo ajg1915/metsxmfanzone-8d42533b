@@ -17,6 +17,7 @@ import StoriesSection from "@/components/StoriesSection";
 import MetsHistorySection from "@/components/MetsHistorySection";
 
 import FAQSection from "@/components/FAQSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
 import InstallPrompt from "@/components/InstallPrompt";
 import AppInstallSection from "@/components/AppInstallSection";
@@ -111,6 +112,12 @@ const Index = () => {
         
         <ScrollReveal direction="scale">
           <FAQSection />
+        </ScrollReveal>
+        
+        <div className="section-divider my-4 sm:my-6" />
+        
+        <ScrollReveal>
+          <TestimonialsSection />
         </ScrollReveal>
         
         <div className="section-divider my-4 sm:my-6" />
