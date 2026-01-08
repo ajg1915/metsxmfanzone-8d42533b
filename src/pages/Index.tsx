@@ -12,6 +12,7 @@ import MetsNewsTracker from "@/components/MetsNewsTracker";
 import BlogSection from "@/components/BlogSection";
 import HomeLineupCard from "@/components/HomeLineupCard";
 import PodcastSection from "@/components/PodcastSection";
+import JoinPodcastSection from "@/components/JoinPodcastSection";
 import HotStoveGuide from "@/components/HotStoveGuide";
 import StoriesSection from "@/components/StoriesSection";
 
@@ -101,7 +102,12 @@ const Index = () => {
         <ScrollReveal direction="right" delay={100}>
           <PodcastSection />
         </ScrollReveal>
-        
+
+        <div className="section-divider my-4 sm:my-6" />
+
+        <ScrollReveal delay={100}>
+          <JoinPodcastSection />
+        </ScrollReveal>
 
         <div className="section-divider my-4 sm:my-6" />
         
