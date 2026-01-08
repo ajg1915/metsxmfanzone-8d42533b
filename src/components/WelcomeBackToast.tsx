@@ -2,14 +2,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { format, parseISO, isAfter } from "date-fns";
-import { Sparkles, Newspaper, Video, Radio, Calendar } from "lucide-react";
+import { parseISO, isAfter } from "date-fns";
+import { Newspaper, Radio, Zap } from "lucide-react";
 
 interface NewContent {
   blogPosts: { title: string; slug: string }[];
-  podcasts: { title: string }[];
-  liveStreams: { title: string }[];
-  events: { title: string }[];
+  liveStreams: { title: string; status: string }[];
 }
 
 const LAST_VISIT_KEY = 'metsxm_last_visit';
@@ -43,9 +41,7 @@ export const WelcomeBackToast = () => {
         // Fetch new content since last visit
         const newContent: NewContent = {
           blogPosts: [],
-          podcasts: [],
           liveStreams: [],
-          events: [],
         };
 
         // Fetch new blog posts
@@ -59,21 +55,10 @@ export const WelcomeBackToast = () => {
 
         if (blogPosts) newContent.blogPosts = blogPosts;
 
-        // Fetch new podcasts
-        const { data: podcasts } = await supabase
-          .from('podcasts')
-          .select('title')
-          .eq('published', true)
-          .gt('created_at', lastVisit)
-          .order('created_at', { ascending: false })
-          .limit(3);
-
-        if (podcasts) newContent.podcasts = podcasts;
-
         // Fetch active or upcoming live streams
         const { data: liveStreams } = await supabase
           .from('live_streams')
-          .select('title')
+          .select('title, status')
           .eq('published', true)
           .in('status', ['live', 'scheduled'])
           .order('created_at', { ascending: false })
@@ -81,73 +66,94 @@ export const WelcomeBackToast = () => {
 
         if (liveStreams) newContent.liveStreams = liveStreams;
 
-        // Fetch upcoming events
-        const { data: events } = await supabase
-          .from('events')
-          .select('title')
-          .eq('published', true)
-          .gte('event_date', now.toISOString())
-          .order('event_date', { ascending: true })
-          .limit(2);
+        const totalNew = newContent.blogPosts.length + newContent.liveStreams.length;
 
-        if (events) newContent.events = events;
+        // No new content to show
+        if (totalNew === 0) return;
 
-        // Build toast message
-        const totalNew = 
-          newContent.blogPosts.length + 
-          newContent.podcasts.length + 
-          newContent.liveStreams.length +
-          newContent.events.length;
-
-        if (totalNew === 0) {
-          // Just show a simple welcome back
-          toast("Welcome back! 👋", {
-            description: "Great to see you again. Enjoy browsing!",
-            duration: 4000,
-          });
-          return;
-        }
-
-        // Show detailed update toast
-        const updates: string[] = [];
+        // Check for live streams first - highest priority
+        const hasLiveStream = newContent.liveStreams.some(s => s.status === 'live');
         
-        if (newContent.blogPosts.length > 0) {
-          updates.push(`📰 ${newContent.blogPosts.length} new article${newContent.blogPosts.length > 1 ? 's' : ''}`);
-        }
-        if (newContent.podcasts.length > 0) {
-          updates.push(`🎙️ ${newContent.podcasts.length} new podcast${newContent.podcasts.length > 1 ? 's' : ''}`);
-        }
-        if (newContent.liveStreams.length > 0) {
-          const hasLive = newContent.liveStreams.some(s => s.title);
-          updates.push(`📺 ${newContent.liveStreams.length} stream${newContent.liveStreams.length > 1 ? 's' : ''} ${hasLive ? 'live now!' : 'scheduled'}`);
-        }
-        if (newContent.events.length > 0) {
-          updates.push(`📅 ${newContent.events.length} upcoming event${newContent.events.length > 1 ? 's' : ''}`);
+        // Try to get AI-generated message
+        let aiMessage: string | null = null;
+        try {
+          const { data, error } = await supabase.functions.invoke('generate-welcome-prompt', {
+            body: { newContent }
+          });
+          
+          if (!error && data?.message) {
+            aiMessage = data.message;
+          }
+        } catch (e) {
+          console.log('AI prompt generation unavailable, using fallback');
         }
 
-        toast("Welcome back! 🎉", {
-          description: (
-            <div className="space-y-1 mt-1">
-              <p className="font-medium">Here's what's new:</p>
-              {updates.map((update, i) => (
-                <p key={i} className="text-sm">{update}</p>
-              ))}
-            </div>
-          ),
-          duration: 6000,
-          action: {
-            label: "View Updates",
-            onClick: () => window.location.href = "/whats-new",
-          },
-        });
+        // Show the news alert toast
+        if (hasLiveStream) {
+          const liveStream = newContent.liveStreams.find(s => s.status === 'live');
+          toast(
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Radio className="h-5 w-5 text-red-500" />
+                <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse" />
+              </div>
+              <div>
+                <p className="font-bold text-[#ff4500]">🔴 LIVE NOW</p>
+                <p className="text-sm">{aiMessage || liveStream?.title || "A stream is live!"}</p>
+              </div>
+            </div>,
+            {
+              duration: 8000,
+              action: {
+                label: "Watch Live",
+                onClick: () => window.location.href = "/spring-training-live",
+              },
+            }
+          );
+        } else if (newContent.blogPosts.length > 0) {
+          toast(
+            <div className="flex items-center gap-3">
+              <div className="bg-[#ff4500]/20 p-2 rounded-full">
+                <Newspaper className="h-5 w-5 text-[#ff4500]" />
+              </div>
+              <div>
+                <p className="font-bold text-[#ff4500] flex items-center gap-1">
+                  <Zap className="h-4 w-4" /> News Alert
+                </p>
+                <p className="text-sm">{aiMessage || `New: "${newContent.blogPosts[0].title}"`}</p>
+              </div>
+            </div>,
+            {
+              duration: 6000,
+              action: {
+                label: "Read Now",
+                onClick: () => window.location.href = `/blog/${newContent.blogPosts[0].slug}`,
+              },
+            }
+          );
+        } else if (newContent.liveStreams.length > 0) {
+          toast(
+            <div className="flex items-center gap-3">
+              <div className="bg-[#002D72]/20 p-2 rounded-full">
+                <Radio className="h-5 w-5 text-[#002D72]" />
+              </div>
+              <div>
+                <p className="font-bold text-[#002D72]">Upcoming Stream</p>
+                <p className="text-sm">{aiMessage || newContent.liveStreams[0].title}</p>
+              </div>
+            </div>,
+            {
+              duration: 6000,
+              action: {
+                label: "View Schedule",
+                onClick: () => window.location.href = "/spring-training-live",
+              },
+            }
+          );
+        }
 
       } catch (error) {
         console.error('Error fetching new content:', error);
-        // Show simple welcome toast on error
-        toast("Welcome back! 👋", {
-          description: "Great to see you again!",
-          duration: 4000,
-        });
       }
     };
 
