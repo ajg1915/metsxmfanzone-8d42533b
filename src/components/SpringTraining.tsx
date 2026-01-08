@@ -119,7 +119,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
               className="text-xs sm:text-sm glass-card border-border/30 hover:border-primary/50"
             >
               <Link to="/spring-training-live">
-                Watch Spring Training Live
+                See Matchup Overview
               </Link>
             </Button>
           </motion.div>
