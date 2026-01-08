@@ -91,7 +91,7 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
             <div className="flex items-center gap-2">
               <Film className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
-                Mets Highlights
+                MetsXMFanZone Highlights
               </h2>
             </div>
             <a
