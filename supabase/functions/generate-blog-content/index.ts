@@ -73,17 +73,26 @@ Deno.serve(async (req) => {
     const systemPrompt = `You are a professional sports writer specializing in New York Mets baseball content. 
 Write engaging, informative, and well-structured blog articles that fans will love to read.
 Use a conversational but professional tone. Include relevant details and insights.
-Format the content with proper paragraphs and structure.`;
+Format the content with proper paragraphs and structure.
+
+IMPORTANT FORMATTING RULES:
+- DO NOT use any markdown headers (no # symbols)
+- DO NOT use markdown formatting like ** or __
+- Use plain text paragraphs only
+- Separate sections with blank lines
+- Write in a natural, flowing style without special formatting characters
+- The content must be 100% original and unique - write it as if you are the original author`;
 
     const userPrompt = `Write a comprehensive blog article about: "${title}"
 ${category ? `Category: ${category}` : ''}
 ${excerpt ? `Brief: ${excerpt}` : ''}
 
 Please write a full article (500-800 words) with:
-- An engaging introduction
+- An engaging introduction paragraph
 - Well-structured body paragraphs with insights and details
-- A compelling conclusion
-- Use Markdown formatting for headings and emphasis where appropriate`;
+- A compelling conclusion paragraph
+- Use PLAIN TEXT ONLY - no markdown, no # symbols, no ** or __ formatting
+- Write original, unique content that passes plagiarism checks`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

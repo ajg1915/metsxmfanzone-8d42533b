@@ -119,6 +119,8 @@ const WriterAuth = lazy(() => import("./pages/WriterAuth"));
 const WriterDashboard = lazy(() => import("./pages/writer/WriterDashboard"));
 const WriterArticleEditor = lazy(() => import("./pages/writer/WriterArticleEditor"));
 const AdminPortal = lazy(() => import("./pages/AdminPortal"));
+const PodcasterApplication = lazy(() => import("./pages/PodcasterApplication"));
+const PodcasterApplicationsManagement = lazy(() => import("./pages/admin/PodcasterApplicationsManagement"));
 const MetsVsAstros = lazy(() => import("./pages/matchups/MetsVsAstros"));
 const MetsVsBraves = lazy(() => import("./pages/matchups/MetsVsBraves"));
 const MetsVsCardinals = lazy(() => import("./pages/matchups/MetsVsCardinals"));
@@ -242,6 +244,7 @@ const AppContent = () => {
             <Route path="/terms" element={<Terms />} />
             <Route path="/podcast" element={<Podcast />} />
             <Route path="/community-podcast" element={<CommunityPodcast />} />
+            <Route path="/podcaster-application" element={<PodcasterApplication />} />
             <Route path="/business-partner" element={<BusinessPartner />} />
             <Route path="/legal/admin-setup" element={<AdminSetup />} />
             <Route path="/admin-portal" element={<AdminPortal />} />
@@ -277,6 +280,7 @@ const AppContent = () => {
               <Route path="seo" element={<SEOManagement />} />
               <Route path="news-tracker" element={<NewsTrackerManagement />} />
               <Route path="game-notifications" element={<GameNotifications />} />
+              <Route path="podcaster-applications" element={<PodcasterApplicationsManagement />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="tutorials" element={<TutorialManagement />} />
             </Route>

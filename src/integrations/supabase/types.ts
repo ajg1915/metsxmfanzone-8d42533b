@@ -829,6 +829,66 @@ export type Database = {
         }
         Relationships: []
       }
+      podcaster_applications: {
+        Row: {
+          admin_notes: string | null
+          availability: string | null
+          created_at: string
+          email: string
+          equipment_description: string | null
+          experience: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          podcast_topic: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sample_url: string | null
+          social_links: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          availability?: string | null
+          created_at?: string
+          email: string
+          equipment_description?: string | null
+          experience?: string | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          podcast_topic: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sample_url?: string | null
+          social_links?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          availability?: string | null
+          created_at?: string
+          email?: string
+          equipment_description?: string | null
+          experience?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          podcast_topic?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sample_url?: string | null
+          social_links?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       podcasts: {
         Row: {
           audio_url: string
