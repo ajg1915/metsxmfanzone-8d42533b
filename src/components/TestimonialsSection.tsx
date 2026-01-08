@@ -37,11 +37,11 @@ const TestimonialsSection = () => {
 
       if (error) throw error;
 
-      // Fetch profiles for each feedback
       if (feedbacks && feedbacks.length > 0) {
-        const userIds = feedbacks.map(f => f.user_id);
+        // Fetch profiles using the profiles table directly
+        const userIds = [...new Set(feedbacks.map(f => f.user_id))];
         const { data: profiles } = await supabase
-          .from("public_profiles")
+          .from("profiles")
           .select("id, full_name, avatar_url")
           .in("id", userIds);
 
