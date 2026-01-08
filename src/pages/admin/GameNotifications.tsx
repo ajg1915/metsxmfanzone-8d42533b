@@ -87,7 +87,7 @@ const GameNotifications = () => {
     const stream = liveStreams.find(s => s.id === streamId);
     if (stream) {
       setTitle(`🔴 ${stream.title} - Going Live!`);
-      setBody(`${stream.title} is about to start! Tune in now to watch live on MetsXM FanZone.`);
+      setBody(`${stream.title} is about to start! Tune in now to watch live on MetsXMFanZone.`);
     }
   };
 

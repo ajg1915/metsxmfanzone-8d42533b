@@ -9,7 +9,7 @@ const thankYouMessages = [
   "We appreciate every moment you spend with us! You're what makes this fan zone special. ⚾",
   "Thanks for visiting! Your support means everything to our Mets community. See you soon! 🎉",
   "You're an amazing fan! We can't wait to see you back. Let's Go Mets! 💪",
-  "Thank you for your loyalty! The MetsXM Fanzone wouldn't be the same without you. 🏆",
+  "Thank you for your loyalty! The MetsXMFanZone wouldn't be the same without you. 🏆",
 ];
 
 const Logout = () => {

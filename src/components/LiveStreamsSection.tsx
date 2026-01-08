@@ -95,16 +95,8 @@ const LiveStreamsSection = () => {
     }
   };
 
-  const handleViewAllClick = () => {
-    if (subscriptionLoading) {
-      navigate("/live");
-      return;
-    }
-    if (isAdmin || tier === "premium" || tier === "annual") {
-      navigate("/live");
-    } else {
-      setShowUpgradePrompt(true);
-    }
+  const handleViewScheduleClick = () => {
+    navigate("/mets-schedule-2026");
   };
 
   const scroll = (direction: 'left' | 'right') => {
@@ -278,11 +270,11 @@ const LiveStreamsSection = () => {
           >
             <Button 
               variant="outline" 
-              onClick={handleViewAllClick}
+              onClick={handleViewScheduleClick}
               size="sm"
               className="text-xs sm:text-sm glass-card border-border/30 hover:border-primary/50"
             >
-              View All Streams
+              View Full 2026 Schedule
             </Button>
           </motion.div>
         </div>
