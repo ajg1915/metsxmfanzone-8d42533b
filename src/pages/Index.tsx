@@ -14,7 +14,7 @@ import HomeLineupCard from "@/components/HomeLineupCard";
 import PodcastSection from "@/components/PodcastSection";
 import HotStoveGuide from "@/components/HotStoveGuide";
 import StoriesSection from "@/components/StoriesSection";
-import MetsHistorySection from "@/components/MetsHistorySection";
+
 
 import FAQSection from "@/components/FAQSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -102,12 +102,7 @@ const Index = () => {
           <PodcastSection />
         </ScrollReveal>
         
-        <div className="section-divider my-4 sm:my-6" />
-        
-        <ScrollReveal>
-          <MetsHistorySection />
-        </ScrollReveal>
-        
+
         <div className="section-divider my-4 sm:my-6" />
         
         <ScrollReveal direction="scale">
