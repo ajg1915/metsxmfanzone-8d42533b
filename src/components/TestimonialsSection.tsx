@@ -12,6 +12,7 @@ interface Testimonial {
   content: string;
   rating: number | null;
   location: string | null;
+  display_name: string | null;
   created_at: string;
   user_id: string;
   profile?: {
@@ -28,19 +29,21 @@ const TestimonialsSection = () => {
   const [newReview, setNewReview] = useState("");
   const [newRating, setNewRating] = useState(5);
   const [newLocation, setNewLocation] = useState("");
+  const [newDisplayName, setNewDisplayName] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Get first name only
-  const getFirstName = (fullName: string | null | undefined): string => {
-    if (!fullName) return "Mets Fan";
-    return fullName.split(" ")[0];
+  // Get display name - prioritize custom display_name, then first name from profile
+  const getDisplayName = (testimonial: Testimonial): string => {
+    if (testimonial.display_name) return testimonial.display_name;
+    if (testimonial.profile?.full_name) return testimonial.profile.full_name.split(" ")[0];
+    return "Mets Fan";
   };
 
   const fetchTestimonials = async () => {
     try {
       const { data: feedbacks, error } = await supabase
         .from("feedbacks")
-        .select("id, content, rating, location, created_at, user_id")
+        .select("id, content, rating, location, display_name, created_at, user_id")
         .order("created_at", { ascending: false })
         .limit(4);
 
@@ -91,7 +94,8 @@ const TestimonialsSection = () => {
         user_id: user.id,
         content: newReview.trim(),
         rating: newRating,
-        location: newLocation.trim() || null
+        location: newLocation.trim() || null,
+        display_name: newDisplayName.trim() || null
       });
 
       if (error) throw error;
@@ -100,6 +104,7 @@ const TestimonialsSection = () => {
       setNewReview("");
       setNewRating(5);
       setNewLocation("");
+      setNewDisplayName("");
       setShowForm(false);
       fetchTestimonials();
     } catch (error) {
@@ -181,11 +186,11 @@ const TestimonialsSection = () => {
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-sm">
-                    {getFirstName(testimonial.profile?.full_name)?.charAt(0)?.toUpperCase() || "F"}
+                    {getDisplayName(testimonial)?.charAt(0)?.toUpperCase() || "F"}
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-foreground/80">
-                      {getFirstName(testimonial.profile?.full_name)}
+                      {getDisplayName(testimonial)}
                     </span>
                     {testimonial.location && (
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -234,6 +239,17 @@ const TestimonialsSection = () => {
                 />
                 <div className="mb-4">
                   <label className="block text-sm text-muted-foreground mb-2">
+                    Your Name (optional)
+                  </label>
+                  <Input
+                    value={newDisplayName}
+                    onChange={(e) => setNewDisplayName(e.target.value)}
+                    placeholder="How would you like to be called?"
+                    maxLength={30}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm text-muted-foreground mb-2">
                     Where are you from? (optional)
                   </label>
                   <Input
@@ -251,6 +267,7 @@ const TestimonialsSection = () => {
                       setNewReview("");
                       setNewRating(5);
                       setNewLocation("");
+                      setNewDisplayName("");
                     }}
                   >
                     Cancel
