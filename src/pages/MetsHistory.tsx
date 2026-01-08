@@ -124,7 +124,7 @@ const MetsHistory = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead 
-        title="Mets History - Blast from the Past | MetsXM FanZone"
+        title="Mets History - Blast from the Past | MetsXMFanZone"
         description="Relive the greatest moments in New York Mets history. From the Miracle Mets of 1969 to modern legends, explore the rich heritage of the Amazin's."
       />
       <Navigation />
