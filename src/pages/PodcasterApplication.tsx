@@ -197,10 +197,10 @@ export default function PodcasterApplication() {
               <span className="text-sm font-medium">Join Our Podcast Network</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Become a <span className="text-primary">MetsXM Podcaster</span>
+              Become a <span className="text-primary">MetsXMFanZone Podcaster</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Share your passion for Mets baseball with our community. Join our lineup of content creators and reach thousands of engaged fans.
+              Share your passion for Mets baseball with MetsXMFanZone and Orange and Blue Media. Join our lineup of content creators and reach thousands of engaged fans.
             </p>
           </motion.div>
 
@@ -274,7 +274,7 @@ export default function PodcasterApplication() {
                 <CardHeader>
                   <CardTitle>Apply to Become a Podcaster</CardTitle>
                   <CardDescription>
-                    Fill out the form below to join our podcast network
+                    Join MetsXMFanZone and Orange and Blue Media podcast network
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
