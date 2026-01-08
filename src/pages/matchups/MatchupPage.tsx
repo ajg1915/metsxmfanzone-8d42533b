@@ -196,7 +196,7 @@ export default function MatchupPage({
               </div>
 
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-foreground mb-2">
-                <span className="text-[#ff4500]">Mets</span> vs <span style={{ color: opponent.primaryColor }}>{opponent.name}</span>
+                <span className="text-[#ff4500]">Mets</span> vs <span className="text-white">{opponent.name}</span>
               </h1>
               
               <p className="text-muted-foreground text-sm sm:text-base max-w-xl">
