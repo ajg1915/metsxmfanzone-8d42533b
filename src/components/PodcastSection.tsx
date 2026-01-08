@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Music2, Facebook, Headphones, Music, Podcast, Radio } from "lucide-react";
+import { Play, Music2, Facebook, Headphones, Music, Podcast, Radio, Mic, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import logo from "@/assets/metsxmfanzone-logo.png";
@@ -154,10 +154,16 @@ const PodcastSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="text-center mt-8"
+              className="text-center mt-8 flex flex-wrap justify-center gap-4"
             >
               <Button size="lg" asChild className="glass-card border-primary/30 hover:border-primary/50">
                 <Link to="/podcast">View All Episodes</Link>
+              </Button>
+              <Button size="lg" asChild variant="outline" className="glass-card border-primary/30 hover:border-primary/50 hover:bg-primary/10">
+                <Link to="/podcaster-application" className="flex items-center gap-2">
+                  <Mic className="w-4 h-4" />
+                  Join Our Team
+                </Link>
               </Button>
             </motion.div>
           </div>

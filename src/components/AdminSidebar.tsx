@@ -66,6 +66,7 @@ const usersItems = [
   { title: "User Roles", url: "/admin/roles", icon: Shield },
   { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
   { title: "Writer Apps", url: "/admin/writer-applications", icon: PenLine },
+  { title: "Podcaster Apps", url: "/admin/podcaster-applications", icon: Mic },
 ];
 
 // Community Content - Posts, Feedback, Business Ads
