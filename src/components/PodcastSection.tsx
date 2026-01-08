@@ -159,12 +159,6 @@ const PodcastSection = () => {
               <Button size="lg" asChild className="glass-card border-primary/30 hover:border-primary/50">
                 <Link to="/podcast">View All Episodes</Link>
               </Button>
-              <Button size="lg" asChild variant="outline" className="glass-card border-primary/30 hover:border-primary/50 hover:bg-primary/10">
-                <Link to="/podcaster-application" className="flex items-center gap-2">
-                  <Mic className="w-4 h-4" />
-                  Join Our Team
-                </Link>
-              </Button>
             </motion.div>
           </div>
         )}
