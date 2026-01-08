@@ -17,6 +17,7 @@ import {
   Play, Radio, Calendar, ChevronRight, Award
 } from "lucide-react";
 import { motion } from "framer-motion";
+import logo from "@/assets/metsxmfanzone-logo.png";
 
 interface PlayerStats {
   name: string;
@@ -477,8 +478,8 @@ export default function MatchupPage({
               <Card className="border-2 border-primary bg-gradient-to-br from-primary/10 via-background to-[#FF5910]/10">
                 <CardHeader>
                   <div className="flex items-center gap-3">
-                    <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center">
-                      <Star className="w-7 h-7 text-primary-foreground" />
+                    <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden p-1">
+                      <img src={logo} alt="MetsXMFanZone" className="w-full h-full object-contain" />
                     </div>
                     <div>
                       <CardTitle className="text-xl">Anthony's Pick</CardTitle>
