@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
-import { Star, Quote, Send } from "lucide-react";
+import { Star, Quote, Send, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 interface Testimonial {
   id: string;
   content: string;
   rating: number | null;
+  location: string | null;
   created_at: string;
   user_id: string;
   profile?: {
@@ -25,13 +27,20 @@ const TestimonialsSection = () => {
   const [showForm, setShowForm] = useState(false);
   const [newReview, setNewReview] = useState("");
   const [newRating, setNewRating] = useState(5);
+  const [newLocation, setNewLocation] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // Get first name only
+  const getFirstName = (fullName: string | null | undefined): string => {
+    if (!fullName) return "Mets Fan";
+    return fullName.split(" ")[0];
+  };
 
   const fetchTestimonials = async () => {
     try {
       const { data: feedbacks, error } = await supabase
         .from("feedbacks")
-        .select("id, content, rating, created_at, user_id")
+        .select("id, content, rating, location, created_at, user_id")
         .order("created_at", { ascending: false })
         .limit(4);
 
@@ -81,7 +90,8 @@ const TestimonialsSection = () => {
       const { error } = await supabase.from("feedbacks").insert({
         user_id: user.id,
         content: newReview.trim(),
-        rating: newRating
+        rating: newRating,
+        location: newLocation.trim() || null
       });
 
       if (error) throw error;
@@ -89,6 +99,7 @@ const TestimonialsSection = () => {
       toast.success("Thank you for your review!");
       setNewReview("");
       setNewRating(5);
+      setNewLocation("");
       setShowForm(false);
       fetchTestimonials();
     } catch (error) {
@@ -170,11 +181,19 @@ const TestimonialsSection = () => {
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-sm">
-                    {testimonial.profile?.full_name?.charAt(0)?.toUpperCase() || "F"}
+                    {getFirstName(testimonial.profile?.full_name)?.charAt(0)?.toUpperCase() || "F"}
                   </div>
-                  <span className="text-sm font-medium text-foreground/80">
-                    {testimonial.profile?.full_name || "Mets Fan"}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-foreground/80">
+                      {getFirstName(testimonial.profile?.full_name)}
+                    </span>
+                    {testimonial.location && (
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {testimonial.location}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -213,6 +232,17 @@ const TestimonialsSection = () => {
                   className="mb-4 min-h-[100px]"
                   maxLength={500}
                 />
+                <div className="mb-4">
+                  <label className="block text-sm text-muted-foreground mb-2">
+                    Where are you from? (optional)
+                  </label>
+                  <Input
+                    value={newLocation}
+                    onChange={(e) => setNewLocation(e.target.value)}
+                    placeholder="e.g. Queens, NY"
+                    maxLength={50}
+                  />
+                </div>
                 <div className="flex gap-3 justify-end">
                   <Button
                     variant="outline"
@@ -220,6 +250,7 @@ const TestimonialsSection = () => {
                       setShowForm(false);
                       setNewReview("");
                       setNewRating(5);
+                      setNewLocation("");
                     }}
                   >
                     Cancel
