@@ -272,7 +272,7 @@ const LiveStreamsSection = () => {
               variant="outline" 
               onClick={handleViewScheduleClick}
               size="sm"
-              className="text-xs sm:text-sm glass-card border-border/30 hover:border-primary/50"
+              className="text-xs sm:text-sm glass-card border-border/30 hover:border-primary/50 text-[#ff4500]"
             >
               View Full 2026 Schedule
             </Button>
