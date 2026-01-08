@@ -95,15 +95,25 @@ const BlogSection = () => {
               <p className="text-sm text-muted-foreground">Stay updated with MetsXMFanZone</p>
             </div>
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => navigate("/blog")} 
-            className="group glass-card border-border/30 hover:border-primary/50 transition-all duration-300"
-          >
-            View All
-            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate("/whats-new")} 
+              className="group glass-card border-primary/50 bg-primary/10 hover:bg-primary/20 transition-all duration-300"
+            >
+              🎉 What's New
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate("/blog")} 
+              className="group glass-card border-border/30 hover:border-primary/50 transition-all duration-300"
+            >
+              View All
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
         </motion.div>
         
         {/* Posts Grid */}
