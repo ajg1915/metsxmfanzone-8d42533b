@@ -3,7 +3,7 @@ import {
   MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, 
   Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, 
   Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers, Sparkles, 
-  Tv, Newspaper
+  Tv, Newspaper, ClipboardList
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -79,6 +79,7 @@ const communityItems = [
 
 // Analytics & SEO
 const analyticsItems = [
+  { title: "Daily Reports", url: "/admin/daily-reports", icon: ClipboardList },
   { title: "Real-Time Stats", url: "/admin/realtime-analytics", icon: TrendingUp },
   { title: "Activity Logs", url: "/admin/activity", icon: Activity },
   { title: "SEO Settings", url: "/admin/seo", icon: Globe },
