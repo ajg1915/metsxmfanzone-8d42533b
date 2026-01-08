@@ -25,6 +25,7 @@ import AppInstallSection from "@/components/AppInstallSection";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 import NotificationPrompt from "@/components/NotificationPrompt";
 import ScrollReveal from "@/components/ScrollReveal";
+import WelcomeBackToast from "@/components/WelcomeBackToast";
 import { useEffect } from "react";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import { useAutoLineupFetch } from "@/hooks/useAutoLineupFetch";
@@ -40,6 +41,9 @@ const Index = () => {
   
   return (
     <div className="min-h-screen bg-background relative">
+      {/* Welcome back toast for returning users */}
+      <WelcomeBackToast />
+      
       {/* Immersive animated background */}
       <ImmersiveBackground />
       
