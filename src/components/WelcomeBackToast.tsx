@@ -137,7 +137,7 @@ export const WelcomeBackToast = () => {
           duration: 6000,
           action: {
             label: "View Updates",
-            onClick: () => window.location.href = "/blog",
+            onClick: () => window.location.href = "/whats-new",
           },
         });
 
