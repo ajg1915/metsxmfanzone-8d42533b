@@ -102,7 +102,8 @@ const BlogSection = () => {
               onClick={() => navigate("/whats-new")} 
               className="group glass-card border-primary/50 bg-primary/10 hover:bg-primary/20 transition-all duration-300"
             >
-              🎉 What's New
+              <img src={logo} alt="" className="w-4 h-4 object-contain" />
+              What's New
             </Button>
             <Button 
               variant="outline" 
