@@ -119,6 +119,12 @@ const WriterAuth = lazy(() => import("./pages/WriterAuth"));
 const WriterDashboard = lazy(() => import("./pages/writer/WriterDashboard"));
 const WriterArticleEditor = lazy(() => import("./pages/writer/WriterArticleEditor"));
 const AdminPortal = lazy(() => import("./pages/AdminPortal"));
+const MetsVsAstros = lazy(() => import("./pages/matchups/MetsVsAstros"));
+const MetsVsBraves = lazy(() => import("./pages/matchups/MetsVsBraves"));
+const MetsVsCardinals = lazy(() => import("./pages/matchups/MetsVsCardinals"));
+const MetsVsNationals = lazy(() => import("./pages/matchups/MetsVsNationals"));
+const MetsVsRedSox = lazy(() => import("./pages/matchups/MetsVsRedSox"));
+const MetsVsYankees = lazy(() => import("./pages/matchups/MetsVsYankees"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -294,6 +300,12 @@ const AppContent = () => {
             <Route path="/mlb-network" element={<MLBNetwork />} />
             <Route path="/espn-network" element={<ESPNNetwork />} />
             <Route path="/pix11-network" element={<PIX11Network />} />
+            <Route path="/matchup/astros" element={<MetsVsAstros />} />
+            <Route path="/matchup/braves" element={<MetsVsBraves />} />
+            <Route path="/matchup/cardinals" element={<MetsVsCardinals />} />
+            <Route path="/matchup/nationals" element={<MetsVsNationals />} />
+            <Route path="/matchup/redsox" element={<MetsVsRedSox />} />
+            <Route path="/matchup/yankees" element={<MetsVsYankees />} />
             <Route path="/sitemap.xml" element={<Sitemap />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

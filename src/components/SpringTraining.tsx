@@ -61,8 +61,10 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
           </div>
         ) : games && games.length > 0 ? (
           <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {games.slice(0, 6).map((game, index) => (
-              <Link key={game.id} to="/spring-training-live">
+            {games.slice(0, 6).map((game, index) => {
+              const opponentSlug = game.opponent.toLowerCase().replace(/\s+/g, '').replace('st.louis', 'cardinals').replace('houston', 'astros').replace('atlanta', 'braves').replace('washington', 'nationals').replace('boston', 'redsox').replace('newyork', 'yankees');
+              return (
+              <Link key={game.id} to={`/matchup/${opponentSlug}`}>
                 <GlassCard
                   variant="interactive"
                   glow="blue"
@@ -94,7 +96,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
                   </div>
                 </GlassCard>
               </Link>
-            ))}
+            );})}
           </div>
         ) : (
           <GlassCard variant="default" glow="blue" className="p-6 text-center">
