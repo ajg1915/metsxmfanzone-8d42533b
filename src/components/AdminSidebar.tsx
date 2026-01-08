@@ -33,6 +33,7 @@ const mediaItems = [
   { title: "Blog", url: "/admin/blog", icon: FileText },
   { title: "Stories", url: "/admin/stories", icon: Sparkles },
   { title: "Videos", url: "/admin/video-gallery-management", icon: Video },
+  { title: "Video Creator", url: "/admin/video-creator", icon: Film },
   { title: "Podcasts", url: "/admin/podcasts", icon: Mic },
   { title: "Newsletter", url: "/admin/newsletter", icon: Mail },
   { title: "Email Editor", url: "/admin/email-editor", icon: Send },
