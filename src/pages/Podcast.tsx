@@ -266,20 +266,31 @@ const Podcast = () => {
                     <CardDescription className="text-xs sm:text-sm">{liveStream.description}</CardDescription>
                   )}
                 </CardHeader>
-                <CardContent>
-                  <div className="aspect-video bg-black rounded-lg overflow-hidden mb-4">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                     <iframe
-                      src={liveStream.vdo_ninja_url?.includes('autostart') 
-                        ? liveStream.vdo_ninja_url 
-                        : `${liveStream.vdo_ninja_url}&autostart&cleanoutput`}
-                      className="w-full h-full"
-                      allow="camera; microphone; autoplay; fullscreen"
+                      src={(() => {
+                        let url = liveStream.vdo_ninja_url || '';
+                        // Add essential params for audio and clean display
+                        if (!url.includes('autostart')) url += '&autostart';
+                        if (!url.includes('cleanoutput')) url += '&cleanoutput';
+                        if (!url.includes('muted=0')) url += '&muted=0';
+                        if (!url.includes('noaudio') && !url.includes('audio')) url += '&audio';
+                        return url;
+                      })()}
+                      className="absolute inset-0 w-full h-full rounded-lg"
+                      style={{ border: 'none' }}
+                      allow="camera; microphone; autoplay; fullscreen; display-capture; picture-in-picture"
                       allowFullScreen
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground text-center">
-                    📺 You're watching the live podcast stream
-                  </p>
+                  <div className="flex items-center justify-center gap-2 mt-3">
+                    <span className="text-xs text-muted-foreground">
+                      📺 Live Podcast Stream
+                    </span>
+                    <span className="text-xs text-muted-foreground">•</span>
+                    <span className="text-xs text-green-500 font-medium">🔊 Audio Enabled</span>
+                  </div>
                 </CardContent>
               </Card>
             </section>
