@@ -464,6 +464,33 @@ const StoriesManagement = () => {
     }
   };
 
+  const handleDownloadGeneratedImage = async () => {
+    if (!generatedImageUrl) return;
+
+    try {
+      const response = await fetch(generatedImageUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ai_generated_${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({ title: "Success", description: "Image downloaded!" });
+    } catch (error: any) {
+      console.error("Error downloading image:", error);
+      toast({
+        title: "Error",
+        description: "Failed to download image",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
       <div className="flex justify-between items-center">
@@ -628,15 +655,26 @@ const StoriesManagement = () => {
                   className="w-full h-48 object-cover"
                 />
               </div>
-              <Button
-                onClick={handleUseGeneratedImage}
-                variant="default"
-                size="sm"
-                className="w-full"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Use Image as Story
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleDownloadGeneratedImage}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
+                </Button>
+                <Button
+                  onClick={handleUseGeneratedImage}
+                  variant="default"
+                  size="sm"
+                  className="flex-1"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Use as Story
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
