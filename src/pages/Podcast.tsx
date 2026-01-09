@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Mic, Radio, Music2, Facebook, Headphones, Music, Podcast as PodcastIcon, Video } from "lucide-react";
+import { Play, Mic, Radio, Music2, Facebook, Headphones, Music, Podcast as PodcastIcon, Video, Volume2, Maximize2, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import { supabase } from "@/integrations/supabase/client";
@@ -73,6 +73,9 @@ const Podcast = () => {
   const [episodes, setEpisodes] = useState<PodcastEpisode[]>([]);
   const [loading, setLoading] = useState(true);
   const [liveStream, setLiveStream] = useState<PodcastLiveStream | null>(null);
+  const [playerEnabled, setPlayerEnabled] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const playerContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetchEpisodes();
@@ -150,6 +153,71 @@ const Podcast = () => {
     if (diffDays === 1) return "Yesterday";
     if (diffDays < 7) return `${diffDays} days ago`;
     return date.toLocaleDateString();
+  };
+
+  useEffect(() => {
+    // Reset the embed when the stream link changes (new show / new VDO.Ninja link)
+    setPlayerEnabled(false);
+  }, [liveStream?.vdo_ninja_url]);
+
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
+  const buildVdoNinjaUrl = (rawUrl: string, opts: { autostart?: boolean }) => {
+    const trimmed = rawUrl.trim();
+    if (!trimmed) return "";
+
+    const [beforeHash, hash] = trimmed.split("#", 2);
+    let base = beforeHash;
+    let hasQuery = base.includes("?");
+
+    const ensureFlag = (flag: string) => {
+      if (base.includes(flag)) return;
+      const sep = hasQuery ? (base.endsWith("?") || base.endsWith("&") ? "" : "&") : "?";
+      base += `${sep}${flag}`;
+      hasQuery = true;
+    };
+
+    // We only autostart after a user interaction; improves mobile audio reliability.
+    if (opts.autostart) ensureFlag("autostart");
+
+    return hash ? `${base}#${hash}` : base;
+  };
+
+  const vdoEmbedUrl = useMemo(() => {
+    if (!liveStream?.vdo_ninja_url) return "";
+    return buildVdoNinjaUrl(liveStream.vdo_ninja_url, { autostart: playerEnabled });
+  }, [liveStream?.vdo_ninja_url, playerEnabled]);
+
+  const vdoOpenUrl = useMemo(() => {
+    if (!liveStream?.vdo_ninja_url) return "";
+    return buildVdoNinjaUrl(liveStream.vdo_ninja_url, { autostart: true });
+  }, [liveStream?.vdo_ninja_url]);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        return;
+      }
+
+      const el = playerContainerRef.current;
+      if (!el || !el.requestFullscreen) {
+        if (vdoOpenUrl) window.open(vdoOpenUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      await el.requestFullscreen();
+    } catch (e) {
+      console.warn("Fullscreen not available on this device/browser.", e);
+      if (vdoOpenUrl) window.open(vdoOpenUrl, "_blank", "noopener,noreferrer");
+    }
   };
 
   const liveShows = [
@@ -267,29 +335,62 @@ const Podcast = () => {
                   )}
                 </CardHeader>
                 <CardContent className="p-2 sm:p-4">
-                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                    <iframe
-                      src={(() => {
-                        let url = liveStream.vdo_ninja_url || '';
-                        // Add essential params for audio and clean display
-                        if (!url.includes('autostart')) url += '&autostart';
-                        if (!url.includes('cleanoutput')) url += '&cleanoutput';
-                        if (!url.includes('muted=0')) url += '&muted=0';
-                        if (!url.includes('noaudio') && !url.includes('audio')) url += '&audio';
-                        return url;
-                      })()}
-                      className="absolute inset-0 w-full h-full rounded-lg"
-                      style={{ border: 'none' }}
-                      allow="camera; microphone; autoplay; fullscreen; display-capture; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                  <div className="flex items-center justify-center gap-2 mt-3">
-                    <span className="text-xs text-muted-foreground">
-                      📺 Live Podcast Stream
-                    </span>
-                    <span className="text-xs text-muted-foreground">•</span>
-                    <span className="text-xs text-green-500 font-medium">🔊 Audio Enabled</span>
+                  <div className="mx-auto w-full max-w-5xl">
+                    <div
+                      ref={playerContainerRef}
+                      className="relative w-full rounded-lg bg-muted"
+                      style={
+                        isFullscreen
+                          ? { height: "100%" }
+                          : { paddingBottom: "56.25%" }
+                      }
+                    >
+                      {playerEnabled ? (
+                        <iframe
+                          src={vdoEmbedUrl}
+                          className="absolute inset-0 h-full w-full rounded-lg"
+                          style={{ border: "none" }}
+                          allow="camera; microphone; autoplay; fullscreen; display-capture; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+                          <p className="text-sm font-medium text-foreground">Ready to watch the live podcast?</p>
+                          <p className="text-xs text-muted-foreground max-w-xs">
+                            Tap start to enable audio reliably, then use the player controls for volume and fullscreen.
+                          </p>
+                          <Button type="button" onClick={() => setPlayerEnabled(true)} className="gap-2">
+                            <Volume2 className="h-4 w-4" />
+                            Start Stream
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="text-xs text-muted-foreground text-center sm:text-left">
+                        If you don’t hear audio, tap inside the player and unmute.
+                      </p>
+                      <div className="flex items-center justify-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          onClick={toggleFullscreen}
+                          disabled={!playerEnabled}
+                        >
+                          <Maximize2 className="h-4 w-4" />
+                          {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                        </Button>
+                        <Button type="button" variant="outline" size="sm" className="gap-2" asChild>
+                          <a href={vdoOpenUrl} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4" />
+                            Open
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
