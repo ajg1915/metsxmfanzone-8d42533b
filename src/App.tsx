@@ -11,6 +11,7 @@ import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import { usePresenceTracking } from "@/hooks/usePresenceTracking";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { StreamExitDialog } from "@/components/StreamExitDialog";
+import { LiveStreamToast } from "@/components/LiveStreamToast";
 import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -199,6 +200,7 @@ const AppContent = () => {
       <PullToRefresh>
         <Toaster />
         <Sonner />
+        <LiveStreamToast />
         <ExitIntentPopup />
         <StreamExitDialog />
         <Suspense fallback={<PageLoader />}>
