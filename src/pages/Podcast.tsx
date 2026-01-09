@@ -269,7 +269,9 @@ const Podcast = () => {
                 <CardContent>
                   <div className="aspect-video bg-black rounded-lg overflow-hidden mb-4">
                     <iframe
-                      src={liveStream.vdo_ninja_url}
+                      src={liveStream.vdo_ninja_url?.includes('autostart') 
+                        ? liveStream.vdo_ninja_url 
+                        : `${liveStream.vdo_ninja_url}&autostart&cleanoutput`}
                       className="w-full h-full"
                       allow="camera; microphone; autoplay; fullscreen"
                       allowFullScreen

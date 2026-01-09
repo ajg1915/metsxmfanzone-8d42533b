@@ -103,8 +103,8 @@ const PodcastLiveStreamManagement = () => {
     
     // VDO.Ninja push URL (for broadcasting from phone)
     const pushUrl = `https://vdo.ninja/?push=${newRoomId}&webcam&quality=2`;
-    // VDO.Ninja view URL (for viewers)
-    const viewUrl = `https://vdo.ninja/?view=${newRoomId}`;
+    // VDO.Ninja view URL (for viewers) - with autostart and cleanoutput for embed
+    const viewUrl = `https://vdo.ninja/?view=${newRoomId}&autostart&cleanoutput`;
     
     setStream(prev => prev ? { ...prev, vdo_ninja_url: viewUrl } : null);
     
@@ -134,7 +134,7 @@ const PodcastLiveStreamManagement = () => {
     
     setSaving(true);
     try {
-      const viewUrl = `https://vdo.ninja/?view=${roomId}`;
+      const viewUrl = `https://vdo.ninja/?view=${roomId}&autostart&cleanoutput`;
       
       const { error } = await supabase
         .from("podcast_live_stream")
@@ -217,7 +217,7 @@ const PodcastLiveStreamManagement = () => {
   }
 
   const pushUrl = `https://vdo.ninja/?push=${roomId}&webcam&quality=2`;
-  const viewUrl = `https://vdo.ninja/?view=${roomId}`;
+  const viewUrl = `https://vdo.ninja/?view=${roomId}&autostart&cleanoutput`;
 
   return (
     <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
