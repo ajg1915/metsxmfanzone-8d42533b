@@ -130,11 +130,18 @@ const PodcastLiveStreamManagement = () => {
   };
 
   const goLive = async () => {
-    if (!stream) return;
+    if (!stream || !stream.vdo_ninja_url) return;
     
     setSaving(true);
     try {
-      const viewUrl = `https://vdo.ninja/?view=${roomId}&autostart&cleanoutput`;
+      // Ensure the URL has autostart & cleanoutput for embedding
+      let viewUrl = stream.vdo_ninja_url;
+      if (!viewUrl.includes('autostart')) {
+        viewUrl = viewUrl.includes('?') ? `${viewUrl}&autostart` : `${viewUrl}?autostart`;
+      }
+      if (!viewUrl.includes('cleanoutput')) {
+        viewUrl = `${viewUrl}&cleanoutput`;
+      }
       
       const { error } = await supabase
         .from("podcast_live_stream")
@@ -150,7 +157,7 @@ const PodcastLiveStreamManagement = () => {
       
       toast({
         title: "🔴 You're Live!",
-        description: "Your podcast is now streaming. Open the broadcast link on your phone.",
+        description: "Your podcast is now streaming!",
       });
     } catch (error) {
       console.error("Error going live:", error);
@@ -242,74 +249,31 @@ const PodcastLiveStreamManagement = () => {
             Quick Start
           </CardTitle>
           <CardDescription className="text-xs">
-            Start streaming in 3 steps
+            Paste your VDO.Ninja view link and go live
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 px-3">
-          {/* Step 1: Generate Link */}
+          {/* Step 1: Paste VDO.Ninja URL */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">1</span>
-              <Label className="text-xs font-medium">Generate Broadcast Link</Label>
+              <Label className="text-xs font-medium">Paste Your VDO.Ninja View Link</Label>
             </div>
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={generateBroadcastLink}
-                className="h-8 text-xs"
-              >
-                <RefreshCw className="w-3 h-3 mr-1" />
-                New Link
-              </Button>
-              <Input 
-                value={roomId} 
-                readOnly 
-                className="h-8 text-xs flex-1 font-mono"
-              />
-            </div>
+            <Input 
+              value={stream.vdo_ninja_url || ""} 
+              onChange={(e) => setStream({ ...stream, vdo_ninja_url: e.target.value })}
+              placeholder="https://vdo.ninja/?view=YOUR_ROOM_ID"
+              className="h-9 text-xs font-mono"
+            />
+            <p className="text-[10px] text-muted-foreground">
+              💡 Get this from VDO.Ninja after you start broadcasting. It's the "view" link, not "push".
+            </p>
           </div>
 
-          {/* Step 2: Open on Phone */}
+          {/* Step 2: Go Live */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">2</span>
-              <Label className="text-xs font-medium">Open on Your Phone</Label>
-            </div>
-            <div className="bg-muted/50 p-2 rounded-lg space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <code className="text-[10px] text-muted-foreground break-all flex-1">
-                  {pushUrl}
-                </code>
-                <div className="flex gap-1">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => copyToClipboard(pushUrl, "Broadcast link")}
-                    className="h-7 w-7 p-0"
-                  >
-                    <Copy className="w-3 h-3" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={openBroadcastLink}
-                    className="h-7 w-7 p-0"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                  </Button>
-                </div>
-              </div>
-              <p className="text-[10px] text-muted-foreground">
-                📱 Copy this link and open it in your phone's browser. Allow camera & mic access.
-              </p>
-            </div>
-          </div>
-
-          {/* Step 3: Go Live */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">3</span>
               <Label className="text-xs font-medium">Go Live!</Label>
             </div>
             {stream.is_live ? (
@@ -327,7 +291,7 @@ const PodcastLiveStreamManagement = () => {
               <Button 
                 size="sm" 
                 onClick={goLive} 
-                disabled={saving}
+                disabled={saving || !stream.vdo_ninja_url}
                 className="w-full h-10 bg-red-600 hover:bg-red-700"
               >
                 {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Radio className="w-4 h-4 mr-2" />}
@@ -368,11 +332,12 @@ const PodcastLiveStreamManagement = () => {
           </div>
 
           <div className="space-y-1">
-            <Label className="text-xs">Viewer URL (auto-generated)</Label>
+            <Label className="text-xs">VDO.Ninja Viewer URL</Label>
             <Input
-              value={stream.vdo_ninja_url || viewUrl}
-              readOnly
-              className="h-8 text-xs font-mono bg-muted/50"
+              value={stream.vdo_ninja_url || ""}
+              onChange={(e) => setStream({ ...stream, vdo_ninja_url: e.target.value })}
+              className="h-8 text-xs font-mono"
+              placeholder="https://vdo.ninja/?view=your-room-id"
             />
           </div>
 
