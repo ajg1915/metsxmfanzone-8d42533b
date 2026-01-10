@@ -351,6 +351,42 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_player_predictions: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          player_id: number | null
+          player_image_url: string | null
+          player_name: string
+          prediction_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          player_id?: number | null
+          player_image_url?: string | null
+          player_name: string
+          prediction_date?: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          player_id?: number | null
+          player_image_url?: string | null
+          player_name?: string
+          prediction_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_confirmation_tokens: {
         Row: {
           confirmed_at: string | null
