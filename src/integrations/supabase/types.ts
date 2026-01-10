@@ -1796,6 +1796,7 @@ export type Database = {
         Returns: boolean
       }
       is_writer: { Args: { _user_id: string }; Returns: boolean }
+      trigger_daily_predictions: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "writer"

@@ -64,9 +64,9 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Select 4-6 random players for today's predictions
+    // Select 4 random players for today's predictions
     const shuffled = [...metsPlayers].sort(() => 0.5 - Math.random());
-    const selectedPlayers = shuffled.slice(0, 5);
+    const selectedPlayers = shuffled.slice(0, 4);
 
     // Generate AI predictions for each player
     const prompt = `You are a Mets baseball analyst. For each of these Mets players, determine if they are currently "hot" or "cold" based on typical spring training performance patterns and provide a brief betting tip or prediction. Be realistic and vary between hot and cold.
