@@ -333,14 +333,14 @@ const PlayersToWatch = () => {
                       </div>
 
                       {/* Player Info */}
-                      <div className="p-3 sm:p-4">
-                        <h3 className="font-bold text-white text-sm sm:text-base mb-2 truncate">
+                      <div className="p-2 sm:p-3 md:p-4">
+                        <h3 className="font-bold text-white text-xs sm:text-sm md:text-base mb-1 sm:mb-2 truncate">
                           {player.player_name}
                         </h3>
-                        <p className="text-xs text-muted-foreground line-clamp-3">
+                        <p className="text-[10px] sm:text-xs text-muted-foreground leading-relaxed">
                           {player.description}
                         </p>
-                        <p className="text-xs text-primary mt-2 font-medium">
+                        <p className="text-[10px] sm:text-xs text-primary mt-1 sm:mt-2 font-medium">
                           Tap for stats →
                         </p>
                       </div>
