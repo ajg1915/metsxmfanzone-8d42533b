@@ -85,9 +85,9 @@ serve(async (req) => {
     const metsPlayers = await fetchMetsRoster();
     console.log(`Fetched ${metsPlayers.length} players from Mets roster`);
 
-    // Select 4 random players for today's predictions
+    // Select 6 random players for today's predictions
     const shuffled = [...metsPlayers].sort(() => 0.5 - Math.random());
-    const selectedPlayers = shuffled.slice(0, 4);
+    const selectedPlayers = shuffled.slice(0, 6);
 
     // Generate AI predictions for each player
     const prompt = `You are Anthony, a passionate Mets baseball analyst and betting expert. For each of these current Mets players, determine if they are currently "hot" or "cold" based on typical performance patterns and provide a brief betting tip or prediction. Be realistic and vary between hot and cold. Make your tips sound like insider knowledge.
