@@ -124,6 +124,7 @@ const PodcasterApplication = lazy(() => import("./pages/PodcasterApplication"));
 const PodcasterApplicationsManagement = lazy(() => import("./pages/admin/PodcasterApplicationsManagement"));
 const VideoCreatorStudio = lazy(() => import("./pages/admin/VideoCreatorStudio"));
 const DailyReports = lazy(() => import("./pages/admin/DailyReports"));
+const PredictionsManagement = lazy(() => import("./pages/admin/PredictionsManagement"));
 const WhatsNew = lazy(() => import("./pages/WhatsNew"));
 const MetsVsAstros = lazy(() => import("./pages/matchups/MetsVsAstros"));
 const MetsVsBraves = lazy(() => import("./pages/matchups/MetsVsBraves"));
@@ -289,6 +290,7 @@ const AppContent = () => {
               <Route path="podcaster-applications" element={<PodcasterApplicationsManagement />} />
               <Route path="video-creator" element={<VideoCreatorStudio />} />
               <Route path="daily-reports" element={<DailyReports />} />
+              <Route path="predictions" element={<PredictionsManagement />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="tutorials" element={<TutorialManagement />} />
             </Route>
