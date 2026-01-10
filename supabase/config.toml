@@ -86,3 +86,6 @@ verify_jwt = false
 
 [functions.admin-pin-login]
 verify_jwt = false
+
+[functions.generate-daily-predictions]
+verify_jwt = false
