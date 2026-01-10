@@ -27,9 +27,20 @@ const Hero = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     dragFree: false,
-    watchDrag: true,
-    duration: 20,
+    watchDrag: false, // Disable drag for fade effect
+    duration: 0, // Instant snap for fade transition
   });
+
+  // Auto-advance slides every 10 seconds
+  useEffect(() => {
+    if (!emblaApi) return;
+    
+    const autoplay = setInterval(() => {
+      emblaApi.scrollNext();
+    }, 10000);
+    
+    return () => clearInterval(autoplay);
+  }, [emblaApi]);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [activeTab, setActiveTab] = useState("overview");
