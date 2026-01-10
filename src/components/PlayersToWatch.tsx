@@ -4,6 +4,7 @@ import { Flame, Snowflake, TrendingUp, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
+import GlassCard from "@/components/GlassCard";
 
 interface PlayerPrediction {
   id: string;
@@ -145,6 +146,7 @@ const PlayersToWatch = () => {
   return (
     <section className="py-8 sm:py-12 px-4 sm:px-6">
       <div className="container mx-auto max-w-6xl">
+        <GlassCard glow="blue" className="p-6 sm:p-8">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-6 sm:mb-8">
           <div className="flex items-center gap-3">
@@ -395,6 +397,7 @@ const PlayersToWatch = () => {
             🎲 Predictions for entertainment purposes. Always bet responsibly.
           </p>
         )}
+        </GlassCard>
       </div>
     </section>
   );
