@@ -202,7 +202,7 @@ const PlayersToWatch = () => {
 
         {/* Player Cards Grid */}
         {predictions && predictions.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {predictions.map((player) => {
               const stats = player.player_id ? playerStats[player.player_id] : null;
               const isFlipped = flippedCards[player.id];
