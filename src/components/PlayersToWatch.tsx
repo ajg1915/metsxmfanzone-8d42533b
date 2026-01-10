@@ -27,12 +27,21 @@ interface PlayerStats {
   strikeouts?: number;
   whip?: string;
   isPitcher?: boolean;
+  position?: string;
+}
+
+interface PositionPlayer {
+  name: string;
+  position: string;
+  status: "hot" | "cold";
+  imageUrl: string | null;
 }
 
 const PlayersToWatch = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [playerStats, setPlayerStats] = useState<Record<number, PlayerStats>>({});
   const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+  const [depthChart, setDepthChart] = useState<Record<string, PositionPlayer>>({});
 
   const { data: predictions, isLoading, refetch } = useQuery({
     queryKey: ["daily-player-predictions"],
@@ -50,25 +59,35 @@ const PlayersToWatch = () => {
     },
   });
 
-  // Fetch player stats from MLB API
+  // Fetch player stats and positions from MLB API
   useEffect(() => {
-    const fetchPlayerStats = async () => {
+    const fetchPlayerData = async () => {
       if (!predictions || predictions.length === 0) return;
 
       const statsMap: Record<number, PlayerStats> = {};
+      const newDepthChart: Record<string, PositionPlayer> = {};
       const currentYear = new Date().getFullYear();
 
       for (const player of predictions) {
         if (!player.player_id) continue;
 
         try {
-          // Fetch player stats from MLB API
-          const response = await fetch(
-            `https://statsapi.mlb.com/api/v1/people/${player.player_id}/stats?stats=season&season=${currentYear}&group=hitting,pitching`
-          );
+          // Fetch player info including position
+          const [statsResponse, infoResponse] = await Promise.all([
+            fetch(`https://statsapi.mlb.com/api/v1/people/${player.player_id}/stats?stats=season&season=${currentYear}&group=hitting,pitching`),
+            fetch(`https://statsapi.mlb.com/api/v1/people/${player.player_id}`)
+          ]);
           
-          if (response.ok) {
-            const data = await response.json();
+          let position = "UTIL";
+          
+          if (infoResponse.ok) {
+            const infoData = await infoResponse.json();
+            const playerInfo = infoData.people?.[0];
+            position = playerInfo?.primaryPosition?.abbreviation || "UTIL";
+          }
+          
+          if (statsResponse.ok) {
+            const data = await statsResponse.json();
             const stats = data.stats || [];
             
             // Check if pitcher or hitter
@@ -83,6 +102,7 @@ const PlayersToWatch = () => {
                 losses: pitchingStats.losses || 0,
                 strikeouts: pitchingStats.strikeOuts || 0,
                 whip: pitchingStats.whip || "0.00",
+                position,
               };
             } else if (hittingStats) {
               statsMap[player.player_id] = {
@@ -91,6 +111,7 @@ const PlayersToWatch = () => {
                 hr: hittingStats.homeRuns || 0,
                 rbi: hittingStats.rbi || 0,
                 ops: hittingStats.ops || ".000",
+                position,
               };
             } else {
               // No stats yet (spring training)
@@ -100,18 +121,48 @@ const PlayersToWatch = () => {
                 hr: 0,
                 rbi: 0,
                 ops: ".---",
+                position,
               };
             }
           }
+          
+          // Map position to depth chart slot
+          const positionMap: Record<string, string> = {
+            "P": "P", "SP": "P", "RP": "P",
+            "C": "C",
+            "1B": "1B",
+            "2B": "2B",
+            "3B": "3B",
+            "SS": "SS",
+            "LF": "LF",
+            "CF": "CF",
+            "RF": "RF",
+            "OF": "CF", // Default outfielders to CF if not specific
+            "DH": "DH",
+            "UTIL": "DH"
+          };
+          
+          const mappedPosition = positionMap[position] || "DH";
+          
+          // Only add if position not already filled (first player gets priority)
+          if (!newDepthChart[mappedPosition]) {
+            newDepthChart[mappedPosition] = {
+              name: player.player_name.split(" ").pop() || player.player_name, // Last name only
+              position: mappedPosition,
+              status: player.status,
+              imageUrl: player.player_image_url
+            };
+          }
         } catch (error) {
-          console.error(`Failed to fetch stats for player ${player.player_id}:`, error);
+          console.error(`Failed to fetch data for player ${player.player_id}:`, error);
         }
       }
 
       setPlayerStats(statsMap);
+      setDepthChart(newDepthChart);
     };
 
-    fetchPlayerStats();
+    fetchPlayerData();
   }, [predictions]);
 
   const generatePredictions = async () => {
@@ -442,47 +493,89 @@ const PlayersToWatch = () => {
                 </defs>
               </svg>
               
-              {/* Position Badges */}
-              <div className="absolute inset-0 pointer-events-none">
+              {/* Position Badges with Player Names */}
+              <div className="absolute inset-0">
                 {/* Pitcher */}
-                <div className="absolute left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-primary/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">P</span>
+                <div className="absolute left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["P"] ? (depthChart["P"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-primary/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[8px] opacity-70">P</span>
+                    <span>{depthChart["P"]?.name || "—"}</span>
+                  </div>
                 </div>
                 {/* Catcher */}
-                <div className="absolute left-1/2 top-[82%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-primary/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">C</span>
+                <div className="absolute left-1/2 top-[82%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["C"] ? (depthChart["C"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-primary/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[8px] opacity-70">C</span>
+                    <span>{depthChart["C"]?.name || "—"}</span>
+                  </div>
                 </div>
                 {/* First Base */}
-                <div className="absolute left-[72%] top-[58%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-blue-500/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">1B</span>
+                <div className="absolute left-[72%] top-[58%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["1B"] ? (depthChart["1B"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[8px] opacity-70">1B</span>
+                    <span>{depthChart["1B"]?.name || "—"}</span>
+                  </div>
                 </div>
                 {/* Second Base */}
-                <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-blue-500/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">2B</span>
+                <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["2B"] ? (depthChart["2B"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[8px] opacity-70">2B</span>
+                    <span>{depthChart["2B"]?.name || "—"}</span>
+                  </div>
                 </div>
                 {/* Third Base */}
-                <div className="absolute left-[28%] top-[58%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-blue-500/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">3B</span>
+                <div className="absolute left-[28%] top-[58%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["3B"] ? (depthChart["3B"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[8px] opacity-70">3B</span>
+                    <span>{depthChart["3B"]?.name || "—"}</span>
+                  </div>
                 </div>
                 {/* Shortstop */}
-                <div className="absolute left-[38%] top-[48%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-blue-500/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">SS</span>
+                <div className="absolute left-[38%] top-[48%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["SS"] ? (depthChart["SS"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[8px] opacity-70">SS</span>
+                    <span>{depthChart["SS"]?.name || "—"}</span>
+                  </div>
                 </div>
                 {/* Left Field */}
-                <div className="absolute left-[18%] top-[32%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-green-600/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">LF</span>
+                <div className="absolute left-[18%] top-[32%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["LF"] ? (depthChart["LF"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-green-600/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[8px] opacity-70">LF</span>
+                    <span>{depthChart["LF"]?.name || "—"}</span>
+                  </div>
                 </div>
                 {/* Center Field */}
-                <div className="absolute left-1/2 top-[18%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-green-600/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">CF</span>
+                <div className="absolute left-1/2 top-[18%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["CF"] ? (depthChart["CF"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-green-600/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[8px] opacity-70">CF</span>
+                    <span>{depthChart["CF"]?.name || "—"}</span>
+                  </div>
                 </div>
                 {/* Right Field */}
-                <div className="absolute left-[82%] top-[32%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-green-600/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">RF</span>
+                <div className="absolute left-[82%] top-[32%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["RF"] ? (depthChart["RF"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-green-600/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[8px] opacity-70">RF</span>
+                    <span>{depthChart["RF"]?.name || "—"}</span>
+                  </div>
                 </div>
                 {/* DH - off to the side */}
-                <div className="absolute left-[92%] top-[75%] -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-purple-500/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">DH</span>
+                <div className="absolute left-[92%] top-[75%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["DH"] ? (depthChart["DH"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-purple-500/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[8px] opacity-70">DH</span>
+                    <span>{depthChart["DH"]?.name || "—"}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Legend */}
+              <div className="flex justify-center gap-4 mt-4 text-xs">
+                <div className="flex items-center gap-1">
+                  <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                  <span className="text-muted-foreground">Hot</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-3 h-3 rounded-full bg-blue-400"></span>
+                  <span className="text-muted-foreground">Cold</span>
                 </div>
               </div>
             </div>
