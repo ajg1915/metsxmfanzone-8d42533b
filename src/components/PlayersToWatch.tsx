@@ -392,6 +392,103 @@ const PlayersToWatch = () => {
           </div>
         )}
 
+        {/* Baseball Field Depth Chart */}
+        {predictions && predictions.length > 0 && (
+          <div className="mt-8 relative">
+            <h3 className="text-lg font-semibold text-white mb-4 text-center">Depth Chart</h3>
+            <div className="relative w-full max-w-lg mx-auto aspect-square">
+              {/* Faded Baseball Field SVG */}
+              <svg
+                viewBox="0 0 400 400"
+                className="w-full h-full opacity-30"
+                style={{ filter: 'drop-shadow(0 0 20px rgba(255, 69, 0, 0.3))' }}
+              >
+                {/* Outfield grass arc */}
+                <path
+                  d="M 200 380 L 20 200 A 250 250 0 0 1 380 200 Z"
+                  fill="url(#fieldGradient)"
+                  stroke="rgba(255, 255, 255, 0.2)"
+                  strokeWidth="2"
+                />
+                {/* Infield diamond */}
+                <path
+                  d="M 200 320 L 120 240 L 200 160 L 280 240 Z"
+                  fill="url(#infieldGradient)"
+                  stroke="rgba(255, 255, 255, 0.3)"
+                  strokeWidth="2"
+                />
+                {/* Base paths */}
+                <line x1="200" y1="320" x2="120" y2="240" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="2" />
+                <line x1="120" y1="240" x2="200" y2="160" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="2" />
+                <line x1="200" y1="160" x2="280" y2="240" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="2" />
+                <line x1="280" y1="240" x2="200" y2="320" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="2" />
+                {/* Pitcher's mound */}
+                <circle cx="200" cy="260" r="8" fill="rgba(255, 69, 0, 0.5)" />
+                {/* Bases */}
+                <rect x="195" y="315" width="10" height="10" fill="white" transform="rotate(45, 200, 320)" />
+                <rect x="115" y="235" width="10" height="10" fill="white" transform="rotate(45, 120, 240)" />
+                <rect x="195" y="155" width="10" height="10" fill="white" transform="rotate(45, 200, 160)" />
+                <rect x="275" y="235" width="10" height="10" fill="white" transform="rotate(45, 280, 240)" />
+                {/* Gradients */}
+                <defs>
+                  <radialGradient id="fieldGradient" cx="50%" cy="100%" r="100%">
+                    <stop offset="0%" stopColor="rgba(34, 139, 34, 0.4)" />
+                    <stop offset="100%" stopColor="rgba(0, 100, 0, 0.2)" />
+                  </radialGradient>
+                  <linearGradient id="infieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(139, 90, 43, 0.4)" />
+                    <stop offset="100%" stopColor="rgba(101, 67, 33, 0.3)" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              
+              {/* Position Badges */}
+              <div className="absolute inset-0 pointer-events-none">
+                {/* Pitcher */}
+                <div className="absolute left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2">
+                  <span className="bg-primary/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">P</span>
+                </div>
+                {/* Catcher */}
+                <div className="absolute left-1/2 top-[82%] -translate-x-1/2 -translate-y-1/2">
+                  <span className="bg-primary/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">C</span>
+                </div>
+                {/* First Base */}
+                <div className="absolute left-[72%] top-[58%] -translate-x-1/2 -translate-y-1/2">
+                  <span className="bg-blue-500/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">1B</span>
+                </div>
+                {/* Second Base */}
+                <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2">
+                  <span className="bg-blue-500/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">2B</span>
+                </div>
+                {/* Third Base */}
+                <div className="absolute left-[28%] top-[58%] -translate-x-1/2 -translate-y-1/2">
+                  <span className="bg-blue-500/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">3B</span>
+                </div>
+                {/* Shortstop */}
+                <div className="absolute left-[38%] top-[48%] -translate-x-1/2 -translate-y-1/2">
+                  <span className="bg-blue-500/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">SS</span>
+                </div>
+                {/* Left Field */}
+                <div className="absolute left-[18%] top-[32%] -translate-x-1/2 -translate-y-1/2">
+                  <span className="bg-green-600/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">LF</span>
+                </div>
+                {/* Center Field */}
+                <div className="absolute left-1/2 top-[18%] -translate-x-1/2 -translate-y-1/2">
+                  <span className="bg-green-600/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">CF</span>
+                </div>
+                {/* Right Field */}
+                <div className="absolute left-[82%] top-[32%] -translate-x-1/2 -translate-y-1/2">
+                  <span className="bg-green-600/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">RF</span>
+                </div>
+                {/* DH - off to the side */}
+                <div className="absolute left-[92%] top-[75%] -translate-x-1/2 -translate-y-1/2">
+                  <span className="bg-purple-500/80 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">DH</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {predictions && predictions.length > 0 && (
           <p className="text-center text-xs text-muted-foreground mt-6">
             🎲 Predictions for entertainment purposes. Always bet responsibly.
