@@ -255,7 +255,7 @@ const PlayersToWatch = () => {
 
         {/* Player Cards Grid */}
         {predictions && predictions.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-3 md:gap-4">
             {predictions.map((player) => {
               const stats = player.player_id ? playerStats[player.player_id] : null;
               const isFlipped = flippedCards[player.id];
@@ -288,7 +288,7 @@ const PlayersToWatch = () => {
                     >
                       {/* Status Badge */}
                       <div
-                        className={`absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
+                        className={`absolute top-3 right-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold ${
                           player.status === "hot"
                             ? "bg-orange-500/90 text-white"
                             : "bg-blue-500/90 text-white"
@@ -296,19 +296,19 @@ const PlayersToWatch = () => {
                       >
                         {player.status === "hot" ? (
                           <>
-                            <Flame className="w-3 h-3" />
+                            <Flame className="w-4 h-4" />
                             HOT
                           </>
                         ) : (
                           <>
-                            <Snowflake className="w-3 h-3" />
+                            <Snowflake className="w-4 h-4" />
                             COLD
                           </>
                         )}
                       </div>
 
                       {/* Player Image */}
-                      <div className="relative h-36 sm:h-44 bg-gradient-to-b from-background to-card overflow-hidden flex items-center justify-center">
+                      <div className="relative h-48 sm:h-44 bg-gradient-to-b from-background to-card overflow-hidden flex items-center justify-center">
                         {player.player_image_url ? (
                           <img
                             src={player.player_image_url}
@@ -320,8 +320,8 @@ const PlayersToWatch = () => {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                              <span className="text-2xl font-bold text-primary">
+                            <div className="w-20 h-20 sm:w-16 sm:h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                              <span className="text-3xl sm:text-2xl font-bold text-primary">
                                 {player.player_name.charAt(0)}
                               </span>
                             </div>
@@ -333,21 +333,21 @@ const PlayersToWatch = () => {
                       </div>
 
                       {/* Player Info */}
-                      <div className="p-2 sm:p-3 md:p-4">
-                        <h3 className="font-bold text-white text-xs sm:text-sm md:text-base mb-1 sm:mb-2 truncate">
+                      <div className="p-4 sm:p-3 md:p-4">
+                        <h3 className="font-bold text-white text-base sm:text-sm md:text-base mb-2 sm:mb-2">
                           {player.player_name}
                         </h3>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground leading-relaxed">
+                        <p className="text-sm sm:text-xs text-muted-foreground leading-relaxed">
                           {player.description}
                         </p>
-                        <p className="text-[10px] sm:text-xs text-primary mt-1 sm:mt-2 font-medium">
+                        <p className="text-sm sm:text-xs text-primary mt-3 sm:mt-2 font-medium">
                           Tap for stats →
                         </p>
                       </div>
 
                       {/* Hot/Cold Indicator Bar */}
                       <div
-                        className={`h-1 w-full ${
+                        className={`h-1.5 sm:h-1 w-full ${
                           player.status === "hot"
                             ? "bg-gradient-to-r from-orange-600 via-orange-500 to-yellow-500"
                             : "bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400"
