@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Flame, Snowflake, TrendingUp, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface PlayerPrediction {
   id: string;
@@ -15,8 +15,23 @@ interface PlayerPrediction {
   prediction_date: string;
 }
 
+interface PlayerStats {
+  avg?: string;
+  hr?: number;
+  rbi?: number;
+  ops?: string;
+  era?: string;
+  wins?: number;
+  losses?: number;
+  strikeouts?: number;
+  whip?: string;
+  isPitcher?: boolean;
+}
+
 const PlayersToWatch = () => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [playerStats, setPlayerStats] = useState<Record<number, PlayerStats>>({});
+  const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
 
   const { data: predictions, isLoading, refetch } = useQuery({
     queryKey: ["daily-player-predictions"],
@@ -33,6 +48,70 @@ const PlayersToWatch = () => {
       return data as PlayerPrediction[];
     },
   });
+
+  // Fetch player stats from MLB API
+  useEffect(() => {
+    const fetchPlayerStats = async () => {
+      if (!predictions || predictions.length === 0) return;
+
+      const statsMap: Record<number, PlayerStats> = {};
+      const currentYear = new Date().getFullYear();
+
+      for (const player of predictions) {
+        if (!player.player_id) continue;
+
+        try {
+          // Fetch player stats from MLB API
+          const response = await fetch(
+            `https://statsapi.mlb.com/api/v1/people/${player.player_id}/stats?stats=season&season=${currentYear}&group=hitting,pitching`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            const stats = data.stats || [];
+            
+            // Check if pitcher or hitter
+            const hittingStats = stats.find((s: any) => s.group?.displayName === "hitting")?.splits?.[0]?.stat;
+            const pitchingStats = stats.find((s: any) => s.group?.displayName === "pitching")?.splits?.[0]?.stat;
+
+            if (pitchingStats && pitchingStats.inningsPitched) {
+              statsMap[player.player_id] = {
+                isPitcher: true,
+                era: pitchingStats.era || "0.00",
+                wins: pitchingStats.wins || 0,
+                losses: pitchingStats.losses || 0,
+                strikeouts: pitchingStats.strikeOuts || 0,
+                whip: pitchingStats.whip || "0.00",
+              };
+            } else if (hittingStats) {
+              statsMap[player.player_id] = {
+                isPitcher: false,
+                avg: hittingStats.avg || ".000",
+                hr: hittingStats.homeRuns || 0,
+                rbi: hittingStats.rbi || 0,
+                ops: hittingStats.ops || ".000",
+              };
+            } else {
+              // No stats yet (spring training)
+              statsMap[player.player_id] = {
+                isPitcher: false,
+                avg: ".---",
+                hr: 0,
+                rbi: 0,
+                ops: ".---",
+              };
+            }
+          }
+        } catch (error) {
+          console.error(`Failed to fetch stats for player ${player.player_id}:`, error);
+        }
+      }
+
+      setPlayerStats(statsMap);
+    };
+
+    fetchPlayerStats();
+  }, [predictions]);
 
   const generatePredictions = async () => {
     setIsGenerating(true);
@@ -51,6 +130,13 @@ const PlayersToWatch = () => {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const toggleFlip = (playerId: string) => {
+    setFlippedCards(prev => ({
+      ...prev,
+      [playerId]: !prev[playerId]
+    }));
   };
 
   // If no predictions for today, try to generate them
@@ -117,81 +203,190 @@ const PlayersToWatch = () => {
         {/* Player Cards Grid */}
         {predictions && predictions.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {predictions.map((player) => (
-              <div
-                key={player.id}
-                className={`relative bg-card/80 backdrop-blur-sm rounded-xl overflow-hidden border-2 transition-all duration-300 hover:scale-105 hover:shadow-xl ${
-                  player.status === "hot" 
-                    ? "border-orange-500 shadow-orange-500/20" 
-                    : "border-blue-500 shadow-blue-500/20"
-                }`}
-              >
-                {/* Status Badge */}
+            {predictions.map((player) => {
+              const stats = player.player_id ? playerStats[player.player_id] : null;
+              const isFlipped = flippedCards[player.id];
+              
+              return (
                 <div
-                  className={`absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
-                    player.status === "hot"
-                      ? "bg-orange-500/90 text-white"
-                      : "bg-blue-500/90 text-white"
-                  }`}
+                  key={player.id}
+                  className="perspective-1000 cursor-pointer"
+                  onClick={() => toggleFlip(player.id)}
+                  onMouseEnter={() => setFlippedCards(prev => ({ ...prev, [player.id]: true }))}
+                  onMouseLeave={() => setFlippedCards(prev => ({ ...prev, [player.id]: false }))}
                 >
-                  {player.status === "hot" ? (
-                    <>
-                      <Flame className="w-3 h-3" />
-                      HOT
-                    </>
-                  ) : (
-                    <>
-                      <Snowflake className="w-3 h-3" />
-                      COLD
-                    </>
-                  )}
-                </div>
+                  <div
+                    className={`relative w-full transition-transform duration-500 transform-style-3d ${
+                      isFlipped ? "rotate-y-180" : ""
+                    }`}
+                    style={{
+                      transformStyle: "preserve-3d",
+                      transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                    }}
+                  >
+                    {/* Front of Card */}
+                    <div
+                      className={`relative bg-card/80 backdrop-blur-sm rounded-xl overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
+                        player.status === "hot" 
+                          ? "border-orange-500 shadow-orange-500/20" 
+                          : "border-blue-500 shadow-blue-500/20"
+                      }`}
+                      style={{ backfaceVisibility: "hidden" }}
+                    >
+                      {/* Status Badge */}
+                      <div
+                        className={`absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
+                          player.status === "hot"
+                            ? "bg-orange-500/90 text-white"
+                            : "bg-blue-500/90 text-white"
+                        }`}
+                      >
+                        {player.status === "hot" ? (
+                          <>
+                            <Flame className="w-3 h-3" />
+                            HOT
+                          </>
+                        ) : (
+                          <>
+                            <Snowflake className="w-3 h-3" />
+                            COLD
+                          </>
+                        )}
+                      </div>
 
-                {/* Player Image */}
-                <div className="relative h-36 sm:h-44 bg-gradient-to-b from-background to-card overflow-hidden flex items-center justify-center">
-                  {player.player_image_url ? (
-                    <img
-                      src={player.player_image_url}
-                      alt={player.player_name}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/placeholder.svg";
+                      {/* Player Image */}
+                      <div className="relative h-36 sm:h-44 bg-gradient-to-b from-background to-card overflow-hidden flex items-center justify-center">
+                        {player.player_image_url ? (
+                          <img
+                            src={player.player_image_url}
+                            alt={player.player_name}
+                            className="w-full h-full object-contain"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "/placeholder.svg";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                              <span className="text-2xl font-bold text-primary">
+                                {player.player_name.charAt(0)}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                      </div>
+
+                      {/* Player Info */}
+                      <div className="p-3 sm:p-4">
+                        <h3 className="font-bold text-white text-sm sm:text-base mb-2 truncate">
+                          {player.player_name}
+                        </h3>
+                        <p className="text-xs text-muted-foreground line-clamp-3">
+                          {player.description}
+                        </p>
+                        <p className="text-xs text-primary mt-2 font-medium">
+                          Tap for stats →
+                        </p>
+                      </div>
+
+                      {/* Hot/Cold Indicator Bar */}
+                      <div
+                        className={`h-1 w-full ${
+                          player.status === "hot"
+                            ? "bg-gradient-to-r from-orange-600 via-orange-500 to-yellow-500"
+                            : "bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400"
+                        }`}
+                      />
+                    </div>
+
+                    {/* Back of Card - Stats */}
+                    <div
+                      className={`absolute inset-0 bg-card/95 backdrop-blur-sm rounded-xl overflow-hidden border-2 ${
+                        player.status === "hot" 
+                          ? "border-orange-500" 
+                          : "border-blue-500"
+                      }`}
+                      style={{ 
+                        backfaceVisibility: "hidden",
+                        transform: "rotateY(180deg)",
                       }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                        <span className="text-2xl font-bold text-primary">
-                          {player.player_name.charAt(0)}
-                        </span>
+                    >
+                      <div className="p-4 h-full flex flex-col">
+                        <h3 className="font-bold text-white text-sm sm:text-base mb-3 text-center">
+                          {player.player_name}
+                        </h3>
+                        
+                        <div className="text-xs text-muted-foreground text-center mb-3">
+                          {new Date().getFullYear()} Season Stats
+                        </div>
+
+                        {stats ? (
+                          <div className="flex-1 flex flex-col justify-center">
+                            {stats.isPitcher ? (
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="bg-background/50 rounded-lg p-2 text-center">
+                                  <div className="text-lg font-bold text-primary">{stats.era}</div>
+                                  <div className="text-xs text-muted-foreground">ERA</div>
+                                </div>
+                                <div className="bg-background/50 rounded-lg p-2 text-center">
+                                  <div className="text-lg font-bold text-white">{stats.wins}-{stats.losses}</div>
+                                  <div className="text-xs text-muted-foreground">W-L</div>
+                                </div>
+                                <div className="bg-background/50 rounded-lg p-2 text-center">
+                                  <div className="text-lg font-bold text-white">{stats.strikeouts}</div>
+                                  <div className="text-xs text-muted-foreground">K</div>
+                                </div>
+                                <div className="bg-background/50 rounded-lg p-2 text-center">
+                                  <div className="text-lg font-bold text-white">{stats.whip}</div>
+                                  <div className="text-xs text-muted-foreground">WHIP</div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="bg-background/50 rounded-lg p-2 text-center">
+                                  <div className="text-lg font-bold text-primary">{stats.avg}</div>
+                                  <div className="text-xs text-muted-foreground">AVG</div>
+                                </div>
+                                <div className="bg-background/50 rounded-lg p-2 text-center">
+                                  <div className="text-lg font-bold text-white">{stats.hr}</div>
+                                  <div className="text-xs text-muted-foreground">HR</div>
+                                </div>
+                                <div className="bg-background/50 rounded-lg p-2 text-center">
+                                  <div className="text-lg font-bold text-white">{stats.rbi}</div>
+                                  <div className="text-xs text-muted-foreground">RBI</div>
+                                </div>
+                                <div className="bg-background/50 rounded-lg p-2 text-center">
+                                  <div className="text-lg font-bold text-white">{stats.ops}</div>
+                                  <div className="text-xs text-muted-foreground">OPS</div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex-1 flex items-center justify-center">
+                            <RefreshCw className="w-6 h-6 text-muted-foreground animate-spin" />
+                          </div>
+                        )}
+
+                        {/* Status indicator on back */}
+                        <div
+                          className={`mt-3 py-1 px-2 rounded-full text-xs font-bold text-center ${
+                            player.status === "hot"
+                              ? "bg-orange-500/20 text-orange-400"
+                              : "bg-blue-500/20 text-blue-400"
+                          }`}
+                        >
+                          {player.status === "hot" ? "🔥 HOT" : "❄️ COLD"}
+                        </div>
                       </div>
                     </div>
-                  )}
-                  
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                  </div>
                 </div>
-
-                {/* Player Info */}
-                <div className="p-3 sm:p-4">
-                  <h3 className="font-bold text-white text-sm sm:text-base mb-2 truncate">
-                    {player.player_name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground line-clamp-3">
-                    {player.description}
-                  </p>
-                </div>
-
-                {/* Hot/Cold Indicator Bar */}
-                <div
-                  className={`h-1 w-full ${
-                    player.status === "hot"
-                      ? "bg-gradient-to-r from-orange-600 via-orange-500 to-yellow-500"
-                      : "bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400"
-                  }`}
-                />
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
