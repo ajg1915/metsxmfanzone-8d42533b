@@ -77,12 +77,29 @@ const AppInstallSection = () => {
       />
       <div className="container max-w-6xl mx-auto px-0 sm:px-4 relative z-10">
         <div className="text-center mb-8 sm:mb-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary font-bold text-sm mb-4">
+            💎 PREMIUM MEMBERSHIP
+          </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
-            Get the Best Experience
+            Join for Only <span className="text-primary">$12.99/month</span>
           </h2>
-          <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
-            Install our app and enable notifications for instant access to live games and updates
+          <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto mb-4">
+            Get unlimited access to all streams with no ads, no providers, and live 24/7 content
           </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
+            <span className="flex items-center gap-1.5 text-foreground/80">
+              <Check className="h-4 w-4 text-green-500" /> All Live Streams
+            </span>
+            <span className="flex items-center gap-1.5 text-foreground/80">
+              <Check className="h-4 w-4 text-green-500" /> No Ads
+            </span>
+            <span className="flex items-center gap-1.5 text-foreground/80">
+              <Check className="h-4 w-4 text-green-500" /> No Providers
+            </span>
+            <span className="flex items-center gap-1.5 text-foreground/80">
+              <Check className="h-4 w-4 text-green-500" /> 24/7 Live Content
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
