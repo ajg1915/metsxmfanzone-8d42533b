@@ -195,24 +195,24 @@ const PlayersToWatch = () => {
   const shouldGenerate = !isLoading && (!predictions || predictions.length === 0);
 
   return (
-    <section className="py-8 sm:py-12 px-4 sm:px-6">
+    <section className="py-8 sm:py-12 px-2 sm:px-4 md:px-6 overflow-hidden">
       <div className="container mx-auto max-w-6xl">
-        <GlassCard glow="blue" className="p-6 sm:p-8">
+        <GlassCard glow="blue" className="p-4 sm:p-6 md:p-8">
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-6 sm:mb-8">
-          <div className="flex items-center gap-3">
-            <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6 md:mb-8">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-primary flex-shrink-0" />
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">
+              <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white">
                 Anthony's Predictions
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Betting tips updated daily
               </p>
             </div>
           </div>
           {predictions && predictions.length > 0 && (
-            <div className="text-xs text-muted-foreground bg-card/50 px-3 py-1 rounded-full">
+            <div className="text-[10px] sm:text-xs text-muted-foreground bg-card/50 px-2 sm:px-3 py-1 rounded-full w-fit">
               Updated: {new Date().toLocaleDateString()}
             </div>
           )}
@@ -255,7 +255,7 @@ const PlayersToWatch = () => {
 
         {/* Player Cards Grid */}
         {predictions && predictions.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
             {predictions.map((player) => {
               const stats = player.player_id ? playerStats[player.player_id] : null;
               const isFlipped = flippedCards[player.id];
@@ -445,9 +445,9 @@ const PlayersToWatch = () => {
 
         {/* Baseball Field Depth Chart */}
         {predictions && predictions.length > 0 && (
-          <div className="mt-8 relative">
-            <h3 className="text-lg font-semibold text-white mb-4 text-center">Depth Chart</h3>
-            <div className="relative w-full max-w-lg mx-auto aspect-square">
+          <div className="mt-6 sm:mt-8 relative overflow-hidden">
+            <h3 className="text-sm sm:text-lg font-semibold text-white mb-3 sm:mb-4 text-center">Depth Chart</h3>
+            <div className="relative w-full max-w-[280px] sm:max-w-sm md:max-w-lg mx-auto aspect-square">
               {/* Faded Baseball Field SVG */}
               <svg
                 viewBox="0 0 400 400"
@@ -497,84 +497,84 @@ const PlayersToWatch = () => {
               <div className="absolute inset-0">
                 {/* Pitcher */}
                 <div className="absolute left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className={`${depthChart["P"] ? (depthChart["P"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-primary/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
-                    <span className="block text-[8px] opacity-70">P</span>
-                    <span>{depthChart["P"]?.name || "—"}</span>
+                  <div className={`${depthChart["P"] ? (depthChart["P"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-primary/60"} text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[6px] sm:text-[8px] opacity-70">P</span>
+                    <span className="truncate max-w-[40px] sm:max-w-none block">{depthChart["P"]?.name || "—"}</span>
                   </div>
                 </div>
                 {/* Catcher */}
                 <div className="absolute left-1/2 top-[82%] -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className={`${depthChart["C"] ? (depthChart["C"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-primary/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
-                    <span className="block text-[8px] opacity-70">C</span>
-                    <span>{depthChart["C"]?.name || "—"}</span>
+                  <div className={`${depthChart["C"] ? (depthChart["C"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-primary/60"} text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[6px] sm:text-[8px] opacity-70">C</span>
+                    <span className="truncate max-w-[40px] sm:max-w-none block">{depthChart["C"]?.name || "—"}</span>
                   </div>
                 </div>
                 {/* First Base */}
-                <div className="absolute left-[72%] top-[58%] -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className={`${depthChart["1B"] ? (depthChart["1B"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
-                    <span className="block text-[8px] opacity-70">1B</span>
-                    <span>{depthChart["1B"]?.name || "—"}</span>
+                <div className="absolute left-[70%] sm:left-[72%] top-[58%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["1B"] ? (depthChart["1B"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[6px] sm:text-[8px] opacity-70">1B</span>
+                    <span className="truncate max-w-[40px] sm:max-w-none block">{depthChart["1B"]?.name || "—"}</span>
                   </div>
                 </div>
                 {/* Second Base */}
                 <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className={`${depthChart["2B"] ? (depthChart["2B"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
-                    <span className="block text-[8px] opacity-70">2B</span>
-                    <span>{depthChart["2B"]?.name || "—"}</span>
+                  <div className={`${depthChart["2B"] ? (depthChart["2B"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[6px] sm:text-[8px] opacity-70">2B</span>
+                    <span className="truncate max-w-[40px] sm:max-w-none block">{depthChart["2B"]?.name || "—"}</span>
                   </div>
                 </div>
                 {/* Third Base */}
-                <div className="absolute left-[28%] top-[58%] -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className={`${depthChart["3B"] ? (depthChart["3B"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
-                    <span className="block text-[8px] opacity-70">3B</span>
-                    <span>{depthChart["3B"]?.name || "—"}</span>
+                <div className="absolute left-[30%] sm:left-[28%] top-[58%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["3B"] ? (depthChart["3B"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[6px] sm:text-[8px] opacity-70">3B</span>
+                    <span className="truncate max-w-[40px] sm:max-w-none block">{depthChart["3B"]?.name || "—"}</span>
                   </div>
                 </div>
                 {/* Shortstop */}
-                <div className="absolute left-[38%] top-[48%] -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className={`${depthChart["SS"] ? (depthChart["SS"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
-                    <span className="block text-[8px] opacity-70">SS</span>
-                    <span>{depthChart["SS"]?.name || "—"}</span>
+                <div className="absolute left-[40%] sm:left-[38%] top-[48%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["SS"] ? (depthChart["SS"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-blue-500/60"} text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[6px] sm:text-[8px] opacity-70">SS</span>
+                    <span className="truncate max-w-[40px] sm:max-w-none block">{depthChart["SS"]?.name || "—"}</span>
                   </div>
                 </div>
                 {/* Left Field */}
-                <div className="absolute left-[18%] top-[32%] -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className={`${depthChart["LF"] ? (depthChart["LF"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-green-600/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
-                    <span className="block text-[8px] opacity-70">LF</span>
-                    <span>{depthChart["LF"]?.name || "—"}</span>
+                <div className="absolute left-[20%] sm:left-[18%] top-[32%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["LF"] ? (depthChart["LF"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-green-600/60"} text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[6px] sm:text-[8px] opacity-70">LF</span>
+                    <span className="truncate max-w-[40px] sm:max-w-none block">{depthChart["LF"]?.name || "—"}</span>
                   </div>
                 </div>
                 {/* Center Field */}
                 <div className="absolute left-1/2 top-[18%] -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className={`${depthChart["CF"] ? (depthChart["CF"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-green-600/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
-                    <span className="block text-[8px] opacity-70">CF</span>
-                    <span>{depthChart["CF"]?.name || "—"}</span>
+                  <div className={`${depthChart["CF"] ? (depthChart["CF"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-green-600/60"} text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[6px] sm:text-[8px] opacity-70">CF</span>
+                    <span className="truncate max-w-[40px] sm:max-w-none block">{depthChart["CF"]?.name || "—"}</span>
                   </div>
                 </div>
                 {/* Right Field */}
-                <div className="absolute left-[82%] top-[32%] -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className={`${depthChart["RF"] ? (depthChart["RF"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-green-600/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
-                    <span className="block text-[8px] opacity-70">RF</span>
-                    <span>{depthChart["RF"]?.name || "—"}</span>
+                <div className="absolute left-[80%] sm:left-[82%] top-[32%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["RF"] ? (depthChart["RF"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-green-600/60"} text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[6px] sm:text-[8px] opacity-70">RF</span>
+                    <span className="truncate max-w-[40px] sm:max-w-none block">{depthChart["RF"]?.name || "—"}</span>
                   </div>
                 </div>
-                {/* DH - off to the side */}
-                <div className="absolute left-[92%] top-[75%] -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className={`${depthChart["DH"] ? (depthChart["DH"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-purple-500/60"} text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-lg shadow-lg whitespace-nowrap`}>
-                    <span className="block text-[8px] opacity-70">DH</span>
-                    <span>{depthChart["DH"]?.name || "—"}</span>
+                {/* DH - positioned inside the field on mobile */}
+                <div className="absolute left-[85%] sm:left-[88%] top-[70%] sm:top-[75%] -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className={`${depthChart["DH"] ? (depthChart["DH"].status === "hot" ? "bg-red-500/90" : "bg-blue-400/90") : "bg-purple-500/60"} text-white text-[8px] sm:text-[10px] md:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-lg whitespace-nowrap`}>
+                    <span className="block text-[6px] sm:text-[8px] opacity-70">DH</span>
+                    <span className="truncate max-w-[40px] sm:max-w-none block">{depthChart["DH"]?.name || "—"}</span>
                   </div>
                 </div>
               </div>
               
               {/* Legend */}
-              <div className="flex justify-center gap-4 mt-4 text-xs">
+              <div className="flex justify-center gap-3 sm:gap-4 mt-3 sm:mt-4 text-[10px] sm:text-xs">
                 <div className="flex items-center gap-1">
-                  <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                  <span className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500"></span>
                   <span className="text-muted-foreground">Hot</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="w-3 h-3 rounded-full bg-blue-400"></span>
+                  <span className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-blue-400"></span>
                   <span className="text-muted-foreground">Cold</span>
                 </div>
               </div>
