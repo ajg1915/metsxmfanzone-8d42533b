@@ -6,25 +6,24 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Mets roster with player IDs for MLB API images
+// Current 2025-2026 Mets roster with player IDs for MLB API images
 const metsPlayers = [
   { name: "Francisco Lindor", id: 596019 },
-  { name: "Pete Alonso", id: 624413 },
+  { name: "Juan Soto", id: 665742 },
   { name: "Brandon Nimmo", id: 607043 },
   { name: "Jeff McNeil", id: 643446 },
   { name: "Mark Vientos", id: 668901 },
   { name: "Francisco Alvarez", id: 682626 },
   { name: "Starling Marte", id: 516782 },
-  { name: "Jose Soto", id: 665742 },
   { name: "Tyrone Taylor", id: 621438 },
   { name: "Kodai Senga", id: 673085 },
   { name: "Sean Manaea", id: 640455 },
   { name: "David Peterson", id: 656849 },
-  { name: "Jose Quintana", id: 500779 },
   { name: "Edwin Diaz", id: 621242 },
-  { name: "Reed Garrett", id: 657585 },
   { name: "Jose Butto", id: 666149 },
   { name: "Luisangel Acuna", id: 682519 },
+  { name: "Brett Baty", id: 683146 },
+  { name: "Jose Iglesias", id: 578428 },
 ];
 
 function getPlayerImageUrl(playerId: number): string {
