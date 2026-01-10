@@ -68,7 +68,7 @@ const PlayersToWatch = () => {
                 Players to Watch
               </h2>
               <p className="text-sm text-muted-foreground">
-                Daily AI-powered predictions & betting tips
+                Daily predictions & betting tips
               </p>
             </div>
           </div>
@@ -92,7 +92,7 @@ const PlayersToWatch = () => {
           <div className="flex flex-col items-center justify-center py-12 bg-card/30 rounded-xl border border-border/50">
             <TrendingUp className="w-12 h-12 text-primary mb-4" />
             <p className="text-white mb-4 text-center">
-              No predictions for today yet. Generate fresh AI predictions!
+              No predictions for today yet. Generate fresh predictions!
             </p>
             <Button 
               onClick={generatePredictions} 
@@ -148,12 +148,12 @@ const PlayersToWatch = () => {
                 </div>
 
                 {/* Player Image */}
-                <div className="relative h-32 sm:h-40 bg-gradient-to-b from-background to-card overflow-hidden">
+                <div className="relative h-36 sm:h-44 bg-gradient-to-b from-background to-card overflow-hidden flex items-center justify-center">
                   {player.player_image_url ? (
                     <img
                       src={player.player_image_url}
                       alt={player.player_name}
-                      className="w-full h-full object-cover object-top"
+                      className="w-full h-full object-contain"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "/placeholder.svg";
                       }}
@@ -195,10 +195,9 @@ const PlayersToWatch = () => {
           </div>
         )}
 
-        {/* Disclaimer */}
         {predictions && predictions.length > 0 && (
           <p className="text-center text-xs text-muted-foreground mt-6">
-            🎲 AI-generated predictions for entertainment purposes. Always bet responsibly.
+            🎲 Predictions for entertainment purposes. Always bet responsibly.
           </p>
         )}
       </div>
