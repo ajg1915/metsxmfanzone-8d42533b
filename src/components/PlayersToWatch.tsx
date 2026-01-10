@@ -195,8 +195,8 @@ const PlayersToWatch = () => {
   const shouldGenerate = !isLoading && (!predictions || predictions.length === 0);
 
   return (
-    <section className="py-8 sm:py-12 px-2 sm:px-4 md:px-6 overflow-hidden">
-      <div className="container mx-auto max-w-6xl">
+    <section className="py-8 sm:py-12 px-2 sm:px-4 md:px-6 lg:px-8 overflow-hidden">
+      <div className="container mx-auto max-w-7xl w-full">
         <GlassCard glow="blue" className="p-4 sm:p-6 md:p-8">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6 md:mb-8">
