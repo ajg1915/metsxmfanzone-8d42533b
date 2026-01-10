@@ -5,7 +5,7 @@ export const useAutoRefresh = () => {
     if ('serviceWorker' in navigator) {
       let refreshing = false;
 
-      // Reload page when new service worker takes control
+      // Reload page only when new service worker takes control (new content detected)
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (refreshing) return;
         refreshing = true;
@@ -13,25 +13,7 @@ export const useAutoRefresh = () => {
         window.location.reload();
       });
 
-      // Check for updates every 30 seconds
-      const checkForUpdates = async () => {
-        try {
-          const registration = await navigator.serviceWorker.getRegistration();
-          if (registration) {
-            await registration.update();
-          }
-        } catch (error) {
-          console.error('Error checking for updates:', error);
-        }
-      };
-
-      // Check immediately on mount
-      checkForUpdates();
-
-      // Check every 30 seconds
-      const interval = setInterval(checkForUpdates, 30000);
-
-      return () => clearInterval(interval);
+      // No interval-based checking - only refresh on actual SW updates
     }
   }, []);
 };
