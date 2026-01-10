@@ -60,25 +60,42 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Parse request body for force star players option
+    // Parse request body for options
     let forceStarPlayers: number[] = [];
+    let forceRegenerate = false;
+    let triggerType = "manual"; // manual, morning, pregame
+    
     try {
       const body = await req.json();
       if (body.forceStarPlayers && Array.isArray(body.forceStarPlayers)) {
         forceStarPlayers = body.forceStarPlayers;
       }
+      if (body.forceRegenerate === true) {
+        forceRegenerate = true;
+      }
+      if (body.triggerType) {
+        triggerType = body.triggerType;
+      }
     } catch {
       // No body or invalid JSON, continue with defaults
     }
 
-    // Check if we already have predictions for today (skip if force regenerating)
     const today = new Date().toISOString().split('T')[0];
+    
+    // Check if we already have predictions for today
     const { data: existingPredictions } = await supabase
       .from("daily_player_predictions")
       .select("*")
       .eq("prediction_date", today);
 
-    if (existingPredictions && existingPredictions.length > 0 && forceStarPlayers.length === 0) {
+    // Only skip if predictions exist AND we're not forcing regeneration
+    const shouldSkip = existingPredictions && 
+                       existingPredictions.length > 0 && 
+                       !forceRegenerate && 
+                       forceStarPlayers.length === 0;
+
+    if (shouldSkip) {
+      console.log(`Predictions already exist for today (${today}), skipping generation`);
       return new Response(
         JSON.stringify({ 
           message: "Predictions already exist for today", 
@@ -86,6 +103,15 @@ serve(async (req) => {
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Delete existing predictions for today if force regenerating
+    if (forceRegenerate && existingPredictions && existingPredictions.length > 0) {
+      console.log(`Force regenerating: deleting ${existingPredictions.length} existing predictions`);
+      await supabase
+        .from("daily_player_predictions")
+        .delete()
+        .eq("prediction_date", today);
     }
 
     if (!lovableApiKey) {
@@ -116,8 +142,18 @@ serve(async (req) => {
       selectedPlayers = [...selectedPlayers, ...shuffled.slice(0, remainingSlots)];
     }
 
+    // Customize prompt based on trigger type
+    let contextNote = "";
+    if (triggerType === "morning") {
+      contextNote = "It's early morning and you're giving your daily picks before the games start. Focus on who's been trending lately.";
+    } else if (triggerType === "pregame") {
+      contextNote = "It's pre-game time! Games are about to start soon. Give your hottest takes for tonight's action.";
+    }
+
     // Generate AI predictions for each player
-    const prompt = `You are Anthony, a passionate Mets baseball analyst and betting expert. For each of these current Mets players, determine if they are currently "hot" or "cold" based on typical performance patterns and provide a brief betting tip or prediction. Be realistic and vary between hot and cold. Make your tips sound like insider knowledge.
+    const prompt = `You are Anthony, a passionate Mets baseball analyst and betting expert. ${contextNote}
+
+For each of these current Mets players, determine if they are currently "hot" or "cold" based on typical performance patterns and provide a brief betting tip or prediction. Be realistic and vary between hot and cold. Make your tips sound like insider knowledge.
 
 Players: ${selectedPlayers.map(p => p.name).join(", ")}
 
@@ -211,9 +247,12 @@ Respond with ONLY a valid JSON array (no markdown, no extra text) in this exact 
       throw insertError;
     }
 
+    console.log(`Successfully generated ${insertedPredictions?.length} predictions (trigger: ${triggerType})`);
+
     return new Response(
       JSON.stringify({ 
         message: "Predictions generated successfully", 
+        triggerType,
         predictions: insertedPredictions 
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
