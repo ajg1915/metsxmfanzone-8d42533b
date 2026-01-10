@@ -6,28 +6,46 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Current 2025-2026 Mets roster with player IDs for MLB API images
-const metsPlayers = [
-  { name: "Francisco Lindor", id: 596019 },
-  { name: "Juan Soto", id: 665742 },
-  { name: "Brandon Nimmo", id: 607043 },
-  { name: "Jeff McNeil", id: 643446 },
-  { name: "Mark Vientos", id: 668901 },
-  { name: "Francisco Alvarez", id: 682626 },
-  { name: "Starling Marte", id: 516782 },
-  { name: "Tyrone Taylor", id: 621438 },
-  { name: "Kodai Senga", id: 673085 },
-  { name: "Sean Manaea", id: 640455 },
-  { name: "David Peterson", id: 656849 },
-  { name: "Edwin Diaz", id: 621242 },
-  { name: "Jose Butto", id: 666149 },
-  { name: "Luisangel Acuna", id: 682519 },
-  { name: "Brett Baty", id: 683146 },
-  { name: "Jose Iglesias", id: 578428 },
-];
+const METS_TEAM_ID = 121;
 
 function getPlayerImageUrl(playerId: number): string {
   return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${playerId}/headshot/67/current`;
+}
+
+async function fetchMetsRoster(): Promise<Array<{ name: string; id: number }>> {
+  try {
+    // Fetch 40-man roster from MLB Stats API
+    const response = await fetch(
+      `https://statsapi.mlb.com/api/v1/teams/${METS_TEAM_ID}/roster?rosterType=40Man`
+    );
+    
+    if (!response.ok) {
+      throw new Error("Failed to fetch roster data");
+    }
+    
+    const data = await response.json();
+    
+    // Map roster to simple format
+    return data.roster.map((player: any) => ({
+      name: player.person.fullName,
+      id: player.person.id,
+    }));
+  } catch (error) {
+    console.error("Error fetching Mets roster:", error);
+    // Fallback to known players if API fails
+    return [
+      { name: "Francisco Lindor", id: 596019 },
+      { name: "Juan Soto", id: 665742 },
+      { name: "Brandon Nimmo", id: 607043 },
+      { name: "Jeff McNeil", id: 643446 },
+      { name: "Mark Vientos", id: 668901 },
+      { name: "Francisco Alvarez", id: 682626 },
+      { name: "Starling Marte", id: 516782 },
+      { name: "Kodai Senga", id: 673085 },
+      { name: "Edwin Diaz", id: 621242 },
+      { name: "Sean Manaea", id: 640455 },
+    ];
+  }
 }
 
 serve(async (req) => {
@@ -63,12 +81,16 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Fetch current Mets roster from MLB API
+    const metsPlayers = await fetchMetsRoster();
+    console.log(`Fetched ${metsPlayers.length} players from Mets roster`);
+
     // Select 4 random players for today's predictions
     const shuffled = [...metsPlayers].sort(() => 0.5 - Math.random());
     const selectedPlayers = shuffled.slice(0, 4);
 
     // Generate AI predictions for each player
-    const prompt = `You are a Mets baseball analyst. For each of these Mets players, determine if they are currently "hot" or "cold" based on typical spring training performance patterns and provide a brief betting tip or prediction. Be realistic and vary between hot and cold.
+    const prompt = `You are Anthony, a passionate Mets baseball analyst and betting expert. For each of these current Mets players, determine if they are currently "hot" or "cold" based on typical performance patterns and provide a brief betting tip or prediction. Be realistic and vary between hot and cold. Make your tips sound like insider knowledge.
 
 Players: ${selectedPlayers.map(p => p.name).join(", ")}
 
@@ -90,7 +112,7 @@ Respond with ONLY a valid JSON array (no markdown, no extra text) in this exact 
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are a knowledgeable Mets baseball analyst. Respond only with valid JSON." },
+          { role: "system", content: "You are Anthony, a knowledgeable Mets baseball analyst and betting tipster. Respond only with valid JSON." },
           { role: "user", content: prompt }
         ],
       }),
