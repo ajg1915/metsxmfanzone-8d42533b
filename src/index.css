@@ -37,8 +37,9 @@ All colors MUST be HSL.
 
     /* Mets Orange border accents (#ff4500) */
     --border: 16 100% 50%;
-    --input: 220 50% 20%;
+    --input: 16 100% 50%;
     --ring: 16 100% 50%;
+    --input-foreground: 0 0% 100%;
 
     --radius: 1rem;
 
@@ -109,8 +110,9 @@ All colors MUST be HSL.
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
     --border: 16 100% 50%;
-    --input: 220 50% 20%;
+    --input: 16 100% 50%;
     --ring: 16 100% 50%;
+    --input-foreground: 0 0% 100%;
     --sidebar-background: 220 70% 8%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 16 100% 50%;
