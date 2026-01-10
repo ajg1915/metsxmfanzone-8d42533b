@@ -26,6 +26,7 @@ const homeItems = [
   { title: "Hero Slides", url: "/admin/hero", icon: Layers },
   { title: "Backgrounds", url: "/admin/backgrounds", icon: Wallpaper },
   { title: "Tutorials", url: "/admin/tutorials", icon: BookOpen },
+  { title: "Predictions", url: "/admin/predictions", icon: Sparkles },
 ];
 
 // Content & Media items - Blog, Stories, Videos, Podcasts, Newsletter

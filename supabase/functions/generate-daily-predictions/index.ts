@@ -60,14 +60,25 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Check if we already have predictions for today
+    // Parse request body for force star players option
+    let forceStarPlayers: number[] = [];
+    try {
+      const body = await req.json();
+      if (body.forceStarPlayers && Array.isArray(body.forceStarPlayers)) {
+        forceStarPlayers = body.forceStarPlayers;
+      }
+    } catch {
+      // No body or invalid JSON, continue with defaults
+    }
+
+    // Check if we already have predictions for today (skip if force regenerating)
     const today = new Date().toISOString().split('T')[0];
     const { data: existingPredictions } = await supabase
       .from("daily_player_predictions")
       .select("*")
       .eq("prediction_date", today);
 
-    if (existingPredictions && existingPredictions.length > 0) {
+    if (existingPredictions && existingPredictions.length > 0 && forceStarPlayers.length === 0) {
       return new Response(
         JSON.stringify({ 
           message: "Predictions already exist for today", 
@@ -85,9 +96,25 @@ serve(async (req) => {
     const metsPlayers = await fetchMetsRoster();
     console.log(`Fetched ${metsPlayers.length} players from Mets roster`);
 
-    // Select 6 random players for today's predictions
-    const shuffled = [...metsPlayers].sort(() => 0.5 - Math.random());
-    const selectedPlayers = shuffled.slice(0, 6);
+    // Handle star players selection
+    let selectedPlayers: Array<{ name: string; id: number }> = [];
+    
+    // If force star players are specified, include them first
+    if (forceStarPlayers.length > 0) {
+      const starPlayersFromRoster = metsPlayers.filter(p => forceStarPlayers.includes(p.id));
+      selectedPlayers = [...starPlayersFromRoster];
+      console.log(`Added ${starPlayersFromRoster.length} forced star players`);
+    }
+
+    // Fill remaining slots with random players (up to 6 total)
+    const remainingSlots = 6 - selectedPlayers.length;
+    if (remainingSlots > 0) {
+      const availablePlayers = metsPlayers.filter(
+        p => !selectedPlayers.some(sp => sp.id === p.id)
+      );
+      const shuffled = [...availablePlayers].sort(() => 0.5 - Math.random());
+      selectedPlayers = [...selectedPlayers, ...shuffled.slice(0, remainingSlots)];
+    }
 
     // Generate AI predictions for each player
     const prompt = `You are Anthony, a passionate Mets baseball analyst and betting expert. For each of these current Mets players, determine if they are currently "hot" or "cold" based on typical performance patterns and provide a brief betting tip or prediction. Be realistic and vary between hot and cold. Make your tips sound like insider knowledge.
