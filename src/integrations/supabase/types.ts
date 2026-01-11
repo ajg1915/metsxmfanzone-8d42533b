@@ -1585,6 +1585,45 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_meta_tags: {
+        Row: {
+          attribute_type: string
+          attribute_value: string
+          content: string
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          attribute_type?: string
+          attribute_value: string
+          content: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          attribute_type?: string
+          attribute_value?: string
+          content?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       videos: {
         Row: {
           category: string | null
