@@ -231,7 +231,7 @@ const PlayersToWatch = () => {
           <div className="flex flex-col items-center justify-center py-12 bg-card/30 rounded-xl border border-border/50">
             <TrendingUp className="w-12 h-12 text-primary mb-4" />
             <p className="text-white mb-4 text-center">
-              No predictions for today yet. Generate fresh predictions!
+              Predictions not yet available
             </p>
             <Button 
               onClick={generatePredictions} 
@@ -246,7 +246,7 @@ const PlayersToWatch = () => {
               ) : (
                 <>
                   <TrendingUp className="w-4 h-4 mr-2" />
-                  Generate Today's Predictions
+                  Refresh Predictions
                 </>
               )}
             </Button>
