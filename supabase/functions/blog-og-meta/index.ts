@@ -65,18 +65,15 @@ Deno.serve(async (req) => {
 
     const postUrl = `${SITE_URL}/blog/${encodeURIComponent(slug)}`;
     const userAgent = req.headers.get("user-agent") || "";
+    const crawler = isCrawler(userAgent);
 
-    // Humans should go straight to the blog post; crawlers need the OG HTML.
-    if (!isCrawler(userAgent)) {
-      return new Response(null, {
-        status: 302,
-        headers: {
-          ...corsHeaders,
-          Location: postUrl,
-          "Cache-Control": "no-store",
-        },
-      });
-    }
+    // IMPORTANT: Always return the OG HTML (even for non-crawler user agents).
+    // Some platforms fetch with generic user agents; if we 302, they end up scraping
+    // the SPA index.html and show the homepage OG instead of the article.
+    //
+    // For humans, we add a meta-refresh redirect inside the HTML so clicking the
+    // shared link still lands on the real article URL.
+
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -152,6 +149,8 @@ Deno.serve(async (req) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(socialTitle)}</title>
     <meta name="description" content="${safeDescriptionAttr}">
+
+    ${crawler ? "" : `<meta http-equiv=\"refresh\" content=\"0;url=${postUrl}\">`}
 
     <!-- Facebook App ID -->
     <meta property="fb:app_id" content="1151558476948104" />
