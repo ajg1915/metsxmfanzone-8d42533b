@@ -8,11 +8,39 @@ interface SocialShareButtonsProps {
 
 export default function SocialShareButtons({ title, url }: SocialShareButtonsProps) {
   const baseUrl = url || window.location.href;
-  // Convert blog URLs to OG-optimized URLs for better social media previews
-  const shareUrl = baseUrl.includes('/blog/') 
-    ? baseUrl.replace('/blog/', '/og-blog/')
-    : baseUrl;
   const shareTitle = title || "Check this out on MetsXMFanZone!";
+
+  const getOgShareUrl = (rawUrl: string) => {
+    try {
+      const parsed = new URL(rawUrl);
+
+      // If it's already a backend meta URL, keep it.
+      if (parsed.pathname.includes("/functions/v1/blog-og-meta")) return rawUrl;
+
+      const parts = parsed.pathname.split("/").filter(Boolean);
+      const blogIndex = parts.indexOf("blog");
+      const ogBlogIndex = parts.indexOf("og-blog");
+      const idx = blogIndex !== -1 ? blogIndex : ogBlogIndex;
+      const slug = idx !== -1 ? parts[idx + 1] : undefined;
+
+      if (!slug) return rawUrl;
+
+      const backendUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim();
+      if (!backendUrl) {
+        console.warn(
+          "VITE_SUPABASE_URL is missing; falling back to the page URL for sharing."
+        );
+        return rawUrl;
+      }
+
+      return `${backendUrl}/functions/v1/blog-og-meta?slug=${encodeURIComponent(slug)}`;
+    } catch {
+      return rawUrl;
+    }
+  };
+
+  // Use the backend-rendered OG meta endpoint for blog posts so social crawlers see the right image/description.
+  const shareUrl = getOgShareUrl(baseUrl);
 
   const socialLinks = [
     {
