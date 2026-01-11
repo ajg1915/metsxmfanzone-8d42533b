@@ -7,10 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Search, Globe, FileText, CheckCircle, AlertCircle, RefreshCw, ExternalLink, Plus, Pencil, Trash2, Eye } from "lucide-react";
+import { Search, Globe, FileText, CheckCircle, AlertCircle, RefreshCw, Plus, Pencil, Trash2, Eye, Tag, Shield, Copy } from "lucide-react";
 
 interface SEOSetting {
   id: string;
@@ -29,32 +31,35 @@ interface SEOSetting {
   updated_at: string;
 }
 
-const defaultPages = [
-  { name: "Home", path: "/" },
-  { name: "Spring Training Live", path: "/spring-training-live" },
-  { name: "Blog", path: "/blog" },
-  { name: "Podcast", path: "/podcast" },
-  { name: "Community", path: "/community" },
-  { name: "Plans", path: "/plans" },
-  { name: "Help Center", path: "/help-center" },
-  { name: "Contact", path: "/contact" },
-  { name: "FAQs", path: "/faqs" },
-  { name: "Events", path: "/events" },
-  { name: "Gallery", path: "/gallery" },
-  { name: "Video Gallery", path: "/video-gallery" },
-];
+interface VerificationTag {
+  id: string;
+  name: string;
+  attribute_type: string;
+  attribute_value: string;
+  content: string;
+  description: string | null;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
 
 export default function SEOManagement() {
   const [seoSettings, setSeoSettings] = useState<SEOSetting[]>([]);
+  const [verificationTags, setVerificationTags] = useState<VerificationTag[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tagsLoading, setTagsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [currentSetting, setCurrentSetting] = useState<Partial<SEOSetting> | null>(null);
+  const [currentTag, setCurrentTag] = useState<Partial<VerificationTag> | null>(null);
   const [saving, setSaving] = useState(false);
   const [seoScore, setSeoScore] = useState({ score: 0, issues: 0, warnings: 0, passed: 0 });
 
   useEffect(() => {
     fetchSEOSettings();
+    fetchVerificationTags();
   }, []);
 
   const fetchSEOSettings = async () => {
@@ -74,27 +79,39 @@ export default function SEOManagement() {
     setLoading(false);
   };
 
+  const fetchVerificationTags = async () => {
+    setTagsLoading(true);
+    const { data, error } = await supabase
+      .from("verification_meta_tags")
+      .select("*")
+      .order("display_order");
+
+    if (error) {
+      console.error("Error fetching verification tags:", error);
+      toast.error("Failed to load verification tags");
+    } else {
+      setVerificationTags(data || []);
+    }
+    setTagsLoading(false);
+  };
+
   const calculateSEOScore = (settings: SEOSetting[]) => {
     let passed = 0;
     let warnings = 0;
     let issues = 0;
 
     settings.forEach((setting) => {
-      // Check title length (50-60 chars ideal)
       if (setting.title.length >= 50 && setting.title.length <= 60) passed++;
       else if (setting.title.length > 0) warnings++;
       else issues++;
 
-      // Check description length (150-160 chars ideal)
       if (setting.description.length >= 150 && setting.description.length <= 160) passed++;
       else if (setting.description.length > 0) warnings++;
       else issues++;
 
-      // Check keywords
       if (setting.keywords && setting.keywords.length > 10) passed++;
       else warnings++;
 
-      // Check OG image
       if (setting.og_image) passed++;
       else warnings++;
     });
@@ -166,6 +183,60 @@ export default function SEOManagement() {
     setSaving(false);
   };
 
+  const handleSaveTag = async () => {
+    if (!currentTag?.name || !currentTag?.attribute_value || !currentTag?.content) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setSaving(true);
+    const isNew = !currentTag.id;
+
+    if (isNew) {
+      const { error } = await supabase.from("verification_meta_tags").insert({
+        name: currentTag.name,
+        attribute_type: currentTag.attribute_type || "name",
+        attribute_value: currentTag.attribute_value,
+        content: currentTag.content,
+        description: currentTag.description || null,
+        is_active: currentTag.is_active !== false,
+        display_order: currentTag.display_order || verificationTags.length + 1,
+      });
+
+      if (error) {
+        console.error("Error creating verification tag:", error);
+        toast.error("Failed to create verification tag");
+      } else {
+        toast.success("Verification tag created successfully");
+        setTagDialogOpen(false);
+        fetchVerificationTags();
+      }
+    } else {
+      const { error } = await supabase
+        .from("verification_meta_tags")
+        .update({
+          name: currentTag.name,
+          attribute_type: currentTag.attribute_type || "name",
+          attribute_value: currentTag.attribute_value,
+          content: currentTag.content,
+          description: currentTag.description || null,
+          is_active: currentTag.is_active !== false,
+          display_order: currentTag.display_order || 0,
+        })
+        .eq("id", currentTag.id);
+
+      if (error) {
+        console.error("Error updating verification tag:", error);
+        toast.error("Failed to update verification tag");
+      } else {
+        toast.success("Verification tag updated successfully");
+        setTagDialogOpen(false);
+        fetchVerificationTags();
+      }
+    }
+    setSaving(false);
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this SEO setting?")) return;
 
@@ -179,9 +250,47 @@ export default function SEOManagement() {
     }
   };
 
+  const handleDeleteTag = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this verification tag?")) return;
+
+    const { error } = await supabase.from("verification_meta_tags").delete().eq("id", id);
+
+    if (error) {
+      toast.error("Failed to delete verification tag");
+    } else {
+      toast.success("Verification tag deleted");
+      fetchVerificationTags();
+    }
+  };
+
+  const toggleTagActive = async (tag: VerificationTag) => {
+    const { error } = await supabase
+      .from("verification_meta_tags")
+      .update({ is_active: !tag.is_active })
+      .eq("id", tag.id);
+
+    if (error) {
+      toast.error("Failed to update tag status");
+    } else {
+      toast.success(`Tag ${!tag.is_active ? "activated" : "deactivated"}`);
+      fetchVerificationTags();
+    }
+  };
+
+  const copyMetaTag = (tag: VerificationTag) => {
+    const metaTag = `<meta name="${tag.attribute_value}" content="${tag.content}" />`;
+    navigator.clipboard.writeText(metaTag);
+    toast.success("Meta tag copied to clipboard");
+  };
+
   const openEditDialog = (setting?: SEOSetting) => {
     setCurrentSetting(setting || { robots: "index, follow", twitter_card: "summary_large_image" });
     setEditDialogOpen(true);
+  };
+
+  const openTagDialog = (tag?: Partial<VerificationTag>) => {
+    setCurrentTag(tag || { attribute_type: "name", is_active: true });
+    setTagDialogOpen(true);
   };
 
   const filteredSettings = seoSettings.filter(
@@ -201,12 +310,8 @@ export default function SEOManagement() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
           <h2 className="text-base sm:text-lg font-bold">SEO Management</h2>
-          <p className="text-xs text-muted-foreground">Manage page titles, descriptions, and meta tags</p>
+          <p className="text-xs text-muted-foreground">Manage page titles, descriptions, meta tags & verification</p>
         </div>
-        <Button size="sm" onClick={() => openEditDialog()} className="gap-1.5">
-          <Plus className="h-3.5 w-3.5" />
-          Add Page SEO
-        </Button>
       </div>
 
       {/* SEO Score Overview */}
@@ -244,11 +349,13 @@ export default function SEOManagement() {
 
         <Card className="min-w-0">
           <CardHeader className="pb-1 pt-3 px-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-[10px] sm:text-xs font-medium">Issues</CardTitle>
-            <AlertCircle className="h-3 w-3 text-red-500" />
+            <CardTitle className="text-[10px] sm:text-xs font-medium">Verification Tags</CardTitle>
+            <Shield className="h-3 w-3 text-primary" />
           </CardHeader>
           <CardContent className="px-3 pb-3">
-            <div className="text-xl sm:text-2xl font-bold text-red-500">{seoScore.issues}</div>
+            <div className="text-xl sm:text-2xl font-bold text-primary">
+              {verificationTags.filter(t => t.is_active).length}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -256,6 +363,7 @@ export default function SEOManagement() {
       <Tabs defaultValue="pages" className="w-full">
         <TabsList className="h-8">
           <TabsTrigger value="pages" className="text-xs px-3 h-7">Pages</TabsTrigger>
+          <TabsTrigger value="verification" className="text-xs px-3 h-7">Verification Tags</TabsTrigger>
           <TabsTrigger value="tools" className="text-xs px-3 h-7">SEO Tools</TabsTrigger>
         </TabsList>
 
@@ -271,10 +379,16 @@ export default function SEOManagement() {
                 className="pl-8 h-8 text-xs"
               />
             </div>
-            <Button variant="outline" size="sm" onClick={fetchSEOSettings} className="gap-1.5">
-              <RefreshCw className="h-3.5 w-3.5" />
-              Refresh
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={fetchSEOSettings} className="gap-1.5">
+                <RefreshCw className="h-3.5 w-3.5" />
+                Refresh
+              </Button>
+              <Button size="sm" onClick={() => openEditDialog()} className="gap-1.5">
+                <Plus className="h-3.5 w-3.5" />
+                Add Page
+              </Button>
+            </div>
           </div>
 
           {/* SEO Settings Table */}
@@ -363,6 +477,163 @@ export default function SEOManagement() {
           </Card>
         </TabsContent>
 
+        {/* Verification Tags Tab */}
+        <TabsContent value="verification" className="mt-3 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-2 justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">
+                Manage site verification meta tags for Google, Facebook, Bing, and other services.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={fetchVerificationTags} className="gap-1.5">
+                <RefreshCw className="h-3.5 w-3.5" />
+                Refresh
+              </Button>
+              <Button size="sm" onClick={() => openTagDialog()} className="gap-1.5">
+                <Plus className="h-3.5 w-3.5" />
+                Add Tag
+              </Button>
+            </div>
+          </div>
+
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Name</TableHead>
+                      <TableHead className="text-xs">Meta Attribute</TableHead>
+                      <TableHead className="text-xs hidden md:table-cell">Content</TableHead>
+                      <TableHead className="text-xs">Status</TableHead>
+                      <TableHead className="text-xs text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {tagsLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                          Loading...
+                        </TableCell>
+                      </TableRow>
+                    ) : verificationTags.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                          No verification tags found. Add your first verification tag.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      verificationTags.map((tag) => (
+                        <TableRow key={tag.id}>
+                          <TableCell className="text-xs">
+                            <div className="flex items-center gap-2">
+                              <Tag className="h-3.5 w-3.5 text-primary" />
+                              <div>
+                                <div className="font-medium">{tag.name}</div>
+                                {tag.description && (
+                                  <div className="text-muted-foreground text-[10px]">{tag.description}</div>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            <code className="bg-muted px-1.5 py-0.5 rounded text-[10px]">
+                              {tag.attribute_type}="{tag.attribute_value}"
+                            </code>
+                          </TableCell>
+                          <TableCell className="text-xs max-w-[200px] truncate hidden md:table-cell">
+                            <code className="text-[10px]">{tag.content}</code>
+                          </TableCell>
+                          <TableCell>
+                            <Switch
+                              checked={tag.is_active}
+                              onCheckedChange={() => toggleTagActive(tag)}
+                              className="scale-75"
+                            />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0"
+                                onClick={() => copyMetaTag(tag)}
+                                title="Copy meta tag"
+                              >
+                                <Copy className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0"
+                                onClick={() => openTagDialog(tag)}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 w-7 p-0 text-destructive"
+                                onClick={() => handleDeleteTag(tag.id)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Reference Card */}
+          <Card>
+            <CardHeader className="pb-2 pt-3 px-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Common Verification Tags
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Click to quickly add common verification tag templates
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-3 pb-3">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  { name: "Google Search Console", attr: "google-site-verification", desc: "Verify site ownership in Google Search Console" },
+                  { name: "Bing Webmaster", attr: "msvalidate.01", desc: "Verify site ownership in Bing Webmaster Tools" },
+                  { name: "Facebook Domain", attr: "facebook-domain-verification", desc: "Verify domain for Facebook Business" },
+                  { name: "Pinterest", attr: "p:domain_verify", desc: "Verify site for Pinterest Rich Pins" },
+                  { name: "Yandex", attr: "yandex-verification", desc: "Verify site in Yandex Webmaster" },
+                  { name: "Norton Safe Web", attr: "norton-safeweb-site-verification", desc: "Verify site for Norton Safe Web" },
+                ].map((template) => (
+                  <Button
+                    key={template.attr}
+                    variant="outline"
+                    size="sm"
+                    className="h-auto py-2 px-3 flex flex-col items-start text-left"
+                    onClick={() => openTagDialog({
+                      name: template.name,
+                      attribute_type: "name",
+                      attribute_value: template.attr,
+                      description: template.desc,
+                      is_active: true,
+                      content: "",
+                    })}
+                  >
+                    <span className="text-xs font-medium">{template.name}</span>
+                    <span className="text-[10px] text-muted-foreground">{template.attr}</span>
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="tools" className="mt-3 space-y-3">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <Card className="cursor-pointer hover:border-primary transition-colors" onClick={() => window.open("https://search.google.com/search-console", "_blank")}>
@@ -440,7 +711,7 @@ export default function SEOManagement() {
         </TabsContent>
       </Tabs>
 
-      {/* Edit Dialog */}
+      {/* Edit SEO Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
@@ -549,6 +820,108 @@ export default function SEOManagement() {
               </Button>
               <Button size="sm" onClick={handleSave} disabled={saving}>
                 {saving ? "Saving..." : "Save SEO Settings"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Verification Tag Dialog */}
+      <Dialog open={tagDialogOpen} onOpenChange={setTagDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-sm">{currentTag?.id ? "Edit" : "Add"} Verification Tag</DialogTitle>
+            <DialogDescription className="text-xs">
+              Add a meta tag for site verification or analytics
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Tag Name *</Label>
+              <Input
+                placeholder="Google Site Verification"
+                value={currentTag?.name || ""}
+                onChange={(e) => setCurrentTag({ ...currentTag, name: e.target.value })}
+                className="h-8 text-xs"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs">Attribute Type</Label>
+                <Select
+                  value={currentTag?.attribute_type || "name"}
+                  onValueChange={(value) => setCurrentTag({ ...currentTag, attribute_type: value })}
+                >
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name">name</SelectItem>
+                    <SelectItem value="property">property</SelectItem>
+                    <SelectItem value="http-equiv">http-equiv</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Attribute Value *</Label>
+                <Input
+                  placeholder="google-site-verification"
+                  value={currentTag?.attribute_value || ""}
+                  onChange={(e) => setCurrentTag({ ...currentTag, attribute_value: e.target.value })}
+                  className="h-8 text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs">Content Value *</Label>
+              <Input
+                placeholder="your-verification-code-here"
+                value={currentTag?.content || ""}
+                onChange={(e) => setCurrentTag({ ...currentTag, content: e.target.value })}
+                className="h-8 text-xs"
+              />
+              <p className="text-[10px] text-muted-foreground">The verification code provided by the service</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs">Description (optional)</Label>
+              <Textarea
+                placeholder="What this verification is for..."
+                value={currentTag?.description || ""}
+                onChange={(e) => setCurrentTag({ ...currentTag, description: e.target.value })}
+                className="text-xs min-h-[50px]"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={currentTag?.is_active !== false}
+                  onCheckedChange={(checked) => setCurrentTag({ ...currentTag, is_active: checked })}
+                />
+                <Label className="text-xs">Active</Label>
+              </div>
+            </div>
+
+            {/* Preview */}
+            {currentTag?.attribute_value && currentTag?.content && (
+              <div className="space-y-1.5">
+                <Label className="text-xs">Preview</Label>
+                <code className="block bg-muted p-2 rounded text-[10px] break-all">
+                  {`<meta ${currentTag.attribute_type || "name"}="${currentTag.attribute_value}" content="${currentTag.content}" />`}
+                </code>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" size="sm" onClick={() => setTagDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleSaveTag} disabled={saving}>
+                {saving ? "Saving..." : "Save Tag"}
               </Button>
             </div>
           </div>
