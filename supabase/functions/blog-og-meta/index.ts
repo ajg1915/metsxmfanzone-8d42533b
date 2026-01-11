@@ -24,6 +24,26 @@ const escapeHtml = (input: string) =>
 const stripHtml = (input: string) =>
   input.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 
+const CRAWLER_USER_AGENTS = [
+  "facebookexternalhit",
+  "Facebot",
+  "Twitterbot",
+  "LinkedInBot",
+  "WhatsApp",
+  "Slackbot",
+  "TelegramBot",
+  "DiscordBot",
+  "pinterest",
+  "redditbot",
+  "Googlebot",
+];
+
+function isCrawler(userAgent: string): boolean {
+  if (!userAgent) return false;
+  const ua = userAgent.toLowerCase();
+  return CRAWLER_USER_AGENTS.some((bot) => ua.includes(bot.toLowerCase()));
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -36,7 +56,25 @@ Deno.serve(async (req) => {
     if (!slug) {
       return new Response("Missing slug parameter", {
         status: 400,
-        headers: corsHeaders,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "text/plain; charset=utf-8",
+        },
+      });
+    }
+
+    const postUrl = `${SITE_URL}/blog/${encodeURIComponent(slug)}`;
+    const userAgent = req.headers.get("user-agent") || "";
+
+    // Humans should go straight to the blog post; crawlers need the OG HTML.
+    if (!isCrawler(userAgent)) {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          ...corsHeaders,
+          Location: postUrl,
+          "Cache-Control": "no-store",
+        },
       });
     }
 
@@ -52,13 +90,21 @@ Deno.serve(async (req) => {
       )
       .eq("slug", slug)
       .eq("published", true)
-      .single();
+      .maybeSingle();
 
     if (error || !post) {
-      return new Response("Post not found", { status: 404, headers: corsHeaders });
+      return new Response("Post not found", {
+        status: 404,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "text/plain; charset=utf-8",
+        },
+      });
     }
 
-    const postUrl = `${SITE_URL}/blog/${slug}`;
+    // Important: set og:url to the *share URL* (this page), not the blog URL,
+    // otherwise some platforms canonicalize to /blog/:slug and fall back to your site-wide OG.
+    const sharePageUrl = url.toString();
 
     // Ensure proper absolute image URL (avoid base64)
     let socialImage = post.featured_image_url || `${SITE_URL}/logo-512.png`;
@@ -83,8 +129,9 @@ Deno.serve(async (req) => {
     const publishedTime = post.published_at || new Date().toISOString();
 
     const tagsMetaTags = (post.tags || [])
-      .map((tag: string) =>
-        `<meta property="article:tag" content="${escapeHtml(tag)}" />`
+      .map(
+        (tag: string) =>
+          `<meta property="article:tag" content="${escapeHtml(tag)}" />`
       )
       .join("\n    ");
 
@@ -107,7 +154,7 @@ Deno.serve(async (req) => {
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="article">
-    <meta property="og:url" content="${postUrl}">
+    <meta property="og:url" content="${sharePageUrl}">
     <meta property="og:site_name" content="MetsXMFanZone">
     <meta property="og:title" content="${safeTitleAttr}">
     <meta property="og:description" content="${safeDescriptionAttr}">
@@ -129,46 +176,42 @@ Deno.serve(async (req) => {
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@metsxmfanzone">
     <meta name="twitter:creator" content="@metsxmfanzone">
-    <meta name="twitter:url" content="${postUrl}">
+    <meta name="twitter:url" content="${sharePageUrl}">
     <meta name="twitter:title" content="${safeTitleAttr}">
     <meta name="twitter:description" content="${safeDescriptionAttr}">
     <meta name="twitter:image" content="${socialImage}">
     <meta name="twitter:image:alt" content="${safePostTitleAttr}">
 
-    <!-- Canonical -->
+    <!-- Canonical (real article URL) -->
     <link rel="canonical" href="${postUrl}">
-
-    <!-- Redirect to actual blog post -->
-    <meta http-equiv="refresh" content="0;url=${postUrl}">
-    <script>window.location.href = ${JSON.stringify(postUrl)};</script>
 </head>
 <body>
     <div style="font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; text-align: center;">
         <h1 style="margin-bottom: 16px;">${escapeHtml(post.title)}</h1>
         <p style="color: #666; font-size: 18px; line-height: 1.6;">${escapeHtml(socialDescription)}</p>
-        <p style="color: #999; margin-top: 20px;">Redirecting…</p>
-        <noscript>
-            <a href="${postUrl}">Click here if you are not redirected</a>
-        </noscript>
+        <p style="color: #999; margin-top: 20px;">This is the share preview page for social media crawlers.</p>
+        <p style="margin-top: 12px;"><a href="${postUrl}">Continue to the article</a></p>
     </div>
 </body>
 </html>`;
 
-    const headers = new Headers(corsHeaders);
-    headers.set("content-type", "text/html; charset=utf-8");
-    headers.set("cache-control", "public, max-age=3600, s-maxage=7200");
-
-    return new Response(html, { headers });
+    return new Response(html, {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "public, max-age=3600, s-maxage=7200",
+      },
+    });
   } catch (error) {
     console.error("Error generating meta tags:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
-    const headers = new Headers(corsHeaders);
-    headers.set("content-type", "application/json; charset=utf-8");
-
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json; charset=utf-8",
+      },
     });
   }
 });
