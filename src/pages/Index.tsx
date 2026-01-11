@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import ImmersiveBackground from "@/components/ImmersiveBackground";
@@ -31,6 +31,36 @@ import { useEffect } from "react";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import { useAutoLineupFetch } from "@/hooks/useAutoLineupFetch";
 
+// Homepage structured data
+const homepageSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://www.metsxmfanzone.com/#webpage",
+  "url": "https://www.metsxmfanzone.com/",
+  "name": "MetsXMFanZone - #1 New York Mets Fan Community",
+  "description": "The ultimate Mets fan community. Watch live game streams, highlights, podcasts, and exclusive Mets coverage. Join thousands of passionate New York Mets fans.",
+  "isPartOf": {
+    "@id": "https://www.metsxmfanzone.com/#website"
+  },
+  "about": {
+    "@type": "SportsTeam",
+    "name": "New York Mets",
+    "sport": "Baseball",
+    "memberOf": {
+      "@type": "SportsOrganization",
+      "name": "Major League Baseball"
+    }
+  },
+  "primaryImageOfPage": {
+    "@type": "ImageObject",
+    "url": "https://www.metsxmfanzone.com/og-image.png"
+  },
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": ["h1", ".hero-description"]
+  }
+};
+
 const Index = () => {
   // Auto-fetch Mets lineup on game days (every 30 minutes)
   useAutoLineupFetch();
@@ -48,12 +78,20 @@ const Index = () => {
       {/* Immersive animated background */}
       <ImmersiveBackground />
       
-      <Helmet>
-        <title>MetsXMFanZone - Watch Mets Live Streams, Highlights & Exclusive Coverage</title>
-        <meta name="description" content="The ultimate Mets fan community. Watch live game streams, highlights, podcasts, and exclusive Mets coverage. Join thousands of passionate New York Mets fans." />
-        <meta name="keywords" content="Mets live streams, New York Mets, Mets highlights, Mets podcast, Mets fan community, MLB streams, Mets games, baseball live stream" />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/" />
-      </Helmet>
+      <SEOHead
+        title="MetsXMFanZone - #1 New York Mets Fan Community | Live Games, News & Podcasts"
+        description="The ultimate Mets fan community. Watch live game streams, highlights, podcasts, and exclusive Mets coverage. Join thousands of passionate New York Mets fans."
+        keywords="Mets live streams, New York Mets, Mets highlights, Mets podcast, Mets fan community, MLB streams, Mets games, baseball live stream, Spring Training, Francisco Lindor, Pete Alonso, Citi Field"
+        canonical="https://www.metsxmfanzone.com/"
+        ogType="website"
+        ogImage="https://www.metsxmfanzone.com/og-image.png"
+        ogImageAlt="MetsXMFanZone - The Ultimate New York Mets Fan Community"
+        structuredData={homepageSchema}
+        pageType="home"
+        breadcrumbs={[
+          { name: "Home", url: "/" }
+        ]}
+      />
       <Navigation />
       <LiveGameTicker />
       <main className="pt-14 sm:pt-16 relative z-10">
