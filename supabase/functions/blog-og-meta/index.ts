@@ -200,10 +200,10 @@ Deno.serve(async (req) => {
 </html>`;
 
     const headers = new Headers(corsHeaders);
-    headers.set("cache-control", "public, max-age=3600, s-maxage=7200");
+    headers.set("Cache-Control", "public, max-age=3600, s-maxage=7200");
+    headers.set("Content-Type", "text/html; charset=utf-8");
 
-    const body = new Blob([html], { type: "text/html; charset=utf-8" });
-    return new Response(body, { headers });
+    return new Response(html, { headers });
 
   } catch (error) {
     console.error("Error generating meta tags:", error);
