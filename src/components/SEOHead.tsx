@@ -16,10 +16,16 @@ interface SEOHeadProps {
   tags?: string[];
   noindex?: boolean;
   structuredData?: object;
+  // New SEO enhancements
+  pageType?: "home" | "blog" | "article" | "product" | "video" | "podcast" | "event" | "faq";
+  breadcrumbs?: Array<{ name: string; url: string }>;
+  readingTime?: number;
+  wordCount?: number;
 }
 
 const BASE_URL = "https://www.metsxmfanzone.com";
-const DEFAULT_IMAGE = `${BASE_URL}/logo-512.png`;
+const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
+const FALLBACK_IMAGE = `${BASE_URL}/logo-512.png`;
 const SITE_NAME = "MetsXMFanZone";
 const TWITTER_HANDLE = "@metsxmfanzone";
 
@@ -39,6 +45,10 @@ export default function SEOHead({
   tags = [],
   noindex = false,
   structuredData,
+  pageType,
+  breadcrumbs,
+  readingTime,
+  wordCount,
 }: SEOHeadProps) {
   const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
   const trimmedDescription = description.length > 160 
@@ -56,6 +66,18 @@ export default function SEOHead({
     socialImage = `${BASE_URL}${socialImage.startsWith('/') ? '' : '/'}${socialImage}`;
   }
 
+  // Generate breadcrumb structured data
+  const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumbs.map((crumb, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": crumb.name,
+      "item": crumb.url.startsWith('http') ? crumb.url : `${BASE_URL}${crumb.url}`,
+    })),
+  } : null;
+
   return (
     <Helmet>
       {/* Primary Meta Tags */}
@@ -65,7 +87,12 @@ export default function SEOHead({
       {keywords && <meta name="keywords" content={keywords} />}
       <meta name="author" content={author} />
       <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />
+      <meta name="googlebot" content={noindex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large"} />
       <link rel="canonical" href={canonicalUrl} />
+      
+      {/* Reading time for articles */}
+      {readingTime && <meta name="twitter:label1" content="Reading time" />}
+      {readingTime && <meta name="twitter:data1" content={`${readingTime} min read`} />}
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={ogType} />
@@ -105,6 +132,7 @@ export default function SEOHead({
       <meta name="twitter:description" content={trimmedDescription} />
       <meta name="twitter:image" content={socialImage} />
       <meta name="twitter:image:alt" content={finalImageAlt} />
+      <meta name="twitter:domain" content="metsxmfanzone.com" />
 
       {/* LinkedIn */}
       <meta property="linkedin:owner" content={SITE_NAME} />
@@ -113,6 +141,13 @@ export default function SEOHead({
       {structuredData && (
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
+        </script>
+      )}
+
+      {/* Breadcrumb Structured Data */}
+      {breadcrumbSchema && (
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
         </script>
       )}
     </Helmet>
