@@ -102,9 +102,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Important: set og:url to the *share URL* (this page), not the blog URL,
+    // Important: set og:url to the *share URL* (this function endpoint), not the blog URL,
     // otherwise some platforms canonicalize to /blog/:slug and fall back to your site-wide OG.
-    const sharePageUrl = url.toString();
+    const supabaseUrl = (Deno.env.get("SUPABASE_URL") || "").replace(/\/$/, "");
+    const sharePageUrl = supabaseUrl
+      ? `${supabaseUrl}/functions/v1/blog-og-meta?slug=${encodeURIComponent(slug)}`
+      : url.toString();
+
 
     // Ensure proper absolute image URL (avoid base64)
     let socialImage = post.featured_image_url || `${SITE_URL}/logo-512.png`;
@@ -195,13 +199,12 @@ Deno.serve(async (req) => {
 </body>
 </html>`;
 
-    return new Response(html, {
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "public, max-age=3600, s-maxage=7200",
-      },
-    });
+    const headers = new Headers(corsHeaders);
+    headers.set("cache-control", "public, max-age=3600, s-maxage=7200");
+
+    const body = new Blob([html], { type: "text/html; charset=utf-8" });
+    return new Response(body, { headers });
+
   } catch (error) {
     console.error("Error generating meta tags:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
