@@ -25,22 +25,22 @@ interface TalentAssessment {
   assessment_date: string;
 }
 
-// Grade colors using brand palette (orange primary, blue secondary)
+// Grade colors using brand palette (orange #ff4500 and blue)
 const getGradeColor = (grade: string): string => {
-  if (grade.startsWith("A")) return "from-primary to-orange-600"; // Elite - Orange
-  if (grade.startsWith("B")) return "from-secondary to-blue-500"; // Above Avg - Blue
-  if (grade.startsWith("C")) return "from-muted-foreground to-slate-500"; // Average - Muted
-  if (grade.startsWith("D")) return "from-slate-600 to-slate-700"; // Below Avg - Dark
-  return "from-slate-700 to-slate-800"; // Poor
+  if (grade.startsWith("A")) return "from-primary to-orange-600"; // Elite - Bright Orange
+  if (grade.startsWith("B")) return "from-primary/80 to-orange-500"; // Above Avg - Orange
+  if (grade.startsWith("C")) return "from-secondary to-blue-600"; // Average - Bright Blue
+  if (grade.startsWith("D")) return "from-secondary/70 to-blue-800"; // Below Avg - Dark Blue
+  return "from-secondary/50 to-blue-900"; // Poor - Darkest Blue
 };
 
 const getGradeBadgeColor = (grade: string | null): string => {
   if (!grade) return "bg-muted text-muted-foreground";
   if (grade.startsWith("A")) return "bg-primary/20 text-primary border-primary/50"; // Elite - Orange
-  if (grade.startsWith("B")) return "bg-secondary/20 text-blue-400 border-secondary/50"; // Above Avg - Blue  
-  if (grade.startsWith("C")) return "bg-muted text-muted-foreground border-muted"; // Average
-  if (grade.startsWith("D")) return "bg-slate-700/20 text-slate-400 border-slate-600/50"; // Below Avg
-  return "bg-slate-800/20 text-slate-500 border-slate-700/50"; // Poor
+  if (grade.startsWith("B")) return "bg-primary/10 text-orange-400 border-primary/30"; // Above Avg - Light Orange
+  if (grade.startsWith("C")) return "bg-secondary/20 text-blue-400 border-secondary/50"; // Average - Blue
+  if (grade.startsWith("D")) return "bg-secondary/10 text-blue-500 border-secondary/30"; // Below Avg - Light Blue
+  return "bg-secondary/5 text-blue-600 border-secondary/20"; // Poor
 };
 
 const TalentAssessmentSection = () => {
@@ -241,9 +241,9 @@ const TalentAssessmentSection = () => {
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
             <span className="font-medium">Grade Scale:</span>
             <Badge className="bg-primary/20 text-primary border-primary/50">A - Elite</Badge>
-            <Badge className="bg-secondary/20 text-blue-400 border-secondary/50">B - Above Avg</Badge>
-            <Badge className="bg-muted text-muted-foreground border-muted">C - Average</Badge>
-            <Badge className="bg-slate-700/20 text-slate-400 border-slate-600/50">D - Below Avg</Badge>
+            <Badge className="bg-primary/10 text-orange-400 border-primary/30">B - Above Avg</Badge>
+            <Badge className="bg-secondary/20 text-blue-400 border-secondary/50">C - Average</Badge>
+            <Badge className="bg-secondary/10 text-blue-500 border-secondary/30">D - Below Avg</Badge>
           </div>
         </div>
       </GlassCard>
