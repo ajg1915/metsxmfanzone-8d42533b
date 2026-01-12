@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "./GlassCard";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { Loader2, Star, Users, RefreshCw, Sparkles } from "lucide-react";
+import { Loader2, Users, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
+import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
 interface TalentAssessment {
   id: string;
@@ -43,7 +43,6 @@ const getGradeBadgeColor = (grade: string | null): string => {
 };
 
 const TalentAssessmentSection = () => {
-  const queryClient = useQueryClient();
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
 
   const { data: assessments, isLoading } = useQuery({
@@ -61,23 +60,6 @@ const TalentAssessmentSection = () => {
     },
   });
 
-  const generateMutation = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.functions.invoke("generate-talent-assessments", {
-        body: { forceRegenerate: true },
-      });
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["talent-assessments"] });
-      toast.success("Talent assessments generated!");
-    },
-    onError: (error) => {
-      toast.error("Failed to generate assessments");
-      console.error(error);
-    },
-  });
 
   const toggleFlip = (id: string) => {
     setFlippedCards((prev) => {
@@ -100,9 +82,7 @@ const TalentAssessmentSection = () => {
       <GlassCard className="p-6 md:p-8 border-2 border-primary/30 shadow-[0_0_30px_rgba(var(--primary),0.3)]">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-orange-500 shadow-lg">
-              <Star className="h-6 w-6 text-white" />
-            </div>
+            <img src={metsLogo} alt="MetsXMFanZone" className="h-12 w-12 object-contain" />
             <div>
               <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-orange-400 to-primary bg-clip-text text-transparent">
                 Mets 2026 Talent Outlook
@@ -228,7 +208,7 @@ const TalentAssessmentSection = () => {
                   <div className="absolute inset-0 backface-hidden rotate-y-180">
                     <div className="h-full rounded-2xl bg-gradient-to-br from-primary/20 to-orange-500/20 border-2 border-primary/40 p-5 shadow-xl flex flex-col">
                       <div className="flex items-center gap-2 mb-3">
-                        <Star className="h-5 w-5 text-primary" />
+                        <img src={metsLogo} alt="MetsXMFanZone" className="h-5 w-5 object-contain" />
                         <h4 className="font-bold text-lg text-foreground">Anthony's Take</h4>
                       </div>
                       <p className="text-foreground/90 text-sm leading-relaxed flex-1 overflow-auto">
@@ -250,19 +230,8 @@ const TalentAssessmentSection = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-muted-foreground mb-4">Talent assessments not yet available for today</p>
-            <Button 
-              onClick={() => generateMutation.mutate()} 
-              disabled={generateMutation.isPending}
-              className="gap-2"
-            >
-              {generateMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4" />
-              )}
-              Generate Today's Assessments
-            </Button>
+            <img src={metsLogo} alt="MetsXMFanZone" className="h-16 w-16 mx-auto mb-4 opacity-60" />
+            <p className="text-muted-foreground">Assessments not yet available</p>
           </div>
         )}
 
