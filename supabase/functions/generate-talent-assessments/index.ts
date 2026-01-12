@@ -29,14 +29,23 @@ const fetchMetsRoster = async (): Promise<any[]> => {
     return data.roster || [];
   } catch (error) {
     console.error("Error fetching roster:", error);
-    // Fallback roster
+    // Fallback to current 2026 Mets roster
     return [
-      { person: { id: 624413, fullName: "Pete Alonso" }, position: { abbreviation: "1B" } },
       { person: { id: 596019, fullName: "Francisco Lindor" }, position: { abbreviation: "SS" } },
-      { person: { id: 605141, fullName: "Brandon Nimmo" }, position: { abbreviation: "CF" } },
-      { person: { id: 666158, fullName: "Mark Vientos" }, position: { abbreviation: "3B" } },
-      { person: { id: 677951, fullName: "Francisco Alvarez" }, position: { abbreviation: "C" } },
-      { person: { id: 663728, fullName: "Kodai Senga" }, position: { abbreviation: "P" } },
+      { person: { id: 665742, fullName: "Juan Soto" }, position: { abbreviation: "RF" } },
+      { person: { id: 607043, fullName: "Brandon Nimmo" }, position: { abbreviation: "CF" } },
+      { person: { id: 668901, fullName: "Mark Vientos" }, position: { abbreviation: "1B" } },
+      { person: { id: 682626, fullName: "Francisco Alvarez" }, position: { abbreviation: "C" } },
+      { person: { id: 608385, fullName: "Jesse Winker" }, position: { abbreviation: "LF" } },
+      { person: { id: 694389, fullName: "Luisangel Acuña" }, position: { abbreviation: "2B" } },
+      { person: { id: 578428, fullName: "Jose Iglesias" }, position: { abbreviation: "3B" } },
+      { person: { id: 673085, fullName: "Kodai Senga" }, position: { abbreviation: "SP" } },
+      { person: { id: 593423, fullName: "Frankie Montas" }, position: { abbreviation: "SP" } },
+      { person: { id: 605280, fullName: "Clay Holmes" }, position: { abbreviation: "RP" } },
+      { person: { id: 640455, fullName: "Sean Manaea" }, position: { abbreviation: "SP" } },
+      { person: { id: 656849, fullName: "David Peterson" }, position: { abbreviation: "SP" } },
+      { person: { id: 500779, fullName: "Jose Quintana" }, position: { abbreviation: "SP" } },
+      { person: { id: 621242, fullName: "Edwin Diaz" }, position: { abbreviation: "CL" } },
     ];
   }
 };

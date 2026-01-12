@@ -88,7 +88,7 @@ const TalentAssessmentSection = () => {
 
   return (
     <section className="py-12 px-4 max-w-full">
-      <GlassCard className="p-6 md:p-8 border-2 border-primary/30 shadow-[0_0_30px_rgba(var(--primary),0.3)]">
+      <GlassCard glow="blue" className="p-6 md:p-8 border-2 border-primary/30 shadow-[0_0_30px_rgba(var(--primary),0.3)]">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
             <img src={metsLogo} alt="MetsXMFanZone" className="h-12 w-12 object-contain" />

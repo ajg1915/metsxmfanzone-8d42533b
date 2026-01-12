@@ -32,18 +32,23 @@ async function fetchMetsRoster(): Promise<Array<{ name: string; id: number }>> {
     }));
   } catch (error) {
     console.error("Error fetching Mets roster:", error);
-    // Fallback to known players if API fails
+    // Fallback to current 2026 Mets roster if API fails
     return [
       { name: "Francisco Lindor", id: 596019 },
       { name: "Juan Soto", id: 665742 },
       { name: "Brandon Nimmo", id: 607043 },
-      { name: "Jeff McNeil", id: 643446 },
+      { name: "Jesse Winker", id: 608385 },
       { name: "Mark Vientos", id: 668901 },
       { name: "Francisco Alvarez", id: 682626 },
-      { name: "Starling Marte", id: 516782 },
+      { name: "Jose Iglesias", id: 578428 },
+      { name: "Luisangel Acuña", id: 694389 },
       { name: "Kodai Senga", id: 673085 },
-      { name: "Edwin Diaz", id: 621242 },
+      { name: "Frankie Montas", id: 593423 },
+      { name: "Clay Holmes", id: 605280 },
       { name: "Sean Manaea", id: 640455 },
+      { name: "David Peterson", id: 656849 },
+      { name: "Jose Quintana", id: 500779 },
+      { name: "Edwin Diaz", id: 621242 },
     ];
   }
 }
