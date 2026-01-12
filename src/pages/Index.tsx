@@ -1,4 +1,4 @@
-tion import SEOHead from "@/components/SEOHead";
+import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import ImmersiveBackground from "@/components/ImmersiveBackground";
