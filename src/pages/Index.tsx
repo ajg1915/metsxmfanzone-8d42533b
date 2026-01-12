@@ -1,4 +1,4 @@
-import SEOHead from "@/components/SEOHead";
+tion import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import ImmersiveBackground from "@/components/ImmersiveBackground";
@@ -37,7 +37,7 @@ const homepageSchema = {
   "@type": "WebPage",
   "@id": "https://www.metsxmfanzone.com/#webpage",
   url: "https://www.metsxmfanzone.com/",
-  name: "MetsXMFanZone - #1 New York Mets Fan Community",
+  name: "MetsXMFanZone - The Ultimate Destination Where the Fans Go",
   description:
     "The ultimate Mets fan community. Watch live game streams, highlights, podcasts, and exclusive Mets coverage. Join thousands of passionate New York Mets fans.",
   isPartOf: {
