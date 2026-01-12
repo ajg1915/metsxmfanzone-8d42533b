@@ -96,7 +96,7 @@ const TalentAssessmentSection = () => {
               <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-orange-400 to-primary bg-clip-text text-transparent">
                 Mets Fan Outlook
               </h2>
-              <p className="text-muted-foreground text-sm">Anthony's daily player grades & analysis</p>
+              <p className="text-muted-foreground text-sm">Anthony's weekly player grades & analysis</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

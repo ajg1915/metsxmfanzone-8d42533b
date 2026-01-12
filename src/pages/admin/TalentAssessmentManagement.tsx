@@ -143,7 +143,7 @@ const TalentAssessmentManagement = () => {
             <Star className="h-6 w-6 text-primary" />
             Mets Fan Outlook Management
           </h1>
-          <p className="text-muted-foreground">Manage weekly 2026 Mets player talent grades</p>
+          <p className="text-muted-foreground">Manage weekly Mets player talent grades</p>
         </div>
         <div className="flex gap-2">
           <AlertDialog>
