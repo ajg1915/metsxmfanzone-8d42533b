@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,6 +6,14 @@ const corsHeaders = {
 };
 
 const METS_TEAM_ID = 121;
+
+// Get the start of the current week (Sunday)
+const getWeekStartDate = (date: Date = new Date()): string => {
+  const d = new Date(date);
+  const day = d.getDay(); // 0 = Sunday
+  d.setDate(d.getDate() - day);
+  return d.toISOString().split("T")[0];
+};
 
 const getPlayerImageUrl = (playerId: number): string => {
   return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${playerId}/headshot/67/current`;
@@ -47,18 +55,19 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    const today = new Date().toISOString().split("T")[0];
+    // Use week start date instead of daily
+    const weekStart = getWeekStartDate();
     
-    // Check if we already have assessments for today
+    // Check if we already have assessments for this week
     const { data: existingAssessments } = await supabase
       .from("daily_talent_assessments")
       .select("id")
-      .eq("assessment_date", today)
+      .eq("assessment_date", weekStart)
       .limit(1);
     
     if (existingAssessments && existingAssessments.length > 0 && !forceRegenerate) {
       return new Response(
-        JSON.stringify({ message: "Assessments already exist for today", skipped: true }),
+        JSON.stringify({ message: "Assessments already exist for this week", weekStart, skipped: true }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -68,7 +77,7 @@ Deno.serve(async (req) => {
       await supabase
         .from("daily_talent_assessments")
         .delete()
-        .eq("assessment_date", today);
+        .eq("assessment_date", weekStart);
     }
     
     // Fetch roster and select 6 random players
@@ -82,7 +91,7 @@ Deno.serve(async (req) => {
       position: p.position?.abbreviation || "UTIL"
     }));
     
-    const prompt = `You are Anthony, a passionate New York Mets fan and baseball analyst for MetsXMFanZone. Generate talent assessments for the 2026 Mets season for these 6 players:
+    const prompt = `You are Anthony, a passionate New York Mets fan and baseball analyst for MetsXMFanZone. Generate weekly talent assessments for the 2026 Mets season for these 6 players:
 
 ${playerList.map((p, i) => `${i + 1}. ${p.name} (${p.position})`).join("\n")}
 
@@ -90,7 +99,7 @@ For each player, provide:
 1. An overall letter grade (A+, A, A-, B+, B, B-, C+, C, C-, D, F)
 2. Tool grades for position players: hitting, fielding, power, speed
 3. Tool grades for pitchers: pitching, arm (velocity/stuff)
-4. A short, opinionated take (2-3 sentences) on their 2026 outlook - be bold, passionate, and fan-focused
+4. A short, opinionated take (2-3 sentences) on their weekly outlook - be bold, passionate, and fan-focused
 
 Use the tool to return the structured data. Be realistic but hopeful as a Mets fan would be. Mix in some hot takes!`;
 
@@ -111,7 +120,7 @@ Use the tool to return the structured data. Be realistic but hopeful as a Mets f
             type: "function",
             function: {
               name: "submit_talent_assessments",
-              description: "Submit talent assessments for 6 Mets players",
+              description: "Submit weekly talent assessments for 6 Mets players",
               parameters: {
                 type: "object",
                 properties: {
@@ -176,17 +185,17 @@ Use the tool to return the structured data. Be realistic but hopeful as a Mets f
         arm_grade: assessment.arm_grade || null,
         pitching_grade: assessment.pitching_grade || null,
         opinion: assessment.opinion,
-        assessment_date: today,
+        assessment_date: weekStart, // Use week start date
       };
     });
 
-    // Delete old assessments (older than 7 days)
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
+    // Delete old assessments (older than 4 weeks)
+    const fourWeeksAgo = new Date();
+    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
     await supabase
       .from("daily_talent_assessments")
       .delete()
-      .lt("assessment_date", weekAgo.toISOString().split("T")[0]);
+      .lt("assessment_date", fourWeeksAgo.toISOString().split("T")[0]);
 
     // Insert new assessments
     const { error: insertError } = await supabase
@@ -201,7 +210,8 @@ Use the tool to return the structured data. Be realistic but hopeful as a Mets f
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Talent assessments generated successfully",
+        message: "Weekly talent assessments generated successfully",
+        weekStart,
         count: assessmentsToInsert.length 
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

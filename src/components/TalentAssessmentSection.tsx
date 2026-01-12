@@ -43,17 +43,25 @@ const getGradeBadgeColor = (grade: string | null): string => {
   return "bg-secondary/5 text-blue-800 border-secondary/20"; // Poor
 };
 
+// Get week start (Sunday) for consistent weekly queries
+const getWeekStartDate = (date: Date = new Date()): string => {
+  const d = new Date(date);
+  const day = d.getDay(); // 0 = Sunday
+  d.setDate(d.getDate() - day);
+  return d.toISOString().split("T")[0];
+};
+
 const TalentAssessmentSection = () => {
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
+  const weekStart = getWeekStartDate();
 
   const { data: assessments, isLoading } = useQuery({
-    queryKey: ["talent-assessments"],
+    queryKey: ["talent-assessments", weekStart],
     queryFn: async () => {
-      const today = new Date().toISOString().split("T")[0];
       const { data, error } = await supabase
         .from("daily_talent_assessments")
         .select("*")
-        .eq("assessment_date", today)
+        .eq("assessment_date", weekStart)
         .order("created_at", { ascending: true });
 
       if (error) throw error;
