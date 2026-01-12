@@ -25,21 +25,22 @@ interface TalentAssessment {
   assessment_date: string;
 }
 
+// Grade colors using brand palette (orange primary, blue secondary)
 const getGradeColor = (grade: string): string => {
-  if (grade.startsWith("A")) return "from-emerald-500 to-green-600";
-  if (grade.startsWith("B")) return "from-blue-500 to-blue-600";
-  if (grade.startsWith("C")) return "from-yellow-500 to-orange-500";
-  if (grade.startsWith("D")) return "from-orange-500 to-red-500";
-  return "from-red-600 to-red-700";
+  if (grade.startsWith("A")) return "from-primary to-orange-600"; // Elite - Orange
+  if (grade.startsWith("B")) return "from-secondary to-blue-500"; // Above Avg - Blue
+  if (grade.startsWith("C")) return "from-muted-foreground to-slate-500"; // Average - Muted
+  if (grade.startsWith("D")) return "from-slate-600 to-slate-700"; // Below Avg - Dark
+  return "from-slate-700 to-slate-800"; // Poor
 };
 
 const getGradeBadgeColor = (grade: string | null): string => {
   if (!grade) return "bg-muted text-muted-foreground";
-  if (grade.startsWith("A")) return "bg-emerald-500/20 text-emerald-400 border-emerald-500/50";
-  if (grade.startsWith("B")) return "bg-blue-500/20 text-blue-400 border-blue-500/50";
-  if (grade.startsWith("C")) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/50";
-  if (grade.startsWith("D")) return "bg-orange-500/20 text-orange-400 border-orange-500/50";
-  return "bg-red-500/20 text-red-400 border-red-500/50";
+  if (grade.startsWith("A")) return "bg-primary/20 text-primary border-primary/50"; // Elite - Orange
+  if (grade.startsWith("B")) return "bg-secondary/20 text-blue-400 border-secondary/50"; // Above Avg - Blue  
+  if (grade.startsWith("C")) return "bg-muted text-muted-foreground border-muted"; // Average
+  if (grade.startsWith("D")) return "bg-slate-700/20 text-slate-400 border-slate-600/50"; // Below Avg
+  return "bg-slate-800/20 text-slate-500 border-slate-700/50"; // Poor
 };
 
 const TalentAssessmentSection = () => {
@@ -239,10 +240,10 @@ const TalentAssessmentSection = () => {
         <div className="mt-8 pt-6 border-t border-primary/20">
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
             <span className="font-medium">Grade Scale:</span>
-            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50">A - Elite</Badge>
-            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/50">B - Above Avg</Badge>
-            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50">C - Average</Badge>
-            <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/50">D - Below Avg</Badge>
+            <Badge className="bg-primary/20 text-primary border-primary/50">A - Elite</Badge>
+            <Badge className="bg-secondary/20 text-blue-400 border-secondary/50">B - Above Avg</Badge>
+            <Badge className="bg-muted text-muted-foreground border-muted">C - Average</Badge>
+            <Badge className="bg-slate-700/20 text-slate-400 border-slate-600/50">D - Below Avg</Badge>
           </div>
         </div>
       </GlassCard>
