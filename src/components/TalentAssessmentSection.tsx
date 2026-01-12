@@ -29,18 +29,18 @@ interface TalentAssessment {
 const getGradeColor = (grade: string): string => {
   if (grade.startsWith("A")) return "from-primary to-orange-600"; // Elite - Bright Orange
   if (grade.startsWith("B")) return "from-primary/80 to-orange-500"; // Above Avg - Orange
-  if (grade.startsWith("C")) return "from-secondary to-blue-600"; // Average - Bright Blue
-  if (grade.startsWith("D")) return "from-secondary/70 to-blue-800"; // Below Avg - Dark Blue
-  return "from-secondary/50 to-blue-900"; // Poor - Darkest Blue
+  if (grade.startsWith("C")) return "from-secondary to-blue-800"; // Average - Dark Blue
+  if (grade.startsWith("D")) return "from-secondary/70 to-blue-900"; // Below Avg - Darker Blue
+  return "from-secondary/50 to-blue-950"; // Poor - Darkest Blue
 };
 
 const getGradeBadgeColor = (grade: string | null): string => {
   if (!grade) return "bg-muted text-muted-foreground";
   if (grade.startsWith("A")) return "bg-primary/20 text-primary border-primary/50"; // Elite - Orange
   if (grade.startsWith("B")) return "bg-primary/10 text-orange-400 border-primary/30"; // Above Avg - Light Orange
-  if (grade.startsWith("C")) return "bg-secondary/20 text-blue-400 border-secondary/50"; // Average - Blue
-  if (grade.startsWith("D")) return "bg-secondary/10 text-blue-500 border-secondary/30"; // Below Avg - Light Blue
-  return "bg-secondary/5 text-blue-600 border-secondary/20"; // Poor
+  if (grade.startsWith("C")) return "bg-secondary/20 text-blue-600 border-secondary/50"; // Average - Dark Blue
+  if (grade.startsWith("D")) return "bg-secondary/10 text-blue-700 border-secondary/30"; // Below Avg - Darker Blue
+  return "bg-secondary/5 text-blue-800 border-secondary/20"; // Poor
 };
 
 const TalentAssessmentSection = () => {
@@ -242,8 +242,8 @@ const TalentAssessmentSection = () => {
             <span className="font-medium">Grade Scale:</span>
             <Badge className="bg-primary/20 text-primary border-primary/50">A - Elite</Badge>
             <Badge className="bg-primary/10 text-orange-400 border-primary/30">B - Above Avg</Badge>
-            <Badge className="bg-secondary/20 text-blue-400 border-secondary/50">C - Average</Badge>
-            <Badge className="bg-secondary/10 text-blue-500 border-secondary/30">D - Below Avg</Badge>
+            <Badge className="bg-secondary/20 text-blue-600 border-secondary/50">C - Average</Badge>
+            <Badge className="bg-secondary/10 text-blue-700 border-secondary/30">D - Below Avg</Badge>
           </div>
         </div>
       </GlassCard>
