@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
+import { Helmet } from "react-helmet-async";
 
 const FAQSection = () => {
   const faqs = [
@@ -13,29 +14,58 @@ const FAQSection = () => {
       answer: "MetsXMFanZone is the ultimate destination for New York Mets fans, offering live game streams, highlights, podcasts, news updates, and an engaged community of passionate fans."
     },
     {
-      question: "How much does it cost?",
+      question: "How much does MetsXMFanZone cost?",
       answer: "We offer a 7-day FREE trial to explore all features. After the trial, it's just $12.99/month for unlimited access to live streams, exclusive content, and more."
     },
     {
-      question: "What content is available?",
+      question: "What content is available on MetsXMFanZone?",
       answer: "Enjoy live game streams, game highlights, exclusive podcasts, spring training coverage, real-time news updates, and a vibrant community forum to connect with fellow Mets fans."
     },
     {
-      question: "Can I cancel anytime?",
+      question: "Can I cancel my MetsXMFanZone subscription anytime?",
       answer: "Yes! You can cancel your subscription at any time with no penalties or hidden fees. Your access continues until the end of your billing period."
     },
     {
-      question: "Is this official Mets content?",
+      question: "Is MetsXMFanZone official Mets content?",
       answer: "MetsXMFanZone is a fan-created platform dedicated to bringing Mets fans together. While we cover all things Mets, we are an independent community not officially affiliated with the New York Mets organization."
     },
     {
-      question: "How do I watch live games?",
+      question: "How do I watch live Mets games on MetsXMFanZone?",
       answer: "After subscribing, navigate to the Live section from the menu to access live game streams and network broadcasts during game times."
+    },
+    {
+      question: "What devices can I use to access MetsXMFanZone?",
+      answer: "MetsXMFanZone works on any device with a web browser including smartphones, tablets, laptops, and desktop computers. You can also install our PWA app for a native-like experience."
+    },
+    {
+      question: "Does MetsXMFanZone have a mobile app?",
+      answer: "Yes! MetsXMFanZone is available as a Progressive Web App (PWA). Simply visit our website and click 'Install' when prompted to add it to your home screen for quick access."
     }
   ];
 
+  // FAQ Schema for AEO (Answer Engine Optimization)
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+
   return (
     <section className="py-10 sm:py-12 md:py-16 relative overflow-hidden">
+      {/* AEO: FAQ Structured Data for AI/Voice Search */}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
+      </Helmet>
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

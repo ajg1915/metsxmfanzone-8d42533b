@@ -92,7 +92,7 @@ const TalentAssessmentSection = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link to="/roster">
+            <Link to="/mets-roster">
               <Button variant="outline" size="sm" className="gap-2">
                 <Users className="h-4 w-4" />
                 Full Roster
