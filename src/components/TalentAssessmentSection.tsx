@@ -86,7 +86,7 @@ const TalentAssessmentSection = () => {
             <img src={metsLogo} alt="MetsXMFanZone" className="h-12 w-12 object-contain" />
             <div>
               <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-orange-400 to-primary bg-clip-text text-transparent">
-                Mets 2026 Talent Outlook
+                Mets Fan Outlook
               </h2>
               <p className="text-muted-foreground text-sm">Anthony's daily player grades & analysis</p>
             </div>
