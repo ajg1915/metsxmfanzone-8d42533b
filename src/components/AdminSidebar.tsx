@@ -3,7 +3,7 @@ import {
   MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, 
   Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, 
   Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers, Sparkles, 
-  Tv, Newspaper, ClipboardList
+  Tv, Newspaper, ClipboardList, Star
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -27,6 +27,7 @@ const homeItems = [
   { title: "Backgrounds", url: "/admin/backgrounds", icon: Wallpaper },
   { title: "Tutorials", url: "/admin/tutorials", icon: BookOpen },
   { title: "Predictions", url: "/admin/predictions", icon: Sparkles },
+  { title: "Fan Outlook", url: "/admin/talent-assessments", icon: Star },
 ];
 
 // Content & Media items - Blog, Stories, Videos, Podcasts, Newsletter
