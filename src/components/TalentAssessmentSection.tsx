@@ -200,6 +200,9 @@ const TalentAssessmentSection = () => {
                               </>
                             )}
                           </div>
+                          
+                          {/* Lineup Graphic Label */}
+                          <p className="text-xs text-primary font-semibold mt-2">Lineup Graphic</p>
                         </div>
                       </div>
 
