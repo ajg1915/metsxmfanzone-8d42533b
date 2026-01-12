@@ -31,7 +31,7 @@ import { useEffect } from "react";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import { useAutoLineupFetch } from "@/hooks/useAutoLineupFetch";
 
-// Homepage structured data
+// Homepage structured data with AEO optimization
 const homepageSchema = {
   "@context": "https://schema.org",
   "@type": "WebPage",
@@ -58,9 +58,56 @@ const homepageSchema = {
   },
   speakable: {
     "@type": "SpeakableSpecification",
-    cssSelector: ["h1", ".hero-description"],
+    cssSelector: ["h1", ".hero-description", "section h2"],
   },
 };
+
+// AEO: Organization Schema for AI assistants
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://www.metsxmfanzone.com/#organization",
+  name: "MetsXMFanZone",
+  alternateName: "Mets XM Fan Zone",
+  url: "https://www.metsxmfanzone.com",
+  logo: "https://www.metsxmfanzone.com/logo-512.png",
+  description: "The ultimate fan-created platform for New York Mets fans featuring live streams, podcasts, news, and community.",
+  foundingDate: "2024",
+  sameAs: [
+    "https://twitter.com/metsxmfanzone",
+    "https://facebook.com/metsxmfanzone",
+    "https://instagram.com/metsxmfanzone"
+  ],
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    url: "https://www.metsxmfanzone.com/contact"
+  }
+};
+
+// AEO: WebSite schema for sitelinks search
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://www.metsxmfanzone.com/#website",
+  url: "https://www.metsxmfanzone.com",
+  name: "MetsXMFanZone",
+  description: "The ultimate destination for New York Mets fans - live streams, podcasts, news, and community.",
+  publisher: {
+    "@id": "https://www.metsxmfanzone.com/#organization"
+  },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: "https://www.metsxmfanzone.com/blog?search={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
+
+// Combined schemas for AEO
+const combinedSchemas = [homepageSchema, organizationSchema, websiteSchema];
 
 const Index = () => {
   // Auto-fetch Mets lineup on game days (every 30 minutes)
@@ -87,7 +134,7 @@ const Index = () => {
         ogType="website"
         ogImage="https://www.metsxmfanzone.com/og-image.png"
         ogImageAlt="MetsXMFanZone - The Ultimate Destination Where The Fans Go"
-        structuredData={homepageSchema}
+        structuredData={combinedSchemas}
         pageType="home"
         breadcrumbs={[{ name: "Home", url: "/" }]}
       />
