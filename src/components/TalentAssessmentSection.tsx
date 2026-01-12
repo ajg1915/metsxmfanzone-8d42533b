@@ -200,15 +200,12 @@ const TalentAssessmentSection = () => {
                               </>
                             )}
                           </div>
-                          
-                          {/* Lineup Graphic Label */}
-                          <p className="text-xs text-primary font-semibold mt-2">Lineup Graphic</p>
                         </div>
                       </div>
 
                       {/* Tap hint */}
                       <div className="absolute bottom-3 left-0 right-0 text-center">
-                        <span className="text-xs text-muted-foreground/60 flex items-center justify-center gap-1">
+                        <span className="text-xs text-white flex items-center justify-center gap-1">
                           <Sparkles className="h-3 w-3" />
                           Tap for Anthony's Take
                         </span>
