@@ -1,6 +1,7 @@
 import { TrendingUp, Users, Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import logo from "@/assets/metsxmfanzone-logo.png";
+import GlassCard from "@/components/GlassCard";
 
 const HotStoveGuide = () => {
   const hotStoveItems = [{
@@ -27,8 +28,9 @@ const HotStoveGuide = () => {
         }}
       />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 mb-4 sm:mb-5">
+        <GlassCard glow="blue" className="max-w-4xl mx-auto p-6 sm:p-8">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 mb-4 sm:mb-5">
             <img src={logo} alt="MetsXMFanZone" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-3 sm:mb-4">
@@ -49,7 +51,8 @@ const HotStoveGuide = () => {
               </Card>
             ))}
           </div>
-        </div>
+          </div>
+        </GlassCard>
       </div>
     </section>
   );

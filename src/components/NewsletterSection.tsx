@@ -23,9 +23,9 @@ const NewsletterSection = () => {
       setIsLoading(false);
     }, 1000);
   };
-  return <section className="py-8 md:py-12 bg-gradient-to-br from-primary/10 via-background to-primary/5">
+  return <section className="py-8 md:py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="max-w-2xl mx-auto text-center">
+        <div className="max-w-2xl mx-auto text-center glass-card glow-blue rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-primary/10 via-background to-primary/5">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-5">
             <img src={logo} alt="MetsXMFanZone" className="w-14 h-14" />
           </div>
