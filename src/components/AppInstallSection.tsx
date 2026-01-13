@@ -3,6 +3,7 @@ import { Check, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useNavigate } from "react-router-dom";
+import GlassCard from "@/components/GlassCard";
 
 const AppInstallSection = () => {
   const { user } = useAuth();
@@ -15,14 +16,8 @@ const AppInstallSection = () => {
 
   return (
     <section className="py-10 sm:py-12 md:py-16 px-4 relative overflow-hidden">
-      {/* Blue glow effect */}
-      <div 
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse 80% 50% at 50% 50%, hsl(220 80% 50% / 0.08), transparent 70%)",
-        }}
-      />
       <div className="container max-w-6xl mx-auto px-0 sm:px-4 relative z-10">
+        <GlassCard glow="blue" className="p-6 sm:p-8 md:p-10">
         <div className="text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary font-bold text-sm mb-4">
             <Crown className="h-4 w-4" /> PREMIUM MEMBERSHIP
@@ -56,6 +51,7 @@ const AppInstallSection = () => {
             View Pricing
           </Button>
         </div>
+        </GlassCard>
       </div>
     </section>
   );
