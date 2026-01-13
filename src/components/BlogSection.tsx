@@ -123,28 +123,37 @@ const BlogSection = () => {
         {/* Highlight Post */}
         {highlightPost && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
             className="mb-6"
           >
             <GlassCard
               variant="interactive"
               glow="blue"
-              className="cursor-pointer overflow-hidden"
+              className="cursor-pointer overflow-hidden group"
             >
               <article
                 onClick={() => navigate(`/blog/${highlightPost.slug}`)}
                 className="grid md:grid-cols-2 gap-0"
               >
                 {/* Image */}
-                <div className="relative aspect-[16/9] md:aspect-auto md:min-h-[280px] overflow-hidden">
+                <motion.div 
+                  className="relative aspect-[16/9] md:aspect-auto md:min-h-[280px] overflow-hidden"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.4 }}
+                >
                   {highlightPost.featured_image_url ? (
-                    <img
+                    <motion.img
                       src={highlightPost.featured_image_url}
                       alt={highlightPost.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover"
+                      initial={{ scale: 1.1 }}
+                      whileInView={{ scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.2, ease: "easeOut" }}
+                      whileHover={{ scale: 1.08 }}
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20" />
@@ -152,41 +161,99 @@ const BlogSection = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-card/80 hidden md:block" />
                   <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent md:hidden" />
                   
+                  {/* Animated Shine Effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: "200%" }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                  />
+                  
                   {/* Highlight Badge */}
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <Badge className="text-xs px-2.5 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      Featured
-                    </Badge>
+                  <motion.div 
+                    className="absolute top-3 left-3 flex items-center gap-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                  >
+                    <motion.div
+                      animate={{ 
+                        boxShadow: [
+                          "0 0 10px rgba(245, 158, 11, 0.3)",
+                          "0 0 20px rgba(245, 158, 11, 0.5)",
+                          "0 0 10px rgba(245, 158, 11, 0.3)"
+                        ]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Badge className="text-xs px-2.5 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg flex items-center gap-1">
+                        <motion.span
+                          animate={{ rotate: [0, 15, -15, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                          <Sparkles className="w-3 h-3" />
+                        </motion.span>
+                        Featured
+                      </Badge>
+                    </motion.div>
                     <Badge className="text-xs px-2.5 py-1 bg-primary/90 text-primary-foreground border-0 backdrop-blur-sm shadow-lg">
                       {highlightPost.category}
                     </Badge>
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
                 
                 {/* Content */}
-                <div className="p-5 sm:p-6 md:p-8 flex flex-col justify-center">
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground hover:text-primary transition-colors duration-300 line-clamp-3 leading-tight mb-3">
+                <motion.div 
+                  className="p-5 sm:p-6 md:p-8 flex flex-col justify-center"
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                >
+                  <motion.h3 
+                    className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-3 leading-tight mb-3"
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3, duration: 0.4 }}
+                  >
                     {highlightPost.title}
-                  </h3>
+                  </motion.h3>
                   
                   {highlightPost.excerpt && (
-                    <p className="text-sm sm:text-base text-muted-foreground line-clamp-3 leading-relaxed mb-4">
+                    <motion.p 
+                      className="text-sm sm:text-base text-muted-foreground line-clamp-3 leading-relaxed mb-4"
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.4, duration: 0.4 }}
+                    >
                       {highlightPost.excerpt}
-                    </p>
+                    </motion.p>
                   )}
                   
-                  <div className="flex items-center justify-between pt-3 border-t border-border/20">
+                  <motion.div 
+                    className="flex items-center justify-between pt-3 border-t border-border/20"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.5, duration: 0.4 }}
+                  >
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                       <Clock className="w-4 h-4" />
                       <span>{getTimeAgo(highlightPost.published_at)}</span>
                     </div>
-                    <span className="text-sm font-medium text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <motion.span 
+                      className="text-sm font-medium text-primary flex items-center gap-1"
+                      whileHover={{ x: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
                       Read full story
                       <ArrowRight className="w-4 h-4" />
-                    </span>
-                  </div>
-                </div>
+                    </motion.span>
+                  </motion.div>
+                </motion.div>
               </article>
             </GlassCard>
           </motion.div>
