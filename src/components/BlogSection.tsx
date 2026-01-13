@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { Clock, ArrowRight } from "lucide-react";
+import { Clock, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import logo from "@/assets/metsxmfanzone-logo.png";
@@ -34,7 +34,7 @@ const BlogSection = () => {
         .select("id, title, slug, excerpt, featured_image_url, category, published_at")
         .eq("published", true)
         .order("published_at", { ascending: false })
-        .limit(3);
+        .limit(4);
       if (error) throw error;
       setPosts(data || []);
     } catch (error) {
@@ -43,6 +43,9 @@ const BlogSection = () => {
       setLoading(false);
     }
   };
+
+  const highlightPost = posts[0];
+  const otherPosts = posts.slice(1);
 
   const getTimeAgo = (date: string) => {
     const now = new Date();
@@ -117,70 +120,144 @@ const BlogSection = () => {
           </div>
         </motion.div>
         
-        {/* Posts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
-          {posts.map((post, index) => (
+        {/* Highlight Post */}
+        {highlightPost && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-6"
+          >
             <GlassCard
-              key={post.id}
               variant="interactive"
               glow="blue"
-              delay={index * 0.1}
-              className="cursor-pointer"
+              className="cursor-pointer overflow-hidden"
             >
               <article
-                onClick={() => navigate(`/blog/${post.slug}`)}
+                onClick={() => navigate(`/blog/${highlightPost.slug}`)}
+                className="grid md:grid-cols-2 gap-0"
               >
-                {/* Image Container */}
-                {post.featured_image_url && (
-                  <div className="aspect-[16/9] overflow-hidden relative">
+                {/* Image */}
+                <div className="relative aspect-[16/9] md:aspect-auto md:min-h-[280px] overflow-hidden">
+                  {highlightPost.featured_image_url ? (
                     <img
-                      src={post.featured_image_url}
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                      src={highlightPost.featured_image_url}
+                      alt={highlightPost.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent opacity-80" />
-                    
-                    {/* Category Badge - Floating */}
-                    <Badge className="absolute top-3 left-3 text-xs px-2.5 py-1 bg-primary/90 text-primary-foreground border-0 backdrop-blur-sm shadow-lg">
-                      {post.category}
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20" />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-card/80 hidden md:block" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent md:hidden" />
+                  
+                  {/* Highlight Badge */}
+                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                    <Badge className="text-xs px-2.5 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      Featured
+                    </Badge>
+                    <Badge className="text-xs px-2.5 py-1 bg-primary/90 text-primary-foreground border-0 backdrop-blur-sm shadow-lg">
+                      {highlightPost.category}
                     </Badge>
                   </div>
-                )}
+                </div>
                 
                 {/* Content */}
-                <div className="p-4 sm:p-5 space-y-3">
-                  {!post.featured_image_url && (
-                    <Badge className="text-xs px-2.5 py-1 bg-primary/10 text-primary border border-primary/20">
-                      {post.category}
-                    </Badge>
-                  )}
-                  
-                  <h3 className="text-base sm:text-lg font-semibold text-foreground hover:text-primary transition-colors duration-300 line-clamp-2 leading-tight">
-                    {post.title}
+                <div className="p-5 sm:p-6 md:p-8 flex flex-col justify-center">
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground hover:text-primary transition-colors duration-300 line-clamp-3 leading-tight mb-3">
+                    {highlightPost.title}
                   </h3>
                   
-                  {post.excerpt && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                      {post.excerpt}
+                  {highlightPost.excerpt && (
+                    <p className="text-sm sm:text-base text-muted-foreground line-clamp-3 leading-relaxed mb-4">
+                      {highlightPost.excerpt}
                     </p>
                   )}
                   
-                  {/* Footer */}
-                  <div className="flex items-center justify-between pt-2 border-t border-border/20">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{getTimeAgo(post.published_at)}</span>
+                  <div className="flex items-center justify-between pt-3 border-t border-border/20">
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4" />
+                      <span>{getTimeAgo(highlightPost.published_at)}</span>
                     </div>
-                    <span className="text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
-                      Read more
-                      <ArrowRight className="w-3 h-3" />
+                    <span className="text-sm font-medium text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                      Read full story
+                      <ArrowRight className="w-4 h-4" />
                     </span>
                   </div>
                 </div>
               </article>
             </GlassCard>
-          ))}
-        </div>
+          </motion.div>
+        )}
+        
+        {/* Other Posts Grid */}
+        {otherPosts.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+            {otherPosts.map((post, index) => (
+              <GlassCard
+                key={post.id}
+                variant="interactive"
+                glow="blue"
+                delay={index * 0.1}
+                className="cursor-pointer"
+              >
+                <article
+                  onClick={() => navigate(`/blog/${post.slug}`)}
+                >
+                  {/* Image Container */}
+                  {post.featured_image_url && (
+                    <div className="aspect-[16/9] overflow-hidden relative">
+                      <img
+                        src={post.featured_image_url}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent opacity-80" />
+                      
+                      {/* Category Badge - Floating */}
+                      <Badge className="absolute top-3 left-3 text-xs px-2.5 py-1 bg-primary/90 text-primary-foreground border-0 backdrop-blur-sm shadow-lg">
+                        {post.category}
+                      </Badge>
+                    </div>
+                  )}
+                  
+                  {/* Content */}
+                  <div className="p-4 sm:p-5 space-y-3">
+                    {!post.featured_image_url && (
+                      <Badge className="text-xs px-2.5 py-1 bg-primary/10 text-primary border border-primary/20">
+                        {post.category}
+                      </Badge>
+                    )}
+                    
+                    <h3 className="text-base sm:text-lg font-semibold text-foreground hover:text-primary transition-colors duration-300 line-clamp-2 leading-tight">
+                      {post.title}
+                    </h3>
+                    
+                    {post.excerpt && (
+                      <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                        {post.excerpt}
+                      </p>
+                    )}
+                    
+                    {/* Footer */}
+                    <div className="flex items-center justify-between pt-2 border-t border-border/20">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{getTimeAgo(post.published_at)}</span>
+                      </div>
+                      <span className="text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
+                        Read more
+                        <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              </GlassCard>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
