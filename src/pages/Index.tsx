@@ -164,6 +164,12 @@ const Index = () => {
 
         <div className="section-divider my-4 sm:my-6" />
 
+        <ScrollReveal direction="left">
+          <BlogSection />
+        </ScrollReveal>
+
+        <div className="section-divider my-4 sm:my-6" />
+
         <ScrollReveal delay={100}>
           <HomeLineupCard />
         </ScrollReveal>
@@ -190,12 +196,6 @@ const Index = () => {
 
         <ScrollReveal>
           <MetsNewsTracker />
-        </ScrollReveal>
-
-        <div className="section-divider my-4 sm:my-6" />
-
-        <ScrollReveal direction="left">
-          <BlogSection />
         </ScrollReveal>
 
         <div className="section-divider my-4 sm:my-6" />
