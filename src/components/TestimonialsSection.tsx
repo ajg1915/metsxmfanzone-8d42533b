@@ -152,7 +152,7 @@ const TestimonialsSection = () => {
 
   return (
     <section className="py-8 sm:py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto glass-card glow-blue rounded-2xl p-6 sm:p-8">
         <div className="text-center mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
             What Fans Are Saying
