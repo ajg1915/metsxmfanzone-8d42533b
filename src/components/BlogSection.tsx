@@ -187,7 +187,7 @@ const BlogSection = () => {
                       }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <Badge className="text-xs px-2.5 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg flex items-center gap-1">
+                      <Badge className="text-xs px-2.5 py-1 bg-gradient-to-r from-primary to-blue-500 text-white border-0 shadow-lg flex items-center gap-1">
                         <motion.span
                           animate={{ rotate: [0, 15, -15, 0] }}
                           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
