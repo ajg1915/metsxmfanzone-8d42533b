@@ -9,13 +9,14 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Mets Blue and Orange Sports Theme - Enhanced for Glass Morphism */
-    --background: 220 70% 5%;
+    /* Lightened blues for better visibility */
+    --background: 220 60% 10%;
     --foreground: 0 0% 98%;
 
-    --card: 220 60% 8%;
+    --card: 220 55% 14%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 220 60% 10%;
+    --popover: 220 55% 16%;
     --popover-foreground: 0 0% 98%;
 
     /* Mets Orange - Primary (#ff4500 = hsl(16 100% 50%)) */
@@ -23,11 +24,11 @@ All colors MUST be HSL.
     --primary-foreground: 0 0% 100%;
 
     /* Mets Blue - Secondary */
-    --secondary: 220 80% 30%;
+    --secondary: 220 70% 40%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 40% 15%;
-    --muted-foreground: 220 20% 60%;
+    --muted: 220 40% 20%;
+    --muted-foreground: 220 20% 70%;
 
     --accent: 16 100% 50%;
     --accent-foreground: 0 0% 100%;
@@ -44,20 +45,20 @@ All colors MUST be HSL.
     --radius: 1rem;
 
     /* Custom design tokens - Mets Theme (#ff4500 = hsl(16 100% 50%)) */
-    --mets-blue: 220 80% 35%;
-    --mets-blue-light: 220 70% 50%;
-    --mets-blue-dark: 220 85% 12%;
+    --mets-blue: 220 70% 45%;
+    --mets-blue-light: 220 65% 55%;
+    --mets-blue-dark: 220 75% 18%;
     --mets-orange: 16 100% 50%;
     --mets-orange-light: 16 100% 60%;
     
-    /* Glass morphism tokens */
-    --glass-bg: 220 60% 8% / 0.6;
-    --glass-border: 220 80% 40% / 0.2;
+    /* Glass morphism tokens - lightened */
+    --glass-bg: 220 55% 14% / 0.7;
+    --glass-border: 220 70% 50% / 0.25;
     --glass-blur: 20px;
-    --glass-highlight: 0 0% 100% / 0.05;
+    --glass-highlight: 0 0% 100% / 0.08;
     
     /* Depth & Shadow tokens */
-    --shadow-color: 220 80% 5%;
+    --shadow-color: 220 70% 8%;
     --shadow-elevation-low: 
       0 1px 2px hsl(var(--shadow-color) / 0.3),
       0 2px 4px hsl(var(--shadow-color) / 0.2);
@@ -71,40 +72,40 @@ All colors MUST be HSL.
       0 16px 32px hsl(var(--shadow-color) / 0.15),
       0 32px 64px hsl(var(--shadow-color) / 0.1);
     
-    --hero-overlay: 220 80% 4% / 0.85;
-    --card-border: 220 80% 35%;
-    --gradient-hero: linear-gradient(135deg, hsl(220 80% 5%), hsl(220 70% 12%));
-    --gradient-card: linear-gradient(180deg, hsl(220 60% 10%), hsl(220 70% 6%));
-    --gradient-blue: linear-gradient(135deg, hsl(220 80% 30%), hsl(220 70% 40%));
-    --gradient-radial-blue: radial-gradient(ellipse at center, hsl(220 80% 25% / 0.4), transparent 70%);
+    --hero-overlay: 220 70% 8% / 0.8;
+    --card-border: 220 70% 45%;
+    --gradient-hero: linear-gradient(135deg, hsl(220 70% 10%), hsl(220 65% 18%));
+    --gradient-card: linear-gradient(180deg, hsl(220 55% 16%), hsl(220 60% 12%));
+    --gradient-blue: linear-gradient(135deg, hsl(220 70% 40%), hsl(220 65% 50%));
+    --gradient-radial-blue: radial-gradient(ellipse at center, hsl(220 70% 35% / 0.4), transparent 70%);
     --gradient-radial-orange: radial-gradient(ellipse at center, hsl(16 100% 50% / 0.2), transparent 70%);
-    --glow-blue: 0 0 60px hsl(220 80% 50% / 0.4);
+    --glow-blue: 0 0 60px hsl(220 70% 55% / 0.4);
     --glow-orange: 0 0 60px hsl(16 100% 50% / 0.3);
-    --glow-subtle: 0 0 120px hsl(220 80% 40% / 0.15);
+    --glow-subtle: 0 0 120px hsl(220 70% 50% / 0.15);
     
-    --sidebar-background: 220 70% 8%;
+    --sidebar-background: 220 60% 12%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 16 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 80% 30%;
+    --sidebar-accent: 220 70% 40%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 16 100% 50%;
     --sidebar-ring: 16 100% 50%;
   }
 
   .dark {
-    --background: 220 70% 5%;
+    --background: 220 60% 10%;
     --foreground: 0 0% 98%;
-    --card: 220 60% 8%;
+    --card: 220 55% 14%;
     --card-foreground: 0 0% 98%;
-    --popover: 220 60% 10%;
+    --popover: 220 55% 16%;
     --popover-foreground: 0 0% 98%;
     --primary: 16 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 80% 30%;
+    --secondary: 220 70% 40%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 220 40% 15%;
-    --muted-foreground: 220 20% 60%;
+    --muted: 220 40% 20%;
+    --muted-foreground: 220 20% 70%;
     --accent: 16 100% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
@@ -113,11 +114,11 @@ All colors MUST be HSL.
     --input: 16 100% 50%;
     --ring: 16 100% 50%;
     --input-foreground: 0 0% 100%;
-    --sidebar-background: 220 70% 8%;
+    --sidebar-background: 220 60% 12%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 16 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 80% 30%;
+    --sidebar-accent: 220 70% 40%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 16 100% 50%;
     --sidebar-ring: 16 100% 50%;
