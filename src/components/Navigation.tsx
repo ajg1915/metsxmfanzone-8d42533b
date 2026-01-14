@@ -311,7 +311,7 @@ const Navigation = () => {
                       className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg touch-target"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Shield className="w-4 h-4" />
+                      <Shield className="w-4 h-4 text-[#ff4500]" />
                       Plans
                     </NavLink>
                   )}

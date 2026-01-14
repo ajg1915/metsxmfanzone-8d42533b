@@ -426,6 +426,12 @@ const Hero = () => {
 
       {/* Bottom Navigation Tabs - Glass styled */}
       <div className="absolute bottom-0 left-0 right-0 z-20">
+        {/* Quick Access Header */}
+        <div className="flex justify-center mb-2">
+          <span className="text-[#ff4500] text-xs sm:text-sm font-semibold border-b-2 border-[#ff4500] pb-0.5">
+            Quick Access
+          </span>
+        </div>
         <div className="flex items-center justify-center gap-1 sm:gap-2 px-4 pb-4">
           {tabs.map((tab) => {
             const Icon = tab.icon;
