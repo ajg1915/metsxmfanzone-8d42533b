@@ -134,7 +134,7 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 onClick={() => setSelectedVideo(video)}
-                className="flex-shrink-0 w-[160px] sm:w-[200px] md:w-[240px] lg:w-[280px] cursor-pointer group"
+                className="flex-shrink-0 w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] cursor-pointer group"
               >
                 <div className="relative overflow-hidden rounded-md sm:rounded-lg transition-all duration-300 group-hover:scale-105 group-hover:z-10 group-hover:shadow-2xl group-hover:shadow-primary/20">
                   {/* Thumbnail */}

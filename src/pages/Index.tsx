@@ -156,79 +156,79 @@ const Index = () => {
           <LiveStreamsSection />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal delay={100}>
           <HighlightsSection />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal direction="left">
           <BlogSection />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal delay={100}>
           <HomeLineupCard />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal>
           <SpringTraining />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal delay={100}>
           <PlayersToWatch />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal delay={100}>
           <TalentAssessmentSection />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal>
           <MetsNewsTracker />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal direction="right" delay={100}>
           <PodcastSection />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal delay={100}>
           <JoinPodcastSection />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal direction="scale">
           <FAQSection />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal>
           <TestimonialsSection />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal>
           <AppInstallSection />
         </ScrollReveal>
 
-        <div className="section-divider my-4 sm:my-6" />
+        <div className="section-divider my-2 sm:my-3" />
 
         <ScrollReveal delay={100}>
           <HotStoveGuide />
