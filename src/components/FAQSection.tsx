@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
+import metsxmfanzoneLogo from "@/assets/metsxmfanzone-logo.png";
 
 const FAQSection = () => {
   const faqs = [
@@ -74,6 +75,15 @@ const FAQSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-6 sm:mb-8 md:mb-10"
         >
+          <motion.img
+            src={metsxmfanzoneLogo}
+            alt="MetsXMFanZone"
+            className="h-16 sm:h-20 md:h-24 mx-auto mb-4 sm:mb-5 md:mb-6"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          />
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">
             Frequently Asked Questions
           </h2>
