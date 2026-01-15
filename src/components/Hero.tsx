@@ -12,7 +12,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { Play, Info, ChevronLeft, ChevronRight } from "lucide-react";
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 interface HeroSlide {
   id: string;
   title: string;
@@ -294,6 +298,8 @@ const Hero = () => {
     </svg>
   );
 
+  const [showOverviewInfo, setShowOverviewInfo] = useState(false);
+
   const tabs = [
     { id: "overview", label: "Overview", icon: LogoIcon, isImage: true },
     { id: "live", label: "Live Streams", icon: LiveStreamIcon, isImage: true },
@@ -494,6 +500,43 @@ const Hero = () => {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isLiveTab = tab.id === "live";
+            const isOverviewTab = tab.id === "overview";
+            
+            const tabButton = (
+              <button
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  if (tab.id === "overview") setShowOverviewInfo(true);
+                  if (tab.id === "live") handleProtectedNavigation("/metsxmfanzone-tv");
+                  if (tab.id === "podcasts") handleProtectedNavigation("/podcast");
+                  if (tab.id === "community") handleProtectedNavigation("/community");
+                }}
+                className={`
+                  relative flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 text-[10px] sm:text-sm font-medium transition-all duration-300 rounded-xl
+                  ${
+                    activeTab === tab.id
+                      ? "text-foreground glass-strong border-primary/50 shadow-lg"
+                      : "text-muted-foreground hover:text-foreground glass-light hover:border-border/50"
+                  }
+                  ${isLiveTab && isLiveNow ? "ring-1 ring-[#ff4500]/40 shadow-[#ff4500]/20" : ""}
+                `}
+              >
+                {/* Live indicator dot - left side */}
+                {isLiveTab && isLiveNow && (
+                  <span className="absolute -top-1 -left-1 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff4500] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff4500]"></span>
+                  </span>
+                )}
+                {tab.isImage ? (
+                  <Icon className="w-4 h-4 sm:w-4 sm:h-4 object-contain" />
+                ) : (
+                  <Icon className="w-4 h-4 sm:w-4 sm:h-4" />
+                )}
+                <span>{tab.label}</span>
+              </button>
+            );
+
             return (
               <div key={tab.id} className="relative">
                 {/* Orange glow for Live Streams tab when live */}
@@ -511,37 +554,20 @@ const Hero = () => {
                     }}
                   />
                 )}
-                <button
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                    if (tab.id === "live") handleProtectedNavigation("/metsxmfanzone-tv");
-                    if (tab.id === "podcasts") handleProtectedNavigation("/podcast");
-                    if (tab.id === "community") handleProtectedNavigation("/community");
-                  }}
-                  className={`
-                    relative flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 text-[10px] sm:text-sm font-medium transition-all duration-300 rounded-xl
-                    ${
-                      activeTab === tab.id
-                        ? "text-foreground glass-strong border-primary/50 shadow-lg"
-                        : "text-muted-foreground hover:text-foreground glass-light hover:border-border/50"
-                    }
-                    ${isLiveTab && isLiveNow ? "ring-1 ring-[#ff4500]/40 shadow-[#ff4500]/20" : ""}
-                  `}
-                >
-                  {/* Live indicator dot - left side */}
-                  {isLiveTab && isLiveNow && (
-                    <span className="absolute -top-1 -left-1 flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff4500] opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff4500]"></span>
-                    </span>
-                  )}
-                  {tab.isImage ? (
-                    <Icon className="w-4 h-4 sm:w-4 sm:h-4 object-contain" />
-                  ) : (
-                    <Icon className="w-4 h-4 sm:w-4 sm:h-4" />
-                  )}
-                  <span>{tab.label}</span>
-                </button>
+                {isOverviewTab ? (
+                  <Popover open={showOverviewInfo} onOpenChange={setShowOverviewInfo}>
+                    <PopoverTrigger asChild>
+                      {tabButton}
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-3 glass-strong border-primary/30">
+                      <p className="text-sm text-foreground">
+                        Your daily hub for streams, podcasts & community!
+                      </p>
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  tabButton
+                )}
               </div>
             );
           })}
