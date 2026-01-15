@@ -355,11 +355,11 @@ export default function BlogPost() {
 
           <article>
             {post.featured_image_url && (
-              <div className="w-full overflow-hidden rounded-lg mb-6">
+              <div className="w-full rounded-lg mb-6">
                 <img 
                   src={post.featured_image_url} 
                   alt={post.title}
-                  className="w-full h-auto object-contain max-h-[600px]"
+                  className="w-full h-auto rounded-lg"
                 />
               </div>
             )}
