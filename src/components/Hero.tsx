@@ -4,6 +4,7 @@ import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import podcastIcon from "@/assets/podcast-icon.png";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,7 +49,44 @@ const Hero = () => {
   const { isPremium, loading: subscriptionLoading } = useSubscription();
   const [memberSlides, setMemberSlides] = useState<HeroSlide[]>([]);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [isLiveNow, setIsLiveNow] = useState(false);
   const navigate = useNavigate();
+
+  // Check if any live stream is currently active
+  useEffect(() => {
+    const checkLiveStreams = async () => {
+      const { data } = await supabase
+        .from('live_streams')
+        .select('id')
+        .eq('status', 'live')
+        .eq('published', true)
+        .limit(1);
+      
+      setIsLiveNow(data && data.length > 0);
+    };
+
+    checkLiveStreams();
+
+    // Subscribe to live stream changes
+    const channel = supabase
+      .channel('hero-live-indicator')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'live_streams',
+        },
+        () => {
+          checkLiveStreams();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -364,14 +402,40 @@ const Hero = () => {
                   {/* Action Buttons - Glass styled */}
                   <div className="flex items-center gap-3 flex-wrap">
                     {slide.show_watch_live && (
-                      <Button
-                        onClick={() => handleProtectedNavigation("/metsxmfanzone-tv")}
-                        size="lg"
-                        className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-6 sm:px-8 shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all duration-300"
-                      >
-                        <Play className="w-5 h-5 fill-current" />
-                        Watch Live
-                      </Button>
+                      <div className="relative">
+                        {isLiveNow && (
+                          <motion.div
+                            className="absolute -inset-2 rounded-xl bg-[#ff4500]/40 blur-xl"
+                            animate={{
+                              opacity: [0.4, 0.8, 0.4],
+                              scale: [1, 1.1, 1],
+                            }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                            }}
+                          />
+                        )}
+                        <Button
+                          onClick={() => handleProtectedNavigation("/metsxmfanzone-tv")}
+                          size="lg"
+                          className={`relative gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-6 sm:px-8 shadow-lg transition-all duration-300 ${
+                            isLiveNow 
+                              ? "shadow-[#ff4500]/50 hover:shadow-[#ff4500]/70 ring-2 ring-[#ff4500]/30" 
+                              : "shadow-primary/30 hover:shadow-primary/50"
+                          }`}
+                        >
+                          {isLiveNow && (
+                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff4500] opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#ff4500]"></span>
+                            </span>
+                          )}
+                          <Play className="w-5 h-5 fill-current" />
+                          Watch Live
+                        </Button>
+                      </div>
                     )}
                     {slide.link_url && slide.link_text && (
                       <Button
