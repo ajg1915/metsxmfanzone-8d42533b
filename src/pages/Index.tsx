@@ -27,9 +27,12 @@ import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
 import NotificationPrompt from "@/components/NotificationPrompt";
 import ScrollReveal from "@/components/ScrollReveal";
 import WelcomeBackToast from "@/components/WelcomeBackToast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import { useAutoLineupFetch } from "@/hooks/useAutoLineupFetch";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 // Homepage structured data with AEO optimization
 const homepageSchema = {
@@ -110,6 +113,10 @@ const websiteSchema = {
 const combinedSchemas = [homepageSchema, organizationSchema, websiteSchema];
 
 const Index = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [onboardingShown, setOnboardingShown] = useState(false);
+
   // Auto-fetch Mets lineup on game days (every 30 minutes)
   useAutoLineupFetch();
 
@@ -117,6 +124,23 @@ const Index = () => {
     const cleanup = setupNotificationListeners();
     return cleanup;
   }, []);
+
+  // Backup toast for unauthenticated users when onboarding doesn't show
+  useEffect(() => {
+    if (!user && !onboardingShown) {
+      const timer = setTimeout(() => {
+        toast("Login or Register", {
+          description: "Join the MetsXMFanZone community!",
+          action: {
+            label: "Sign In",
+            onClick: () => navigate("/auth"),
+          },
+          duration: 8000,
+        });
+      }, 3000); // Show after 3 seconds if onboarding didn't appear
+      return () => clearTimeout(timer);
+    }
+  }, [user, onboardingShown, navigate]);
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -237,7 +261,7 @@ const Index = () => {
       <Footer />
       <InstallPrompt />
       <NotificationPrompt />
-      <OnboardingWalkthrough onComplete={() => {}} />
+      <OnboardingWalkthrough onComplete={() => setOnboardingShown(true)} />
     </div>
   );
 };
