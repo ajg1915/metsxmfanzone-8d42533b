@@ -1254,6 +1254,7 @@ export type Database = {
       }
       stories: {
         Row: {
+          blog_post_id: string | null
           created_at: string
           display_order: number | null
           duration: number | null
@@ -1267,6 +1268,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          blog_post_id?: string | null
           created_at?: string
           display_order?: number | null
           duration?: number | null
@@ -1280,6 +1282,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          blog_post_id?: string | null
           created_at?: string
           display_order?: number | null
           duration?: number | null
@@ -1292,7 +1295,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "stories_blog_post_id_fkey"
+            columns: ["blog_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stream_alerts: {
         Row: {

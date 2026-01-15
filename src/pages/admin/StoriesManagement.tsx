@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Edit, Eye, EyeOff, Image as ImageIcon, Video, Sparkles, Download } from "lucide-react";
+import { Plus, Trash2, Edit, Eye, EyeOff, Image as ImageIcon, Video, Sparkles, Download, FileText, Link2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -15,7 +15,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { validateFile, generateSafeFilename, FileType } from "@/utils/fileValidation";
+
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+}
 
 interface Story {
   id: string;
@@ -28,21 +42,25 @@ interface Story {
   published: boolean;
   created_at: string;
   link_url: string | null;
+  blog_post_id: string | null;
 }
 
 const StoriesManagement = () => {
   const { toast } = useToast();
   const [stories, setStories] = useState<Story[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStory, setEditingStory] = useState<Story | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [linkType, setLinkType] = useState<"blog" | "custom">("blog");
 
   const [formData, setFormData] = useState({
     title: "",
     display_order: 0,
     published: false,
     link_url: "",
+    blog_post_id: "",
   });
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -58,7 +76,23 @@ const StoriesManagement = () => {
 
   useEffect(() => {
     fetchStories();
+    fetchBlogPosts();
   }, []);
+
+  const fetchBlogPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("blog_posts")
+        .select("id, title, slug")
+        .eq("published", true)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setBlogPosts(data || []);
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+    }
+  };
 
   const fetchStories = async () => {
     try {
@@ -127,6 +161,17 @@ const StoriesManagement = () => {
         thumbnailUrl = thumbName;
       }
 
+      // Determine link_url based on link type
+      let finalLinkUrl = null;
+      if (linkType === "blog" && formData.blog_post_id) {
+        const selectedBlog = blogPosts.find(b => b.id === formData.blog_post_id);
+        if (selectedBlog) {
+          finalLinkUrl = `/blog/${selectedBlog.slug}`;
+        }
+      } else if (linkType === "custom" && formData.link_url) {
+        finalLinkUrl = formData.link_url;
+      }
+
       const storyData = {
         title: formData.title,
         media_url: mediaUrl,
@@ -134,7 +179,8 @@ const StoriesManagement = () => {
         thumbnail_url: thumbnailUrl,
         display_order: formData.display_order,
         published: formData.published,
-        link_url: formData.link_url || null,
+        link_url: finalLinkUrl,
+        blog_post_id: linkType === "blog" ? formData.blog_post_id || null : null,
       };
 
       if (editingStory) {
@@ -221,7 +267,10 @@ const StoriesManagement = () => {
       display_order: story.display_order,
       published: story.published,
       link_url: story.link_url || "",
+      blog_post_id: story.blog_post_id || "",
     });
+    // Set link type based on existing data
+    setLinkType(story.blog_post_id ? "blog" : "custom");
     setIsDialogOpen(true);
   };
 
@@ -363,7 +412,8 @@ const StoriesManagement = () => {
   };
 
   const resetForm = () => {
-    setFormData({ title: "", display_order: 0, published: false, link_url: "" });
+    setFormData({ title: "", display_order: 0, published: false, link_url: "", blog_post_id: "" });
+    setLinkType("blog");
     setMediaFile(null);
     setThumbnailFile(null);
     if (mediaPreview) URL.revokeObjectURL(mediaPreview);
@@ -567,14 +617,45 @@ const StoriesManagement = () => {
               </div>
 
               <div>
-                <Label htmlFor="link">Article Link (Optional)</Label>
-                <Input
-                  id="link"
-                  type="url"
-                  placeholder="https://example.com/article"
-                  value={formData.link_url}
-                  onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
-                />
+                <Label>Link Story To (Optional)</Label>
+                <Tabs value={linkType} onValueChange={(v) => setLinkType(v as "blog" | "custom")} className="mt-2">
+                  <TabsList className="grid w-full grid-cols-2 h-9">
+                    <TabsTrigger value="blog" className="text-xs flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5" />
+                      Blog Post
+                    </TabsTrigger>
+                    <TabsTrigger value="custom" className="text-xs flex items-center gap-1">
+                      <Link2 className="w-3.5 h-3.5" />
+                      Custom URL
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="blog" className="mt-2">
+                    <Select
+                      value={formData.blog_post_id}
+                      onValueChange={(value) => setFormData({ ...formData, blog_post_id: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a blog post" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">None</SelectItem>
+                        {blogPosts.map((post) => (
+                          <SelectItem key={post.id} value={post.id}>
+                            {post.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TabsContent>
+                  <TabsContent value="custom" className="mt-2">
+                    <Input
+                      type="url"
+                      placeholder="https://example.com/article"
+                      value={formData.link_url}
+                      onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                    />
+                  </TabsContent>
+                </Tabs>
               </div>
 
               <div>
@@ -703,6 +784,14 @@ const StoriesManagement = () => {
                     <div className="text-xs text-muted-foreground mt-1">
                       {new Date(story.created_at).toLocaleDateString()}
                     </div>
+                    {story.blog_post_id && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <FileText className="w-3 h-3 text-primary" />
+                        <span className="text-xs text-primary">
+                          Linked to blog
+                        </span>
+                      </div>
+                    )}
                     {story.link_url && (
                       <a 
                         href={story.link_url} 
@@ -710,7 +799,7 @@ const StoriesManagement = () => {
                         rel="noopener noreferrer"
                         className="text-xs text-primary hover:underline mt-1 block truncate"
                       >
-                        View Article →
+                        {story.blog_post_id ? "View Blog Post →" : "View Article →"}
                       </a>
                     )}
                   </div>
