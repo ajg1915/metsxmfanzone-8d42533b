@@ -499,31 +499,56 @@ const Hero = () => {
         <div className="flex items-center justify-center gap-1 sm:gap-2 px-4 pb-4">
           {tabs.map((tab) => {
             const Icon = tab.icon;
+            const isLiveTab = tab.id === "live";
             return (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  if (tab.id === "live") handleProtectedNavigation("/metsxmfanzone-tv");
-                  if (tab.id === "podcasts") handleProtectedNavigation("/podcast");
-                  if (tab.id === "community") handleProtectedNavigation("/community");
-                }}
-                className={`
-                  flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 text-[10px] sm:text-sm font-medium transition-all duration-300 rounded-xl
-                  ${
-                    activeTab === tab.id
-                      ? "text-foreground glass-strong border-primary/50 shadow-lg"
-                      : "text-muted-foreground hover:text-foreground glass-light hover:border-border/50"
-                  }
-                `}
-              >
-                {tab.isImage ? (
-                  <Icon className="w-4 h-4 sm:w-4 sm:h-4 object-contain" />
-                ) : (
-                  <Icon className="w-4 h-4 sm:w-4 sm:h-4" />
+              <div key={tab.id} className="relative">
+                {/* Orange glow for Live Streams tab when live */}
+                {isLiveTab && isLiveNow && (
+                  <motion.div
+                    className="absolute -inset-1 rounded-xl bg-[#ff4500]/30 blur-md"
+                    animate={{
+                      opacity: [0.3, 0.6, 0.3],
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
                 )}
-                <span>{tab.label}</span>
-              </button>
+                <button
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    if (tab.id === "live") handleProtectedNavigation("/metsxmfanzone-tv");
+                    if (tab.id === "podcasts") handleProtectedNavigation("/podcast");
+                    if (tab.id === "community") handleProtectedNavigation("/community");
+                  }}
+                  className={`
+                    relative flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 text-[10px] sm:text-sm font-medium transition-all duration-300 rounded-xl
+                    ${
+                      activeTab === tab.id
+                        ? "text-foreground glass-strong border-primary/50 shadow-lg"
+                        : "text-muted-foreground hover:text-foreground glass-light hover:border-border/50"
+                    }
+                    ${isLiveTab && isLiveNow ? "ring-1 ring-[#ff4500]/40 shadow-[#ff4500]/20" : ""}
+                  `}
+                >
+                  {/* Live indicator dot */}
+                  {isLiveTab && isLiveNow && (
+                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff4500] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff4500]"></span>
+                    </span>
+                  )}
+                  {tab.isImage ? (
+                    <Icon className="w-4 h-4 sm:w-4 sm:h-4 object-contain" />
+                  ) : (
+                    <Icon className="w-4 h-4 sm:w-4 sm:h-4" />
+                  )}
+                  <span>{tab.label}</span>
+                </button>
+              </div>
             );
           })}
         </div>
