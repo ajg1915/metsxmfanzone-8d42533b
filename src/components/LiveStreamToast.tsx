@@ -34,7 +34,7 @@ export const LiveStreamToast = () => {
               title: (
                 <div className="flex items-center gap-2">
                   <Radio className="h-4 w-4 text-red-500 animate-pulse" />
-                  <span>We're Live!</span>
+                  <span>MetsXMFanZone.TV Live Streaming</span>
                 </div>
               ) as any,
               description: newStream.title || "A live stream just started!",
@@ -110,14 +110,14 @@ export const LiveStreamToast = () => {
         if (!shownStreamIds.current.has(stream.id)) {
           shownStreamIds.current.add(stream.id);
           
-          toast({
-            title: (
-              <div className="flex items-center gap-2">
-                <Radio className="h-4 w-4 text-red-500 animate-pulse" />
-                <span>We're Live!</span>
-              </div>
-            ) as any,
-            description: stream.title || "A live stream is happening now!",
+              toast({
+                title: (
+                  <div className="flex items-center gap-2">
+                    <Radio className="h-4 w-4 text-red-500 animate-pulse" />
+                    <span>MetsXMFanZone.TV Live Streaming</span>
+                  </div>
+                ) as any,
+                description: stream.title || "A live stream is happening now!",
             action: (
               <button
                 onClick={() => navigate('/metsxmfanzone')}
