@@ -426,12 +426,6 @@ const Hero = () => {
                               : "shadow-primary/30 hover:shadow-primary/50"
                           }`}
                         >
-                          {isLiveNow && (
-                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff4500] opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#ff4500]"></span>
-                            </span>
-                          )}
                           <Play className="w-5 h-5 fill-current" />
                           Watch Live
                         </Button>
@@ -534,9 +528,9 @@ const Hero = () => {
                     ${isLiveTab && isLiveNow ? "ring-1 ring-[#ff4500]/40 shadow-[#ff4500]/20" : ""}
                   `}
                 >
-                  {/* Live indicator dot */}
+                  {/* Live indicator dot - left side */}
                   {isLiveTab && isLiveNow && (
-                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                    <span className="absolute -top-1 -left-1 flex h-2.5 w-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff4500] opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff4500]"></span>
                     </span>
