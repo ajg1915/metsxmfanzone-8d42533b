@@ -507,22 +507,10 @@ const Hero = () => {
               <button
                 onClick={() => {
                   setActiveTab(tab.id);
-                  if (tab.id === "overview") {
-                    setShowOverviewInfo(true);
-                  } else if (!user) {
-                    // Show toast for unauthenticated users trying to access protected tabs
-                    toast("Login to Access Quick Access", {
-                      description: "Sign in or create an account to use Live Streams, Podcasts & Community!",
-                      action: {
-                        label: "Login",
-                        onClick: () => navigate("/auth"),
-                      },
-                    });
-                  } else {
-                    if (tab.id === "live") handleProtectedNavigation("/metsxmfanzone-tv");
-                    if (tab.id === "podcasts") handleProtectedNavigation("/podcast");
-                    if (tab.id === "community") handleProtectedNavigation("/community");
-                  }
+                  if (tab.id === "overview") setShowOverviewInfo(true);
+                  if (tab.id === "live") handleProtectedNavigation("/metsxmfanzone-tv");
+                  if (tab.id === "podcasts") handleProtectedNavigation("/podcast");
+                  if (tab.id === "community") handleProtectedNavigation("/community");
                 }}
                 className={`
                   relative flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 text-[10px] sm:text-sm font-medium transition-all duration-300 rounded-xl
