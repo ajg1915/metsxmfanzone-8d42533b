@@ -559,9 +559,9 @@ const Hero = () => {
                     <PopoverTrigger asChild>
                       {tabButton}
                     </PopoverTrigger>
-                    <PopoverContent className="w-64 p-3 glass-strong border-primary/30">
+                    <PopoverContent className="w-72 p-3 glass-strong border-primary/30">
                       <p className="text-sm text-foreground">
-                        Your daily hub for streams, podcasts & community!
+                        Here is a quick way to select your tabs quickly for Live Streams, Live Podcast and chat with your fellow fans daily!
                       </p>
                     </PopoverContent>
                   </Popover>
