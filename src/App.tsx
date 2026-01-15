@@ -202,7 +202,7 @@ const AppContent = () => {
       <PullToRefresh>
         <Toaster />
         <Sonner />
-        <LiveStreamToast />
+        {/* LiveStreamToast removed per user request */}
         <ExitIntentPopup />
         <StreamExitDialog />
         <Suspense fallback={<PageLoader />}>
