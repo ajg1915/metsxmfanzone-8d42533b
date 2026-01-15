@@ -631,14 +631,14 @@ const StoriesManagement = () => {
                   </TabsList>
                   <TabsContent value="blog" className="mt-2">
                     <Select
-                      value={formData.blog_post_id}
-                      onValueChange={(value) => setFormData({ ...formData, blog_post_id: value })}
+                      value={formData.blog_post_id || "__none__"}
+                      onValueChange={(value) => setFormData({ ...formData, blog_post_id: value === "__none__" ? "" : value })}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a blog post" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                      <SelectContent className="bg-background border z-50">
+                        <SelectItem value="__none__">None</SelectItem>
                         {blogPosts.map((post) => (
                           <SelectItem key={post.id} value={post.id}>
                             {post.title}
