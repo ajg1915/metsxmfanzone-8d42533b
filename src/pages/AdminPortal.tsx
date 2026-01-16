@@ -67,9 +67,36 @@ export default function AdminPortal() {
         }
       });
 
-      if (error) throw error;
+      // If the backend returns a 429 lockout, Supabase surfaces it as `error`.
+      // Parse the JSON payload so we can show the lockout UI instead of crashing.
+      if (error) {
+        const message = String((error as any)?.message || "");
+        const jsonStart = message.indexOf("{");
+        const jsonEnd = message.lastIndexOf("}");
 
-      if (data.error) {
+        if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+          try {
+            const payload = JSON.parse(message.slice(jsonStart, jsonEnd + 1));
+            if (payload?.locked) {
+              setIsLocked(true);
+              setLockoutMinutes(payload.remainingMinutes ?? 30);
+              await trackSuspiciousActivity('unknown', 'admin_lockout', `Device locked after multiple failed PIN attempts`);
+              toast({
+                title: "Account Locked",
+                description: payload.message || "Too many failed attempts. Please wait and try again.",
+                variant: "destructive",
+              });
+              return;
+            }
+          } catch {
+            // ignore JSON parse failures
+          }
+        }
+
+        throw error;
+      }
+
+      if (data?.error) {
         // Handle locked account
         if (data.locked) {
           setIsLocked(true);
