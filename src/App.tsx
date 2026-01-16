@@ -12,6 +12,7 @@ import { usePresenceTracking } from "@/hooks/usePresenceTracking";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { StreamExitDialog } from "@/components/StreamExitDialog";
 import { LiveStreamToast } from "@/components/LiveStreamToast";
+import ToastPoll from "@/components/ToastPoll";
 import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -126,6 +127,7 @@ const VideoCreatorStudio = lazy(() => import("./pages/admin/VideoCreatorStudio")
 const DailyReports = lazy(() => import("./pages/admin/DailyReports"));
 const PredictionsManagement = lazy(() => import("./pages/admin/PredictionsManagement"));
 const TalentAssessmentManagement = lazy(() => import("./pages/admin/TalentAssessmentManagement"));
+const PollManagement = lazy(() => import("./pages/admin/PollManagement"));
 const WhatsNew = lazy(() => import("./pages/WhatsNew"));
 const MetsVsAstros = lazy(() => import("./pages/matchups/MetsVsAstros"));
 const MetsVsBraves = lazy(() => import("./pages/matchups/MetsVsBraves"));
@@ -205,6 +207,7 @@ const AppContent = () => {
         {/* LiveStreamToast removed per user request */}
         <ExitIntentPopup />
         <StreamExitDialog />
+        <ToastPoll />
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Index />} />
@@ -293,6 +296,7 @@ const AppContent = () => {
               <Route path="daily-reports" element={<DailyReports />} />
               <Route path="predictions" element={<PredictionsManagement />} />
               <Route path="talent-assessments" element={<TalentAssessmentManagement />} />
+              <Route path="polls" element={<PollManagement />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="tutorials" element={<TutorialManagement />} />
             </Route>

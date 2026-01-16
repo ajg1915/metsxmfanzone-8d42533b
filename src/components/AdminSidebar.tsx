@@ -3,7 +3,7 @@ import {
   MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, 
   Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, 
   Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers, Sparkles, 
-  Tv, Newspaper, ClipboardList, Star
+  Tv, Newspaper, ClipboardList, Star, BarChart3
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -72,11 +72,12 @@ const usersItems = [
   { title: "Podcaster Apps", url: "/admin/podcaster-applications", icon: Mic },
 ];
 
-// Community Content - Posts, Feedback, Business Ads
+// Community Content - Posts, Feedback, Business Ads, Polls
 const communityItems = [
   { title: "Posts", url: "/admin/posts", icon: FileText },
   { title: "Feedback", url: "/admin/feedbacks", icon: MessageSquare },
   { title: "Business Ads", url: "/admin/business-ads", icon: Megaphone },
+  { title: "Polls", url: "/admin/polls", icon: BarChart3 },
 ];
 
 // Analytics & SEO
