@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { X, BarChart3, Check } from "lucide-react";
+import { X, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
 interface Poll {
   id: string;
@@ -148,7 +149,7 @@ const ToastPoll = () => {
         <Card className="border-primary/50 shadow-2xl bg-background/95 backdrop-blur-sm">
           <CardHeader className="pb-2 flex flex-row items-start justify-between">
             <div className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-primary" />
+              <img src={metsLogo} alt="MetsXMFanZone" className="h-6 w-6 object-contain" />
               <CardTitle className="text-base font-semibold">Quick Poll</CardTitle>
             </div>
             <Button
