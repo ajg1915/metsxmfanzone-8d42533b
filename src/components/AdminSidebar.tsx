@@ -34,6 +34,7 @@ const homeItems = [
 const mediaItems = [
   { title: "Blog", url: "/admin/blog", icon: FileText },
   { title: "Stories", url: "/admin/stories", icon: Sparkles },
+  { title: "AI Images", url: "/admin/ai-images", icon: Image },
   { title: "Videos", url: "/admin/video-gallery-management", icon: Video },
   { title: "Video Creator", url: "/admin/video-creator", icon: Film },
   { title: "Podcasts", url: "/admin/podcasts", icon: Mic },

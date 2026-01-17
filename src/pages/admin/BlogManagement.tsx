@@ -65,6 +65,7 @@ export default function BlogManagement() {
     published: false,
   });
   const [generatingContent, setGeneratingContent] = useState(false);
+  const [generatingExcerpt, setGeneratingExcerpt] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [checkingAI, setCheckingAI] = useState<string | null>(null);
@@ -446,6 +447,47 @@ export default function BlogManagement() {
     }
   };
 
+  const handleGenerateExcerpt = async () => {
+    if (!formData.title && !formData.content) {
+      toast({
+        title: "Error",
+        description: "Please enter a title or content first to generate an excerpt",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setGeneratingExcerpt(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-excerpt', {
+        body: { 
+          title: formData.title,
+          content: formData.content,
+          category: formData.category
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.excerpt) {
+        setFormData({ ...formData, excerpt: data.excerpt });
+        toast({
+          title: "Success",
+          description: "Excerpt generated successfully!",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error generating excerpt:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate excerpt",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingExcerpt(false);
+    }
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -653,13 +695,36 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
                 </div>
 
                 <div className="sm:col-span-2">
-                  <Label htmlFor="excerpt" className="text-sm">Excerpt</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="excerpt" className="text-sm">Excerpt</Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleGenerateExcerpt}
+                      disabled={generatingExcerpt || (!formData.title && !formData.content)}
+                      className="h-6 text-xs"
+                    >
+                      {generatingExcerpt ? (
+                        <>
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-3 w-3 mr-1" />
+                          Auto-Generate
+                        </>
+                      )}
+                    </Button>
+                  </div>
                   <Textarea
                     id="excerpt"
                     value={formData.excerpt}
                     onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                     rows={2}
-                    className="text-sm"
+                    className="text-sm mt-1"
+                    placeholder="Brief summary of the article..."
                   />
                 </div>
 
