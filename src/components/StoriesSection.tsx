@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Play, BarChart3 } from "lucide-react";
+import { Play, BarChart3, Heart, MessageCircle, Share2, Send, X, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Carousel,
   CarouselContent,
@@ -12,6 +12,12 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import GlassCard from "@/components/GlassCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Story {
   id: string;
@@ -24,14 +30,50 @@ interface Story {
   link_url: string | null;
 }
 
+interface StoryComment {
+  id: string;
+  story_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  profile?: {
+    full_name: string | null;
+    avatar_url: string | null;
+  };
+}
+
+interface StoryStats {
+  likesCount: number;
+  commentsCount: number;
+  isLiked: boolean;
+}
+
 const StoriesSection = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
+  const [storyStats, setStoryStats] = useState<Record<string, StoryStats>>({});
+  const [comments, setComments] = useState<StoryComment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [showComments, setShowComments] = useState(false);
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchStories();
   }, []);
+
+  useEffect(() => {
+    if (stories.length > 0) {
+      fetchAllStoryStats();
+    }
+  }, [stories, user]);
+
+  useEffect(() => {
+    if (selectedStory && showComments) {
+      fetchComments(selectedStory.id);
+    }
+  }, [selectedStory, showComments]);
 
   const fetchStories = async () => {
     try {
@@ -73,6 +115,195 @@ const StoriesSection = () => {
       console.error("Error fetching stories:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAllStoryStats = async () => {
+    const stats: Record<string, StoryStats> = {};
+    
+    for (const story of stories) {
+      const [likesResult, commentsResult, userLikeResult] = await Promise.all([
+        supabase.from("story_likes").select("id", { count: "exact" }).eq("story_id", story.id),
+        supabase.from("story_comments").select("id", { count: "exact" }).eq("story_id", story.id),
+        user ? supabase.from("story_likes").select("id").eq("story_id", story.id).eq("user_id", user.id).maybeSingle() : Promise.resolve({ data: null })
+      ]);
+
+      stats[story.id] = {
+        likesCount: likesResult.count || 0,
+        commentsCount: commentsResult.count || 0,
+        isLiked: !!userLikeResult.data
+      };
+    }
+    
+    setStoryStats(stats);
+  };
+
+  const fetchComments = async (storyId: string) => {
+    const { data, error } = await supabase
+      .from("story_comments")
+      .select("*")
+      .eq("story_id", storyId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching comments:", error);
+      return;
+    }
+
+    // Fetch profiles for each comment
+    const commentsWithProfiles = await Promise.all(
+      (data || []).map(async (comment) => {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", comment.user_id)
+          .maybeSingle();
+        
+        return {
+          ...comment,
+          profile: profile || { full_name: null, avatar_url: null }
+        };
+      })
+    );
+
+    setComments(commentsWithProfiles);
+  };
+
+  const handleLike = async (storyId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!user) {
+      toast.error("Please sign in to like stories");
+      return;
+    }
+
+    const currentStats = storyStats[storyId];
+    const isCurrentlyLiked = currentStats?.isLiked;
+
+    // Optimistic update
+    setStoryStats(prev => ({
+      ...prev,
+      [storyId]: {
+        ...prev[storyId],
+        isLiked: !isCurrentlyLiked,
+        likesCount: isCurrentlyLiked 
+          ? (prev[storyId]?.likesCount || 1) - 1 
+          : (prev[storyId]?.likesCount || 0) + 1
+      }
+    }));
+
+    try {
+      if (isCurrentlyLiked) {
+        await supabase
+          .from("story_likes")
+          .delete()
+          .eq("story_id", storyId)
+          .eq("user_id", user.id);
+      } else {
+        await supabase
+          .from("story_likes")
+          .insert({ story_id: storyId, user_id: user.id });
+      }
+    } catch (error) {
+      // Revert on error
+      setStoryStats(prev => ({
+        ...prev,
+        [storyId]: currentStats
+      }));
+      toast.error("Failed to update like");
+    }
+  };
+
+  const handleComment = async () => {
+    if (!user) {
+      toast.error("Please sign in to comment");
+      return;
+    }
+
+    if (!newComment.trim() || !selectedStory) return;
+
+    setSubmittingComment(true);
+    try {
+      const { error } = await supabase
+        .from("story_comments")
+        .insert({
+          story_id: selectedStory.id,
+          user_id: user.id,
+          content: newComment.trim()
+        });
+
+      if (error) throw error;
+
+      setNewComment("");
+      await fetchComments(selectedStory.id);
+      
+      // Update comment count
+      setStoryStats(prev => ({
+        ...prev,
+        [selectedStory.id]: {
+          ...prev[selectedStory.id],
+          commentsCount: (prev[selectedStory.id]?.commentsCount || 0) + 1
+        }
+      }));
+      
+      toast.success("Comment added!");
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      toast.error("Failed to add comment");
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!selectedStory) return;
+    
+    try {
+      const { error } = await supabase
+        .from("story_comments")
+        .delete()
+        .eq("id", commentId);
+
+      if (error) throw error;
+
+      setComments(prev => prev.filter(c => c.id !== commentId));
+      setStoryStats(prev => ({
+        ...prev,
+        [selectedStory.id]: {
+          ...prev[selectedStory.id],
+          commentsCount: Math.max(0, (prev[selectedStory.id]?.commentsCount || 1) - 1)
+        }
+      }));
+      
+      toast.success("Comment deleted");
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      toast.error("Failed to delete comment");
+    }
+  };
+
+  const handleShare = async (story: Story, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    const shareUrl = `${window.location.origin}?story=${story.id}`;
+    const shareData = {
+      title: story.title,
+      text: `Check out this story on MetsXMFanZone: ${story.title}`,
+      url: shareUrl
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Link copied to clipboard!");
+      }
+    } catch (error) {
+      if ((error as Error).name !== 'AbortError') {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Link copied to clipboard!");
+      }
     }
   };
 
@@ -118,8 +349,11 @@ const StoriesSection = () => {
                     window.open(story.link_url, '_blank', 'noopener,noreferrer');
                   } else {
                     setSelectedStory(story);
+                    setShowComments(false);
                   }
                 };
+
+                const stats = storyStats[story.id] || { likesCount: 0, commentsCount: 0, isLiked: false };
 
                 return (
                   <CarouselItem 
@@ -151,6 +385,59 @@ const StoriesSection = () => {
                           </div>
                         )}
                         
+                        {/* Interactive buttons overlay */}
+                        <div 
+                          className="absolute top-2 right-2 flex flex-col gap-1.5 z-10"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 bg-background/60 backdrop-blur-sm hover:bg-background/80"
+                            onClick={(e) => handleLike(story.id, e)}
+                          >
+                            <Heart 
+                              className={`h-4 w-4 transition-colors ${stats.isLiked ? 'fill-red-500 text-red-500' : 'text-foreground'}`} 
+                            />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 bg-background/60 backdrop-blur-sm hover:bg-background/80"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedStory(story);
+                              setShowComments(true);
+                            }}
+                          >
+                            <MessageCircle className="h-4 w-4 text-foreground" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 bg-background/60 backdrop-blur-sm hover:bg-background/80"
+                            onClick={(e) => handleShare(story, e)}
+                          >
+                            <Share2 className="h-4 w-4 text-foreground" />
+                          </Button>
+                        </div>
+
+                        {/* Stats display */}
+                        <div className="absolute top-2 left-2 flex items-center gap-2 z-10">
+                          {stats.likesCount > 0 && (
+                            <span className="flex items-center gap-1 text-[10px] bg-background/60 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+                              <Heart className="h-3 w-3 fill-red-500 text-red-500" />
+                              {stats.likesCount}
+                            </span>
+                          )}
+                          {stats.commentsCount > 0 && (
+                            <span className="flex items-center gap-1 text-[10px] bg-background/60 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+                              <MessageCircle className="h-3 w-3" />
+                              {stats.commentsCount}
+                            </span>
+                          )}
+                        </div>
+                        
                         <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
                           <p className="text-foreground text-[10px] sm:text-xs font-semibold truncate">
                             {story.title}
@@ -171,31 +458,149 @@ const StoriesSection = () => {
         </div>
       </div>
 
-      <Dialog open={!!selectedStory} onOpenChange={() => setSelectedStory(null)}>
-        <DialogContent className="w-[92vw] max-w-sm sm:max-w-md max-h-[80vh] p-0 overflow-hidden glass-card border-border/30">
+      <Dialog open={!!selectedStory} onOpenChange={() => { setSelectedStory(null); setShowComments(false); }}>
+        <DialogContent className="w-[92vw] max-w-lg max-h-[85vh] p-0 overflow-hidden glass-card border-border/30">
           {selectedStory && (
-            <div className="relative bg-background/80 w-full animate-scale-in">
-              {selectedStory.media_type === 'video' ? (
-                <video 
-                  src={selectedStory.media_url} 
-                  controls 
-                  autoPlay 
-                  playsInline 
-                  muted={false} 
-                  className="w-full h-auto max-h-[50vh] object-contain"
-                />
-              ) : (
-                <img 
-                  src={selectedStory.media_url} 
-                  alt={selectedStory.title} 
-                  className="w-full h-auto max-h-[50vh] object-contain" 
-                />
-              )}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent p-2 sm:p-3">
-                <h3 className="text-foreground text-xs sm:text-sm font-bold truncate">
-                  {selectedStory.title}
-                </h3>
+            <div className="relative bg-background/80 w-full animate-scale-in flex flex-col max-h-[85vh]">
+              {/* Media section */}
+              <div className="relative flex-shrink-0">
+                {selectedStory.media_type === 'video' ? (
+                  <video 
+                    src={selectedStory.media_url} 
+                    controls 
+                    autoPlay 
+                    playsInline 
+                    muted={false} 
+                    className="w-full h-auto max-h-[40vh] object-contain"
+                  />
+                ) : (
+                  <img 
+                    src={selectedStory.media_url} 
+                    alt={selectedStory.title} 
+                    className="w-full h-auto max-h-[40vh] object-contain" 
+                  />
+                )}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent p-2 sm:p-3">
+                  <h3 className="text-foreground text-xs sm:text-sm font-bold truncate">
+                    {selectedStory.title}
+                  </h3>
+                </div>
               </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center gap-4 px-4 py-3 border-b border-border/30">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={(e) => handleLike(selectedStory.id, e)}
+                >
+                  <Heart 
+                    className={`h-5 w-5 transition-colors ${storyStats[selectedStory.id]?.isLiked ? 'fill-red-500 text-red-500' : ''}`} 
+                  />
+                  <span>{storyStats[selectedStory.id]?.likesCount || 0}</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`flex items-center gap-2 ${showComments ? 'bg-accent' : ''}`}
+                  onClick={() => setShowComments(!showComments)}
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  <span>{storyStats[selectedStory.id]?.commentsCount || 0}</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={(e) => handleShare(selectedStory, e)}
+                >
+                  <Share2 className="h-5 w-5" />
+                  <span>Share</span>
+                </Button>
+              </div>
+
+              {/* Comments section */}
+              <AnimatePresence>
+                {showComments && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="flex flex-col flex-1 overflow-hidden"
+                  >
+                    <ScrollArea className="flex-1 max-h-[25vh] px-4 py-2">
+                      {comments.length === 0 ? (
+                        <p className="text-muted-foreground text-sm text-center py-4">
+                          No comments yet. Be the first to comment!
+                        </p>
+                      ) : (
+                        <div className="space-y-3">
+                          {comments.map((comment) => (
+                            <div key={comment.id} className="flex gap-2 group">
+                              <Avatar className="h-8 w-8 flex-shrink-0">
+                                <AvatarImage src={comment.profile?.avatar_url || undefined} />
+                                <AvatarFallback className="text-xs">
+                                  {comment.profile?.full_name?.charAt(0) || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-medium truncate">
+                                    {comment.profile?.full_name || 'Anonymous'}
+                                  </span>
+                                  <span className="text-[10px] text-muted-foreground">
+                                    {new Date(comment.created_at).toLocaleDateString()}
+                                  </span>
+                                  {user?.id === comment.user_id && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity ml-auto"
+                                      onClick={() => handleDeleteComment(comment.id)}
+                                    >
+                                      <Trash2 className="h-3 w-3 text-destructive" />
+                                    </Button>
+                                  )}
+                                </div>
+                                <p className="text-sm text-foreground break-words">
+                                  {comment.content}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </ScrollArea>
+
+                    {/* Comment input */}
+                    <div className="p-3 border-t border-border/30 flex-shrink-0">
+                      {user ? (
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Add a comment..."
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleComment()}
+                            className="flex-1 text-sm"
+                          />
+                          <Button
+                            size="icon"
+                            onClick={handleComment}
+                            disabled={!newComment.trim() || submittingComment}
+                          >
+                            <Send className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground text-center">
+                          <Link to="/auth" className="text-primary hover:underline">Sign in</Link> to comment
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
         </DialogContent>
