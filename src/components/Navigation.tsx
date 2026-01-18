@@ -232,6 +232,17 @@ const Navigation = () => {
               </>
             )}
             
+            {/* Mobile Login/Register button - only shown when not logged in */}
+            {!user && (
+              <Button 
+                size="sm" 
+                className="md:hidden text-[10px] h-7 px-2"
+                onClick={() => navigate("/auth")}
+              >
+                Login / Register
+              </Button>
+            )}
+
             {/* Single mobile menu for all users */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
