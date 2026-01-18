@@ -6,7 +6,6 @@ import { ExternalLink, Building2, Megaphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import ScrollReveal from "@/components/ScrollReveal";
-import GlassCard from "@/components/GlassCard";
 import {
   Carousel,
   CarouselContent,
@@ -83,7 +82,7 @@ const BusinessAdsSection = () => {
     <ScrollReveal direction="up">
       <section className="py-4 sm:py-6 md:py-8">
         <div className="container mx-auto px-4">
-          <GlassCard glow="blue" className="p-4 sm:p-6">
+          <div className="p-4 sm:p-6">
           <ScrollReveal direction="left" delay={100}>
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 md:mb-6">
               <Megaphone className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
@@ -157,7 +156,7 @@ const BusinessAdsSection = () => {
             <CarouselPrevious className="hidden md:flex -left-4 h-8 w-8 border-border/50 bg-background/80 hover:bg-background" />
             <CarouselNext className="hidden md:flex -right-4 h-8 w-8 border-border/50 bg-background/80 hover:bg-background" />
           </Carousel>
-          </GlassCard>
+          </div>
         </div>
       </section>
     </ScrollReveal>
