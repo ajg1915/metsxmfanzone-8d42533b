@@ -125,22 +125,6 @@ const Index = () => {
     return cleanup;
   }, []);
 
-  // Backup toast for unauthenticated users when onboarding doesn't show
-  useEffect(() => {
-    if (!user && !onboardingShown) {
-      const timer = setTimeout(() => {
-        toast("Login or Register", {
-          description: "Join the MetsXMFanZone community!",
-          action: {
-            label: "Sign In",
-            onClick: () => navigate("/auth"),
-          },
-          duration: 8000,
-        });
-      }, 3000); // Show after 3 seconds if onboarding didn't appear
-      return () => clearTimeout(timer);
-    }
-  }, [user, onboardingShown, navigate]);
 
   return (
     <div className="min-h-screen bg-background relative">
