@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays } from "lucide-react";
+import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import podcastIcon from "@/assets/podcast-icon.png";
@@ -37,6 +37,12 @@ const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [userProfile, setUserProfile] = useState<{ full_name: string | null; avatar_url: string | null }>({ full_name: null, avatar_url: null });
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    window.location.reload();
+  };
   
   const isHomePage = location.pathname === "/";
   
@@ -177,6 +183,17 @@ const Navigation = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Refresh button - visible on all devices */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleRefresh}
+              className="h-8 w-8"
+              title="Refresh page"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            
             {user ? (
               <>
                 <DropdownMenu>
