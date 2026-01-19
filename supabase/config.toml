@@ -95,3 +95,6 @@ verify_jwt = true
 
 [functions.generate-video-gif]
 verify_jwt = false
+
+[functions.fetch-mets-highlights]
+verify_jwt = false
