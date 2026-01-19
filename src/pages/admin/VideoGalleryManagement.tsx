@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit, Upload, Sparkles, Film } from "lucide-react";
+import { Trash2, Plus, Edit, Upload, Sparkles, Film, Download, RefreshCw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -45,6 +45,7 @@ export default function VideoGalleryManagement() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
   const [generatingGif, setGeneratingGif] = useState(false);
+  const [fetchingMLBHighlights, setFetchingMLBHighlights] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<'file' | 'youtube' | 'link'>('file');
   const [formData, setFormData] = useState({
     title: "",
@@ -135,6 +136,37 @@ export default function VideoGalleryManagement() {
       return null;
     } finally {
       setGeneratingGif(false);
+    }
+  };
+
+  const fetchMLBHighlights = async () => {
+    setFetchingMLBHighlights(true);
+    try {
+      const response = await supabase.functions.invoke("fetch-mets-highlights");
+      
+      if (response.error) {
+        throw new Error(response.error.message || "Failed to fetch MLB highlights");
+      }
+
+      const data = response.data;
+      const newHighlights = data?.highlights?.filter((h: any) => h.status === 'new')?.length || 0;
+      
+      toast({
+        title: "MLB Highlights Synced",
+        description: newHighlights > 0 
+          ? `Added ${newHighlights} new Mets highlights from recent games!`
+          : "All highlights are up to date.",
+      });
+      
+      fetchVideos();
+    } catch (error: any) {
+      toast({
+        title: "Error fetching MLB highlights",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setFetchingMLBHighlights(false);
     }
   };
 
@@ -353,14 +385,34 @@ export default function VideoGalleryManagement() {
 
   return (
     <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <h1 className="text-lg sm:text-xl font-bold">Video Gallery</h1>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm} size="sm" className="h-8 text-xs">
-              <Plus className="mr-1 h-3.5 w-3.5" />
-              Add
-            </Button>
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={fetchMLBHighlights}
+            disabled={fetchingMLBHighlights}
+          >
+            {fetchingMLBHighlights ? (
+              <>
+                <RefreshCw className="mr-1 h-3.5 w-3.5 animate-spin" />
+                Fetching...
+              </>
+            ) : (
+              <>
+                <Download className="mr-1 h-3.5 w-3.5" />
+                Fetch MLB Highlights
+              </>
+            )}
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={resetForm} size="sm" className="h-8 text-xs">
+                <Plus className="mr-1 h-3.5 w-3.5" />
+                Add
+              </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -544,6 +596,7 @@ export default function VideoGalleryManagement() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
