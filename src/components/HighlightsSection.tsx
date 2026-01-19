@@ -11,6 +11,7 @@ interface Video {
   title: string;
   video_url: string;
   thumbnail_url: string | null;
+  thumbnail_gif_url?: string | null;
   description: string | null;
   duration: number | null;
   views: number | null;
@@ -24,6 +25,7 @@ interface HighlightsSectionProps {
 const HighlightsSection = ({ className }: HighlightsSectionProps) => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [hoveredVideoId, setHoveredVideoId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [scrollPosition, setScrollPosition] = useState(0);
 
@@ -134,17 +136,36 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 onClick={() => setSelectedVideo(video)}
+                onMouseEnter={() => setHoveredVideoId(video.id)}
+                onMouseLeave={() => setHoveredVideoId(null)}
                 className="flex-shrink-0 w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] cursor-pointer group"
               >
                 <div className="relative overflow-hidden rounded-md sm:rounded-lg transition-all duration-300 group-hover:scale-105 group-hover:z-10 group-hover:shadow-2xl group-hover:shadow-primary/20">
-                  {/* Thumbnail */}
+                  {/* Thumbnail with GIF on hover */}
                   <div className="aspect-video relative">
                     {video.thumbnail_url ? (
-                      <img
-                        src={video.thumbnail_url}
-                        alt={video.title}
-                        className="w-full h-full object-cover"
-                      />
+                      <>
+                        {/* Static thumbnail (always visible, fades out on hover if GIF exists) */}
+                        <img
+                          src={video.thumbnail_url}
+                          alt={video.title}
+                          className={cn(
+                            "w-full h-full object-cover absolute inset-0 transition-opacity duration-300",
+                            hoveredVideoId === video.id && video.thumbnail_gif_url ? "opacity-0" : "opacity-100"
+                          )}
+                        />
+                        {/* GIF thumbnail (shows on hover if available) */}
+                        {video.thumbnail_gif_url && (
+                          <img
+                            src={video.thumbnail_gif_url}
+                            alt={`${video.title} preview`}
+                            className={cn(
+                              "w-full h-full object-cover absolute inset-0 transition-opacity duration-300",
+                              hoveredVideoId === video.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        )}
+                      </>
                     ) : (
                       <div className="w-full h-full bg-muted flex items-center justify-center">
                         <Film className="w-8 h-8 text-muted-foreground" />

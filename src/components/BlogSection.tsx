@@ -275,11 +275,11 @@ const BlogSection = () => {
                 >
                   {/* Image Container */}
                   {post.featured_image_url && (
-                    <div className="aspect-[4/3] overflow-hidden relative">
+                    <div className="aspect-[4/3] overflow-hidden relative bg-card">
                       <img
                         src={post.featured_image_url}
                         alt={post.title}
-                        className="w-full h-full object-contain bg-card group-hover:scale-105 transition-transform duration-700 ease-out"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent opacity-80" />
                       
