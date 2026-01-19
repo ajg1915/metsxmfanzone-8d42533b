@@ -68,31 +68,51 @@ Deno.serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    console.log('Generating blog content for:', title);
+    const timestamp = new Date().toISOString();
+    const randomSeed = Math.random().toString(36).substring(7);
+    console.log('Generating blog content for:', title, 'at:', timestamp);
 
-    const systemPrompt = `You are a professional sports writer specializing in New York Mets baseball content. 
-Write engaging, informative, and well-structured blog articles that fans will love to read.
-Use a conversational but professional tone. Include relevant details and insights.
-Format the content with proper paragraphs and structure.
+    const systemPrompt = `You are an expert New York Mets baseball journalist and analyst with decades of experience covering the team.
 
-IMPORTANT FORMATTING RULES:
-- DO NOT use any markdown headers (no # symbols)
-- DO NOT use markdown formatting like ** or __
-- Use plain text paragraphs only
+CRITICAL REQUIREMENTS:
+1. ORIGINALITY: Every article must be 100% original. Never copy or closely paraphrase existing content. Create fresh perspectives and unique angles.
+2. AUTHENTICITY: Write with genuine expertise and passion for the Mets. Use your own voice and style.
+3. ACCURACY: Only include verifiable facts, statistics, and information. If discussing current events, be clear about what is known vs speculation.
+4. UNIQUENESS: Each article must be distinctly different. Vary your writing style, structure, opening hooks, and narrative approaches.
+5. NO PLAGIARISM: Generate completely new content from scratch. Do not reproduce phrases or structures from existing articles.
+
+WRITING STYLE:
+- Conversational yet professional tone
+- Engaging storytelling with vivid descriptions
+- Include specific details, stats, and context when relevant
+- Use varied sentence structures and paragraph lengths
+- Create compelling hooks and memorable conclusions
+
+FORMATTING RULES:
+- NO markdown headers (no # symbols)
+- NO markdown formatting (no ** or __ or other markup)
+- Plain text paragraphs only
 - Separate sections with blank lines
-- Write in a natural, flowing style without special formatting characters
-- The content must be 100% original and unique - write it as if you are the original author`;
+- Natural, flowing prose
 
-    const userPrompt = `Write a comprehensive blog article about: "${title}"
+Generation ID: ${randomSeed}-${Date.now()}`;
+
+    const userPrompt = `Write a fresh, original blog article about: "${title}"
 ${category ? `Category: ${category}` : ''}
-${excerpt ? `Brief: ${excerpt}` : ''}
+${excerpt ? `Context: ${excerpt}` : ''}
 
-Please write a full article (500-800 words) with:
-- An engaging introduction paragraph
-- Well-structured body paragraphs with insights and details
-- A compelling conclusion paragraph
-- Use PLAIN TEXT ONLY - no markdown, no # symbols, no ** or __ formatting
-- Write original, unique content that passes plagiarism checks`;
+Requirements for this unique article:
+1. Create an entirely NEW perspective on this topic - approach it differently than typical coverage
+2. Write 500-800 words of 100% ORIGINAL content
+3. Include an attention-grabbing opening that hooks readers immediately
+4. Develop 3-4 substantive body paragraphs with unique insights
+5. End with a memorable, thought-provoking conclusion
+6. Ensure all facts and statistics mentioned are accurate
+7. Use plain text only - no markdown formatting whatsoever
+8. Make this article distinctly different from any other article on this topic
+
+Timestamp: ${timestamp}
+Article Variation Seed: ${randomSeed}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -101,11 +121,12 @@ Please write a full article (500-800 words) with:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-3-flash-preview',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
+        temperature: 0.9,
       }),
     });
 
