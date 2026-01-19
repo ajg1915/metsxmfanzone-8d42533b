@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Radio, Users, Play, ChevronRight, ChevronLeft } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Radio, Users, Play, ChevronRight, ChevronLeft, X, Volume2, VolumeX } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,40 @@ const LiveStreamsSection = () => {
   const [loading, setLoading] = useState(true);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [previewStream, setPreviewStream] = useState<LiveStream | null>(null);
+  const [isMuted, setIsMuted] = useState(true);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const isLongPress = useRef(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Long press handlers
+  const handleLongPressStart = useCallback((stream: LiveStream) => {
+    isLongPress.current = false;
+    longPressTimer.current = setTimeout(() => {
+      isLongPress.current = true;
+      // Only show preview for live streams with premium access
+      if (stream.status === 'live' && (isAdmin || tier === "premium" || tier === "annual")) {
+        setPreviewStream(stream);
+      }
+    }, 500); // 500ms for long press
+  }, [isAdmin, tier]);
+
+  const handleLongPressEnd = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback((stream: LiveStream) => {
+    handleLongPressEnd();
+    // If it was a long press, don't navigate
+    if (isLongPress.current) {
+      isLongPress.current = false;
+      return;
+    }
+    handleStreamClick(stream);
+  }, [handleLongPressEnd]);
 
   useEffect(() => {
     fetchStreams();
@@ -186,8 +221,16 @@ const LiveStreamsSection = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                onClick={() => handleStreamClick(stream)}
-                className="flex-shrink-0 w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] cursor-pointer group"
+                onMouseDown={() => handleLongPressStart(stream)}
+                onMouseUp={() => handleTouchEnd(stream)}
+                onMouseLeave={handleLongPressEnd}
+                onTouchStart={() => handleLongPressStart(stream)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleTouchEnd(stream);
+                }}
+                onContextMenu={(e) => e.preventDefault()}
+                className="flex-shrink-0 w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] cursor-pointer group select-none"
               >
                 <div className="relative overflow-hidden rounded-md sm:rounded-lg transition-all duration-300 group-hover:scale-105 group-hover:z-10 group-hover:shadow-2xl group-hover:shadow-primary/20">
                   {/* Thumbnail */}
@@ -197,6 +240,7 @@ const LiveStreamsSection = () => {
                         src={stream.thumbnail_url}
                         alt={stream.title}
                         className="w-full h-full object-cover"
+                        draggable={false}
                       />
                     ) : (
                       <div className="w-full h-full bg-muted flex items-center justify-center">
@@ -213,6 +257,13 @@ const LiveStreamsSection = () => {
                         <Play className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground ml-0.5" fill="currentColor" />
                       </div>
                     </div>
+
+                    {/* Long press hint for live streams */}
+                    {stream.status === 'live' && (isAdmin || tier === "premium" || tier === "annual") && (
+                      <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-background/70 backdrop-blur-sm text-[10px] font-medium text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                        Hold to preview
+                      </div>
+                    )}
 
                     {/* Status badge */}
                     <div className="absolute top-2 right-2">
@@ -279,6 +330,81 @@ const LiveStreamsSection = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Stream Preview Dialog */}
+      <Dialog open={!!previewStream} onOpenChange={(open) => !open && setPreviewStream(null)}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-border/50">
+          {previewStream && (
+            <div className="relative">
+              {/* Close button */}
+              <button
+                onClick={() => setPreviewStream(null)}
+                className="absolute top-3 right-3 z-20 p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-colors"
+              >
+                <X className="w-5 h-5 text-foreground" />
+              </button>
+
+              {/* Video player */}
+              <div className="aspect-video relative bg-black">
+                <video
+                  ref={videoRef}
+                  src={previewStream.stream_url}
+                  autoPlay
+                  muted={isMuted}
+                  playsInline
+                  className="w-full h-full object-contain"
+                  onError={() => console.log('Video preview error')}
+                />
+                
+                {/* Live badge */}
+                <div className="absolute top-3 left-3">
+                  <Badge className="bg-red-600/90 text-white shadow-lg shadow-red-600/50 text-xs px-2 py-0.5">
+                    <Radio className="w-3 h-3 mr-1 animate-pulse" />
+                    LIVE PREVIEW
+                  </Badge>
+                </div>
+
+                {/* Mute toggle */}
+                <button
+                  onClick={() => setIsMuted(!isMuted)}
+                  className="absolute bottom-3 right-3 p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-colors"
+                >
+                  {isMuted ? (
+                    <VolumeX className="w-5 h-5 text-foreground" />
+                  ) : (
+                    <Volume2 className="w-5 h-5 text-foreground" />
+                  )}
+                </button>
+              </div>
+
+              {/* Stream info */}
+              <div className="p-4">
+                <h3 className="text-lg font-bold text-foreground mb-1">{previewStream.title}</h3>
+                <p className="text-sm text-muted-foreground line-clamp-2">{previewStream.description}</p>
+                <div className="flex items-center gap-4 mt-3">
+                  {previewStream.viewers_count > 0 && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Users className="w-4 h-4 text-primary" />
+                      {previewStream.viewers_count} watching
+                    </div>
+                  )}
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setPreviewStream(null);
+                      handleStreamClick(previewStream);
+                    }}
+                    className="ml-auto"
+                  >
+                    <Play className="w-4 h-4 mr-1" />
+                    Watch Full Stream
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
