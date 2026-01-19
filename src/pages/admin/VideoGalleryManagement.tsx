@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit, Upload } from "lucide-react";
+import { Trash2, Plus, Edit, Upload, Sparkles, Film } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,7 @@ interface Video {
   description: string;
   video_url: string;
   thumbnail_url: string;
+  thumbnail_gif_url?: string;
   video_type: string;
   category: string;
   duration: number;
@@ -43,12 +44,14 @@ export default function VideoGalleryManagement() {
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
+  const [generatingGif, setGeneratingGif] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<'file' | 'youtube' | 'link'>('file');
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     video_url: "",
     thumbnail_url: "",
+    thumbnail_gif_url: "",
     video_type: "highlight",
     category: "General",
     duration: 0,
@@ -109,6 +112,32 @@ export default function VideoGalleryManagement() {
     });
   };
 
+  const generateGifPreview = async (videoUrl: string, videoId?: string): Promise<string | null> => {
+    try {
+      setGeneratingGif(true);
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Not authenticated");
+      }
+
+      const response = await supabase.functions.invoke("generate-video-gif", {
+        body: { videoUrl, videoId },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Failed to generate GIF preview");
+      }
+
+      return response.data?.gifUrl || null;
+    } catch (error) {
+      console.error("Error generating GIF preview:", error);
+      return null;
+    } finally {
+      setGeneratingGif(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploading(true);
@@ -116,6 +145,7 @@ export default function VideoGalleryManagement() {
     try {
       let videoUrl = formData.video_url;
       let thumbnailUrl = formData.thumbnail_url;
+      let thumbnailGifUrl = formData.thumbnail_gif_url;
       let duration = formData.duration;
 
       // Handle file upload method
@@ -184,6 +214,26 @@ export default function VideoGalleryManagement() {
         }
       }
 
+      // Auto-generate GIF preview for highlight videos
+      const isHighlight = formData.video_type === 'highlight';
+      const needsGif = isHighlight && !thumbnailGifUrl && videoUrl;
+      
+      if (needsGif) {
+        toast({
+          title: "Generating preview",
+          description: "Creating animated preview for your highlight...",
+        });
+        
+        const gifUrl = await generateGifPreview(videoUrl);
+        if (gifUrl) {
+          thumbnailGifUrl = gifUrl;
+          toast({
+            title: "Preview generated",
+            description: "Animated preview created successfully!",
+          });
+        }
+      }
+
       if (editingVideo) {
         const { error } = await supabase
           .from("videos")
@@ -191,6 +241,7 @@ export default function VideoGalleryManagement() {
             ...formData,
             video_url: videoUrl,
             thumbnail_url: thumbnailUrl,
+            thumbnail_gif_url: thumbnailGifUrl || null,
             duration: duration,
             published_at: formData.published ? new Date().toISOString() : null,
           })
@@ -207,6 +258,7 @@ export default function VideoGalleryManagement() {
           ...formData,
           video_url: videoUrl,
           thumbnail_url: thumbnailUrl,
+          thumbnail_gif_url: thumbnailGifUrl || null,
           duration: duration,
           published_at: formData.published ? new Date().toISOString() : null,
         });
@@ -264,6 +316,7 @@ export default function VideoGalleryManagement() {
       description: video.description,
       video_url: video.video_url,
       thumbnail_url: video.thumbnail_url,
+      thumbnail_gif_url: video.thumbnail_gif_url || "",
       video_type: video.video_type,
       category: video.category,
       duration: video.duration,
@@ -278,6 +331,7 @@ export default function VideoGalleryManagement() {
       description: "",
       video_url: "",
       thumbnail_url: "",
+      thumbnail_gif_url: "",
       video_type: "highlight",
       category: "General",
       duration: 0,
@@ -473,9 +527,9 @@ export default function VideoGalleryManagement() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={uploading || generatingThumbnail}>
-                  {uploading && <Upload className="mr-2 h-4 w-4 animate-spin" />}
-                  {uploading ? "Uploading..." : generatingThumbnail ? "Generating Thumbnail..." : editingVideo ? "Update" : "Create"}
+                <Button type="submit" disabled={uploading || generatingThumbnail || generatingGif}>
+                  {(uploading || generatingGif) && <Upload className="mr-2 h-4 w-4 animate-spin" />}
+                  {uploading ? "Uploading..." : generatingThumbnail ? "Generating Thumbnail..." : generatingGif ? "Generating Preview..." : editingVideo ? "Update" : "Create"}
                 </Button>
               </div>
 
@@ -496,26 +550,80 @@ export default function VideoGalleryManagement() {
         {videos.map((video) => (
           <Card key={video.id}>
             <CardHeader>
-              <CardTitle className="text-lg">{video.title}</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                {video.title}
+                {video.video_type === 'highlight' && (
+                  <span className="text-xs px-1.5 py-0.5 bg-primary/20 text-primary rounded">
+                    Highlight
+                  </span>
+                )}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              {video.thumbnail_url && (
-                <img
-                  src={video.thumbnail_url}
-                  alt={video.title}
-                  className="w-full h-48 object-cover rounded-md mb-4"
-                />
-              )}
+              <div className="relative">
+                {video.thumbnail_url && (
+                  <img
+                    src={video.thumbnail_url}
+                    alt={video.title}
+                    className="w-full h-48 object-cover rounded-md mb-2"
+                  />
+                )}
+                {video.thumbnail_gif_url && (
+                  <div className="absolute top-2 right-2 bg-primary/90 text-primary-foreground px-1.5 py-0.5 rounded text-xs flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    GIF
+                  </div>
+                )}
+              </div>
               <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
                 {video.description}
               </p>
-              <div className="flex justify-between items-center text-sm">
-                <span className={`px-2 py-1 rounded-full ${video.published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+              <div className="flex justify-between items-center text-sm mb-3">
+                <span className={`px-2 py-1 rounded-full ${video.published ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'}`}>
                   {video.published ? 'Published' : 'Draft'}
                 </span>
                 <span className="text-muted-foreground">{video.category}</span>
               </div>
-              <div className="flex justify-end space-x-2 mt-4">
+              
+              {/* Generate GIF button for highlights without GIF */}
+              {video.video_type === 'highlight' && !video.thumbnail_gif_url && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full mb-3 text-xs"
+                  disabled={generatingGif}
+                  onClick={async () => {
+                    const gifUrl = await generateGifPreview(video.video_url, video.id);
+                    if (gifUrl) {
+                      toast({
+                        title: "GIF Preview Generated",
+                        description: "Animated preview has been added to this highlight",
+                      });
+                      fetchVideos();
+                    } else {
+                      toast({
+                        title: "Generation Failed",
+                        description: "Could not generate preview. Please try again.",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
+                  {generatingGif ? (
+                    <>
+                      <Upload className="mr-1 h-3 w-3 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-1 h-3 w-3" />
+                      Generate GIF Preview
+                    </>
+                  )}
+                </Button>
+              )}
+              
+              <div className="flex justify-end space-x-2">
                 <Button
                   variant="outline"
                   size="sm"

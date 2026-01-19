@@ -92,3 +92,6 @@ verify_jwt = false
 
 [functions.generate-excerpt]
 verify_jwt = true
+
+[functions.generate-video-gif]
+verify_jwt = false
