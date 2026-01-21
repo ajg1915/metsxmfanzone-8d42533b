@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import GlassCard from "@/components/GlassCard";
+import PremiumBadge from "@/components/PremiumBadge";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface PodcastEpisode {
   id: string;
@@ -26,7 +28,9 @@ const platforms = [
 ];
 
 const PodcastSection = () => {
+  const { tier, isAdmin } = useSubscription();
   const [podcasts, setPodcasts] = useState<PodcastEpisode[]>([]);
+  const isPremium = isAdmin || tier === "premium" || tier === "annual";
 
   useEffect(() => {
     fetchPodcasts();
@@ -62,6 +66,7 @@ const PodcastSection = () => {
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
               MetsXMFanZone Podcast
             </h2>
+            {!isPremium && <PremiumBadge size="md" />}
           </div>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
             Listen to exclusive Mets content, game analysis, and fan discussions

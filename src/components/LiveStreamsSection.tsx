@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Radio, Users, Play, ChevronRight, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import PremiumBadge from "@/components/PremiumBadge";
 
 interface LiveStream {
   id: string;
@@ -215,7 +216,11 @@ const LiveStreamsSection = () => {
                     </div>
 
                     {/* Status badge */}
-                    <div className="absolute top-2 right-2">
+                    <div className="absolute top-2 right-2 flex items-center gap-1.5">
+                      {/* Premium badge for non-members */}
+                      {!isAdmin && tier !== "premium" && tier !== "annual" && (
+                        <PremiumBadge size="sm" />
+                      )}
                       <Badge className={cn(
                         "text-[10px] sm:text-xs px-1.5 py-0.5 font-semibold backdrop-blur-sm",
                         stream.status === 'live' 

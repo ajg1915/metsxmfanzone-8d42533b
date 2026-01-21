@@ -5,12 +5,17 @@ import { Calendar, ChevronRight, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
+import PremiumBadge from "@/components/PremiumBadge";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface SpringTrainingProps {
   className?: string;
 }
 
 export default function SpringTraining({ className }: SpringTrainingProps) {
+  const { tier, isAdmin } = useSubscription();
+  const isPremium = isAdmin || tier === "premium" || tier === "annual";
+  
   const { data: games, isLoading } = useQuery({
     queryKey: ["spring-training-games"],
     queryFn: async () => {
@@ -34,14 +39,15 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
           transition={{ duration: 0.6 }}
           className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6"
         >
-          <div>
+          <div className="flex items-center gap-3">
             <h2 className="font-bold text-lg sm:text-xl md:text-2xl text-foreground">
               Spring Training 2026
             </h2>
-            <p className="text-muted-foreground text-xs sm:text-sm mt-1">
-              Get ready for the upcoming spring training season
-            </p>
+            {!isPremium && <PremiumBadge size="sm" />}
           </div>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-1">
+            Get ready for the upcoming spring training season
+          </p>
           <Link 
             to="/mets-schedule-2026" 
             className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-xs sm:text-sm transition-colors group"
@@ -78,6 +84,11 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+                    
+                    {/* Premium badge for non-members */}
+                    {!isPremium && (
+                      <PremiumBadge variant="corner" size="sm" />
+                    )}
                     
                     {/* Play button overlay */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
