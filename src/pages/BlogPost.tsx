@@ -9,6 +9,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,8 +41,16 @@ export default function BlogPost() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth", { replace: true });
+    }
+  }, [user, authLoading, navigate]);
   
   // Free browser TTS states
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -241,7 +250,8 @@ export default function BlogPost() {
   };
 
 
-  if (loading) {
+  // Show loading while checking auth or fetching post
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
         <Navigation />
@@ -251,6 +261,11 @@ export default function BlogPost() {
         <Footer />
       </div>
     );
+  }
+
+  // Don't render content if not authenticated
+  if (!user) {
+    return null;
   }
 
   if (!post) {
