@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw } from "lucide-react";
+import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import podcastIcon from "@/assets/podcast-icon.png";
@@ -384,17 +384,30 @@ const Navigation = () => {
                           Dashboard
                         </Button>
                         {isAdmin && (
-                          <Button 
-                            onClick={() => {
-                              navigate("/admin");
-                              setMobileMenuOpen(false);
-                            }}
-                            variant="ghost"
-                            className="w-full justify-start gap-3 h-11"
-                          >
-                            <Shield className="w-4 h-4" />
-                            Admin Portal
-                          </Button>
+                          <>
+                            <Button 
+                              onClick={() => {
+                                navigate("/admin/stories");
+                                setMobileMenuOpen(false);
+                              }}
+                              variant="ghost"
+                              className="w-full justify-start gap-3 h-11"
+                            >
+                              <Sparkles className="w-4 h-4" />
+                              Admin Stories
+                            </Button>
+                            <Button 
+                              onClick={() => {
+                                navigate("/admin");
+                                setMobileMenuOpen(false);
+                              }}
+                              variant="ghost"
+                              className="w-full justify-start gap-3 h-11"
+                            >
+                              <Shield className="w-4 h-4" />
+                              Admin Portal
+                            </Button>
+                          </>
                         )}
                         <Button 
                           onClick={async () => {
