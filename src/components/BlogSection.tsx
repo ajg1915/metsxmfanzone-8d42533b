@@ -6,7 +6,7 @@ import { Clock, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import logo from "@/assets/metsxmfanzone-logo.png";
-import GlassCard from "@/components/GlassCard";
+
 
 interface BlogPost {
   id: string;
@@ -129,13 +129,14 @@ const BlogSection = () => {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="mb-6"
           >
-            <GlassCard
-              variant="interactive"
-              glow="blue"
-              className="cursor-pointer overflow-hidden group"
+            <div
+              onClick={() => navigate(`/blog/${highlightPost.slug}`)}
+              className="cursor-pointer group glass-card hover-lift hover-border-glow glow-blue rounded-2xl overflow-hidden"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && navigate(`/blog/${highlightPost.slug}`)}
             >
               <article
-                onClick={() => navigate(`/blog/${highlightPost.slug}`)}
                 className="grid md:grid-cols-2 gap-0"
               >
                 {/* Image */}
@@ -255,7 +256,7 @@ const BlogSection = () => {
                   </motion.div>
                 </motion.div>
               </article>
-            </GlassCard>
+            </div>
           </motion.div>
         )}
         
@@ -263,16 +264,19 @@ const BlogSection = () => {
         {otherPosts.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
             {otherPosts.map((post, index) => (
-              <GlassCard
+              <motion.div
                 key={post.id}
-                variant="interactive"
-                glow="blue"
-                delay={index * 0.1}
-                className="cursor-pointer"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                onClick={() => navigate(`/blog/${post.slug}`)}
+                className="cursor-pointer group glass-card hover-lift hover-border-glow glow-blue rounded-2xl overflow-hidden"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/blog/${post.slug}`)}
               >
-                <article
-                  onClick={() => navigate(`/blog/${post.slug}`)}
-                >
+                <article>
                   {/* Image Container */}
                   {post.featured_image_url && (
                     <div className="aspect-[4/3] overflow-hidden relative bg-card">
@@ -321,7 +325,7 @@ const BlogSection = () => {
                     </div>
                   </div>
                 </article>
-              </GlassCard>
+              </motion.div>
             ))}
           </div>
         )}
