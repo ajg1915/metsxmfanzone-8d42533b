@@ -66,7 +66,7 @@ const PodcastSection = () => {
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
               MetsXMFanZone Podcast
             </h2>
-            {!isPremium && <PremiumBadge size="md" />}
+            {!isPremium && <PremiumBadge size="md" noGlow />}
           </div>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
             Listen to exclusive Mets content, game analysis, and fan discussions
