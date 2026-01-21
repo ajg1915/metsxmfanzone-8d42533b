@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
-import GlassCard from "@/components/GlassCard";
+
 
 interface NewsItem {
   id: string;
@@ -199,17 +199,19 @@ const MetsNewsTracker = () => {
             const IconComponent = typeConfig.icon;
             
             return (
-              <GlassCard
+              <motion.div
                 key={item.id}
-                variant="interactive"
-                glow="blue"
-                delay={index * 0.1}
-                className="cursor-pointer group"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                onClick={() => item.link && window.open(item.link, '_blank')}
+                className={`glass-card hover-lift hover-border-glow glow-blue rounded-2xl overflow-hidden group ${item.link ? 'cursor-pointer' : ''}`}
+                role={item.link ? "button" : undefined}
+                tabIndex={item.link ? 0 : undefined}
+                onKeyDown={(e) => e.key === 'Enter' && item.link && window.open(item.link, '_blank')}
               >
-                <div 
-                  className="flex gap-4 p-6"
-                  onClick={() => item.link && window.open(item.link, '_blank')}
-                >
+                <div className="flex gap-4 p-6">
                   <div className="relative flex-shrink-0">
                     <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 group-hover:border-primary/50 transition-colors">
                       <img 
@@ -253,7 +255,7 @@ const MetsNewsTracker = () => {
                     </div>
                   </div>
                 </div>
-              </GlassCard>
+              </motion.div>
             );
           })}
         </div>
