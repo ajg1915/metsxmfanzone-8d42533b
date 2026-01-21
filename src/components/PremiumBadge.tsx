@@ -6,12 +6,14 @@ interface PremiumBadgeProps {
   className?: string;
   size?: "sm" | "md" | "lg";
   variant?: "default" | "corner" | "inline";
+  noGlow?: boolean;
 }
 
 const PremiumBadge = ({ 
   className, 
   size = "sm",
-  variant = "default" 
+  variant = "default",
+  noGlow = false
 }: PremiumBadgeProps) => {
   const sizeClasses = {
     sm: "text-[10px] px-2 py-0.5 gap-1",
@@ -44,7 +46,7 @@ const PremiumBadge = ({
         positionClasses[variant],
         className
       )}
-      style={{
+      style={noGlow ? undefined : {
         boxShadow: "0 0 15px rgba(255, 69, 0, 0.5), 0 0 30px rgba(255, 69, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)"
       }}
     >
@@ -64,22 +66,24 @@ const PremiumBadge = ({
       </motion.div>
       <span>PRO</span>
       
-      {/* Animated glow pulse */}
-      <motion.div
-        className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500 via-orange-400 to-amber-500 -z-10"
-        animate={{
-          opacity: [0.5, 0.8, 0.5],
-          scale: [1, 1.1, 1]
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        style={{
-          filter: "blur(8px)"
-        }}
-      />
+      {/* Animated glow pulse - only show if noGlow is false */}
+      {!noGlow && (
+        <motion.div
+          className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500 via-orange-400 to-amber-500 -z-10"
+          animate={{
+            opacity: [0.5, 0.8, 0.5],
+            scale: [1, 1.1, 1]
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{
+            filter: "blur(8px)"
+          }}
+        />
+      )}
     </motion.div>
   );
 };
