@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/metsxmfanzone-logo.png";
 
 interface PremiumBadgeProps {
   className?: string;
@@ -22,9 +22,9 @@ const PremiumBadge = ({
   };
 
   const iconSizes = {
-    sm: "w-3 h-3",
-    md: "w-3.5 h-3.5",
-    lg: "w-4 h-4"
+    sm: "w-4 h-4",
+    md: "w-5 h-5",
+    lg: "w-6 h-6"
   };
 
   const positionClasses = {
@@ -52,7 +52,6 @@ const PremiumBadge = ({
     >
       <motion.div
         animate={{ 
-          rotate: [0, -10, 10, -5, 5, 0],
           scale: [1, 1.1, 1]
         }}
         transition={{ 
@@ -62,7 +61,7 @@ const PremiumBadge = ({
           ease: "easeInOut"
         }}
       >
-        <Crown className={iconSizes[size]} />
+        <img src={logo} alt="MetsXMFanZone" className={iconSizes[size]} />
       </motion.div>
       <span>PRO</span>
       
