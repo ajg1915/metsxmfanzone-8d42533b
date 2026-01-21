@@ -43,7 +43,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
             <h2 className="font-bold text-lg sm:text-xl md:text-2xl text-foreground">
               Spring Training 2026
             </h2>
-            {!isPremium && <PremiumBadge size="sm" />}
+            {!isPremium && <PremiumBadge size="sm" noGlow />}
           </div>
           <p className="text-muted-foreground text-xs sm:text-sm mt-1">
             Get ready for the upcoming spring training season
@@ -87,7 +87,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
                     
                     {/* Premium badge for non-members */}
                     {!isPremium && (
-                      <PremiumBadge variant="corner" size="sm" />
+                      <PremiumBadge variant="corner" size="sm" noGlow />
                     )}
                     
                     {/* Play button overlay */}
