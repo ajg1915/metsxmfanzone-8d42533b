@@ -99,12 +99,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Important: set og:url to the *share URL* (this function endpoint), not the blog URL,
-    // otherwise some platforms canonicalize to /blog/:slug and fall back to your site-wide OG.
-    const supabaseUrl = (Deno.env.get("SUPABASE_URL") || "").replace(/\/$/, "");
-    const sharePageUrl = supabaseUrl
-      ? `${supabaseUrl}/functions/v1/blog-og-meta?slug=${encodeURIComponent(slug)}`
-      : url.toString();
+    // Use the actual blog URL on the custom domain for og:url
+    // This ensures social platforms display metsxmfanzone.com instead of the backend URL
+    const sharePageUrl = postUrl;
 
 
     // Ensure proper absolute image URL (avoid base64)
