@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles } from "lucide-react";
+import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles, ChevronDown } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import podcastIcon from "@/assets/podcast-icon.png";
@@ -27,6 +27,11 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
@@ -384,41 +389,55 @@ const Navigation = () => {
                           Dashboard
                         </Button>
                         {isAdmin && (
-                          <>
-                            <Button 
-                              onClick={() => {
-                                navigate("/admin");
-                                setMobileMenuOpen(false);
-                              }}
-                              variant="ghost"
-                              className="w-full justify-start gap-3 h-11"
-                            >
-                              <Shield className="w-4 h-4" />
-                              Admin Portal
-                            </Button>
-                            <Button 
-                              onClick={() => {
-                                navigate("/admin/blog");
-                                setMobileMenuOpen(false);
-                              }}
-                              variant="ghost"
-                              className="w-full justify-start gap-3 h-11 pl-9"
-                            >
-                              <img src={logo} alt="" className="w-4 h-4 object-contain" />
-                              Blog
-                            </Button>
-                            <Button 
-                              onClick={() => {
-                                navigate("/admin/stories");
-                                setMobileMenuOpen(false);
-                              }}
-                              variant="ghost"
-                              className="w-full justify-start gap-3 h-11 pl-9"
-                            >
-                              <Sparkles className="w-4 h-4" />
-                              Admin Stories
-                            </Button>
-                          </>
+                          <Collapsible className="w-full">
+                            <CollapsibleTrigger asChild>
+                              <Button 
+                                variant="ghost"
+                                className="w-full justify-between gap-3 h-11"
+                              >
+                                <span className="flex items-center gap-3">
+                                  <Shield className="w-4 h-4" />
+                                  Admin
+                                </span>
+                                <ChevronDown className="w-4 h-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                              </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="pl-4 space-y-1">
+                              <Button 
+                                onClick={() => {
+                                  navigate("/admin");
+                                  setMobileMenuOpen(false);
+                                }}
+                                variant="ghost"
+                                className="w-full justify-start gap-3 h-10 text-sm"
+                              >
+                                <LayoutDashboard className="w-4 h-4" />
+                                Admin Portal
+                              </Button>
+                              <Button 
+                                onClick={() => {
+                                  navigate("/admin/blog");
+                                  setMobileMenuOpen(false);
+                                }}
+                                variant="ghost"
+                                className="w-full justify-start gap-3 h-10 text-sm"
+                              >
+                                <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                                Blog
+                              </Button>
+                              <Button 
+                                onClick={() => {
+                                  navigate("/admin/stories");
+                                  setMobileMenuOpen(false);
+                                }}
+                                variant="ghost"
+                                className="w-full justify-start gap-3 h-10 text-sm"
+                              >
+                                <Sparkles className="w-4 h-4" />
+                                Stories
+                              </Button>
+                            </CollapsibleContent>
+                          </Collapsible>
                         )}
                         <Button 
                           onClick={async () => {
