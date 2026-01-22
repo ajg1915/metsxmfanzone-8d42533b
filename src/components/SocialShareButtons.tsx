@@ -7,35 +7,39 @@ interface SocialShareButtonsProps {
 }
 
 const SITE_URL = "https://www.metsxmfanzone.com";
+const OG_META_FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/blog-og-meta`;
 
 export default function SocialShareButtons({ title, url }: SocialShareButtonsProps) {
   const shareTitle = title || "Check this out on MetsXMFanZone!";
 
-  // Build the share URL using the custom domain instead of backend URLs
-  const getShareUrl = (rawUrl?: string) => {
-    if (!rawUrl) {
-      // Use current path with custom domain
-      const path = window.location.pathname;
-      return `${SITE_URL}${path}`;
-    }
-
-    try {
-      const parsed = new URL(rawUrl);
-      
-      // If it's already the custom domain, use as-is
-      if (parsed.hostname.includes("metsxmfanzone.com")) {
-        return rawUrl;
-      }
-
-      // Extract the path and use with custom domain
-      return `${SITE_URL}${parsed.pathname}`;
-    } catch {
-      // If it's a relative path, prepend the custom domain
-      return `${SITE_URL}${rawUrl.startsWith('/') ? rawUrl : '/' + rawUrl}`;
-    }
+  // Extract blog slug from URL for OG meta function
+  const getBlogSlug = (rawUrl?: string): string | null => {
+    const path = rawUrl || window.location.pathname;
+    const blogMatch = path.match(/\/blog\/([^/?#]+)/);
+    return blogMatch ? blogMatch[1] : null;
   };
 
-  const shareUrl = getShareUrl(url);
+  // For social sharing (Facebook, Twitter), use the OG meta edge function
+  // so crawlers get proper article meta tags with featured images
+  const getOgShareUrl = (rawUrl?: string): string => {
+    const slug = getBlogSlug(rawUrl);
+    if (slug) {
+      // Use the edge function URL for social crawlers to get proper OG tags
+      return `${OG_META_FUNCTION_URL}?slug=${encodeURIComponent(slug)}`;
+    }
+    // Fallback to regular URL for non-blog pages
+    const path = rawUrl || window.location.pathname;
+    return `${SITE_URL}${path.startsWith('/') ? path : '/' + path}`;
+  };
+
+  // For clipboard/native share, use the clean custom domain URL
+  const getCleanShareUrl = (rawUrl?: string): string => {
+    const path = rawUrl || window.location.pathname;
+    return `${SITE_URL}${path.startsWith('/') ? path : '/' + path}`;
+  };
+
+  const ogShareUrl = getOgShareUrl(url);
+  const cleanShareUrl = getCleanShareUrl(url);
 
   const socialLinks = [
     {
@@ -63,7 +67,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
     {
       name: "X (Twitter)",
       url: "https://x.com/metsxmfanzone",
-      shareUrl: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`,
+      shareUrl: `https://twitter.com/intent/tweet?url=${encodeURIComponent(ogShareUrl)}&text=${encodeURIComponent(shareTitle)}`,
       color: "hover:bg-[#000000]",
       icon: (
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -74,7 +78,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
     {
       name: "Facebook",
       url: "https://www.facebook.com/metsxmfanzoneofficial",
-      shareUrl: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      shareUrl: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogShareUrl)}`,
       color: "hover:bg-[#1877F2]",
       icon: (
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -86,7 +90,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(cleanShareUrl);
       // You could add a toast notification here
       alert('Link copied to clipboard!');
     } catch (error) {
@@ -99,7 +103,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
       try {
         await navigator.share({
           title: shareTitle,
-          url: shareUrl,
+          url: cleanShareUrl,
         });
       } catch (error) {
         console.log('Error sharing:', error);
