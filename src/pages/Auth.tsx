@@ -171,12 +171,36 @@ const detectBot = (): { isBot: boolean; reason?: string } => {
   return { isBot: false };
 };
 
+// Helper function to detect password recovery mode from URL hash
+const getIsPasswordRecoveryMode = (): boolean => {
+  try {
+    // Check URL hash for Supabase recovery tokens
+    const hash = window.location.hash;
+    if (hash) {
+      const params = new URLSearchParams(hash.substring(1));
+      const type = params.get("type");
+      const accessToken = params.get("access_token");
+      // Supabase sends type=recovery for password reset links
+      if (type === "recovery" && accessToken) {
+        return true;
+      }
+    }
+    return false;
+  } catch {
+    return false;
+  }
+};
+
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const mode = searchParams.get("mode");
+  
+  // Check for password recovery mode from URL hash on initial render
+  const [isRecoveryMode] = useState(() => getIsPasswordRecoveryMode());
+  
   const [isLogin, setIsLogin] = useState(mode === "login" || mode !== "signup");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [isResettingPassword, setIsResettingPassword] = useState(mode === "reset");
+  const [isResettingPassword, setIsResettingPassword] = useState(mode === "reset" || isRecoveryMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -379,6 +403,28 @@ const Auth = () => {
     }
   };
 
+  // Handle Supabase auth events (including password recovery)
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth event:", event);
+      
+      // Handle password recovery event
+      if (event === "PASSWORD_RECOVERY") {
+        setIsResettingPassword(true);
+        setIsLogin(false);
+        setIsForgotPassword(false);
+        setIsRememberedLogin(false);
+      }
+      
+      // Handle successful sign in (but not during 2FA or remembered login flow)
+      if (event === "SIGNED_IN" && session && !show2FA && !isRememberedLogin && !isResettingPassword) {
+        // Don't auto-redirect during login flow - we handle this after 2FA
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [show2FA, isRememberedLogin, isResettingPassword]);
+
   useEffect(() => {
     if (mode === "login") {
       setIsLogin(true);
@@ -386,21 +432,13 @@ const Auth = () => {
     } else if (mode === "signup") {
       setIsLogin(false);
       setIsResettingPassword(false);
-      setIsRememberedLogin(false); // Don't show remembered login for signup
-    } else if (mode === "reset") {
+      setIsRememberedLogin(false);
+    } else if (mode === "reset" || isRecoveryMode) {
       setIsResettingPassword(true);
       setIsLogin(false);
       setIsForgotPassword(false);
     }
-  }, [mode]);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && !show2FA && !isRememberedLogin) {
-        navigate("/");
-      }
-    });
-  }, [navigate, show2FA, isRememberedLogin]);
+  }, [mode, isRecoveryMode]);
 
   // Resend cooldown timer
   useEffect(() => {
@@ -1002,12 +1040,25 @@ const Auth = () => {
         return;
       }
 
+      // Sign out after password reset so user can log in fresh with new password
+      await supabase.auth.signOut();
+      
+      // Clear URL hash to remove recovery tokens
+      if (window.location.hash) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+
       toast({
         title: "Password updated!",
-        description: "Your password has been successfully reset.",
+        description: "Your password has been successfully reset. Please sign in with your new password.",
       });
       
-      navigate("/");
+      // Reset state and show login form
+      setIsResettingPassword(false);
+      setIsLogin(true);
+      setPassword("");
+      setConfirmPassword("");
+      setEmail("");
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
