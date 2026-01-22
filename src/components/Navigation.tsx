@@ -387,17 +387,6 @@ const Navigation = () => {
                           <>
                             <Button 
                               onClick={() => {
-                                navigate("/admin/stories");
-                                setMobileMenuOpen(false);
-                              }}
-                              variant="ghost"
-                              className="w-full justify-start gap-3 h-11"
-                            >
-                              <Sparkles className="w-4 h-4" />
-                              Admin Stories
-                            </Button>
-                            <Button 
-                              onClick={() => {
                                 navigate("/admin");
                                 setMobileMenuOpen(false);
                               }}
@@ -406,6 +395,28 @@ const Navigation = () => {
                             >
                               <Shield className="w-4 h-4" />
                               Admin Portal
+                            </Button>
+                            <Button 
+                              onClick={() => {
+                                navigate("/admin/blog");
+                                setMobileMenuOpen(false);
+                              }}
+                              variant="ghost"
+                              className="w-full justify-start gap-3 h-11 pl-9"
+                            >
+                              <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                              Blog
+                            </Button>
+                            <Button 
+                              onClick={() => {
+                                navigate("/admin/stories");
+                                setMobileMenuOpen(false);
+                              }}
+                              variant="ghost"
+                              className="w-full justify-start gap-3 h-11 pl-9"
+                            >
+                              <Sparkles className="w-4 h-4" />
+                              Admin Stories
                             </Button>
                           </>
                         )}
