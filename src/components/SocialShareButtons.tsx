@@ -7,7 +7,7 @@ interface SocialShareButtonsProps {
 }
 
 const SITE_URL = "https://www.metsxmfanzone.com";
-const OG_META_FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/blog-og-meta`;
+const OG_META_FUNCTION_URL = "https://clwghkbtkofacsjeyrtk.supabase.co/functions/v1/blog-og-meta";
 
 export default function SocialShareButtons({ title, url }: SocialShareButtonsProps) {
   const shareTitle = title || "Check this out on MetsXMFanZone!";
