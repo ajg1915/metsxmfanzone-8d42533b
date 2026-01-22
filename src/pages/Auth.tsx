@@ -10,7 +10,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { Shield, ArrowLeft, Fingerprint } from "lucide-react";
+import { Shield, ArrowLeft, Fingerprint, Loader2, Mail } from "lucide-react";
 import AuthBackground from "@/components/AuthBackground";
 import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 import { trackFailedLogin } from "@/utils/securityAlerts";
@@ -218,6 +218,7 @@ const Auth = () => {
   
   // 2FA states
   const [show2FA, setShow2FA] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false); // Loading state for OTP email
   const [otpCode, setOtpCode] = useState("");
   const [generatedOtp, setGeneratedOtp] = useState("");
   const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
@@ -741,7 +742,13 @@ const Auth = () => {
         setOtpExpiry(expiry);
         setPendingUserData({ userId: data.user.id, isSignup: false });
         
+        // Show sending OTP screen
+        setSendingOtp(true);
+        setLoading(false); // Stop the button loading state
+        
         const emailSent = await sendOtpEmail(validated.email, otp);
+        setSendingOtp(false);
+        
         if (emailSent) {
           setShow2FA(true);
           setResendCooldown(60);
@@ -782,7 +789,6 @@ const Auth = () => {
   const handleRememberedLogin = async () => {
     if (!rememberedUser) return;
     
-    setLoading(true);
     try {
       // Generate and send OTP for 2FA
       const { otp, expiry } = generateOtp();
@@ -790,8 +796,14 @@ const Auth = () => {
       setOtpExpiry(expiry);
       // We don't have userId yet, will get it after OTP verification
       setPendingUserData({ userId: "remembered", isSignup: false });
+      setEmail(rememberedUser.email); // Set email for the loading screen
+      
+      // Show sending OTP screen
+      setSendingOtp(true);
       
       const emailSent = await sendOtpEmail(rememberedUser.email, otp);
+      setSendingOtp(false);
+      
       if (emailSent) {
         setShow2FA(true);
         setResendCooldown(60);
@@ -808,13 +820,12 @@ const Auth = () => {
         handleForgetDevice();
       }
     } catch (error) {
+      setSendingOtp(false);
       toast({
         title: "Error",
         description: "An error occurred. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -1077,6 +1088,43 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  // Sending OTP Loading Screen
+  if (sendingOtp) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 relative">
+        <AuthBackground />
+        <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl">
+          <CardHeader className="space-y-1">
+            <div className="flex flex-col items-center gap-3 mb-4">
+              <img 
+                src={authLogo} 
+                alt="MetsXMFanZone" 
+                className="h-20 w-auto object-contain"
+              />
+              <span className="text-lg font-bold text-[#FF5910]">MetsXMFanZone.com</span>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Loader2 className="h-12 w-12 text-primary animate-spin" />
+                </div>
+                <Mail className="h-12 w-12 text-primary/20" />
+              </div>
+              <div className="text-center space-y-2">
+                <h3 className="text-lg font-semibold">Sending Verification Code</h3>
+                <p className="text-sm text-muted-foreground">
+                  Sending a 6-digit code to <span className="font-medium text-foreground">{email}</span>
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // 2FA Verification Screen
   if (show2FA) {
