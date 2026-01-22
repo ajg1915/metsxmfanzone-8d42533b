@@ -6,40 +6,41 @@ interface SocialShareButtonsProps {
   url?: string;
 }
 
-const SITE_URL = "https://www.metsxmfanzone.com";
-const OG_META_FUNCTION_URL = "https://clwghkbtkofacsjeyrtk.supabase.co/functions/v1/blog-og-meta";
-
 export default function SocialShareButtons({ title, url }: SocialShareButtonsProps) {
+  const baseUrl = url || window.location.href;
   const shareTitle = title || "Check this out on MetsXMFanZone!";
 
-  // Extract blog slug from URL for OG meta function
-  const getBlogSlug = (rawUrl?: string): string | null => {
-    const path = rawUrl || window.location.pathname;
-    const blogMatch = path.match(/\/blog\/([^/?#]+)/);
-    return blogMatch ? blogMatch[1] : null;
-  };
+  const getOgShareUrl = (rawUrl: string) => {
+    try {
+      const parsed = new URL(rawUrl);
 
-  // For social sharing (Facebook, Twitter), use the OG meta edge function
-  // so crawlers get proper article meta tags with featured images
-  const getOgShareUrl = (rawUrl?: string): string => {
-    const slug = getBlogSlug(rawUrl);
-    if (slug) {
-      // Use the edge function URL for social crawlers to get proper OG tags
-      return `${OG_META_FUNCTION_URL}?slug=${encodeURIComponent(slug)}`;
+      // If it's already a backend meta URL, keep it.
+      if (parsed.pathname.includes("/functions/v1/blog-og-meta")) return rawUrl;
+
+      const parts = parsed.pathname.split("/").filter(Boolean);
+      const blogIndex = parts.indexOf("blog");
+      const ogBlogIndex = parts.indexOf("og-blog");
+      const idx = blogIndex !== -1 ? blogIndex : ogBlogIndex;
+      const slug = idx !== -1 ? parts[idx + 1] : undefined;
+
+      if (!slug) return rawUrl;
+
+      const backendUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim();
+      if (!backendUrl) {
+        console.warn(
+          "VITE_SUPABASE_URL is missing; falling back to the page URL for sharing."
+        );
+        return rawUrl;
+      }
+
+      return `${backendUrl}/functions/v1/blog-og-meta?slug=${encodeURIComponent(slug)}`;
+    } catch {
+      return rawUrl;
     }
-    // Fallback to regular URL for non-blog pages
-    const path = rawUrl || window.location.pathname;
-    return `${SITE_URL}${path.startsWith('/') ? path : '/' + path}`;
   };
 
-  // For clipboard/native share, use the clean custom domain URL
-  const getCleanShareUrl = (rawUrl?: string): string => {
-    const path = rawUrl || window.location.pathname;
-    return `${SITE_URL}${path.startsWith('/') ? path : '/' + path}`;
-  };
-
-  const ogShareUrl = getOgShareUrl(url);
-  const cleanShareUrl = getCleanShareUrl(url);
+  // Use the backend-rendered OG meta endpoint for blog posts so social crawlers see the right image/description.
+  const shareUrl = getOgShareUrl(baseUrl);
 
   const socialLinks = [
     {
@@ -67,7 +68,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
     {
       name: "X (Twitter)",
       url: "https://x.com/metsxmfanzone",
-      shareUrl: `https://twitter.com/intent/tweet?url=${encodeURIComponent(ogShareUrl)}&text=${encodeURIComponent(shareTitle)}`,
+      shareUrl: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`,
       color: "hover:bg-[#000000]",
       icon: (
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -78,7 +79,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
     {
       name: "Facebook",
       url: "https://www.facebook.com/metsxmfanzoneofficial",
-      shareUrl: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogShareUrl)}`,
+      shareUrl: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
       color: "hover:bg-[#1877F2]",
       icon: (
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -90,7 +91,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(cleanShareUrl);
+      await navigator.clipboard.writeText(shareUrl);
       // You could add a toast notification here
       alert('Link copied to clipboard!');
     } catch (error) {
@@ -103,7 +104,7 @@ export default function SocialShareButtons({ title, url }: SocialShareButtonsPro
       try {
         await navigator.share({
           title: shareTitle,
-          url: cleanShareUrl,
+          url: shareUrl,
         });
       } catch (error) {
         console.log('Error sharing:', error);

@@ -10,7 +10,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { Shield, ArrowLeft, Fingerprint, Loader2, Mail } from "lucide-react";
+import { Shield, ArrowLeft, Fingerprint } from "lucide-react";
 import AuthBackground from "@/components/AuthBackground";
 import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 import { trackFailedLogin } from "@/utils/securityAlerts";
@@ -171,36 +171,12 @@ const detectBot = (): { isBot: boolean; reason?: string } => {
   return { isBot: false };
 };
 
-// Helper function to detect password recovery mode from URL hash
-const getIsPasswordRecoveryMode = (): boolean => {
-  try {
-    // Check URL hash for Supabase recovery tokens
-    const hash = window.location.hash;
-    if (hash) {
-      const params = new URLSearchParams(hash.substring(1));
-      const type = params.get("type");
-      const accessToken = params.get("access_token");
-      // Supabase sends type=recovery for password reset links
-      if (type === "recovery" && accessToken) {
-        return true;
-      }
-    }
-    return false;
-  } catch {
-    return false;
-  }
-};
-
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const mode = searchParams.get("mode");
-  
-  // Check for password recovery mode from URL hash on initial render
-  const [isRecoveryMode] = useState(() => getIsPasswordRecoveryMode());
-  
   const [isLogin, setIsLogin] = useState(mode === "login" || mode !== "signup");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [isResettingPassword, setIsResettingPassword] = useState(mode === "reset" || isRecoveryMode);
+  const [isResettingPassword, setIsResettingPassword] = useState(mode === "reset");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -218,7 +194,6 @@ const Auth = () => {
   
   // 2FA states
   const [show2FA, setShow2FA] = useState(false);
-  const [sendingOtp, setSendingOtp] = useState(false); // Loading state for OTP email
   const [otpCode, setOtpCode] = useState("");
   const [generatedOtp, setGeneratedOtp] = useState("");
   const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
@@ -404,28 +379,6 @@ const Auth = () => {
     }
   };
 
-  // Handle Supabase auth events (including password recovery)
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth event:", event);
-      
-      // Handle password recovery event
-      if (event === "PASSWORD_RECOVERY") {
-        setIsResettingPassword(true);
-        setIsLogin(false);
-        setIsForgotPassword(false);
-        setIsRememberedLogin(false);
-      }
-      
-      // Handle successful sign in (but not during 2FA or remembered login flow)
-      if (event === "SIGNED_IN" && session && !show2FA && !isRememberedLogin && !isResettingPassword) {
-        // Don't auto-redirect during login flow - we handle this after 2FA
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [show2FA, isRememberedLogin, isResettingPassword]);
-
   useEffect(() => {
     if (mode === "login") {
       setIsLogin(true);
@@ -433,13 +386,21 @@ const Auth = () => {
     } else if (mode === "signup") {
       setIsLogin(false);
       setIsResettingPassword(false);
-      setIsRememberedLogin(false);
-    } else if (mode === "reset" || isRecoveryMode) {
+      setIsRememberedLogin(false); // Don't show remembered login for signup
+    } else if (mode === "reset") {
       setIsResettingPassword(true);
       setIsLogin(false);
       setIsForgotPassword(false);
     }
-  }, [mode, isRecoveryMode]);
+  }, [mode]);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session && !show2FA && !isRememberedLogin) {
+        navigate("/");
+      }
+    });
+  }, [navigate, show2FA, isRememberedLogin]);
 
   // Resend cooldown timer
   useEffect(() => {
@@ -742,13 +703,7 @@ const Auth = () => {
         setOtpExpiry(expiry);
         setPendingUserData({ userId: data.user.id, isSignup: false });
         
-        // Show sending OTP screen
-        setSendingOtp(true);
-        setLoading(false); // Stop the button loading state
-        
         const emailSent = await sendOtpEmail(validated.email, otp);
-        setSendingOtp(false);
-        
         if (emailSent) {
           setShow2FA(true);
           setResendCooldown(60);
@@ -789,6 +744,7 @@ const Auth = () => {
   const handleRememberedLogin = async () => {
     if (!rememberedUser) return;
     
+    setLoading(true);
     try {
       // Generate and send OTP for 2FA
       const { otp, expiry } = generateOtp();
@@ -796,14 +752,8 @@ const Auth = () => {
       setOtpExpiry(expiry);
       // We don't have userId yet, will get it after OTP verification
       setPendingUserData({ userId: "remembered", isSignup: false });
-      setEmail(rememberedUser.email); // Set email for the loading screen
-      
-      // Show sending OTP screen
-      setSendingOtp(true);
       
       const emailSent = await sendOtpEmail(rememberedUser.email, otp);
-      setSendingOtp(false);
-      
       if (emailSent) {
         setShow2FA(true);
         setResendCooldown(60);
@@ -820,12 +770,13 @@ const Auth = () => {
         handleForgetDevice();
       }
     } catch (error) {
-      setSendingOtp(false);
       toast({
         title: "Error",
         description: "An error occurred. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -1051,25 +1002,12 @@ const Auth = () => {
         return;
       }
 
-      // Sign out after password reset so user can log in fresh with new password
-      await supabase.auth.signOut();
-      
-      // Clear URL hash to remove recovery tokens
-      if (window.location.hash) {
-        window.history.replaceState(null, "", window.location.pathname);
-      }
-
       toast({
         title: "Password updated!",
-        description: "Your password has been successfully reset. Please sign in with your new password.",
+        description: "Your password has been successfully reset.",
       });
       
-      // Reset state and show login form
-      setIsResettingPassword(false);
-      setIsLogin(true);
-      setPassword("");
-      setConfirmPassword("");
-      setEmail("");
+      navigate("/");
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
@@ -1088,43 +1026,6 @@ const Auth = () => {
       setLoading(false);
     }
   };
-
-  // Sending OTP Loading Screen
-  if (sendingOtp) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 relative">
-        <AuthBackground />
-        <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl">
-          <CardHeader className="space-y-1">
-            <div className="flex flex-col items-center gap-3 mb-4">
-              <img 
-                src={authLogo} 
-                alt="MetsXMFanZone" 
-                className="h-20 w-auto object-contain"
-              />
-              <span className="text-lg font-bold text-[#FF5910]">MetsXMFanZone.com</span>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex flex-col items-center justify-center py-8 space-y-4">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Loader2 className="h-12 w-12 text-primary animate-spin" />
-                </div>
-                <Mail className="h-12 w-12 text-primary/20" />
-              </div>
-              <div className="text-center space-y-2">
-                <h3 className="text-lg font-semibold">Sending Verification Code</h3>
-                <p className="text-sm text-muted-foreground">
-                  Sending a 6-digit code to <span className="font-medium text-foreground">{email}</span>
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   // 2FA Verification Screen
   if (show2FA) {
