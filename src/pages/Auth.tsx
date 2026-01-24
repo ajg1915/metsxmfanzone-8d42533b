@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -6,15 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { Shield, ArrowLeft, Fingerprint } from "lucide-react";
+import { Fingerprint } from "lucide-react";
 import AuthBackground from "@/components/AuthBackground";
 import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 import { trackFailedLogin } from "@/utils/securityAlerts";
 import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
+import AuthLoadingScreen from "@/components/auth/AuthLoadingScreen";
+import OTPVerificationForm from "@/components/auth/OTPVerificationForm";
 
 const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
 
@@ -194,6 +195,7 @@ const Auth = () => {
   
   // 2FA states
   const [show2FA, setShow2FA] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false); // New: smooth loading during OTP send
   const [otpCode, setOtpCode] = useState("");
   const [generatedOtp, setGeneratedOtp] = useState("");
   const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
@@ -301,7 +303,10 @@ const Auth = () => {
         throw new Error(verifyResponse.data.error);
       }
 
-      // Step 4: Biometric verified - now trigger 2FA
+      // Step 4: Biometric verified - now trigger 2FA with loading screen
+      setBiometricLoading(false);
+      setSendingOtp(true); // Show loading screen
+      
       // Generate and send OTP for 2FA
       const { otp, expiry } = generateOtp();
       setGeneratedOtp(otp);
@@ -309,6 +314,7 @@ const Auth = () => {
       
       // Send OTP email
       const otpSent = await sendOtpEmail(biometricEmail, otp);
+      setSendingOtp(false); // Hide loading screen
       
       if (!otpSent) {
         toast({
@@ -326,11 +332,7 @@ const Auth = () => {
       // Show 2FA screen
       setShow2FA(true);
       setShowBiometricEmailInput(false);
-      
-      toast({
-        title: "Biometric verified!",
-        description: "Please enter the verification code sent to your email.",
-      });
+      setResendCooldown(60);
 
     } catch (error: any) {
       console.error("Biometric login error:", error);
@@ -697,20 +699,21 @@ const Auth = () => {
           return;
         }
 
-        // Generate and send OTP for 2FA
+        // Generate and send OTP for 2FA - show loading screen during send
+        setLoading(false); // Hide form loading
+        setSendingOtp(true); // Show OTP sending screen
+        
         const { otp, expiry } = generateOtp();
         setGeneratedOtp(otp);
         setOtpExpiry(expiry);
         setPendingUserData({ userId: data.user.id, isSignup: false });
         
         const emailSent = await sendOtpEmail(validated.email, otp);
+        setSendingOtp(false); // Hide loading screen
+        
         if (emailSent) {
           setShow2FA(true);
           setResendCooldown(60);
-          toast({
-            title: "Verification code sent",
-            description: "Please check your email for the 6-digit code.",
-          });
         } else {
           toast({
             title: "2FA email not delivered",
@@ -744,7 +747,7 @@ const Auth = () => {
   const handleRememberedLogin = async () => {
     if (!rememberedUser) return;
     
-    setLoading(true);
+    setSendingOtp(true); // Show loading screen
     try {
       // Generate and send OTP for 2FA
       const { otp, expiry } = generateOtp();
@@ -754,13 +757,11 @@ const Auth = () => {
       setPendingUserData({ userId: "remembered", isSignup: false });
       
       const emailSent = await sendOtpEmail(rememberedUser.email, otp);
+      setSendingOtp(false); // Hide loading screen
+      
       if (emailSent) {
         setShow2FA(true);
         setResendCooldown(60);
-        toast({
-          title: "Verification code sent",
-          description: `A 6-digit code has been sent to ${rememberedUser.email}`,
-        });
       } else {
         toast({
           title: "Failed to send code",
@@ -770,13 +771,12 @@ const Auth = () => {
         handleForgetDevice();
       }
     } catch (error) {
+      setSendingOtp(false);
       toast({
         title: "Error",
         description: "An error occurred. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -1027,81 +1027,30 @@ const Auth = () => {
     }
   };
 
-  // 2FA Verification Screen
+  // Loading screen while sending OTP
+  if (sendingOtp) {
+    return (
+      <AuthLoadingScreen 
+        title="Sending Verification Code"
+        description="Please wait while we send your secure code..."
+        type="otp"
+      />
+    );
+  }
+
+  // 2FA Verification Screen - using new streamlined component
   if (show2FA) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 relative">
-        <AuthBackground />
-        <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl">
-          <CardHeader className="space-y-1">
-            <div className="flex flex-col items-center gap-3 mb-4">
-              <img 
-                src={authLogo} 
-                alt="MetsXMFanZone" 
-                className="h-20 w-auto object-contain"
-              />
-              <span className="text-lg font-bold text-[#FF5910]">MetsXMFanZone.com</span>
-            </div>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <CardTitle className="text-xl font-bold">Two-Factor Authentication</CardTitle>
-            </div>
-            <CardDescription className="text-center">
-              Enter the 6-digit code sent to <span className="font-medium text-foreground">{email}</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex justify-center">
-              <InputOTP
-                maxLength={6}
-                value={otpCode}
-                onChange={setOtpCode}
-                disabled={loading}
-              >
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-
-            <Button 
-              onClick={handleVerifyOtp} 
-              className="w-full" 
-              disabled={loading || otpCode.length !== 6}
-            >
-              {loading ? "Verifying..." : "Verify Code"}
-            </Button>
-
-            <div className="text-center space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Didn't receive the code?{" "}
-                <button
-                  type="button"
-                  onClick={handleResendOtp}
-                  disabled={resendCooldown > 0 || loading}
-                  className="text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
-                </button>
-              </p>
-              <button
-                type="button"
-                onClick={handleBack2FA}
-                className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mx-auto"
-                disabled={loading}
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to login
-              </button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <OTPVerificationForm
+        email={email}
+        otpCode={otpCode}
+        onOtpChange={setOtpCode}
+        onVerify={handleVerifyOtp}
+        onResend={handleResendOtp}
+        onBack={handleBack2FA}
+        loading={loading}
+        resendCooldown={resendCooldown}
+      />
     );
   }
 
