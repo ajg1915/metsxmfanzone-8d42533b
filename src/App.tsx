@@ -131,6 +131,7 @@ const PredictionsManagement = lazy(() => import("./pages/admin/PredictionsManage
 const TalentAssessmentManagement = lazy(() => import("./pages/admin/TalentAssessmentManagement"));
 const PollManagement = lazy(() => import("./pages/admin/PollManagement"));
 const WhatsNew = lazy(() => import("./pages/WhatsNew"));
+const Install = lazy(() => import("./pages/Install"));
 const MetsVsAstros = lazy(() => import("./pages/matchups/MetsVsAstros"));
 const MetsVsBraves = lazy(() => import("./pages/matchups/MetsVsBraves"));
 const MetsVsCardinals = lazy(() => import("./pages/matchups/MetsVsCardinals"));
@@ -285,6 +286,7 @@ const AppContent = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/whats-new" element={<WhatsNew />} />
+            <Route path="/install" element={<Install />} />
             <Route path="/podcast" element={<Podcast />} />
             <Route path="/community-podcast" element={<CommunityPodcast />} />
             <Route path="/podcaster-application" element={<PodcasterApplication />} />
