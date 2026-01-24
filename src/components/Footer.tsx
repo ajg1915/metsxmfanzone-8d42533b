@@ -21,6 +21,8 @@ const Footer = () => {
           <div className="flex flex-col items-center gap-2 mb-2">
             <h3 className="font-bold text-primary text-base">MetsXMFanZone.com</h3>
             <div className="flex flex-wrap justify-center gap-x-2 gap-y-1 text-xs">
+              <Link to="/install" className="text-muted-foreground hover:text-primary transition-colors">Install App</Link>
+              <span className="text-muted-foreground">•</span>
               <Link to="/help-center" className="text-muted-foreground hover:text-primary transition-colors">Help Center</Link>
               <span className="text-muted-foreground">•</span>
               <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
