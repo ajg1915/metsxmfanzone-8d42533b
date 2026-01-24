@@ -1,4 +1,6 @@
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { Resend } from "https://esm.sh/resend@4.0.0";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,9 +21,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { Resend } = await import("https://esm.sh/resend@4.0.0");
-    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-    
     const { to, otp }: OtpEmailRequest = await req.json();
 
     if (!to || !otp) {
