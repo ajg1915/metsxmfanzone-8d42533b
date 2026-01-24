@@ -1,38 +1,52 @@
+import { lazy, Suspense, useEffect, useState } from "react";
 import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
-import ImmersiveBackground from "@/components/ImmersiveBackground";
-import LiveNotificationBar from "@/components/LiveNotificationBar";
 import LiveGameTicker from "@/components/LiveGameTicker";
-import LiveNetworks from "@/components/LiveNetworks";
-import LiveStreamsSection from "@/components/LiveStreamsSection";
-import HighlightsSection from "@/components/HighlightsSection";
-import SpringTraining from "@/components/SpringTraining";
-import PlayersToWatch from "@/components/PlayersToWatch";
-import TalentAssessmentSection from "@/components/TalentAssessmentSection";
-import MetsNewsTracker from "@/components/MetsNewsTracker";
-import BlogSection from "@/components/BlogSection";
-import HomeLineupCard from "@/components/HomeLineupCard";
-import PodcastSection from "@/components/PodcastSection";
-import JoinPodcastSection from "@/components/JoinPodcastSection";
-import HotStoveGuide from "@/components/HotStoveGuide";
-import StoriesSection from "@/components/StoriesSection";
-
-import FAQSection from "@/components/FAQSection";
-import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
-import InstallPrompt from "@/components/InstallPrompt";
-import AppInstallSection from "@/components/AppInstallSection";
-import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
-import NotificationPrompt from "@/components/NotificationPrompt";
-import ScrollReveal from "@/components/ScrollReveal";
-import WelcomeBackToast from "@/components/WelcomeBackToast";
-import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import { useAutoLineupFetch } from "@/hooks/useAutoLineupFetch";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+
+// Lazy load heavy components that are below the fold
+const ImmersiveBackground = lazy(() => import("@/components/ImmersiveBackground"));
+const LiveNotificationBar = lazy(() => import("@/components/LiveNotificationBar"));
+const LiveNetworks = lazy(() => import("@/components/LiveNetworks"));
+const LiveStreamsSection = lazy(() => import("@/components/LiveStreamsSection"));
+const HighlightsSection = lazy(() => import("@/components/HighlightsSection"));
+const SpringTraining = lazy(() => import("@/components/SpringTraining"));
+const PlayersToWatch = lazy(() => import("@/components/PlayersToWatch"));
+const TalentAssessmentSection = lazy(() => import("@/components/TalentAssessmentSection"));
+const MetsNewsTracker = lazy(() => import("@/components/MetsNewsTracker"));
+const BlogSection = lazy(() => import("@/components/BlogSection"));
+const HomeLineupCard = lazy(() => import("@/components/HomeLineupCard"));
+const PodcastSection = lazy(() => import("@/components/PodcastSection"));
+const JoinPodcastSection = lazy(() => import("@/components/JoinPodcastSection"));
+const HotStoveGuide = lazy(() => import("@/components/HotStoveGuide"));
+const StoriesSection = lazy(() => import("@/components/StoriesSection"));
+const FAQSection = lazy(() => import("@/components/FAQSection"));
+const TestimonialsSection = lazy(() => import("@/components/TestimonialsSection"));
+const AppInstallSection = lazy(() => import("@/components/AppInstallSection"));
+const InstallPrompt = lazy(() => import("@/components/InstallPrompt"));
+const OnboardingWalkthrough = lazy(() => import("@/components/OnboardingWalkthrough"));
+const NotificationPrompt = lazy(() => import("@/components/NotificationPrompt"));
+const WelcomeBackToast = lazy(() => import("@/components/WelcomeBackToast"));
+const ScrollReveal = lazy(() => import("@/components/ScrollReveal"));
+
+// Section loading skeleton
+const SectionSkeleton = ({ height = "h-64" }: { height?: string }) => (
+  <div className={`w-full ${height} px-4`}>
+    <div className="container mx-auto max-w-7xl">
+      <Skeleton className="h-8 w-48 mb-4" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Skeleton className="h-40 rounded-xl" />
+        <Skeleton className="h-40 rounded-xl" />
+        <Skeleton className="h-40 rounded-xl" />
+      </div>
+    </div>
+  </div>
+);
 
 // Homepage structured data with AEO optimization
 const homepageSchema = {
@@ -114,7 +128,6 @@ const combinedSchemas = [homepageSchema, organizationSchema, websiteSchema];
 
 const Index = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [onboardingShown, setOnboardingShown] = useState(false);
 
   // Auto-fetch Mets lineup on game days (every 30 minutes)
@@ -125,14 +138,17 @@ const Index = () => {
     return cleanup;
   }, []);
 
-
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Welcome back toast for returning users */}
-      <WelcomeBackToast />
+      {/* Welcome back toast for returning users - lazy loaded */}
+      <Suspense fallback={null}>
+        <WelcomeBackToast />
+      </Suspense>
 
-      {/* Immersive animated background */}
-      <ImmersiveBackground />
+      {/* Immersive animated background - lazy loaded */}
+      <Suspense fallback={null}>
+        <ImmersiveBackground />
+      </Suspense>
 
       <SEOHead
         title="MetsXMFanZone - The Ultimate Destination Where The Fans Go | Live Games, News & Podcasts"
@@ -150,102 +166,145 @@ const Index = () => {
       <LiveGameTicker />
       <main className="pt-14 sm:pt-16 relative z-10">
         <Hero />
-        <LiveNotificationBar />
+        
+        <Suspense fallback={null}>
+          <LiveNotificationBar />
+        </Suspense>
 
-        <ScrollReveal delay={100}>
-          <StoriesSection />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton height="h-32" />}>
+          <ScrollReveal delay={100}>
+            <StoriesSection />
+          </ScrollReveal>
+        </Suspense>
 
-        <ScrollReveal>
-          <LiveNetworks />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal>
+            <LiveNetworks />
+          </ScrollReveal>
+        </Suspense>
 
-        <ScrollReveal delay={100}>
-          <LiveStreamsSection />
-        </ScrollReveal>
-
-        <div className="section-divider my-2 sm:my-3" />
-
-        <ScrollReveal delay={100}>
-          <HighlightsSection />
-        </ScrollReveal>
-
-        <div className="section-divider my-2 sm:my-3" />
-
-        <ScrollReveal direction="left">
-          <BlogSection />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal delay={100}>
+            <LiveStreamsSection />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal delay={100}>
-          <HomeLineupCard />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal delay={100}>
+            <HighlightsSection />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal>
-          <SpringTraining />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal direction="left">
+            <BlogSection />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal delay={100}>
-          <PlayersToWatch />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton height="h-48" />}>
+          <ScrollReveal delay={100}>
+            <HomeLineupCard />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal delay={100}>
-          <TalentAssessmentSection />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal>
+            <SpringTraining />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal>
-          <MetsNewsTracker />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal delay={100}>
+            <PlayersToWatch />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal direction="right" delay={100}>
-          <PodcastSection />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal delay={100}>
+            <TalentAssessmentSection />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal delay={100}>
-          <JoinPodcastSection />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal>
+            <MetsNewsTracker />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal direction="scale">
-          <FAQSection />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal direction="right" delay={100}>
+            <PodcastSection />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal>
-          <TestimonialsSection />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton height="h-48" />}>
+          <ScrollReveal delay={100}>
+            <JoinPodcastSection />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal>
-          <AppInstallSection />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal direction="scale">
+            <FAQSection />
+          </ScrollReveal>
+        </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <ScrollReveal delay={100}>
-          <HotStoveGuide />
-        </ScrollReveal>
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal>
+            <TestimonialsSection />
+          </ScrollReveal>
+        </Suspense>
+
+        <div className="section-divider my-2 sm:my-3" />
+
+        <Suspense fallback={<SectionSkeleton height="h-48" />}>
+          <ScrollReveal>
+            <AppInstallSection />
+          </ScrollReveal>
+        </Suspense>
+
+        <div className="section-divider my-2 sm:my-3" />
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal delay={100}>
+            <HotStoveGuide />
+          </ScrollReveal>
+        </Suspense>
       </main>
       <Footer />
-      <InstallPrompt />
-      <NotificationPrompt />
-      <OnboardingWalkthrough onComplete={() => setOnboardingShown(true)} />
+      
+      {/* Lazy load non-critical UI */}
+      <Suspense fallback={null}>
+        <InstallPrompt />
+      </Suspense>
+      <Suspense fallback={null}>
+        <NotificationPrompt />
+      </Suspense>
+      <Suspense fallback={null}>
+        <OnboardingWalkthrough onComplete={() => setOnboardingShown(true)} />
+      </Suspense>
     </div>
   );
 };
