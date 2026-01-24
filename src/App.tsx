@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { useSessionExpiryWarning } from "@/hooks/useSessionExpiryWarning";
@@ -14,6 +14,7 @@ import { StreamExitDialog } from "@/components/StreamExitDialog";
 import { LiveStreamToast } from "@/components/LiveStreamToast";
 import ToastPoll from "@/components/ToastPoll";
 import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
+import { useDevice } from "@/hooks/use-device";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Eager load critical pages
@@ -138,6 +139,10 @@ const MetsVsRedSox = lazy(() => import("./pages/matchups/MetsVsRedSox"));
 const MetsVsYankees = lazy(() => import("./pages/matchups/MetsVsYankees"));
 const MetsVsBlueJays = lazy(() => import("./pages/matchups/MetsVsBlueJays"));
 
+// TV Mode Pages
+const TVHome = lazy(() => import("./pages/tv/TVHome"));
+const TVPlayer = lazy(() => import("./pages/tv/TVPlayer"));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -163,7 +168,9 @@ const PageLoader = () => (
 // Wrapper to access maintenance mode inside router context
 const AppContent = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isEnabled: maintenanceEnabled, message: maintenanceMessage, isLoading } = useMaintenanceMode();
+  const { isTV } = useDevice();
   
   useAutoRefresh();
   useSessionExpiryWarning();
@@ -185,6 +192,21 @@ const AppContent = () => {
     document.addEventListener("contextmenu", handleContextMenu);
     return () => document.removeEventListener("contextmenu", handleContextMenu);
   }, []);
+
+  // Auto-redirect to TV mode on TV devices
+  useEffect(() => {
+    const isTVRoute = location.pathname.startsWith('/tv');
+    const isAdminRoute = location.pathname.startsWith('/admin');
+    const isAuthRoute = location.pathname === '/auth' || location.pathname === '/logout';
+    
+    // Redirect to TV mode if on a TV device and not already on TV/admin/auth routes
+    if (isTV && !isTVRoute && !isAdminRoute && !isAuthRoute) {
+      // Map regular routes to TV equivalents
+      if (location.pathname === '/') {
+        navigate('/tv', { replace: true });
+      }
+    }
+  }, [isTV, location.pathname, navigate]);
 
   // Check if current route is admin route (admins should bypass maintenance)
   const isAdminRoute = location.pathname.startsWith("/admin");
@@ -211,6 +233,15 @@ const AppContent = () => {
         <ToastPoll />
         <Suspense fallback={<PageLoader />}>
           <Routes>
+            {/* TV Mode Routes */}
+            <Route path="/tv" element={<TVHome />} />
+            <Route path="/tv/watch/:streamId" element={<TVPlayer />} />
+            <Route path="/tv/video/:videoId" element={<TVPlayer />} />
+            <Route path="/tv/live" element={<TVHome />} />
+            <Route path="/tv/highlights" element={<TVHome />} />
+            <Route path="/tv/podcasts" element={<TVHome />} />
+            <Route path="/tv/schedule" element={<TVHome />} />
+            
             <Route path="/" element={<Index />} />
             <Route path="/community" element={<Community />} />
             <Route path="/gallery" element={<Gallery />} />

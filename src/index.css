@@ -744,3 +744,90 @@ All colors MUST be HSL.
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
+
+/* ========================================
+   TV MODE STYLES
+   ======================================== */
+
+.tv-mode {
+  --tv-min-font-size: 24px;
+}
+
+.tv-mode * {
+  font-size: max(var(--tv-min-font-size), inherit);
+}
+
+/* Override for elements that should remain smaller */
+.tv-mode .tv-small-text {
+  font-size: inherit;
+}
+
+/* TV Focus Ring - highly visible for remote navigation */
+.tv-focus-ring {
+  outline: none !important;
+  box-shadow: 
+    0 0 0 4px hsl(var(--mets-orange)),
+    0 0 30px hsl(var(--mets-orange) / 0.5),
+    0 0 60px hsl(var(--mets-orange) / 0.3) !important;
+  border-color: hsl(var(--mets-orange)) !important;
+}
+
+/* Disable hover effects in TV mode - use focus instead */
+.tv-mode *:hover {
+  /* Prevent hover states - TV uses focus */
+}
+
+.tv-mode *:focus {
+  outline: none;
+}
+
+.tv-mode .focus\:scale-105:focus,
+.tv-mode .tv-focus-ring {
+  transform: scale(1.05);
+}
+
+/* Hide scrollbars in TV mode for cleaner look */
+.tv-mode .scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.tv-mode .scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* TV Navigation animations */
+@keyframes tv-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 0 4px hsl(var(--mets-orange)),
+      0 0 20px hsl(var(--mets-orange) / 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 6px hsl(var(--mets-orange)),
+      0 0 40px hsl(var(--mets-orange) / 0.6);
+  }
+}
+
+.tv-mode .tv-focus-ring {
+  animation: tv-pulse 2s ease-in-out infinite;
+}
+
+/* Large touch targets for TV remote */
+.tv-mode button,
+.tv-mode a,
+.tv-mode [role="button"] {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* TV Player specific styles */
+.tv-player-controls {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.tv-player-controls.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
