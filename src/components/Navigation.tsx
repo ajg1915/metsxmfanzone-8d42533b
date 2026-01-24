@@ -183,17 +183,6 @@ const Navigation = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Refresh button - desktop only */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleRefresh}
-              className="hidden md:flex h-8 w-8"
-              title="Refresh page"
-            >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            </Button>
-            
             {user ? (
               <>
                 <DropdownMenu>
@@ -275,17 +264,6 @@ const Navigation = () => {
                   </SheetDescription>
                 </SheetHeader>
                 <div className="flex flex-col p-4 stagger-children">
-                  {/* Refresh button - mobile menu */}
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleRefresh();
-                    }}
-                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                  >
-                    <RefreshCw className="w-5 h-5 text-primary" />
-                    Refresh Page
-                  </button>
                   <NavLink 
                     to="/" 
                     className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg touch-target"
