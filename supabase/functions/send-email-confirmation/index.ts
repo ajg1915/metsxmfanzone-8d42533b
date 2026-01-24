@@ -1,3 +1,7 @@
+import { Resend } from "https://esm.sh/resend@4.0.0";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -19,8 +23,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { Resend } = await import("https://esm.sh/resend@4.0.0");
-    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     const { email, name, userId, token }: EmailConfirmationRequest = await req.json();
 
     if (!email || !userId || !token) {
