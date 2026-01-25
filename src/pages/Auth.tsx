@@ -672,22 +672,34 @@ const Auth = () => {
       }
 
       if (data.user) {
-        // Check if email is verified
-        const { data: profile } = await supabase
+        // Check if email is verified in profiles table
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("email_verified")
           .eq("id", data.user.id)
-          .single();
+          .maybeSingle();
+
+        // If profile lookup fails or profile doesn't exist, that's a different issue
+        if (profileError) {
+          console.error("Profile lookup error:", profileError);
+          toast({
+            title: "Account Error",
+            description: "There was an issue accessing your account. Please contact support.",
+            variant: "destructive",
+          });
+          await supabase.auth.signOut();
+          return;
+        }
 
         if (!profile?.email_verified) {
           // Sign out the user since they haven't confirmed their email
           await supabase.auth.signOut();
           toast({
-            title: "Email not confirmed",
-            description: "Please check your email and click the confirmation link to activate your account.",
+            title: "Email Not Verified",
+            description: "Your email address hasn't been verified yet. Please check your email for the confirmation link, or click 'Resend' on the next page.",
             variant: "destructive",
           });
-          navigate(`/confirm-account?email=${encodeURIComponent(validated.email)}`);
+          navigate(`/confirm-account?email=${encodeURIComponent(validated.email.toLowerCase().trim())}`);
           return;
         }
 
@@ -1020,6 +1032,14 @@ const Auth = () => {
         });
         return;
       }
+
+      // IMPORTANT: If user successfully reset password via email link, they've proven email ownership
+      // Mark their email as verified in the profiles table
+      const userId = sessionData.session.user.id;
+      await supabase
+        .from("profiles")
+        .update({ email_verified: true })
+        .eq("id", userId);
 
       toast({
         title: "Password updated!",
