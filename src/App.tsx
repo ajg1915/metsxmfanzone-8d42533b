@@ -186,40 +186,52 @@ const AppContent = () => {
   
   // Disable right-click context menu for non-admin users only
   useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    let mounted = true;
+    
     const checkAdminAndSetupContextMenu = async () => {
-      // Check if user is admin
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .eq("role", "admin")
-          .single();
+      try {
+        // Check if user is admin - use getUser() which is more reliable
+        const { data: { user } } = await supabase.auth.getUser();
         
-        // If admin, don't block context menu
-        if (roleData) {
-          return () => {};
+        if (!mounted) return;
+        
+        if (user) {
+          const { data: roleData } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id)
+            .eq("role", "admin")
+            .maybeSingle();
+          
+          if (!mounted) return;
+          
+          // If admin, don't block context menu
+          if (roleData) {
+            return;
+          }
         }
+        
+        if (!mounted) return;
+        
+        // Block context menu for non-admins
+        const handleContextMenu = (e: MouseEvent) => {
+          e.preventDefault();
+          return false;
+        };
+        
+        document.addEventListener("contextmenu", handleContextMenu);
+        cleanup = () => document.removeEventListener("contextmenu", handleContextMenu);
+      } catch (error) {
+        // Silently handle errors - don't let this break the app
+        console.error('Context menu setup error:', error);
       }
-      
-      // Block context menu for non-admins
-      const handleContextMenu = (e: MouseEvent) => {
-        e.preventDefault();
-        return false;
-      };
-      
-      document.addEventListener("contextmenu", handleContextMenu);
-      return () => document.removeEventListener("contextmenu", handleContextMenu);
     };
     
-    let cleanup: (() => void) | undefined;
-    checkAdminAndSetupContextMenu().then(fn => {
-      cleanup = fn;
-    });
+    checkAdminAndSetupContextMenu();
     
     return () => {
+      mounted = false;
       if (cleanup) cleanup();
     };
   }, []);
