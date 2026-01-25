@@ -183,16 +183,7 @@ const AppContent = () => {
     return cleanup;
   }, []);
   
-  // Disable right-click context menu across the entire website
-  useEffect(() => {
-    const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-      return false;
-    };
-    
-    document.addEventListener("contextmenu", handleContextMenu);
-    return () => document.removeEventListener("contextmenu", handleContextMenu);
-  }, []);
+  // Context menu is now enabled for all users to allow copy/paste functionality
 
   // Auto-redirect to TV mode on TV devices
   useEffect(() => {
