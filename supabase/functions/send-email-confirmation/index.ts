@@ -1,4 +1,5 @@
-import { Resend } from "resend";
+import { Resend } from "npm:resend@4.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -14,7 +15,7 @@ interface EmailConfirmationRequest {
   email: string;
   name?: string;
   userId: string;
-  token: string;
+  token?: string; // Optional - if not provided, we'll create one
 }
 
 Deno.serve(async (req) => {
@@ -25,21 +26,65 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { email, name, userId, token }: EmailConfirmationRequest = await req.json();
+    const body = await req.json();
+    let { email, name, userId, token }: EmailConfirmationRequest = body;
 
     console.log("send-email-confirmation: processing for", email);
 
-    if (!email || !userId || !token) {
-      console.error("send-email-confirmation: Missing required fields", { email: !!email, userId: !!userId, token: !!token });
+    if (!email || !userId) {
+      console.error("send-email-confirmation: Missing required fields", { email: !!email, userId: !!userId });
       return new Response(
-        JSON.stringify({ error: "Email, userId, and token are required" }),
+        JSON.stringify({ error: "Email and userId are required" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Create confirmation link – use custom domain as base
+    // Create Supabase client with service role for token management
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // If no token provided, generate one and store it
+    if (!token) {
+      token = crypto.randomUUID() + "-" + Date.now().toString(36);
+      console.log("send-email-confirmation: generated new token for", email);
+    }
+
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Delete any existing unconfirmed tokens for this user before inserting new one
+    const { error: deleteError } = await supabase
+      .from("email_confirmation_tokens")
+      .delete()
+      .eq("user_id", userId)
+      .is("confirmed_at", null);
+
+    if (deleteError) {
+      console.log("send-email-confirmation: could not clean old tokens", deleteError);
+      // Continue anyway
+    }
+
+    // Insert the new token
+    const { error: tokenError } = await supabase
+      .from("email_confirmation_tokens")
+      .insert({
+        user_id: userId,
+        token: token,
+        email: normalizedEmail,
+        expires_at: tokenExpiry.toISOString(),
+      });
+
+    if (tokenError) {
+      console.error("send-email-confirmation: failed to store token", tokenError);
+      // Don't fail - the email is still useful for support purposes
+    } else {
+      console.log("send-email-confirmation: token stored successfully");
+    }
+
+    // Create confirmation link using custom domain
     const baseUrl = "https://metsxmfanzone.com";
-    const confirmationLink = `${baseUrl}/confirm-account?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
+    const confirmationLink = `${baseUrl}/confirm-account?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email.toLowerCase().trim())}`;
 
     const subject = "Confirm Your MetsXMFanZone Account";
     const emailContent = `
@@ -121,14 +166,38 @@ Deno.serve(async (req) => {
       </html>
     `;
 
+    // Plain text version for better deliverability
+    const plainText = `
+Welcome to MetsXMFanZone, ${name || "Mets Fan"}!
+
+Please confirm your email address to activate your account.
+
+Click here to confirm: ${confirmationLink}
+
+After confirming:
+- Choose a subscription plan
+- Watch live streams
+- Connect with fans
+
+This link expires in 24 hours.
+
+Let's Go Mets!
+
+The MetsXMFanZone Team
+https://metsxmfanzone.com
+    `.trim();
+
     const emailResponse = await resend.emails.send({
       from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
       to: [email],
       subject: subject,
       html: emailContent,
+      text: plainText, // Add plain text for better deliverability
       headers: {
-        "X-Entity-Ref-ID": userId, // helps with threading / tracking
+        "X-Entity-Ref-ID": userId,
         "List-Unsubscribe": "<mailto:unsubscribe@metsxmfanzone.com>",
+        "X-Priority": "1", // High priority
+        "Importance": "high",
       },
     });
 
