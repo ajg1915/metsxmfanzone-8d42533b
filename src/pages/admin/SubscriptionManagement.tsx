@@ -40,9 +40,10 @@ export default function SubscriptionManagement() {
 
   const fetchSubscriptions = async () => {
     try {
+      // Admin view - select fields needed for management, mask payment IDs in display
       const { data: subs, error: subsError } = await supabase
         .from("subscriptions")
-        .select("*")
+        .select("id, user_id, plan_type, status, amount, currency, start_date, end_date, created_at, updated_at")
         .order("created_at", { ascending: false });
 
       if (subsError) throw subsError;

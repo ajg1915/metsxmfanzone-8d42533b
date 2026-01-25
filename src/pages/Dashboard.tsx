@@ -45,10 +45,10 @@ const Dashboard = () => {
       if (!user) return;
       
       try {
-        // Fetch subscription
+        // Fetch subscription - only select needed fields, never expose payment IDs
         const { data: subData, error: subError } = await supabase
           .from('subscriptions')
-          .select('*')
+          .select('id, plan_type, status, start_date, end_date, amount, currency')
           .eq('user_id', user.id)
           .eq('status', 'active')
           .order('created_at', { ascending: false })
