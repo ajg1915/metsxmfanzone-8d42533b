@@ -11,7 +11,8 @@ interface Feedback {
   content: string;
   rating: number | null;
   created_at: string;
-  user_id: string;
+  display_name: string | null;
+  location: string | null;
 }
 
 const FeedbackSection = () => {
@@ -21,14 +22,15 @@ const FeedbackSection = () => {
   useEffect(() => {
     const fetchFeedbacks = async () => {
       try {
+        // Query feedbacks but only select non-sensitive fields (excludes user_id)
         const { data, error } = await supabase
           .from("feedbacks")
-          .select("*")
+          .select("id, display_name, content, rating, location, created_at")
           .order("created_at", { ascending: false })
           .limit(10);
 
         if (error) throw error;
-        setFeedbacks(data || []);
+        setFeedbacks((data as Feedback[]) || []);
       } catch (error) {
         console.error("Error fetching feedbacks:", error);
       } finally {
@@ -50,11 +52,28 @@ const FeedbackSection = () => {
         },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            setFeedbacks((current) => [payload.new as Feedback, ...current].slice(0, 10));
+            const newFeedback = {
+              id: payload.new.id,
+              content: payload.new.content,
+              rating: payload.new.rating,
+              created_at: payload.new.created_at,
+              display_name: payload.new.display_name,
+              location: payload.new.location,
+            } as Feedback;
+            setFeedbacks((current) => [newFeedback, ...current].slice(0, 10));
           } else if (payload.eventType === "UPDATE") {
             setFeedbacks((current) =>
               current.map((feedback) =>
-                feedback.id === payload.new.id ? (payload.new as Feedback) : feedback
+                feedback.id === payload.new.id 
+                  ? {
+                      id: payload.new.id,
+                      content: payload.new.content,
+                      rating: payload.new.rating,
+                      created_at: payload.new.created_at,
+                      display_name: payload.new.display_name,
+                      location: payload.new.location,
+                    } as Feedback
+                  : feedback
               )
             );
           } else if (payload.eventType === "DELETE") {
