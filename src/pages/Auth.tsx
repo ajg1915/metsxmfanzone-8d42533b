@@ -981,11 +981,38 @@ const Auth = () => {
       const validated = newPasswordSchema.parse({ password, confirmPassword });
       setLoading(true);
 
+      // First check if we have a valid session (required for password update)
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      if (!sessionData.session) {
+        toast({
+          title: "Session expired",
+          description: "Your password reset link has expired. Please request a new one.",
+          variant: "destructive",
+        });
+        setIsResettingPassword(false);
+        setIsForgotPassword(true);
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.updateUser({
         password: validated.password,
       });
 
       if (error) {
+        // Handle specific auth session errors
+        if (error.message.includes("session") || error.message.includes("Auth session missing")) {
+          toast({
+            title: "Session expired",
+            description: "Your password reset link has expired. Please request a new one.",
+            variant: "destructive",
+          });
+          setIsResettingPassword(false);
+          setIsForgotPassword(true);
+          return;
+        }
+        
         toast({
           title: "Error",
           description: error.message,
@@ -996,10 +1023,16 @@ const Auth = () => {
 
       toast({
         title: "Password updated!",
-        description: "Your password has been successfully reset.",
+        description: "Your password has been successfully reset. Please log in with your new password.",
       });
       
-      navigate("/");
+      // Sign out and redirect to login so user can log in with new password
+      await supabase.auth.signOut();
+      setIsResettingPassword(false);
+      setIsLogin(true);
+      setPassword("");
+      setConfirmPassword("");
+      navigate("/auth?mode=login");
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
