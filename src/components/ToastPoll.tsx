@@ -24,16 +24,25 @@ const ToastPoll = () => {
   const [votes, setVotes] = useState<PollVote[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const checkAndFetchPoll = async () => {
+      // Only show polls to logged-in users
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setIsAuthenticated(false);
+        return;
+      }
+      setIsAuthenticated(true);
+
       // Check if user has dismissed polls recently
       const dismissedUntil = localStorage.getItem("poll_dismissed_until");
       if (dismissedUntil && new Date(dismissedUntil) > new Date()) {
         return;
       }
 
-      // Get session ID for anonymous voting
+      // Get session ID for voting tracking
       let sessionId = localStorage.getItem("poll_session_id");
       if (!sessionId) {
         sessionId = crypto.randomUUID();
@@ -136,7 +145,7 @@ const ToastPoll = () => {
     return (optionVotes / votes.length) * 100;
   };
 
-  if (!poll || !visible || dismissed) return null;
+  if (!poll || !visible || dismissed || !isAuthenticated) return null;
 
   return (
     <AnimatePresence>
