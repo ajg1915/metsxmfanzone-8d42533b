@@ -1117,7 +1117,7 @@ const Auth = () => {
               ? "Enter your email to receive a password reset link"
               : isLogin
               ? "Enter your credentials to access your account"
-              : "Sign up to join the Mets fan community"}
+              : "Sign up to join MetsXMFanZone"}
           </CardDescription>
         </CardHeader>
         <CardContent>
