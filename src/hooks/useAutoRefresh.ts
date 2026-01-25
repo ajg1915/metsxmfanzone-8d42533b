@@ -2,18 +2,11 @@ import { useEffect } from 'react';
 
 export const useAutoRefresh = () => {
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      let refreshing = false;
-
-      // Reload page only when new service worker takes control (new content detected)
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        refreshing = true;
-        console.log('New version detected, reloading...');
-        window.location.reload();
-      });
-
-      // No interval-based checking - only refresh on actual SW updates
-    }
+    // Disabled auto-refresh on service worker updates
+    // Content updates via Supabase realtime subscriptions instead
+    // Users can manually refresh if needed - no more constant page reloads
+    
+    // The service worker still caches assets for offline/performance,
+    // but won't force page reloads when updated
   }, []);
 };
