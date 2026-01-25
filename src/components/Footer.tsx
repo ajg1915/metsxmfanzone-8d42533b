@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { APP_VERSION } from "@/config/appVersion";
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -30,13 +31,16 @@ const Footer = () => {
               <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link>
             </div>
           </div>
-          <div className="border-t border-border/30 pt-2 text-center">
+          <div className="border-t border-border/30 pt-2 text-center space-y-1">
             <p 
               onClick={handleSecretClick}
               className="text-[10px] text-muted-foreground cursor-pointer select-none hover:text-foreground/70 transition-colors"
               aria-hidden="true"
             >
               © 2025 MetsXMFanZone.com. All rights reserved.
+            </p>
+            <p className="text-[10px] text-muted-foreground/60">
+              Version {APP_VERSION}
             </p>
           </div>
         </div>
