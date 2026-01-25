@@ -398,11 +398,14 @@ const Auth = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && !show2FA && !isRememberedLogin) {
+      // IMPORTANT: During password recovery (reset link), Supabase creates a session.
+      // We must NOT redirect away from /auth?mode=reset, otherwise the user never
+      // sees the "Set New Password" screen.
+      if (session && !show2FA && !isRememberedLogin && !isResettingPassword) {
         navigate("/");
       }
     });
-  }, [navigate, show2FA, isRememberedLogin]);
+  }, [navigate, show2FA, isRememberedLogin, isResettingPassword]);
 
   // Resend cooldown timer
   useEffect(() => {
