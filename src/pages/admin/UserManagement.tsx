@@ -84,9 +84,10 @@ const UserManagement = () => {
 
       if (profilesError) throw profilesError;
 
+      // Select only needed fields - never expose payment IDs even to admins in UI
       const { data: subscriptions, error: subsError } = await supabase
         .from("subscriptions")
-        .select("*")
+        .select("id, user_id, plan_type, status, amount, start_date, end_date, created_at")
         .order("created_at", { ascending: false });
 
       if (subsError) throw subsError;
