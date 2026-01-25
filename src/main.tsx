@@ -4,7 +4,7 @@ import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 
-// Register service worker for push notifications
+// Register service worker for push notifications and offline caching
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
@@ -13,10 +13,8 @@ if ('serviceWorker' in navigator) {
       });
       console.log('[App] Service Worker registered:', registration.scope);
       
-      // Check for updates periodically
-      setInterval(() => {
-        registration.update();
-      }, 60 * 60 * 1000); // Check every hour
+      // No periodic update checks - let natural navigation handle updates
+      // This prevents constant refreshing while still maintaining push notification support
     } catch (error) {
       console.error('[App] Service Worker registration failed:', error);
     }
