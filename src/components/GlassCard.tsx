@@ -20,10 +20,10 @@ const GlassCard = ({
   delay = 0,
 }: GlassCardProps) => {
   const variants = {
-    default: "glass-card",
-    subtle: "glass-light",
-    strong: "glass-strong",
-    interactive: "glass-card hover-lift hover-border-glow",
+    default: "glass-card glow-blue",
+    subtle: "glass-light glow-blue",
+    strong: "glass-strong glow-blue-strong",
+    interactive: "glass-card hover-lift glow-blue glow-blue-pulse",
   };
   
   const glowStyles = {
