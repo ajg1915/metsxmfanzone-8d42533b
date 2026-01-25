@@ -1988,6 +1988,33 @@ export type Database = {
         }
         Relationships: []
       }
+      feedbacks_public: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string | null
+          location: string | null
+          rating: number | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string | null
+          location?: string | null
+          rating?: number | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string | null
+          location?: string | null
+          rating?: number | null
+        }
+        Relationships: []
+      }
       public_profiles: {
         Row: {
           avatar_url: string | null
