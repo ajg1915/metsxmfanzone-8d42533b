@@ -1,4 +1,5 @@
 import { useEffect, lazy, Suspense } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -183,7 +184,45 @@ const AppContent = () => {
     return cleanup;
   }, []);
   
-  // Context menu is now enabled for all users to allow copy/paste functionality
+  // Disable right-click context menu for non-admin users only
+  useEffect(() => {
+    const checkAdminAndSetupContextMenu = async () => {
+      // Check if user is admin
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .single();
+        
+        // If admin, don't block context menu
+        if (roleData) {
+          return () => {};
+        }
+      }
+      
+      // Block context menu for non-admins
+      const handleContextMenu = (e: MouseEvent) => {
+        e.preventDefault();
+        return false;
+      };
+      
+      document.addEventListener("contextmenu", handleContextMenu);
+      return () => document.removeEventListener("contextmenu", handleContextMenu);
+    };
+    
+    let cleanup: (() => void) | undefined;
+    checkAdminAndSetupContextMenu().then(fn => {
+      cleanup = fn;
+    });
+    
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, []);
 
   // Auto-redirect to TV mode on TV devices
   useEffect(() => {
