@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { APP_VERSION } from "@/config/appVersion";
+
+// App version - displayed in footer
+const APP_VERSION = "1.0.0";
 
 const Footer = () => {
   const navigate = useNavigate();
