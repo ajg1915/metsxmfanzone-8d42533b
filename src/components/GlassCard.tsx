@@ -23,7 +23,7 @@ const GlassCard = ({
     default: "glass-card glow-blue",
     subtle: "glass-light glow-blue",
     strong: "glass-strong glow-blue-strong",
-    interactive: "glass-card hover-lift glow-blue glow-blue-pulse",
+    interactive: "glass-card hover-lift glow-blue",
   };
   
   const glowStyles = {
