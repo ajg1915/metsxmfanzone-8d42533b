@@ -131,7 +131,7 @@ const BlogSection = () => {
           >
             <div
               onClick={() => navigate(`/blog/${highlightPost.slug}`)}
-              className="cursor-pointer group glass-card hover-lift hover-border-glow glow-blue rounded-2xl overflow-hidden"
+              className="cursor-pointer group glass-card hover-lift glow-blue glow-blue-pulse rounded-2xl overflow-hidden"
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && navigate(`/blog/${highlightPost.slug}`)}
@@ -271,7 +271,7 @@ const BlogSection = () => {
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 onClick={() => navigate(`/blog/${post.slug}`)}
-                className="cursor-pointer group glass-card hover-lift hover-border-glow glow-blue rounded-2xl overflow-hidden"
+                className="cursor-pointer group glass-card hover-lift glow-blue glow-blue-pulse rounded-2xl overflow-hidden"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && navigate(`/blog/${post.slug}`)}

@@ -304,7 +304,17 @@ All colors MUST be HSL.
      ======================================== */
   
   .glow-blue {
-    box-shadow: var(--glow-blue);
+    box-shadow: 
+      0 0 20px hsl(225 73% 57% / 0.3),
+      0 0 40px hsl(225 73% 57% / 0.2),
+      0 0 60px hsl(225 73% 57% / 0.1);
+  }
+  
+  .glow-blue-strong {
+    box-shadow: 
+      0 0 30px hsl(225 73% 57% / 0.5),
+      0 0 60px hsl(225 73% 57% / 0.3),
+      0 0 100px hsl(225 73% 57% / 0.15);
   }
   
   .glow-orange {
@@ -319,6 +329,10 @@ All colors MUST be HSL.
     animation: glowPulse 3s ease-in-out infinite;
   }
   
+  .glow-blue-pulse {
+    animation: glowBluePulse 3s ease-in-out infinite;
+  }
+  
   @keyframes glowPulse {
     0%, 100% {
       box-shadow: 0 0 30px hsl(16 100% 50% / 0.2);
@@ -326,6 +340,34 @@ All colors MUST be HSL.
     50% {
       box-shadow: 0 0 60px hsl(16 100% 50% / 0.4), 0 0 100px hsl(16 100% 50% / 0.2);
     }
+  }
+  
+  @keyframes glowBluePulse {
+    0%, 100% {
+      box-shadow: 
+        0 0 20px hsl(225 73% 57% / 0.3),
+        0 0 40px hsl(225 73% 57% / 0.2);
+    }
+    50% {
+      box-shadow: 
+        0 0 40px hsl(225 73% 57% / 0.5),
+        0 0 80px hsl(225 73% 57% / 0.3),
+        0 0 120px hsl(225 73% 57% / 0.15);
+    }
+  }
+  
+  /* Section glow container - removes border, adds blue glow */
+  .section-glow-blue {
+    border: none !important;
+    box-shadow: 
+      0 0 30px hsl(225 73% 57% / 0.25),
+      0 0 60px hsl(225 73% 57% / 0.15),
+      inset 0 0 60px hsl(225 73% 57% / 0.05);
+    background: linear-gradient(
+      135deg,
+      hsl(225 65% 12% / 0.9),
+      hsl(225 70% 10% / 0.8)
+    );
   }
 
   /* ========================================
