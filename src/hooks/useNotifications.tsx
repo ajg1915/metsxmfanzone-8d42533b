@@ -59,16 +59,27 @@ export const useNotifications = () => {
       // Register service worker for push notifications
       const registration = await navigator.serviceWorker.ready;
 
-      // VAPID public key for push notifications (safe to expose - it's a public key)
-      const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
+      // Fetch VAPID public key from edge function (safe to expose - it's a public key)
+      let vapidPublicKey: string | undefined;
+      
+      try {
+        const { data, error } = await supabase.functions.invoke('get-vapid-key');
+        if (error) {
+          console.error("Error fetching VAPID key:", error);
+        } else {
+          vapidPublicKey = data?.vapidPublicKey;
+        }
+      } catch (fetchError) {
+        console.error("Failed to fetch VAPID key:", fetchError);
+      }
 
       if (!vapidPublicKey) {
         console.warn(
-          "[Notifications] Missing VITE_VAPID_PUBLIC_KEY. Push subscription skipped."
+          "[Notifications] Missing VAPID public key. Push subscription skipped."
         );
         toast({
           title: "Notifications not configured",
-          description: "Push notifications are not configured yet.",
+          description: "Push notifications are not available. Please try again later.",
           variant: "destructive",
         });
         return;
