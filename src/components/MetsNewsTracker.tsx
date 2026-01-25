@@ -206,7 +206,7 @@ const MetsNewsTracker = () => {
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 onClick={() => item.link && window.open(item.link, '_blank')}
-                className={`glass-card hover-lift glow-blue glow-blue-pulse rounded-2xl overflow-hidden group ${item.link ? 'cursor-pointer' : ''}`}
+                className={`glass-card hover-lift glow-blue rounded-2xl overflow-hidden group ${item.link ? 'cursor-pointer' : ''}`}
                 role={item.link ? "button" : undefined}
                 tabIndex={item.link ? 0 : undefined}
                 onKeyDown={(e) => e.key === 'Enter' && item.link && window.open(item.link, '_blank')}
