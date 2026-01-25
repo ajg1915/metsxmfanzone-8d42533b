@@ -1,4 +1,4 @@
-import { Resend } from "https://esm.sh/resend@4.0.0";
+import { Resend } from "resend";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -16,6 +16,8 @@ interface OtpEmailRequest {
 }
 
 Deno.serve(async (req) => {
+  console.log("send-otp-email: request received", req.method);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -23,12 +25,15 @@ Deno.serve(async (req) => {
   try {
     const { to, otp }: OtpEmailRequest = await req.json();
 
-    if (!to || !otp) {
-      console.error("Missing required fields: to or otp");
-      throw new Error("Email address and OTP code are required");
-    }
+    console.log("send-otp-email: sending to", to);
 
-    console.log(`Sending OTP email to: ${to}`);
+    if (!to || !otp) {
+      console.error("send-otp-email: missing required fields");
+      return new Response(
+        JSON.stringify({ error: "Email address and OTP code are required" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     const emailResponse = await resend.emails.send({
       from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
@@ -86,23 +91,27 @@ Deno.serve(async (req) => {
         </body>
         </html>
       `,
+      headers: {
+        "List-Unsubscribe": "<mailto:unsubscribe@metsxmfanzone.com>",
+      },
     });
 
     if ((emailResponse as any)?.error) {
-      console.error("Resend returned an error:", (emailResponse as any).error);
+      console.error("send-otp-email: Resend returned an error", (emailResponse as any).error);
       throw new Error((emailResponse as any).error?.message || "Email provider error");
     }
 
-    console.log("OTP email sent successfully:", emailResponse);
+    console.log("send-otp-email: SUCCESS", { to, messageId: (emailResponse as any).data?.id });
 
     return new Response(
       JSON.stringify({ success: true, messageId: (emailResponse as any).data?.id }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
-  } catch (error: any) {
-    console.error("Error in send-otp-email function:", error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("send-otp-email: ERROR", message);
     return new Response(
-      JSON.stringify({ error: error.message || "Failed to send OTP email" }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }

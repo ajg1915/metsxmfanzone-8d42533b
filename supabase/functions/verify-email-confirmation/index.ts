@@ -1,4 +1,4 @@
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient } from "@supabase/supabase-js";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,15 +13,21 @@ interface VerifyRequest {
   email: string;
 }
 
-const handler = async (req: Request): Promise<Response> => {
+Deno.serve(async (req: Request): Promise<Response> => {
+  console.log("verify-email-confirmation: received request", req.method);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { token, email }: VerifyRequest = await req.json();
+    const body = await req.json();
+    const { token, email } = body as VerifyRequest;
+
+    console.log("verify-email-confirmation: verifying token for email", email);
 
     if (!token || !email) {
+      console.error("verify-email-confirmation: missing token or email");
       return new Response(
         JSON.stringify({ error: "Token and email are required" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
@@ -33,25 +39,36 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Find the token
+    // Find the token (case-insensitive email match for safety)
     const { data: tokenData, error: tokenError } = await supabase
       .from("email_confirmation_tokens")
       .select("*")
       .eq("token", token)
-      .eq("email", email)
+      .ilike("email", email)
       .is("confirmed_at", null)
-      .single();
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    if (tokenError || !tokenData) {
-      console.error("Token not found or already used:", tokenError);
+    if (tokenError) {
+      console.error("verify-email-confirmation: DB error looking up token", tokenError);
       return new Response(
-        JSON.stringify({ error: "Invalid or expired confirmation link" }),
+        JSON.stringify({ error: "Database error during verification" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!tokenData) {
+      console.error("verify-email-confirmation: token not found or already used");
+      return new Response(
+        JSON.stringify({ error: "Invalid or expired confirmation link. Please request a new one." }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
     // Check if token has expired
     if (new Date(tokenData.expires_at) < new Date()) {
+      console.error("verify-email-confirmation: token expired at", tokenData.expires_at);
       return new Response(
         JSON.stringify({ error: "This confirmation link has expired. Please request a new one." }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
@@ -65,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("id", tokenData.id);
 
     if (updateTokenError) {
-      console.error("Error updating token:", updateTokenError);
+      console.error("verify-email-confirmation: error updating token", updateTokenError);
       return new Response(
         JSON.stringify({ error: "Failed to confirm email" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
@@ -79,11 +96,11 @@ const handler = async (req: Request): Promise<Response> => {
       .eq("id", tokenData.user_id);
 
     if (profileError) {
-      console.error("Error updating profile:", profileError);
+      console.error("verify-email-confirmation: error updating profile", profileError);
       // Don't fail the whole operation, just log it
     }
 
-    console.log("Email confirmed successfully for user:", tokenData.user_id);
+    console.log("verify-email-confirmation: SUCCESS for user", tokenData.user_id);
 
     return new Response(
       JSON.stringify({ 
@@ -93,13 +110,12 @@ const handler = async (req: Request): Promise<Response> => {
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
-  } catch (error: any) {
-    console.error("Error verifying email:", error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("verify-email-confirmation: unhandled error", message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
-};
-
-Deno.serve(handler);
+});
