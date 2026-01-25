@@ -28,8 +28,6 @@ const Footer = () => {
               <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
               <span className="text-muted-foreground">•</span>
               <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</Link>
-              <span className="text-muted-foreground">•</span>
-              <Link to="/feedback" className="text-muted-foreground hover:text-primary transition-colors">Feedback</Link>
             </div>
           </div>
           <div className="border-t border-border/30 pt-2 text-center">
