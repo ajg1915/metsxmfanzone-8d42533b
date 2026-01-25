@@ -68,25 +68,53 @@ export default function ConfirmAccount() {
 
     setResendLoading(true);
     try {
-      // Get the user's profile to find their user_id
-      const { data: authData } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: false,
-        },
-      });
+      // First, look up the user by email in email_confirmation_tokens
+      const { data: existingToken, error: lookupError } = await supabase
+        .from("email_confirmation_tokens")
+        .select("user_id")
+        .eq("email", email)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      let userId = existingToken?.user_id;
+
+      // If no token found, we can't resend – user may not have signed up yet
+      if (!userId) {
+        toast({
+          title: "Account not found",
+          description: "No pending account found for this email. Please sign up first.",
+          variant: "destructive",
+        });
+        setResendLoading(false);
+        return;
+      }
 
       // Generate a new token
       const newToken = crypto.randomUUID() + "-" + Date.now().toString(36);
       const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      // We need to send a new confirmation email
-      // Since we don't have the user_id, we'll use the edge function which can handle this
+      // Insert new token into the database
+      const { error: insertError } = await supabase
+        .from("email_confirmation_tokens")
+        .insert({
+          user_id: userId,
+          token: newToken,
+          email: email,
+          expires_at: tokenExpiry.toISOString(),
+        });
+
+      if (insertError) {
+        console.error("Failed to store new confirmation token:", insertError);
+        throw new Error("Failed to generate confirmation link");
+      }
+
+      // Send confirmation email via edge function
       const { error } = await supabase.functions.invoke('send-email-confirmation', {
         body: {
           email,
           name: "Mets Fan",
-          userId: "resend",
+          userId: userId,
           token: newToken,
         },
       });
@@ -97,13 +125,14 @@ export default function ConfirmAccount() {
 
       toast({
         title: "Confirmation email sent",
-        description: "Please check your inbox for the new confirmation link.",
+        description: "Please check your inbox (and spam folder) for the new confirmation link.",
       });
       setResendCooldown(60);
     } catch (err: any) {
+      console.error("Resend confirmation error:", err);
       toast({
         title: "Failed to resend",
-        description: "Unable to send confirmation email. Please try again later.",
+        description: err.message || "Unable to send confirmation email. Please try again later.",
         variant: "destructive",
       });
     } finally {

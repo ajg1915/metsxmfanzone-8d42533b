@@ -1,4 +1,4 @@
-import { Resend } from "https://esm.sh/resend@4.0.0";
+import { Resend } from "resend";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -18,6 +18,8 @@ interface EmailConfirmationRequest {
 }
 
 Deno.serve(async (req) => {
+  console.log("send-email-confirmation: request received", req.method);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -25,17 +27,19 @@ Deno.serve(async (req) => {
   try {
     const { email, name, userId, token }: EmailConfirmationRequest = await req.json();
 
+    console.log("send-email-confirmation: processing for", email);
+
     if (!email || !userId || !token) {
-      console.error("Missing required fields:", { email: !!email, userId: !!userId, token: !!token });
+      console.error("send-email-confirmation: Missing required fields", { email: !!email, userId: !!userId, token: !!token });
       return new Response(
         JSON.stringify({ error: "Email, userId, and token are required" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Create confirmation link
-    const baseUrl = Deno.env.get("SITE_URL") || "https://metsxmfanzone.com";
-    const confirmationLink = `${baseUrl}/confirm-account?token=${token}&email=${encodeURIComponent(email)}`;
+    // Create confirmation link – use custom domain as base
+    const baseUrl = "https://metsxmfanzone.com";
+    const confirmationLink = `${baseUrl}/confirm-account?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
 
     const subject = "Confirm Your MetsXMFanZone Account";
     const emailContent = `
@@ -122,17 +126,22 @@ Deno.serve(async (req) => {
       to: [email],
       subject: subject,
       html: emailContent,
+      headers: {
+        "X-Entity-Ref-ID": userId, // helps with threading / tracking
+        "List-Unsubscribe": "<mailto:unsubscribe@metsxmfanzone.com>",
+      },
     });
 
-    console.log("Confirmation email sent successfully:", emailResponse);
+    console.log("send-email-confirmation: SUCCESS", emailResponse);
 
     return new Response(JSON.stringify({ success: true, ...emailResponse }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
-  } catch (error: any) {
-    console.error("Error sending confirmation email:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("send-email-confirmation: ERROR", message);
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
