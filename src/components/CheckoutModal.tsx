@@ -97,7 +97,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
 
         if (error) throw error;
 
-        if (data?.orderId && data?.approvalUrl) {
+        if (data?.approvalUrl) {
           window.location.href = data.approvalUrl;
         } else {
           toast({

@@ -41,12 +41,12 @@ Deno.serve(async (req) => {
       throw new Error('Checkout token is required');
     }
 
-    console.log('Processing Helcim checkout token:', checkoutToken);
+    console.log('Processing Helcim checkout: [REDACTED]');
 
-    // Get subscription from database
+    // Get subscription from database - only select needed fields, never expose payment IDs
     const { data: subscription, error: fetchError } = await supabase
       .from('subscriptions')
-      .select('*')
+      .select('id, user_id, plan_type, status, amount, currency, start_date, end_date')
       .eq('paypal_order_id', checkoutToken) // Using paypal_order_id field for Helcim checkout token
       .single();
 
