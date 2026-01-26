@@ -124,8 +124,12 @@ Deno.serve(async (req: Request) => {
       throw insertError;
     }
 
+    // Only return the approval URL - orderId stays server-side in the subscription record
+    const approvalUrl = orderData.links.find((l: any) => l.rel === 'approve')?.href;
+    console.log('Payment order created successfully');
+    
     return new Response(
-      JSON.stringify({ orderId: orderData.id, approvalUrl: orderData.links.find((l: any) => l.rel === 'approve')?.href }),
+      JSON.stringify({ approvalUrl }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {

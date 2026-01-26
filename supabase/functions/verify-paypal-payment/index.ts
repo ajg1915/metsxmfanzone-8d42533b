@@ -78,10 +78,10 @@ Deno.serve(async (req) => {
       throw new Error('Payment capture failed');
     }
 
-    // Fetch subscription and verify user owns it
+    // Fetch subscription with only needed fields - never expose payment IDs
     const { data: subscription } = await supabase
       .from('subscriptions')
-      .select('*')
+      .select('id, user_id, plan_type, status, amount, currency, start_date, end_date')
       .eq('paypal_order_id', orderId)
       .single();
 
@@ -144,8 +144,18 @@ Deno.serve(async (req) => {
       // Don't fail the payment if email fails
     }
 
+    // Return only safe subscription data - never expose payment IDs
     return new Response(
-      JSON.stringify({ success: true, subscription }),
+      JSON.stringify({ 
+        success: true, 
+        subscription: {
+          id: subscription.id,
+          plan_type: subscription.plan_type,
+          status: 'active',
+          start_date: startDate.toISOString(),
+          end_date: endDate.toISOString(),
+        }
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
