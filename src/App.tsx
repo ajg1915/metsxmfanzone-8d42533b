@@ -131,6 +131,7 @@ const DailyReports = lazy(() => import("./pages/admin/DailyReports"));
 const PredictionsManagement = lazy(() => import("./pages/admin/PredictionsManagement"));
 const TalentAssessmentManagement = lazy(() => import("./pages/admin/TalentAssessmentManagement"));
 const PollManagement = lazy(() => import("./pages/admin/PollManagement"));
+const SocialMediaSettings = lazy(() => import("./pages/admin/SocialMediaSettings"));
 const WhatsNew = lazy(() => import("./pages/WhatsNew"));
 const Install = lazy(() => import("./pages/Install"));
 const MetsVsAstros = lazy(() => import("./pages/matchups/MetsVsAstros"));
@@ -375,6 +376,7 @@ const AppContent = () => {
               <Route path="talent-assessments" element={<TalentAssessmentManagement />} />
               <Route path="polls" element={<PollManagement />} />
               <Route path="settings" element={<AdminSettings />} />
+              <Route path="social-media" element={<SocialMediaSettings />} />
               <Route path="tutorials" element={<TutorialManagement />} />
             </Route>
             {/* Writer Portal Routes */}
