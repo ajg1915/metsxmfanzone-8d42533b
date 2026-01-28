@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Edit, Eye, EyeOff, Image as ImageIcon, Video, Sparkles, Download, FileText, Link2 } from "lucide-react";
+import { Plus, Trash2, Edit, Eye, EyeOff, Image as ImageIcon, Video, Sparkles, Download, FileText, Link2, Share2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { validateFile, generateSafeFilename, FileType } from "@/utils/fileValidation";
+import { SocialShareDialog } from "@/components/SocialShareDialog";
 
 interface BlogPost {
   id: string;
@@ -73,6 +74,8 @@ const StoriesManagement = () => {
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareStory, setShareStory] = useState<Story | null>(null);
 
   useEffect(() => {
     fetchStories();
@@ -813,7 +816,7 @@ const StoriesManagement = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     variant="outline"
                     size="sm"
@@ -821,6 +824,14 @@ const StoriesManagement = () => {
                   >
                     <Edit className="w-4 h-4 mr-1" />
                     Edit
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => { setShareStory(story); setShareDialogOpen(true); }}
+                  >
+                    <Share2 className="w-4 h-4 mr-1" />
+                    Share
                   </Button>
                   <Button
                     variant="destructive"
@@ -843,6 +854,15 @@ const StoriesManagement = () => {
             No stories yet. Create your first story!
           </CardContent>
         </Card>
+      )}
+      {shareStory && (
+        <SocialShareDialog
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+          storyId={shareStory.id}
+          storyTitle={shareStory.title}
+          mediaUrl={shareStory.media_url}
+        />
       )}
     </div>
   );

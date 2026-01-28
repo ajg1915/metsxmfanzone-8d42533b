@@ -98,3 +98,18 @@ verify_jwt = false
 
 [functions.fetch-mets-highlights]
 verify_jwt = false
+
+[functions.post-to-facebook]
+verify_jwt = false
+
+[functions.post-to-instagram]
+verify_jwt = false
+
+[functions.post-to-twitter]
+verify_jwt = false
+
+[functions.post-to-tiktok]
+verify_jwt = false
+
+[functions.social-media-oauth-callback]
+verify_jwt = false

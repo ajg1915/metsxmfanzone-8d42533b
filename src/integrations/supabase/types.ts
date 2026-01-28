@@ -1287,6 +1287,104 @@ export type Database = {
         }
         Relationships: []
       }
+      social_media_connections: {
+        Row: {
+          access_token: string
+          account_username: string | null
+          connected_at: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          page_id: string | null
+          page_name: string | null
+          platform: string
+          refresh_token: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          account_username?: string | null
+          connected_at?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          page_id?: string | null
+          page_name?: string | null
+          platform: string
+          refresh_token?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          account_username?: string | null
+          connected_at?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          page_id?: string | null
+          page_name?: string | null
+          platform?: string
+          refresh_token?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      social_media_posts: {
+        Row: {
+          caption: string | null
+          created_at: string
+          error_message: string | null
+          external_post_id: string | null
+          external_post_url: string | null
+          id: string
+          platform: string
+          posted_at: string | null
+          status: string
+          story_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          error_message?: string | null
+          external_post_id?: string | null
+          external_post_url?: string | null
+          id?: string
+          platform: string
+          posted_at?: string | null
+          status?: string
+          story_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          error_message?: string | null
+          external_post_id?: string | null
+          external_post_url?: string | null
+          id?: string
+          platform?: string
+          posted_at?: string | null
+          status?: string
+          story_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_media_posts_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       spring_training_games: {
         Row: {
           created_at: string | null

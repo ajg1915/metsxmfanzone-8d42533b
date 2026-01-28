@@ -3,7 +3,7 @@ import {
   MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, 
   Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, 
   Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers, Sparkles, 
-  Tv, Newspaper, ClipboardList, Star, BarChart3
+  Tv, Newspaper, ClipboardList, Star, BarChart3, Share2
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -45,6 +45,7 @@ const mediaItems = [
 // Settings items (moved to prominent position)
 const settingsNavItems = [
   { title: "Admin Settings", url: "/admin/settings", icon: Settings },
+  { title: "Social Media", url: "/admin/social-media", icon: Share2 },
   { title: "News Tracker", url: "/admin/news-tracker", icon: Newspaper },
   { title: "TV Schedule", url: "/admin/tv-schedule", icon: Tv },
 ];
