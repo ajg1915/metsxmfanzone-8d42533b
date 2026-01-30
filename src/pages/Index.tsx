@@ -28,6 +28,7 @@ const StoriesSection = lazy(() => import("@/components/StoriesSection"));
 const FAQSection = lazy(() => import("@/components/FAQSection"));
 const TestimonialsSection = lazy(() => import("@/components/TestimonialsSection"));
 const AppInstallSection = lazy(() => import("@/components/AppInstallSection"));
+const CommunityPreviewSection = lazy(() => import("@/components/CommunityPreviewSection"));
 const InstallPrompt = lazy(() => import("@/components/InstallPrompt"));
 const OnboardingWalkthrough = lazy(() => import("@/components/OnboardingWalkthrough"));
 const NotificationPrompt = lazy(() => import("@/components/NotificationPrompt"));
@@ -206,6 +207,12 @@ const Index = () => {
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal>
+            <CommunityPreviewSection />
+          </ScrollReveal>
+        </Suspense>
 
         <Suspense fallback={<SectionSkeleton height="h-48" />}>
           <ScrollReveal delay={100}>
