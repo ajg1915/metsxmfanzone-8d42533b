@@ -172,6 +172,14 @@ const Navigation = () => {
             >
               Events
             </button>
+            {user && (
+              <button
+                onClick={() => navigate("/mets-roster")}
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Roster
+              </button>
+            )}
             {!user && (
               <NavLink 
                 to="/plans" 
@@ -322,6 +330,18 @@ const Navigation = () => {
                     <CalendarDays className="w-5 h-5 text-orange-500" />
                     Events
                   </button>
+                  {user && (
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/mets-roster");
+                      }}
+                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
+                    >
+                      <Users className="w-5 h-5 text-primary" />
+                      Roster
+                    </button>
+                  )}
                   {!user && (
                     <NavLink 
                       to="/plans" 

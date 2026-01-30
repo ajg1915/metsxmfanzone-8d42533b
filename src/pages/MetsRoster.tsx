@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -6,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Search, RefreshCw, User } from "lucide-react";
+import { Search, RefreshCw, User, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import rosterLogo from "@/assets/metsxmfanzone-logo-roster.png";
@@ -48,6 +49,7 @@ interface RosterData {
 const METS_TEAM_ID = 121; // MLB team ID for New York Mets
 
 const MetsRoster = () => {
+  const navigate = useNavigate();
   const [rosterData, setRosterData] = useState<RosterData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -309,7 +311,8 @@ const MetsRoster = () => {
                     {filteredPlayers.map((player) => (
                       <Card
                         key={player.id}
-                        className="overflow-hidden hover:border-primary/50 transition-colors group"
+                        className="overflow-hidden hover:border-primary/50 transition-colors group cursor-pointer"
+                        onClick={() => navigate(`/player/${player.id}`)}
                       >
                         <CardContent className="p-4">
                           <div className="flex items-start gap-4">
@@ -340,9 +343,12 @@ const MetsRoster = () => {
                             
                             {/* Player Info */}
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
-                                {player.fullName}
-                              </h3>
+                              <div className="flex items-center justify-between">
+                                <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                                  {player.fullName}
+                                </h3>
+                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+                              </div>
                               
                               <div className="flex items-center gap-2 mt-1">
                                 <Badge
