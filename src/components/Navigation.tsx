@@ -160,6 +160,14 @@ const Navigation = () => {
             >
               Blog
             </button>
+            {user && (
+              <button
+                onClick={() => navigate("/mets-roster")}
+                className="text-foreground hover:text-primary transition-colors"
+              >
+                Roster
+              </button>
+            )}
             <button
               onClick={() => handleProtectedNavigation("/podcast")}
               className="text-foreground hover:text-primary transition-colors"
@@ -172,14 +180,6 @@ const Navigation = () => {
             >
               Events
             </button>
-            {user && (
-              <button
-                onClick={() => navigate("/mets-roster")}
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                Roster
-              </button>
-            )}
             {!user && (
               <NavLink 
                 to="/plans" 
@@ -310,6 +310,18 @@ const Navigation = () => {
                     <img src={logo} alt="" className="w-5 h-5 object-contain" />
                     Blog
                   </button>
+                  {user && (
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/mets-roster");
+                      }}
+                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
+                    >
+                      <Users className="w-5 h-5 text-primary" />
+                      Roster
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
@@ -330,18 +342,6 @@ const Navigation = () => {
                     <CalendarDays className="w-5 h-5 text-orange-500" />
                     Events
                   </button>
-                  {user && (
-                    <button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        navigate("/mets-roster");
-                      }}
-                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                    >
-                      <Users className="w-5 h-5 text-primary" />
-                      Roster
-                    </button>
-                  )}
                   {!user && (
                     <NavLink 
                       to="/plans" 
