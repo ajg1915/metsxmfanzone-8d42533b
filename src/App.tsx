@@ -86,6 +86,7 @@ const SocialMediaHub = lazy(() => import("./pages/SocialMediaHub"));
 const NLScores = lazy(() => import("./pages/NLScores"));
 const Events = lazy(() => import("./pages/Events"));
 const MetsRoster = lazy(() => import("./pages/MetsRoster"));
+const PlayerStats = lazy(() => import("./pages/PlayerStats"));
 const MetsHistory = lazy(() => import("./pages/MetsHistory"));
 const EventsManagement = lazy(() => import("./pages/admin/EventsManagement"));
 const SpringTrainingManagement = lazy(() => import("./pages/admin/SpringTrainingManagement"));
@@ -395,6 +396,7 @@ const AppContent = () => {
             <Route path="/nl-scores" element={<NLScores />} />
             <Route path="/events" element={<Events />} />
             <Route path="/mets-roster" element={<MetsRoster />} />
+            <Route path="/player/:playerId" element={<PlayerStats />} />
             <Route path="/mets-history" element={<MetsHistory />} />
             <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
             <Route path="/mlb-network" element={<MLBNetwork />} />
