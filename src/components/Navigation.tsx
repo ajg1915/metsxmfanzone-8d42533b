@@ -157,49 +157,62 @@ const Navigation = () => {
               </button>
             )}
             
-            {/* TV Schedule Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+            {/* TV Schedule Dropdown - Hover Based */}
+            <div className="relative group">
+              <button className="text-foreground hover:text-primary transition-colors py-2">
                 TV Schedule
-                <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 10 6">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
-                </svg>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-background z-50 min-w-[160px]">
-                <DropdownMenuItem onClick={() => navigate("/broadcast-schedule")}>
-                  <Tv className="w-4 h-4 mr-2" />
-                  Broadcast Schedule
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleProtectedNavigation("/spring-training-live")}>
-                  <CalendarDays className="w-4 h-4 mr-2" />
-                  Spring Training
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </button>
+              <div className="absolute left-0 top-full pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="bg-background border border-border rounded-lg shadow-lg min-w-[160px] py-1">
+                  <button
+                    onClick={() => navigate("/broadcast-schedule")}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  >
+                    <Tv className="w-4 h-4" />
+                    Broadcast Schedule
+                  </button>
+                  <button
+                    onClick={() => handleProtectedNavigation("/spring-training-live")}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  >
+                    <CalendarDays className="w-4 h-4" />
+                    Spring Training
+                  </button>
+                </div>
+              </div>
+            </div>
 
-            {/* Community Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+            {/* Community Dropdown - Hover Based */}
+            <div className="relative group">
+              <button className="text-foreground hover:text-primary transition-colors py-2">
                 Community
-                <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 10 6">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
-                </svg>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-background z-50 min-w-[160px]">
-                <DropdownMenuItem onClick={() => handleProtectedNavigation("/community")}>
-                  <Users className="w-4 h-4 mr-2" />
-                  Fan Community
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleProtectedNavigation("/events")}>
-                  <CalendarDays className="w-4 h-4 mr-2" />
-                  Events
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleProtectedNavigation("/blog")}>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Blog
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </button>
+              <div className="absolute left-0 top-full pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="bg-background border border-border rounded-lg shadow-lg min-w-[160px] py-1">
+                  <button
+                    onClick={() => handleProtectedNavigation("/community")}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  >
+                    <Users className="w-4 h-4" />
+                    Fan Community
+                  </button>
+                  <button
+                    onClick={() => handleProtectedNavigation("/events")}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  >
+                    <CalendarDays className="w-4 h-4" />
+                    Events
+                  </button>
+                  <button
+                    onClick={() => handleProtectedNavigation("/blog")}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Blog
+                  </button>
+                </div>
+              </div>
+            </div>
 
             {!user && (
               <NavLink 
