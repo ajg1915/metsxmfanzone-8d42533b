@@ -276,63 +276,97 @@ const CommunityPreviewSection = () => {
               <FileText className="w-5 h-5 text-secondary" />
               Latest Articles
             </h3>
-            <div className="space-y-3">
-              {recentBlogs.length > 0 ? (
-                recentBlogs.map((blog, index) => (
-                  <motion.div
-                    key={blog.id}
-                    initial={{ opacity: 0, y: 15 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.05 }}
-                    onClick={() => navigate(`/blog/${blog.slug}`)}
-                    className="cursor-pointer group glass-card hover-lift glow-blue rounded-lg overflow-hidden"
-                  >
-                    <div className="flex gap-3 p-2.5">
-                      {/* Thumbnail - same size as other sections */}
-                      {blog.featured_image_url ? (
-                        <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted">
-                          <img 
-                            src={blog.featured_image_url} 
-                            alt={blog.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-20 h-20 flex-shrink-0 rounded-md bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                          <FileText className="w-8 h-8 text-primary/50" />
-                        </div>
-                      )}
-                      
-                      {/* Content */}
-                      <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                        <div>
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 mb-1 bg-muted text-muted-foreground border-0">
-                            Blog
-                          </Badge>
+            {recentBlogs.length > 0 ? (
+              <>
+                {/* Featured First Article */}
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  onClick={() => navigate(`/blog/${recentBlogs[0].slug}`)}
+                  className="cursor-pointer group glass-card hover-lift glow-blue rounded-xl overflow-hidden"
+                >
+                  {recentBlogs[0].featured_image_url && (
+                    <div className="relative aspect-video overflow-hidden">
+                      <img 
+                        src={recentBlogs[0].featured_image_url} 
+                        alt={recentBlogs[0].title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      <Badge className="absolute top-3 left-3 bg-secondary text-secondary-foreground">
+                        Featured
+                      </Badge>
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                      {recentBlogs[0].title}
+                    </h4>
+                    {recentBlogs[0].excerpt && (
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                        {recentBlogs[0].excerpt}
+                      </p>
+                    )}
+                    {recentBlogs[0].published_at && (
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <FileText className="w-3 h-3" />
+                        <span>{formatTimeAgo(recentBlogs[0].published_at)}</span>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+
+                {/* Remaining Articles - Compact */}
+                <div className="space-y-2">
+                  {recentBlogs.slice(1).map((blog, index) => (
+                    <motion.div
+                      key={blog.id}
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={() => navigate(`/blog/${blog.slug}`)}
+                      className="cursor-pointer group glass-card hover-lift rounded-lg overflow-hidden"
+                    >
+                      <div className="flex gap-3 p-2.5">
+                        {blog.featured_image_url ? (
+                          <div className="relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-muted">
+                            <img 
+                              src={blog.featured_image_url} 
+                              alt={blog.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-16 h-16 flex-shrink-0 rounded-md bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                            <FileText className="w-6 h-6 text-primary/50" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
                           <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
                             {blog.title}
                           </h4>
+                          {blog.published_at && (
+                            <div className="flex items-center gap-1 text-[10px] text-muted-foreground mt-1">
+                              <FileText className="w-2.5 h-2.5" />
+                              <span>{formatTimeAgo(blog.published_at)}</span>
+                            </div>
+                          )}
                         </div>
-                        {blog.published_at && (
-                          <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
-                            <FileText className="w-3 h-3" />
-                            <span>{formatTimeAgo(blog.published_at)}</span>
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  </motion.div>
-                ))
-              ) : (
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-                  <CardContent className="p-6 text-center">
-                    <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground text-sm">No articles yet</p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                <CardContent className="p-6 text-center">
+                  <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-muted-foreground text-sm">No articles yet</p>
+                </CardContent>
+              </Card>
+            )}
 
             {/* CTA Card */}
             <Card className="bg-gradient-to-br from-primary/20 to-secondary/20 border-primary/30">
