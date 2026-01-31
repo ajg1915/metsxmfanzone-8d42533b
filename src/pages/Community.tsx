@@ -604,53 +604,45 @@ const Community = () => {
                       </Button>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      {/* Social media style layout - thumbnail + text side by side */}
-                      <div className={`flex gap-3 ${item.image_url ? '' : ''}`}>
-                        {/* Thumbnail - compact square like social shares */}
-                        {item.image_url && (
-                          <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
-                            <img
-                              src={item.image_url}
-                              alt="Post"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        
-                        {/* Text content */}
-                        <div className="flex-1 min-w-0">
-                          {editingPostId === item.id ? (
-                            <div className="space-y-3">
-                              <Textarea
-                                value={editContent}
-                                onChange={(e) => setEditContent(e.target.value)}
-                                className="min-h-[80px]"
-                              />
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleSaveEdit(item.id)}
-                                >
-                                  <Check className="w-4 h-4 mr-1" />
-                                  Save
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={handleCancelEdit}
-                                >
-                                  <X className="w-4 h-4 mr-1" />
-                                  Cancel
-                                </Button>
-                              </div>
-                            </div>
-                          ) : (
-                            item.content && (
-                              <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-4">{item.content}</p>
-                            )
-                          )}
+                    <div className="flex gap-3">
+                      {/* Thumbnail - same size as Latest News cards */}
+                      {item.image_url && (
+                        <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted">
+                          <img
+                            src={item.image_url}
+                            alt="Post"
+                            className="w-full h-full object-cover"
+                          />
                         </div>
+                      )}
+                      
+                      {/* Content */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                        {editingPostId === item.id ? (
+                          <div className="space-y-2">
+                            <Textarea
+                              value={editContent}
+                              onChange={(e) => setEditContent(e.target.value)}
+                              className="min-h-[60px] text-sm"
+                            />
+                            <div className="flex items-center gap-2">
+                              <Button size="sm" onClick={() => handleSaveEdit(item.id)}>
+                                <Check className="w-3 h-3 mr-1" />
+                                Save
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                                <X className="w-3 h-3 mr-1" />
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            {item.content && (
+                              <p className="text-sm text-foreground line-clamp-3 leading-snug">{item.content}</p>
+                            )}
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
