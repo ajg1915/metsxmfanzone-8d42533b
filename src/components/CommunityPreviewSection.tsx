@@ -216,13 +216,23 @@ const CommunityPreviewSection = () => {
                     transition={{ delay: index * 0.1 }}
                   >
                     <Card 
-                      className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all cursor-pointer group"
+                      className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all cursor-pointer group overflow-hidden"
                       onClick={() => navigate("/community")}
                     >
+                      {/* Show image prominently first if present */}
+                      {post.image_url && (
+                        <div className="w-full h-40 overflow-hidden">
+                          <img 
+                            src={post.image_url} 
+                            alt="Post" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
-                          <Avatar className="w-10 h-10 flex-shrink-0">
-                            <AvatarFallback className="bg-primary/10 text-primary">
+                          <Avatar className="w-8 h-8 flex-shrink-0">
+                            <AvatarFallback className="bg-primary/10 text-primary text-xs">
                               {post.isAdmin ? "A" : (post.profiles?.full_name?.[0] || "U")}
                             </AvatarFallback>
                           </Avatar>
@@ -235,17 +245,10 @@ const CommunityPreviewSection = () => {
                                 {formatTimeAgo(post.created_at)}
                               </span>
                             </div>
-                            <p className="text-sm text-muted-foreground line-clamp-2">
-                              {post.content}
-                            </p>
-                            {post.image_url && (
-                              <div className="mt-2 rounded-lg overflow-hidden h-20 w-32">
-                                <img 
-                                  src={post.image_url} 
-                                  alt="Post" 
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
+                            {post.content && (
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                {post.content}
+                              </p>
                             )}
                           </div>
                           <Heart className="w-4 h-4 text-muted-foreground group-hover:text-red-500 transition-colors flex-shrink-0" />
