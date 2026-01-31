@@ -934,6 +934,7 @@ export type Database = {
           show_type: string
           thumbnail_colors: Json | null
           thumbnail_gradient: string | null
+          thumbnail_url: string | null
           title: string
           updated_at: string
         }
@@ -948,6 +949,7 @@ export type Database = {
           show_type?: string
           thumbnail_colors?: Json | null
           thumbnail_gradient?: string | null
+          thumbnail_url?: string | null
           title: string
           updated_at?: string
         }
@@ -962,6 +964,7 @@ export type Database = {
           show_type?: string
           thumbnail_colors?: Json | null
           thumbnail_gradient?: string | null
+          thumbnail_url?: string | null
           title?: string
           updated_at?: string
         }

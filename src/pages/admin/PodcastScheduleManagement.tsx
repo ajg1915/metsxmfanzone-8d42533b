@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Loader2, Wand2, Calendar, Clock, Sparkles, Radio, RefreshCw } from "lucide-react";
+import { Trash2, Loader2, Wand2, Calendar, Clock, Sparkles, Radio, RefreshCw, Upload, Image } from "lucide-react";
 import { format } from "date-fns";
 
 interface PodcastShow {
@@ -19,6 +19,7 @@ interface PodcastShow {
   show_date: string;
   show_type: string;
   thumbnail_gradient: string | null;
+  thumbnail_url: string | null;
   thumbnail_colors: unknown;
   is_featured: boolean;
   is_live: boolean;
@@ -59,22 +60,22 @@ const DESCRIPTIONS = [
   "Comprehensive coverage of today's most talked-about Mets topics.",
 ];
 
-// Color palettes for AI-generated thumbnails
-const COLOR_PALETTES = [
-  { name: "Mets Classic", colors: ["#002D72", "#FF5910", "#FFFFFF"], gradient: "from-[#002D72] via-[#003087] to-[#FF5910]" },
-  { name: "Sunset Orange", colors: ["#FF5910", "#FF8C00", "#FFD700"], gradient: "from-[#FF5910] via-[#FF8C00] to-[#FFD700]" },
-  { name: "Royal Blue", colors: ["#002D72", "#0047AB", "#6495ED"], gradient: "from-[#002D72] via-[#0047AB] to-[#6495ED]" },
-  { name: "Night Game", colors: ["#1a1a2e", "#16213e", "#0f3460"], gradient: "from-[#1a1a2e] via-[#16213e] to-[#0f3460]" },
-  { name: "Electric", colors: ["#6366f1", "#8b5cf6", "#a855f7"], gradient: "from-[#6366f1] via-[#8b5cf6] to-[#a855f7]" },
-  { name: "Fire", colors: ["#dc2626", "#f97316", "#fbbf24"], gradient: "from-[#dc2626] via-[#f97316] to-[#fbbf24]" },
-  { name: "Ocean", colors: ["#0ea5e9", "#06b6d4", "#14b8a6"], gradient: "from-[#0ea5e9] via-[#06b6d4] to-[#14b8a6]" },
-  { name: "Neon", colors: ["#f43f5e", "#ec4899", "#d946ef"], gradient: "from-[#f43f5e] via-[#ec4899] to-[#d946ef]" },
+// AI Image prompts for podcast thumbnails
+const IMAGE_PROMPTS = [
+  "New York Mets baseball podcast show artwork, orange and blue colors, microphone and baseball, professional sports media design, dynamic composition",
+  "Mets fan podcast thumbnail, Citi Field stadium background, baseball and headphones, blue and orange theme, broadcast style",
+  "Baseball talk show artwork, New York Mets colors, exciting sports podcast design, modern and energetic",
+  "Mets baseball discussion show art, podcast microphone with baseball, orange and blue gradient, professional sports media",
+  "Live sports podcast thumbnail, New York Mets theme, baseball diamond and microphone, dynamic sports broadcasting style",
 ];
 
 export default function PodcastScheduleManagement() {
   const [shows, setShows] = useState<PodcastShow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [generatingImage, setGeneratingImage] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -83,8 +84,7 @@ export default function PodcastScheduleManagement() {
     show_date: "",
     show_time: "17:30",
     show_type: "regular",
-    thumbnail_gradient: COLOR_PALETTES[0].gradient,
-    thumbnail_colors: COLOR_PALETTES[0].colors,
+    thumbnail_url: "",
     is_featured: false,
     published: true,
   });
@@ -118,45 +118,115 @@ export default function PodcastScheduleManagement() {
     toast({ title: "AI Generated!", description: "Title and description created" });
   };
 
-  const generateAIColors = () => {
-    const palette = COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
-    setFormData(prev => ({
-      ...prev,
-      thumbnail_gradient: palette.gradient,
-      thumbnail_colors: palette.colors,
-    }));
-    toast({ title: "AI Generated!", description: `Using "${palette.name}" color palette` });
+  const generateAIImage = async () => {
+    setGeneratingImage(true);
+    try {
+      const prompt = IMAGE_PROMPTS[Math.floor(Math.random() * IMAGE_PROMPTS.length)];
+      
+      const { data, error } = await supabase.functions.invoke('generate-ai-image', {
+        body: { prompt }
+      });
+
+      if (error) throw error;
+
+      if (data?.imageUrl) {
+        // Upload the base64 image to storage
+        const base64Data = data.imageUrl.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/png' });
+
+        const fileName = `podcast-thumbnail-${Date.now()}.png`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('content_uploads')
+          .upload(`podcast-thumbnails/${fileName}`, blob);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from('content_uploads')
+          .getPublicUrl(`podcast-thumbnails/${fileName}`);
+
+        setFormData(prev => ({ ...prev, thumbnail_url: urlData.publicUrl }));
+        toast({ title: "AI Image Generated!", description: "Thumbnail created successfully" });
+      }
+    } catch (error) {
+      console.error('Error generating AI image:', error);
+      toast({ 
+        title: "Error generating image", 
+        description: error instanceof Error ? error.message : "Failed to generate image", 
+        variant: "destructive" 
+      });
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      toast({ title: "Invalid file", description: "Please upload an image file", variant: "destructive" });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Maximum file size is 5MB", variant: "destructive" });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileName = `podcast-thumbnail-${Date.now()}.${file.name.split('.').pop()}`;
+      const { data, error } = await supabase.storage
+        .from('content_uploads')
+        .upload(`podcast-thumbnails/${fileName}`, file);
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('content_uploads')
+        .getPublicUrl(`podcast-thumbnails/${fileName}`);
+
+      setFormData(prev => ({ ...prev, thumbnail_url: urlData.publicUrl }));
+      toast({ title: "Image uploaded!", description: "Thumbnail uploaded successfully" });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({ 
+        title: "Upload failed", 
+        description: error instanceof Error ? error.message : "Failed to upload image", 
+        variant: "destructive" 
+      });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const generateFullShow = async () => {
     setGenerating(true);
     
-    // Generate everything
+    // Generate title and description
     const template = TITLE_TEMPLATES[Math.floor(Math.random() * TITLE_TEMPLATES.length)];
     const topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
     const title = template.replace("{topic}", topic);
     const description = DESCRIPTIONS[Math.floor(Math.random() * DESCRIPTIONS.length)];
-    const palette = COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
     
-    // Set next available show date based on schedule
+    // Set next available show date
     const now = new Date();
     let nextShowDate = new Date(now);
-    
-    // Find next Monday, Tuesday, Friday, or Weekend
     const dayOfWeek = now.getDay();
     const daysUntilNext: Record<number, number> = {
-      0: 1, // Sunday -> Monday
-      1: 0, // Monday -> Today
-      2: 0, // Tuesday -> Today
-      3: 2, // Wednesday -> Friday
-      4: 1, // Thursday -> Friday
-      5: 0, // Friday -> Today
-      6: 0, // Saturday -> Today
+      0: 1, 1: 0, 2: 0, 3: 2, 4: 1, 5: 0, 6: 0,
     };
-    
     nextShowDate.setDate(now.getDate() + daysUntilNext[dayOfWeek]);
     
-    // Set time based on day
     const isWeekend = nextShowDate.getDay() === 0 || nextShowDate.getDay() === 6;
     const showTime = isWeekend ? "14:00" : "17:30";
     
@@ -166,14 +236,46 @@ export default function PodcastScheduleManagement() {
       show_date: format(nextShowDate, "yyyy-MM-dd"),
       show_time: showTime,
       show_type: isWeekend ? "weekend" : "regular",
-      thumbnail_gradient: palette.gradient,
-      thumbnail_colors: palette.colors,
+      thumbnail_url: "",
       is_featured: false,
       published: true,
     });
 
+    // Generate AI image
+    try {
+      const prompt = IMAGE_PROMPTS[Math.floor(Math.random() * IMAGE_PROMPTS.length)];
+      const { data, error } = await supabase.functions.invoke('generate-ai-image', {
+        body: { prompt }
+      });
+
+      if (!error && data?.imageUrl) {
+        const base64Data = data.imageUrl.split(',')[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/png' });
+
+        const fileName = `podcast-thumbnail-${Date.now()}.png`;
+        const { error: uploadError } = await supabase.storage
+          .from('content_uploads')
+          .upload(`podcast-thumbnails/${fileName}`, blob);
+
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage
+            .from('content_uploads')
+            .getPublicUrl(`podcast-thumbnails/${fileName}`);
+          setFormData(prev => ({ ...prev, thumbnail_url: urlData.publicUrl }));
+        }
+      }
+    } catch (error) {
+      console.error('Error generating AI image:', error);
+    }
+
     setGenerating(false);
-    toast({ title: "Full Show Generated!", description: `"${title}" with ${palette.name} theme` });
+    toast({ title: "Full Show Generated!", description: `"${title}" with AI thumbnail` });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -186,8 +288,7 @@ export default function PodcastScheduleManagement() {
       description: formData.description,
       show_date: showDateTime.toISOString(),
       show_type: formData.show_type,
-      thumbnail_gradient: formData.thumbnail_gradient,
-      thumbnail_colors: formData.thumbnail_colors,
+      thumbnail_url: formData.thumbnail_url || null,
       is_featured: formData.is_featured,
       published: formData.published,
     });
@@ -202,8 +303,7 @@ export default function PodcastScheduleManagement() {
         show_date: "",
         show_time: "17:30",
         show_type: "regular",
-        thumbnail_gradient: COLOR_PALETTES[0].gradient,
-        thumbnail_colors: COLOR_PALETTES[0].colors,
+        thumbnail_url: "",
         is_featured: false,
         published: true,
       });
@@ -225,7 +325,6 @@ export default function PodcastScheduleManagement() {
   };
 
   const toggleLive = async (id: string, current: boolean) => {
-    // First, set all shows to not live
     if (!current) {
       await supabase.from("podcast_shows").update({ is_live: false }).neq("id", "none");
     }
@@ -366,35 +465,71 @@ export default function PodcastScheduleManagement() {
               </Select>
             </div>
 
-            {/* Thumbnail Colors */}
-            <div className="space-y-2">
+            {/* Thumbnail Section */}
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label>Thumbnail Colors (AI Fan Art)</Label>
-                <Button type="button" variant="ghost" size="sm" onClick={generateAIColors} className="h-7 text-xs">
-                  <Wand2 className="w-3 h-3 mr-1" />
-                  AI Colors
-                </Button>
+                <Label>Show Thumbnail</Label>
+                <div className="flex gap-2">
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={generateAIImage} 
+                    disabled={generatingImage}
+                    className="h-7 text-xs"
+                  >
+                    {generatingImage ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Wand2 className="w-3 h-3 mr-1" />}
+                    AI Image
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="h-7 text-xs"
+                  >
+                    {uploading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Upload className="w-3 h-3 mr-1" />}
+                    Upload
+                  </Button>
+                </div>
               </div>
               
-              {/* Preview */}
-              <div className={`h-20 rounded-lg bg-gradient-to-br ${formData.thumbnail_gradient} flex items-center justify-center`}>
-                <span className="text-white font-bold text-sm drop-shadow-lg">Preview</span>
-              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
               
-              {/* Color Palette Selection */}
-              <div className="grid grid-cols-4 gap-2">
-                {COLOR_PALETTES.map((palette) => (
-                  <button
-                    key={palette.name}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, thumbnail_gradient: palette.gradient, thumbnail_colors: palette.colors })}
-                    className={`h-8 rounded bg-gradient-to-r ${palette.gradient} border-2 transition-all ${
-                      formData.thumbnail_gradient === palette.gradient ? "border-white ring-2 ring-primary" : "border-transparent"
-                    }`}
-                    title={palette.name}
+              {/* Thumbnail Preview */}
+              <div className="h-32 rounded-lg border-2 border-dashed border-muted-foreground/30 flex items-center justify-center overflow-hidden bg-muted/20">
+                {formData.thumbnail_url ? (
+                  <img 
+                    src={formData.thumbnail_url} 
+                    alt="Thumbnail preview" 
+                    className="w-full h-full object-cover"
                   />
-                ))}
+                ) : (
+                  <div className="text-center text-muted-foreground">
+                    <Image className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-xs">Generate or upload a thumbnail</p>
+                  </div>
+                )}
               </div>
+
+              {formData.thumbnail_url && (
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setFormData(prev => ({ ...prev, thumbnail_url: "" }))}
+                  className="text-xs text-destructive"
+                >
+                  Remove Thumbnail
+                </Button>
+              )}
             </div>
 
             {/* Toggles */}
@@ -443,9 +578,19 @@ export default function PodcastScheduleManagement() {
                   className="flex gap-3 p-3 border rounded-lg bg-card"
                 >
                   {/* Thumbnail Preview */}
-                  <div className={`w-20 h-16 rounded-lg bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'} flex items-center justify-center flex-shrink-0`}>
-                    {show.is_live && (
-                      <Badge className="bg-red-500 text-white text-[10px] animate-pulse">LIVE</Badge>
+                  <div className="w-20 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                    {show.thumbnail_url ? (
+                      <img 
+                        src={show.thumbnail_url} 
+                        alt={show.title} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className={`w-full h-full bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'} flex items-center justify-center`}>
+                        {show.is_live && (
+                          <Badge className="bg-red-500 text-white text-[10px] animate-pulse">LIVE</Badge>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -464,6 +609,9 @@ export default function PodcastScheduleManagement() {
                           </Badge>
                           {show.is_featured && (
                             <Badge className="bg-orange-500 text-[10px] h-5">Featured</Badge>
+                          )}
+                          {show.is_live && (
+                            <Badge className="bg-red-500 text-[10px] h-5 animate-pulse">LIVE</Badge>
                           )}
                         </div>
                       </div>
