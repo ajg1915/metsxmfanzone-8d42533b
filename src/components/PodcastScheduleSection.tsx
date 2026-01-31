@@ -179,22 +179,22 @@ const PodcastScheduleSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 sm:mb-10"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-2 rounded-xl glass-card">
-              <img src={logo} alt="MetsXMFanZone" className="w-8 h-8" />
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl glass-card">
+              <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
               Live Podcast Schedule
             </h2>
             {isLiveNow && (
-              <Badge className="bg-red-500 text-white animate-pulse">
-                <Radio className="w-3 h-3 mr-1" />
+              <Badge className="bg-red-500 text-white animate-pulse text-[10px] sm:text-xs">
+                <Radio className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                 LIVE NOW
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
-            Catch us live on Mondays, Tuesdays & Fridays at 5:30 PM • Weekends at 2:00 PM • Game days with special pregame shows!
+          <p className="text-muted-foreground max-w-xl sm:max-w-2xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed px-2">
+            Catch us live on Mon, Tue & Fri @ 5:30 PM • Weekends @ 2:00 PM • Game day pregame shows!
           </p>
         </motion.div>
 
@@ -242,7 +242,7 @@ const PodcastScheduleSection = () => {
             >
               <GlassCard variant="interactive" glow="blue" className="h-full overflow-hidden">
                 {/* Thumbnail - AI Image or Gradient Fallback */}
-                <div className="relative h-28 sm:h-32 overflow-hidden">
+                <div className="relative h-24 sm:h-28 md:h-32 overflow-hidden">
                   {show.thumbnail_url ? (
                     <img 
                       src={show.thumbnail_url} 
@@ -254,45 +254,45 @@ const PodcastScheduleSection = () => {
                   )}
                   
                   {/* Overlay Content */}
-                  <div className="absolute inset-0 p-3 sm:p-4 flex flex-col justify-between">
-                    <div className="flex items-start justify-between">
-                      <Badge className="bg-black/40 text-white border-0 text-[10px] sm:text-xs">
-                        {show.show_type === "weekend" ? "Weekend Show" : show.show_type === "pregame" ? "Pregame" : "Live Show"}
+                  <div className="absolute inset-0 p-2 sm:p-3 flex flex-col justify-between">
+                    <div className="flex items-start justify-between gap-1">
+                      <Badge className="bg-black/50 backdrop-blur-sm text-white border-0 text-[9px] sm:text-[10px] md:text-xs px-1.5 sm:px-2 py-0.5">
+                        {show.show_type === "weekend" ? "Weekend" : show.show_type === "pregame" ? "Pregame" : "Live"}
                       </Badge>
-                      <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 sm:w-10 sm:h-10 opacity-90 drop-shadow-lg" />
+                      <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 opacity-90 drop-shadow-lg" />
                     </div>
                     {show.is_live && (
-                      <Badge className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white animate-pulse">
-                        <Radio className="w-3 h-3 mr-1" />
+                      <Badge className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white animate-pulse text-[10px] sm:text-xs">
+                        <Radio className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                         LIVE
                       </Badge>
                     )}
                   </div>
                   
                   {/* Bottom Gradient with Date/Time */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 sm:p-3">
-                    <div className="flex items-center gap-1.5 sm:gap-2 text-white/90 text-xs sm:text-sm">
-                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span className="font-medium">{formatDate(show.show_date)}</span>
-                      <span className="mx-0.5 sm:mx-1">•</span>
-                      <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1.5 sm:p-2">
+                    <div className="flex items-center justify-center gap-1 sm:gap-1.5 text-white/95 text-[10px] sm:text-xs">
+                      <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
+                      <span className="font-medium truncate">{formatDate(show.show_date)}</span>
+                      <span className="opacity-70">•</span>
+                      <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
                       <span className="font-medium">{formatTime(show.show_date)}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Show Info */}
-                <div className="p-3 sm:p-4">
-                  <h3 className="font-bold text-foreground text-sm sm:text-lg mb-1 line-clamp-1">
+                <div className="p-2 sm:p-3">
+                  <h3 className="font-bold text-foreground text-xs sm:text-sm md:text-base mb-0.5 sm:mb-1 line-clamp-1 leading-tight">
                     {show.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
+                  <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground line-clamp-2 leading-snug">
                     {show.description}
                   </p>
 
-                  <div className="mt-2 sm:mt-3 flex items-center gap-2">
-                    <Badge variant="outline" className="text-[10px] sm:text-xs border-primary/30 text-primary">
-                      <Tv className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
+                  <div className="mt-1.5 sm:mt-2 flex items-center">
+                    <Badge variant="outline" className="text-[9px] sm:text-[10px] md:text-xs border-primary/30 text-primary px-1.5 sm:px-2 py-0.5">
+                      <Tv className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5 sm:mr-1" />
                       MetsXMFanZone
                     </Badge>
                   </div>
@@ -310,25 +310,25 @@ const PodcastScheduleSection = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="mt-6 sm:mt-8 text-center"
         >
-          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-            <Badge variant="secondary" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-primary/10 text-primary text-xs sm:text-sm">
-              <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Mon • Tue • Fri @ 5:30 PM
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 md:gap-3 mb-3 sm:mb-4 md:mb-6 px-2">
+            <Badge variant="secondary" className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 bg-primary/10 text-primary text-[10px] sm:text-xs md:text-sm">
+              <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 mr-0.5 sm:mr-1" />
+              Mon•Tue•Fri 5:30PM
             </Badge>
-            <Badge variant="secondary" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-orange-500/10 text-orange-500 text-xs sm:text-sm">
-              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Weekends @ 2:00 PM
+            <Badge variant="secondary" className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 bg-orange-500/10 text-orange-500 text-[10px] sm:text-xs md:text-sm">
+              <Zap className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 mr-0.5 sm:mr-1" />
+              Weekends 2PM
             </Badge>
-            <Badge variant="secondary" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-secondary/10 text-secondary text-xs sm:text-sm">
-              <Radio className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Game Day Pregame
+            <Badge variant="secondary" className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 bg-secondary/10 text-secondary text-[10px] sm:text-xs md:text-sm">
+              <Radio className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 mr-0.5 sm:mr-1" />
+              Pregame
             </Badge>
           </div>
 
-          <Button asChild size="lg" className="glass-card border-primary/30 hover:border-primary/50">
+          <Button asChild size="default" className="glass-card border-primary/30 hover:border-primary/50 text-xs sm:text-sm md:text-base h-9 sm:h-10 px-3 sm:px-4 md:px-6">
             <Link to="/podcast">
-              <Radio className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              View All Shows & Listen Live
+              <Radio className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+              View All Shows
             </Link>
           </Button>
         </motion.div>
