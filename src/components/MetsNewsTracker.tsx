@@ -206,13 +206,13 @@ const MetsNewsTracker = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => featuredItem.link && window.open(featuredItem.link, '_blank')}
-              className={`glass-card hover-lift glow-blue rounded-2xl overflow-hidden group mb-6 ${featuredItem.link ? 'cursor-pointer' : ''}`}
+              className={`glass-card hover-lift glow-blue rounded-xl sm:rounded-2xl overflow-hidden group mb-4 sm:mb-6 ${featuredItem.link ? 'cursor-pointer' : ''}`}
               role={featuredItem.link ? "button" : undefined}
               tabIndex={featuredItem.link ? 0 : undefined}
               onKeyDown={(e) => e.key === 'Enter' && featuredItem.link && window.open(featuredItem.link, '_blank')}
             >
-              <div className="md:flex">
-                <div className="relative md:w-1/3 aspect-video md:aspect-auto">
+              <div className="flex flex-col md:flex-row">
+                <div className="relative w-full md:w-1/3 aspect-[16/9] md:aspect-auto">
                   <img 
                     src={featuredItem.image_url} 
                     alt={featuredItem.player} 
@@ -221,12 +221,22 @@ const MetsNewsTracker = () => {
                       (e.target as HTMLImageElement).src = "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png";
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent md:bg-gradient-to-r" />
-                  <div className={`absolute top-4 left-4 p-2.5 rounded-full ${featuredConfig.iconBg} backdrop-blur-sm`}>
-                    <FeaturedIcon className="w-5 h-5 text-white" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-card/80" />
+                  <div className={`absolute top-3 left-3 sm:top-4 sm:left-4 p-2 sm:p-2.5 rounded-full ${featuredConfig.iconBg} backdrop-blur-sm`}>
+                    <FeaturedIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
+                  {/* Mobile overlay content */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:hidden">
+                    <Badge className={`mb-2 text-[10px] sm:text-xs ${featuredConfig.color} text-white backdrop-blur-sm`}>
+                      {featuredConfig.label}
+                    </Badge>
+                    <h3 className="text-base sm:text-lg font-bold text-white line-clamp-2 drop-shadow-lg">
+                      {featuredItem.title}
+                    </h3>
                   </div>
                 </div>
-                <div className="p-6 md:w-2/3 flex flex-col justify-center">
+                {/* Desktop content */}
+                <div className="hidden md:flex p-6 md:w-2/3 flex-col justify-center">
                   <Badge className={`w-fit mb-3 ${featuredConfig.color} text-white backdrop-blur-sm`}>
                     {featuredConfig.label}
                   </Badge>
@@ -246,6 +256,14 @@ const MetsNewsTracker = () => {
                         <ExternalLink className="w-4 h-4" />
                       </div>
                     )}
+                  </div>
+                </div>
+                {/* Mobile bottom bar */}
+                <div className="flex md:hidden items-center justify-between p-3 border-t border-border/30">
+                  <p className="text-xs sm:text-sm font-medium text-primary truncate max-w-[60%]">{featuredItem.player}</p>
+                  <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground">
+                    <Clock className="w-3 h-3" />
+                    {featuredItem.time_ago}
                   </div>
                 </div>
               </div>
