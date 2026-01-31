@@ -205,60 +205,62 @@ const CommunityPreviewSection = () => {
               <MessageSquare className="w-5 h-5 text-primary" />
               Recent Posts
             </h3>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {posts.length > 0 ? (
                 posts.map((post, index) => (
                   <motion.div
                     key={post.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: index * 0.05 }}
+                    onClick={() => navigate("/community")}
+                    className="cursor-pointer group glass-card hover-lift glow-blue rounded-lg overflow-hidden"
                   >
-                    <Card 
-                      className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all cursor-pointer group overflow-hidden"
-                      onClick={() => navigate("/community")}
-                    >
-                      {/* Show image prominently first if present */}
-                      {post.image_url && (
-                        <div className="w-full h-40 overflow-hidden">
+                    <div className="flex gap-3 p-2.5">
+                      {/* Thumbnail - same size as Latest News */}
+                      {post.image_url ? (
+                        <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted">
                           <img 
                             src={post.image_url} 
                             alt="Post" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
-                      )}
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <Avatar className="w-8 h-8 flex-shrink-0">
-                            <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                      ) : (
+                        <div className="w-20 h-20 flex-shrink-0 rounded-md bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                          <Avatar className="w-10 h-10">
+                            <AvatarFallback className="bg-primary/20 text-primary">
                               {post.isAdmin ? "A" : (post.profiles?.full_name?.[0] || "U")}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-foreground text-sm">
-                                {post.isAdmin ? "Admin" : (post.profiles?.full_name?.split(' ')[0] || "Fan")}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                {formatTimeAgo(post.created_at)}
-                              </span>
-                            </div>
-                            {post.content && (
-                              <p className="text-sm text-muted-foreground line-clamp-2">
-                                {post.content}
-                              </p>
-                            )}
-                          </div>
-                          <Heart className="w-4 h-4 text-muted-foreground group-hover:text-red-500 transition-colors flex-shrink-0" />
                         </div>
-                      </CardContent>
-                    </Card>
+                      )}
+                      
+                      {/* Content */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-foreground text-sm">
+                              {post.isAdmin ? "Admin" : (post.profiles?.full_name?.split(' ')[0] || "Fan")}
+                            </span>
+                          </div>
+                          {post.content && (
+                            <p className="text-sm text-muted-foreground line-clamp-2 leading-snug">
+                              {post.content}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
+                          <MessageSquare className="w-3 h-3" />
+                          <span>{formatTimeAgo(post.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
                   </motion.div>
                 ))
               ) : (
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                <Card className="col-span-full bg-card/50 backdrop-blur-sm border-border/50">
                   <CardContent className="p-6 text-center">
                     <MessageSquare className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground">Be the first to post!</p>
