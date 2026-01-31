@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles } from "lucide-react";
+import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles, Tv } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import podcastIcon from "@/assets/podcast-icon.png";
@@ -180,6 +180,12 @@ const Navigation = () => {
             >
               Events
             </button>
+            <button
+              onClick={() => navigate("/broadcast-schedule")}
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              TV Schedule
+            </button>
             {!user && (
               <NavLink 
                 to="/plans" 
@@ -341,6 +347,16 @@ const Navigation = () => {
                   >
                     <CalendarDays className="w-5 h-5 text-orange-500" />
                     Events
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate("/broadcast-schedule");
+                    }}
+                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
+                  >
+                    <Tv className="w-5 h-5 text-blue-500" />
+                    TV Schedule
                   </button>
                   {!user && (
                     <NavLink 
