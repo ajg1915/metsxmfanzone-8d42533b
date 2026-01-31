@@ -281,39 +281,47 @@ const CommunityPreviewSection = () => {
                 recentBlogs.map((blog, index) => (
                   <motion.div
                     key={blog.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: index * 0.05 }}
+                    onClick={() => navigate(`/blog/${blog.slug}`)}
+                    className="cursor-pointer group glass-card hover-lift glow-blue rounded-lg overflow-hidden"
                   >
-                    <Card 
-                      className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-secondary/50 transition-all cursor-pointer overflow-hidden group"
-                      onClick={() => navigate(`/blog/${blog.slug}`)}
-                    >
-                      {blog.featured_image_url && (
-                        <div className="h-24 overflow-hidden">
+                    <div className="flex gap-3 p-2.5">
+                      {/* Thumbnail - same size as other sections */}
+                      {blog.featured_image_url ? (
+                        <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted">
                           <img 
                             src={blog.featured_image_url} 
                             alt={blog.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
+                      ) : (
+                        <div className="w-20 h-20 flex-shrink-0 rounded-md bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                          <FileText className="w-8 h-8 text-primary/50" />
+                        </div>
                       )}
-                      <CardContent className="p-4">
-                        <Badge variant="outline" className="mb-2 text-xs">
-                          <FileText className="w-3 h-3 mr-1" />
-                          Blog
-                        </Badge>
-                        <h4 className="font-medium text-foreground text-sm line-clamp-2 group-hover:text-primary transition-colors">
-                          {blog.title}
-                        </h4>
-                        {blog.excerpt && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                            {blog.excerpt}
-                          </p>
+                      
+                      {/* Content */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                        <div>
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 mb-1 bg-muted text-muted-foreground border-0">
+                            Blog
+                          </Badge>
+                          <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                            {blog.title}
+                          </h4>
+                        </div>
+                        {blog.published_at && (
+                          <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
+                            <FileText className="w-3 h-3" />
+                            <span>{formatTimeAgo(blog.published_at)}</span>
+                          </div>
                         )}
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   </motion.div>
                 ))
               ) : (
