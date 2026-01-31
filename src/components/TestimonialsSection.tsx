@@ -151,50 +151,50 @@ const TestimonialsSection = () => {
   );
 
   return (
-    <section className="py-8 sm:py-12 px-4">
-      <div className="max-w-6xl mx-auto glass-card glow-blue rounded-2xl p-6 sm:p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+    <section className="py-6 sm:py-8 md:py-12 px-4">
+      <div className="max-w-6xl mx-auto glass-card glow-blue rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8">
+        <div className="text-center mb-5 sm:mb-6 md:mb-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1.5 sm:mb-2 leading-tight">
             What Fans Are Saying
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Join our community and share your experience
           </p>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-card/50 rounded-xl p-6 animate-pulse">
-                <div className="h-4 bg-muted rounded w-3/4 mb-4" />
-                <div className="h-16 bg-muted rounded mb-4" />
-                <div className="h-4 bg-muted rounded w-1/2" />
+              <div key={i} className="bg-card/50 rounded-lg sm:rounded-xl p-4 sm:p-5 md:p-6 animate-pulse">
+                <div className="h-3 sm:h-4 bg-muted rounded w-3/4 mb-3 sm:mb-4" />
+                <div className="h-12 sm:h-16 bg-muted rounded mb-3 sm:mb-4" />
+                <div className="h-3 sm:h-4 bg-muted rounded w-1/2" />
               </div>
             ))}
           </div>
         ) : testimonials.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.id}
-                className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-5 relative group hover:border-primary/30 transition-all duration-300"
+                className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 relative group hover:border-primary/30 transition-all duration-300"
               >
-                <Quote className="absolute top-4 right-4 w-6 h-6 text-primary/20" />
-                <div className="mb-3">{renderStars(testimonial.rating)}</div>
-                <p className="text-foreground/90 text-sm leading-relaxed mb-4 line-clamp-4">
+                <Quote className="absolute top-3 right-3 sm:top-4 sm:right-4 w-5 h-5 sm:w-6 sm:h-6 text-primary/20" />
+                <div className="mb-2 sm:mb-3">{renderStars(testimonial.rating)}</div>
+                <p className="text-foreground/90 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4 line-clamp-4">
                   "{testimonial.content}"
                 </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-sm">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-xs sm:text-sm">
                     {getDisplayName(testimonial)?.charAt(0)?.toUpperCase() || "F"}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-foreground/80">
+                    <span className="text-xs sm:text-sm font-medium text-foreground/80">
                       {getDisplayName(testimonial)}
                     </span>
                     {testimonial.location && (
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
+                      <span className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-0.5 sm:gap-1">
+                        <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         {testimonial.location}
                       </span>
                     )}

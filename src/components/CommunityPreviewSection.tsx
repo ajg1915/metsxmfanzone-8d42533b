@@ -135,41 +135,41 @@ const CommunityPreviewSection = () => {
     <section className="py-10 sm:py-12 md:py-16 px-4">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-6 md:mb-8">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
-              <img src={logo} alt="MetsXMFanZone" className="w-8 h-8" />
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2 sm:gap-3 leading-tight">
+              <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
               MetsXMFanZone Community
             </h2>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
               Join the conversation with {stats.membersCount.toLocaleString()}+ Mets fans
             </p>
           </div>
           <Button 
             onClick={() => navigate("/community")}
-            className="group"
+            className="group text-xs sm:text-sm h-8 sm:h-9 px-3 sm:px-4"
           >
             Join Community
-            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
 
         {/* Stats Bar */}
-        <div className="flex flex-wrap gap-4 mb-6">
-          <Badge variant="secondary" className="bg-primary/10 text-primary px-4 py-2">
-            <MessageSquare className="w-4 h-4 mr-2" />
+        <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-5 md:mb-6">
+          <Badge variant="secondary" className="bg-primary/10 text-primary px-2.5 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-[10px] sm:text-xs md:text-sm">
+            <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 mr-1 sm:mr-1.5 md:mr-2" />
             {stats.postsCount.toLocaleString()} Posts
           </Badge>
-          <Badge variant="secondary" className="bg-secondary/10 text-secondary px-4 py-2">
-            <img src={logo} alt="" className="w-4 h-4 mr-2" />
+          <Badge variant="secondary" className="bg-secondary/10 text-secondary px-2.5 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-[10px] sm:text-xs md:text-sm">
+            <img src={logo} alt="" className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 mr-1 sm:mr-1.5 md:mr-2" />
             {stats.membersCount.toLocaleString()} Members
           </Badge>
         </div>
 
         {/* Recent Posts - Full Width */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-primary" />
+        <div className="space-y-3 sm:space-y-4">
+          <h3 className="text-sm sm:text-base md:text-lg font-semibold text-foreground flex items-center gap-1.5 sm:gap-2">
+            <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             Recent Posts
           </h3>
           
@@ -309,13 +309,13 @@ const CommunityPreviewSection = () => {
           )}
 
           {/* CTA Card */}
-          <Card className="bg-gradient-to-br from-primary/20 to-secondary/20 border-primary/30 mt-4">
-            <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3 text-center sm:text-left">
-                <img src={logo} alt="MetsXMFanZone" className="w-8 h-8" />
+          <Card className="bg-gradient-to-br from-primary/20 to-secondary/20 border-primary/30 mt-3 sm:mt-4">
+            <CardContent className="p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-2 sm:gap-3 text-center sm:text-left">
+                <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
                 <div>
-                  <h4 className="font-semibold text-foreground">Join the Discussion</h4>
-                  <p className="text-xs text-muted-foreground">
+                  <h4 className="font-semibold text-foreground text-sm sm:text-base">Join the Discussion</h4>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
                     Share your thoughts with fellow Mets fans
                   </p>
                 </div>
@@ -323,6 +323,7 @@ const CommunityPreviewSection = () => {
               <Button 
                 size="sm" 
                 onClick={() => navigate("/community")}
+                className="text-xs sm:text-sm h-8 sm:h-9"
               >
                 Get Started
               </Button>
