@@ -8,140 +8,122 @@ import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import GlassCard from "@/components/GlassCard";
 
-interface UpcomingShow {
+interface PodcastShow {
   id: string;
   title: string;
-  description: string;
-  date: Date;
-  time: string;
-  type: "regular" | "pregame" | "weekend";
-  thumbnailUrl?: string;
-  isLive?: boolean;
+  description: string | null;
+  show_date: string;
+  show_type: string;
+  thumbnail_gradient: string | null;
+  is_featured: boolean;
+  is_live: boolean;
 }
 
-// Schedule configuration based on user requirements
-const SHOW_SCHEDULE = {
-  regular: {
-    monday: { time: "17:30", label: "5:30 PM" },
-    tuesday: { time: "17:30", label: "5:30 PM" },
-    friday: { time: "17:30", label: "5:30 PM" },
-  },
-  weekend: {
-    saturday: { time: "14:00", label: "2:00 PM" },
-    sunday: { time: "14:00", label: "2:00 PM" },
-  },
-  pregame: {
-    earlyGame: { offset: -60, label: "1 hour before" }, // Game at 1pm = show at 12pm
-    eveningGame: { time: "17:30", label: "5:30 PM" }, // Game at 7:10pm = show at 5:30pm
-  }
-};
-
-const CREATIVE_TITLES = [
+// Fallback data generation for when no shows are in database
+const FALLBACK_TITLES = [
   "🔥 Hot Stove Report Live",
   "⚾ Mets Daily Rundown",
   "🎙️ The FanZone Hour",
   "📊 Stats & Analysis Live",
-  "💪 Amazin' Update",
-  "🏟️ Citi Field Breakdown",
-  "🎯 Mets Spotlight Show",
-  "⭐ All-Star Talk Live",
-  "🚀 Pregame Countdown",
-  "📺 MetsXMFanZone Tonight",
-  "🔵 Blue & Orange Live",
-  "⚡ Quick Takes Live",
 ];
 
-const SHOW_DESCRIPTIONS = [
+const FALLBACK_DESCRIPTIONS = [
   "Join us for live Mets analysis, hot takes, and fan interaction!",
   "Breaking down all the latest Mets news and roster updates.",
   "Your daily dose of Mets content with special guest appearances.",
   "Pre-game predictions, lineup analysis, and betting insights.",
-  "Fan call-ins, Q&A, and community discussions.",
-  "Deep dive into stats, projections, and player performance.",
 ];
 
-// Gradient backgrounds for thumbnails
-const THUMBNAIL_GRADIENTS = [
-  "from-blue-600 via-blue-800 to-orange-500",
-  "from-orange-500 via-orange-600 to-blue-700",
-  "from-blue-700 via-purple-600 to-orange-400",
-  "from-orange-600 via-red-500 to-blue-600",
-  "from-blue-500 via-indigo-600 to-orange-500",
+const FALLBACK_GRADIENTS = [
+  "from-[#002D72] via-[#003087] to-[#FF5910]",
+  "from-[#FF5910] via-[#FF8C00] to-[#FFD700]",
+  "from-[#002D72] via-[#0047AB] to-[#6495ED]",
+  "from-[#6366f1] via-[#8b5cf6] to-[#a855f7]",
 ];
 
 const PodcastScheduleSection = () => {
-  const [upcomingShows, setUpcomingShows] = useState<UpcomingShow[]>([]);
+  const [shows, setShows] = useState<PodcastShow[]>([]);
   const [isLiveNow, setIsLiveNow] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    generateUpcomingShows();
-    checkIfLive();
+    fetchShows();
   }, []);
 
-  const checkIfLive = async () => {
-    const { data } = await supabase
-      .from("podcast_live_stream")
+  const fetchShows = async () => {
+    setLoading(true);
+    
+    // Fetch upcoming shows from database
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("podcast_shows")
+      .select("id, title, description, show_date, show_type, thumbnail_gradient, is_featured, is_live")
+      .eq("published", true)
+      .gte("show_date", now)
+      .order("show_date", { ascending: true })
+      .limit(4);
+
+    if (error) {
+      console.error("Error fetching podcast shows:", error);
+      // Use fallback generated shows
+      generateFallbackShows();
+    } else if (data && data.length > 0) {
+      setShows(data);
+      setIsLiveNow(data.some(show => show.is_live));
+    } else {
+      // No shows in database, generate fallback
+      generateFallbackShows();
+    }
+    
+    // Also check for any live shows
+    const { data: liveData } = await supabase
+      .from("podcast_shows")
       .select("is_live")
       .eq("is_live", true)
       .limit(1);
     
-    setIsLiveNow(data && data.length > 0);
+    if (liveData && liveData.length > 0) {
+      setIsLiveNow(true);
+    }
+    
+    setLoading(false);
   };
 
-  const generateUpcomingShows = () => {
-    const shows: UpcomingShow[] = [];
+  const generateFallbackShows = () => {
+    const fallbackShows: PodcastShow[] = [];
     const now = new Date();
-    const daysToGenerate = 7;
+    const scheduleDays = [1, 2, 5, 6]; // Mon, Tue, Fri, Sat
 
-    for (let i = 0; i < daysToGenerate; i++) {
+    for (let i = 0; i < 7 && fallbackShows.length < 4; i++) {
       const date = new Date(now);
       date.setDate(date.getDate() + i);
       const dayOfWeek = date.getDay();
-      const dayName = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][dayOfWeek];
 
-      let showTime: string | null = null;
-      let showType: "regular" | "pregame" | "weekend" = "regular";
+      if (scheduleDays.includes(dayOfWeek)) {
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        date.setHours(isWeekend ? 14 : 17, isWeekend ? 0 : 30, 0, 0);
 
-      // Check regular weekday schedule
-      if (dayName === "monday" || dayName === "tuesday" || dayName === "friday") {
-        showTime = SHOW_SCHEDULE.regular[dayName as keyof typeof SHOW_SCHEDULE.regular]?.time;
-        showType = "regular";
-      }
-      // Check weekend schedule
-      else if (dayName === "saturday" || dayName === "sunday") {
-        showTime = SHOW_SCHEDULE.weekend[dayName as keyof typeof SHOW_SCHEDULE.weekend]?.time;
-        showType = "weekend";
-      }
-
-      if (showTime) {
-        const [hours, minutes] = showTime.split(":").map(Number);
-        const showDate = new Date(date);
-        showDate.setHours(hours, minutes, 0, 0);
-
-        // Only include future shows
-        if (showDate > now) {
-          const titleIndex = (date.getDate() + dayOfWeek) % CREATIVE_TITLES.length;
-          const descIndex = (date.getDate() + dayOfWeek) % SHOW_DESCRIPTIONS.length;
-
-          shows.push({
-            id: `show-${date.toISOString()}`,
-            title: CREATIVE_TITLES[titleIndex],
-            description: SHOW_DESCRIPTIONS[descIndex],
-            date: showDate,
-            time: formatTime(showDate),
-            type: showType,
-            isLive: false,
+        if (date > now) {
+          const idx = fallbackShows.length;
+          fallbackShows.push({
+            id: `fallback-${i}`,
+            title: FALLBACK_TITLES[idx % FALLBACK_TITLES.length],
+            description: FALLBACK_DESCRIPTIONS[idx % FALLBACK_DESCRIPTIONS.length],
+            show_date: date.toISOString(),
+            show_type: isWeekend ? "weekend" : "regular",
+            thumbnail_gradient: FALLBACK_GRADIENTS[idx % FALLBACK_GRADIENTS.length],
+            is_featured: idx === 0,
+            is_live: false,
           });
         }
       }
     }
 
-    // Sort by date and limit to 4 shows
-    shows.sort((a, b) => a.date.getTime() - b.date.getTime());
-    setUpcomingShows(shows.slice(0, 4));
+    setShows(fallbackShows);
   };
 
-  const formatTime = (date: Date) => {
+  const formatTime = (dateStr: string) => {
+    const date = new Date(dateStr);
     return date.toLocaleTimeString("en-US", {
       hour: "numeric",
       minute: "2-digit",
@@ -149,7 +131,8 @@ const PodcastScheduleSection = () => {
     });
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -166,9 +149,22 @@ const PodcastScheduleSection = () => {
     });
   };
 
-  const getGradient = (index: number) => {
-    return THUMBNAIL_GRADIENTS[index % THUMBNAIL_GRADIENTS.length];
-  };
+  if (loading) {
+    return (
+      <section className="py-10 sm:py-12 md:py-16 px-4">
+        <div className="container mx-auto max-w-7xl">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded w-64 mx-auto" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-48 bg-muted rounded-xl" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-10 sm:py-12 md:py-16 px-4 relative overflow-hidden">
@@ -195,7 +191,7 @@ const PodcastScheduleSection = () => {
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
             Catch us live on Mondays, Tuesdays & Fridays at 5:30 PM • Weekends at 2:00 PM • Game days with special pregame shows!
           </p>
         </motion.div>
@@ -207,21 +203,21 @@ const PodcastScheduleSection = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="mb-8"
           >
-            <GlassCard variant="interactive" glow="orange" className="p-6 border-2 border-red-500/50">
+            <GlassCard variant="interactive" glow="orange" className="p-4 sm:p-6 border-2 border-red-500/50">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center animate-pulse">
-                      <Radio className="w-8 h-8 text-white" />
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center animate-pulse">
+                      <Radio className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                     </div>
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-ping" />
+                    <span className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-full animate-ping" />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground">We're Live Right Now!</h3>
-                    <p className="text-muted-foreground">Join the show and be part of the conversation</p>
+                  <div className="text-center sm:text-left">
+                    <h3 className="text-lg sm:text-xl font-bold text-foreground">We're Live Right Now!</h3>
+                    <p className="text-sm text-muted-foreground">Join the show and be part of the conversation</p>
                   </div>
                 </div>
-                <Button asChild size="lg" className="bg-red-500 hover:bg-red-600">
+                <Button asChild size="lg" className="bg-red-500 hover:bg-red-600 w-full sm:w-auto">
                   <Link to="/podcast">
                     <Play className="w-5 h-5 mr-2" fill="currentColor" />
                     Watch Live
@@ -233,8 +229,8 @@ const PodcastScheduleSection = () => {
         )}
 
         {/* Upcoming Shows Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {upcomingShows.map((show, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {shows.map((show, index) => (
             <motion.div
               key={show.id}
               initial={{ opacity: 0, y: 20 }}
@@ -243,37 +239,43 @@ const PodcastScheduleSection = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
               <GlassCard variant="interactive" glow="blue" className="h-full overflow-hidden">
-                {/* AI-Generated Thumbnail */}
-                <div className={`relative h-32 bg-gradient-to-br ${getGradient(index)} p-4 flex flex-col justify-between`}>
+                {/* AI-Generated Color Thumbnail */}
+                <div className={`relative h-28 sm:h-32 bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'} p-3 sm:p-4 flex flex-col justify-between`}>
                   <div className="flex items-start justify-between">
-                    <Badge className="bg-black/40 text-white border-0">
-                      {show.type === "weekend" ? "Weekend Show" : show.type === "pregame" ? "Pregame" : "Live Show"}
+                    <Badge className="bg-black/40 text-white border-0 text-[10px] sm:text-xs">
+                      {show.show_type === "weekend" ? "Weekend Show" : show.show_type === "pregame" ? "Pregame" : "Live Show"}
                     </Badge>
-                    <img src={logo} alt="MetsXMFanZone" className="w-10 h-10 opacity-90" />
+                    <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 sm:w-10 sm:h-10 opacity-90" />
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                    <div className="flex items-center gap-2 text-white/90 text-sm">
-                      <Calendar className="w-4 h-4" />
-                      <span className="font-medium">{formatDate(show.date)}</span>
-                      <span className="mx-1">•</span>
-                      <Clock className="w-4 h-4" />
-                      <span className="font-medium">{show.time}</span>
+                  {show.is_live && (
+                    <Badge className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white animate-pulse">
+                      <Radio className="w-3 h-3 mr-1" />
+                      LIVE
+                    </Badge>
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 sm:p-3">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-white/90 text-xs sm:text-sm">
+                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="font-medium">{formatDate(show.show_date)}</span>
+                      <span className="mx-0.5 sm:mx-1">•</span>
+                      <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="font-medium">{formatTime(show.show_date)}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Show Info */}
-                <div className="p-4">
-                  <h3 className="font-bold text-foreground text-lg mb-1 line-clamp-1">
+                <div className="p-3 sm:p-4">
+                  <h3 className="font-bold text-foreground text-sm sm:text-lg mb-1 line-clamp-1">
                     {show.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                     {show.description}
                   </p>
 
-                  <div className="mt-3 flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs border-primary/30 text-primary">
-                      <Tv className="w-3 h-3 mr-1" />
+                  <div className="mt-2 sm:mt-3 flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px] sm:text-xs border-primary/30 text-primary">
+                      <Tv className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
                       MetsXMFanZone
                     </Badge>
                   </div>
@@ -289,26 +291,26 @@ const PodcastScheduleSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-8 text-center"
+          className="mt-6 sm:mt-8 text-center"
         >
-          <div className="flex flex-wrap justify-center gap-3 mb-6">
-            <Badge variant="secondary" className="px-4 py-2 bg-primary/10 text-primary">
-              <Calendar className="w-4 h-4 mr-2" />
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <Badge variant="secondary" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-primary/10 text-primary text-xs sm:text-sm">
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Mon • Tue • Fri @ 5:30 PM
             </Badge>
-            <Badge variant="secondary" className="px-4 py-2 bg-orange-500/10 text-orange-500">
-              <Zap className="w-4 h-4 mr-2" />
+            <Badge variant="secondary" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-orange-500/10 text-orange-500 text-xs sm:text-sm">
+              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Weekends @ 2:00 PM
             </Badge>
-            <Badge variant="secondary" className="px-4 py-2 bg-secondary/10 text-secondary">
-              <Radio className="w-4 h-4 mr-2" />
-              Game Day Pregame Shows
+            <Badge variant="secondary" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-secondary/10 text-secondary text-xs sm:text-sm">
+              <Radio className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              Game Day Pregame
             </Badge>
           </div>
 
           <Button asChild size="lg" className="glass-card border-primary/30 hover:border-primary/50">
             <Link to="/podcast">
-              <Radio className="w-5 h-5 mr-2" />
+              <Radio className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               View All Shows & Listen Live
             </Link>
           </Button>

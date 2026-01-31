@@ -922,6 +922,51 @@ export type Database = {
         }
         Relationships: []
       }
+      podcast_shows: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_featured: boolean | null
+          is_live: boolean | null
+          published: boolean | null
+          show_date: string
+          show_type: string
+          thumbnail_colors: Json | null
+          thumbnail_gradient: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_live?: boolean | null
+          published?: boolean | null
+          show_date: string
+          show_type?: string
+          thumbnail_colors?: Json | null
+          thumbnail_gradient?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_live?: boolean | null
+          published?: boolean | null
+          show_date?: string
+          show_type?: string
+          thumbnail_colors?: Json | null
+          thumbnail_gradient?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       podcaster_applications: {
         Row: {
           admin_notes: string | null
