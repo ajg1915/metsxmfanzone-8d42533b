@@ -604,49 +604,54 @@ const Community = () => {
                       </Button>
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                      {/* Show image first/prominently if present */}
-                      {item.image_url && (
-                        <div className="relative -mx-6 -mt-2">
-                          <img
-                            src={item.image_url}
-                            alt="Post"
-                            className="w-full max-h-[500px] object-contain bg-black/5"
-                          />
-                        </div>
-                      )}
-                      
-                      {/* Text content */}
-                      {editingPostId === item.id ? (
-                        <div className="space-y-3">
-                          <Textarea
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
-                            className="min-h-[100px]"
-                          />
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              onClick={() => handleSaveEdit(item.id)}
-                            >
-                              <Check className="w-4 h-4 mr-1" />
-                              Save
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={handleCancelEdit}
-                            >
-                              <X className="w-4 h-4 mr-1" />
-                              Cancel
-                            </Button>
+                    <div className="space-y-3">
+                      {/* Social media style layout - thumbnail + text side by side */}
+                      <div className={`flex gap-3 ${item.image_url ? '' : ''}`}>
+                        {/* Thumbnail - compact square like social shares */}
+                        {item.image_url && (
+                          <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                            <img
+                              src={item.image_url}
+                              alt="Post"
+                              className="w-full h-full object-cover"
+                            />
                           </div>
+                        )}
+                        
+                        {/* Text content */}
+                        <div className="flex-1 min-w-0">
+                          {editingPostId === item.id ? (
+                            <div className="space-y-3">
+                              <Textarea
+                                value={editContent}
+                                onChange={(e) => setEditContent(e.target.value)}
+                                className="min-h-[80px]"
+                              />
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleSaveEdit(item.id)}
+                                >
+                                  <Check className="w-4 h-4 mr-1" />
+                                  Save
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={handleCancelEdit}
+                                >
+                                  <X className="w-4 h-4 mr-1" />
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            item.content && (
+                              <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-4">{item.content}</p>
+                            )
+                          )}
                         </div>
-                      ) : (
-                        item.content && (
-                          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.content}</p>
-                        )
-                      )}
+                      </div>
                     </div>
                   )}
                   <div className="flex items-center gap-4 mt-4 pt-4 border-t">
