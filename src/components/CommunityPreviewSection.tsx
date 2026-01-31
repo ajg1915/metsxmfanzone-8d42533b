@@ -171,69 +171,141 @@ const CommunityPreviewSection = () => {
             <MessageSquare className="w-5 h-5 text-primary" />
             Recent Posts
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {posts.length > 0 ? (
-              posts.map((post, index) => (
-                <motion.div
-                  key={post.id}
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  onClick={() => navigate("/community")}
-                  className="cursor-pointer group glass-card hover-lift glow-blue rounded-lg overflow-hidden"
-                >
-                  <div className="flex gap-3 p-2.5">
-                    {/* Thumbnail */}
-                    {post.image_url ? (
-                      <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted">
-                        <img 
-                          src={post.image_url} 
-                          alt="Post" 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
+          
+          {posts.length > 0 ? (
+            <>
+              {/* Featured Highlight Post */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
+                onClick={() => navigate("/community")}
+                className="cursor-pointer group glass-card hover-lift glow-blue rounded-xl overflow-hidden"
+              >
+                <div className="flex flex-col sm:flex-row">
+                  {/* Large Featured Image/Avatar */}
+                  <div className="relative w-full sm:w-2/5 aspect-[16/10] sm:aspect-auto overflow-hidden bg-card">
+                    {posts[0].image_url ? (
+                      <img 
+                        src={posts[0].image_url} 
+                        alt="Featured Post" 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
                     ) : (
-                      <div className="w-20 h-20 flex-shrink-0 rounded-md bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                        <Avatar className="w-10 h-10">
-                          <AvatarFallback className="bg-primary/20 text-primary">
-                            {post.isAdmin ? "A" : (post.profiles?.full_name?.[0] || "U")}
+                      <div className="w-full h-full min-h-[160px] bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                        <Avatar className="w-20 h-20">
+                          <AvatarFallback className="bg-primary/30 text-primary text-2xl">
+                            {posts[0].isAdmin ? "A" : (posts[0].profiles?.full_name?.[0] || "U")}
                           </AvatarFallback>
                         </Avatar>
                       </div>
                     )}
-                    
-                    {/* Content */}
-                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-foreground text-sm">
-                            {post.isAdmin ? "Admin" : (post.profiles?.full_name?.split(' ')[0] || "Fan")}
-                          </span>
-                        </div>
-                        {post.content && (
-                          <p className="text-sm text-muted-foreground line-clamp-2 leading-snug">
-                            {post.content}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
-                        <MessageSquare className="w-3 h-3" />
-                        <span>{formatTimeAgo(post.created_at)}</span>
-                      </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-card/30" />
+                    <Badge className="absolute top-3 left-3 text-xs px-2 py-0.5 bg-primary text-primary-foreground border-0 shadow-lg">
+                      Latest
+                    </Badge>
+                    {/* Mobile overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 sm:hidden">
+                      <span className="text-sm font-semibold text-white drop-shadow-lg">
+                        {posts[0].isAdmin ? "Admin" : (posts[0].profiles?.full_name || "Mets Fan")}
+                      </span>
                     </div>
                   </div>
-                </motion.div>
-              ))
-            ) : (
-              <Card className="col-span-full bg-card/50 backdrop-blur-sm border-border/50">
-                <CardContent className="p-6 text-center">
-                  <MessageSquare className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">Be the first to post!</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                  
+                  {/* Desktop Content */}
+                  <div className="hidden sm:flex flex-1 p-4 sm:p-5 flex-col justify-center">
+                    <span className="text-base font-bold text-foreground mb-2">
+                      {posts[0].isAdmin ? "Admin" : (posts[0].profiles?.full_name || "Mets Fan")}
+                    </span>
+                    {posts[0].content && (
+                      <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
+                        {posts[0].content}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>{formatTimeAgo(posts[0].created_at)}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Mobile bottom bar */}
+                  <div className="flex sm:hidden items-center justify-between p-3 border-t border-border/20">
+                    <p className="text-xs text-muted-foreground line-clamp-1 flex-1 mr-2">
+                      {posts[0].content}
+                    </p>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-shrink-0">
+                      <MessageSquare className="w-3 h-3" />
+                      <span>{formatTimeAgo(posts[0].created_at)}</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Remaining Posts - Compact Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {posts.slice(1).map((post, index) => (
+                  <motion.div
+                    key={post.id}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.05 }}
+                    onClick={() => navigate("/community")}
+                    className="cursor-pointer group glass-card hover-lift glow-blue rounded-lg overflow-hidden"
+                  >
+                    <div className="flex gap-3 p-2.5">
+                      {/* Thumbnail */}
+                      {post.image_url ? (
+                        <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted">
+                          <img 
+                            src={post.image_url} 
+                            alt="Post" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-20 h-20 flex-shrink-0 rounded-md bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                          <Avatar className="w-10 h-10">
+                            <AvatarFallback className="bg-primary/20 text-primary">
+                              {post.isAdmin ? "A" : (post.profiles?.full_name?.[0] || "U")}
+                            </AvatarFallback>
+                          </Avatar>
+                        </div>
+                      )}
+                      
+                      {/* Content */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold text-foreground text-sm">
+                              {post.isAdmin ? "Admin" : (post.profiles?.full_name?.split(' ')[0] || "Fan")}
+                            </span>
+                          </div>
+                          {post.content && (
+                            <p className="text-sm text-muted-foreground line-clamp-2 leading-snug">
+                              {post.content}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
+                          <MessageSquare className="w-3 h-3" />
+                          <span>{formatTimeAgo(post.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+              <CardContent className="p-6 text-center">
+                <MessageSquare className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+                <p className="text-muted-foreground">Be the first to post!</p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* CTA Card */}
           <Card className="bg-gradient-to-br from-primary/20 to-secondary/20 border-primary/30 mt-4">
