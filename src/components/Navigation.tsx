@@ -169,7 +169,7 @@ const Navigation = () => {
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
                     <Tv className="w-4 h-4" />
-                    Broadcast Schedule
+                    Live Games
                   </button>
                   <button
                     onClick={() => handleProtectedNavigation("/spring-training-live")}
@@ -348,7 +348,7 @@ const Navigation = () => {
                       className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                     >
                       <Tv className="w-5 h-5 text-blue-500" />
-                      Broadcast Schedule
+                      Live Games
                     </button>
                     <button
                       onClick={() => {
