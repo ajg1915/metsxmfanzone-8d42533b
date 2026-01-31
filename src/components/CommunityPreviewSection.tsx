@@ -279,7 +279,7 @@ const CommunityPreviewSection = () => {
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold text-foreground text-sm">
-                              {post.isAdmin ? "Admin" : (post.profiles?.full_name?.split(' ')[0] || "Fan")}
+                              {post.isAdmin ? "Admin" : (post.profiles?.full_name?.split(' ')[0] || "MetsXMFanZone")}
                             </span>
                           </div>
                           {post.content && (
