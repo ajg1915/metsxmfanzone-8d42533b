@@ -15,6 +15,7 @@ interface PodcastShow {
   show_date: string;
   show_type: string;
   thumbnail_gradient: string | null;
+  thumbnail_url: string | null;
   is_featured: boolean;
   is_live: boolean;
 }
@@ -57,7 +58,7 @@ const PodcastScheduleSection = () => {
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from("podcast_shows")
-      .select("id, title, description, show_date, show_type, thumbnail_gradient, is_featured, is_live")
+      .select("id, title, description, show_date, show_type, thumbnail_gradient, thumbnail_url, is_featured, is_live")
       .eq("published", true)
       .gte("show_date", now)
       .order("show_date", { ascending: true })
@@ -112,6 +113,7 @@ const PodcastScheduleSection = () => {
             show_date: date.toISOString(),
             show_type: isWeekend ? "weekend" : "regular",
             thumbnail_gradient: FALLBACK_GRADIENTS[idx % FALLBACK_GRADIENTS.length],
+            thumbnail_url: null,
             is_featured: idx === 0,
             is_live: false,
           });
@@ -239,20 +241,35 @@ const PodcastScheduleSection = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
               <GlassCard variant="interactive" glow="blue" className="h-full overflow-hidden">
-                {/* AI-Generated Color Thumbnail */}
-                <div className={`relative h-28 sm:h-32 bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'} p-3 sm:p-4 flex flex-col justify-between`}>
-                  <div className="flex items-start justify-between">
-                    <Badge className="bg-black/40 text-white border-0 text-[10px] sm:text-xs">
-                      {show.show_type === "weekend" ? "Weekend Show" : show.show_type === "pregame" ? "Pregame" : "Live Show"}
-                    </Badge>
-                    <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 sm:w-10 sm:h-10 opacity-90" />
-                  </div>
-                  {show.is_live && (
-                    <Badge className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white animate-pulse">
-                      <Radio className="w-3 h-3 mr-1" />
-                      LIVE
-                    </Badge>
+                {/* Thumbnail - AI Image or Gradient Fallback */}
+                <div className="relative h-28 sm:h-32 overflow-hidden">
+                  {show.thumbnail_url ? (
+                    <img 
+                      src={show.thumbnail_url} 
+                      alt={show.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className={`w-full h-full bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'}`} />
                   )}
+                  
+                  {/* Overlay Content */}
+                  <div className="absolute inset-0 p-3 sm:p-4 flex flex-col justify-between">
+                    <div className="flex items-start justify-between">
+                      <Badge className="bg-black/40 text-white border-0 text-[10px] sm:text-xs">
+                        {show.show_type === "weekend" ? "Weekend Show" : show.show_type === "pregame" ? "Pregame" : "Live Show"}
+                      </Badge>
+                      <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 sm:w-10 sm:h-10 opacity-90 drop-shadow-lg" />
+                    </div>
+                    {show.is_live && (
+                      <Badge className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white animate-pulse">
+                        <Radio className="w-3 h-3 mr-1" />
+                        LIVE
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  {/* Bottom Gradient with Date/Time */}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 sm:p-3">
                     <div className="flex items-center gap-1.5 sm:gap-2 text-white/90 text-xs sm:text-sm">
                       <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
