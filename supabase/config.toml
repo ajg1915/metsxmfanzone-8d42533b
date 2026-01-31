@@ -116,3 +116,6 @@ verify_jwt = false
 
 [functions.fetch-player-stats]
 verify_jwt = false
+
+[functions.generate-fan-feedback]
+verify_jwt = false
