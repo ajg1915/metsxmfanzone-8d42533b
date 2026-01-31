@@ -120,12 +120,88 @@ const BlogSection = () => {
           </div>
         </motion.div>
         
-        {/* All Posts Grid - Social Media Style */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {posts.map((post, index) => (
+        {/* Featured Highlight Post */}
+        {highlightPost && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            onClick={() => navigate(`/blog/${highlightPost.slug}`)}
+            className="cursor-pointer group glass-card hover-lift glow-blue rounded-xl overflow-hidden mb-4"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && navigate(`/blog/${highlightPost.slug}`)}
+          >
+            <article className="flex flex-col sm:flex-row">
+              {/* Large Featured Image */}
+              <div className="relative w-full sm:w-2/5 aspect-[16/10] sm:aspect-auto overflow-hidden bg-card">
+                {highlightPost.featured_image_url ? (
+                  <img
+                    src={highlightPost.featured_image_url}
+                    alt={highlightPost.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center min-h-[160px]">
+                    <img src={logo} alt="" className="w-16 h-16 opacity-30" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-card/30" />
+                <div className="absolute top-3 left-3">
+                  <Badge className="text-xs px-2 py-0.5 bg-primary text-primary-foreground border-0 shadow-lg">
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    Featured
+                  </Badge>
+                </div>
+                {/* Mobile overlay title */}
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:hidden">
+                  <Badge className="text-[10px] px-1.5 py-0 mb-1.5 bg-white/20 text-white border-0 backdrop-blur-sm">
+                    {highlightPost.category}
+                  </Badge>
+                  <h3 className="text-base font-bold text-white line-clamp-2 drop-shadow-lg">
+                    {highlightPost.title}
+                  </h3>
+                </div>
+              </div>
+              
+              {/* Desktop Content */}
+              <div className="hidden sm:flex flex-1 p-4 sm:p-5 flex-col justify-center">
+                <Badge className="w-fit text-xs px-2 py-0.5 mb-2 bg-muted text-muted-foreground border-0">
+                  {highlightPost.category}
+                </Badge>
+                <h3 className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                  {highlightPost.title}
+                </h3>
+                {highlightPost.excerpt && (
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                    {highlightPost.excerpt}
+                  </p>
+                )}
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{getTimeAgo(highlightPost.published_at)}</span>
+                </div>
+              </div>
+              
+              {/* Mobile bottom bar */}
+              <div className="flex sm:hidden items-center justify-between p-3 border-t border-border/20">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Clock className="w-3 h-3" />
+                  <span>{getTimeAgo(highlightPost.published_at)}</span>
+                </div>
+                <span className="text-xs text-primary font-medium">Read more →</span>
+              </div>
+            </article>
+          </motion.div>
+        )}
+        
+        {/* Remaining Posts - Compact Cards */}
+        <div className="space-y-2">
+          {otherPosts.map((post, index) => (
             <motion.div
               key={post.id}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
@@ -136,7 +212,7 @@ const BlogSection = () => {
               onKeyDown={(e) => e.key === 'Enter' && navigate(`/blog/${post.slug}`)}
             >
               <article className="flex gap-3 p-2.5">
-                {/* Thumbnail - Small square like social shares */}
+                {/* Thumbnail - Small square */}
                 <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-card">
                   {post.featured_image_url ? (
                     <img
@@ -147,14 +223,6 @@ const BlogSection = () => {
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
                       <img src={logo} alt="" className="w-8 h-8 opacity-30" />
-                    </div>
-                  )}
-                  {index === 0 && (
-                    <div className="absolute top-1 left-1">
-                      <Badge className="text-[10px] px-1.5 py-0 bg-primary text-primary-foreground border-0">
-                        <Sparkles className="w-2.5 h-2.5 mr-0.5" />
-                        New
-                      </Badge>
                     </div>
                   )}
                 </div>
