@@ -207,6 +207,12 @@ const Index = () => {
           </ScrollReveal>
         </Suspense>
 
+        <Suspense fallback={<SectionSkeleton height="h-48" />}>
+          <ScrollReveal delay={100}>
+            <HomeLineupCard />
+          </ScrollReveal>
+        </Suspense>
+
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
@@ -215,9 +221,9 @@ const Index = () => {
           </ScrollReveal>
         </Suspense>
 
-        <Suspense fallback={<SectionSkeleton height="h-48" />}>
-          <ScrollReveal delay={100}>
-            <HomeLineupCard />
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal delay={150}>
+            <PodcastScheduleSection />
           </ScrollReveal>
         </Suspense>
 
@@ -258,12 +264,6 @@ const Index = () => {
         <Suspense fallback={<SectionSkeleton />}>
           <ScrollReveal direction="right" delay={100}>
             <PodcastSection />
-          </ScrollReveal>
-        </Suspense>
-
-        <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal delay={150}>
-            <PodcastScheduleSection />
           </ScrollReveal>
         </Suspense>
 
