@@ -145,7 +145,7 @@ const LiveStreamsSection = () => {
             <div className="flex items-center gap-2">
               <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 animate-pulse" />
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
-                Live & Upcoming Streams
+                Live Streams
               </h2>
             </div>
             <a
