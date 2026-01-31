@@ -244,23 +244,23 @@ export default function HomeLineupCard({
       
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-foreground">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <h2 className="text-lg sm:text-xl font-bold text-foreground">
           Mets Game Center
         </h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleRefreshLineup}
             disabled={isRefreshing}
-            className="text-primary hover:text-primary/80 hover:bg-primary/10"
+            className="text-primary hover:text-primary/80 hover:bg-primary/10 h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm"
           >
-            <RefreshCw className={`w-4 h-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-0.5 sm:mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
-          <Link to="/video-gallery" className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-sm font-medium">
-            <Video className="w-4 h-4" />
+          <Link to="/video-gallery" className="flex items-center gap-1 sm:gap-1.5 text-primary hover:text-primary/80 transition-colors text-xs sm:text-sm font-medium">
+            <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Video Gallery</span>
           </Link>
         </div>

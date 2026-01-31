@@ -370,31 +370,31 @@ const Hero = () => {
                   }}
                 >
                   {/* Logo */}
-                  <div className="mb-4">
+                  <div className="mb-3 sm:mb-4">
                     <img
                       src={logo}
                       alt="MetsXMFanZone"
-                      className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain"
+                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 object-contain"
                     />
                   </div>
 
                   {/* Subtitle */}
-                  <span className="text-primary font-bold text-xs sm:text-sm tracking-widest mb-2">
+                  <span className="text-primary font-bold text-[10px] sm:text-xs md:text-sm tracking-widest mb-1.5 sm:mb-2">
                     {slide.subtitle}
                   </span>
 
                   {/* Title */}
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-3 max-w-2xl leading-tight uppercase tracking-tight">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-foreground mb-2 sm:mb-3 max-w-2xl leading-tight uppercase tracking-tight">
                     {slide.title}
                   </h1>
 
                   {/* Badges */}
-                  <div className="flex items-center gap-2 sm:gap-3 mb-4 flex-wrap">
-                    <span className="text-primary font-semibold text-sm">98% Match</span>
+                  <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 mb-3 sm:mb-4 flex-wrap">
+                    <span className="text-primary font-semibold text-xs sm:text-sm">98% Match</span>
                     {slide.badges?.map((badge, i) => (
                       <span
                         key={i}
-                        className="px-2 py-0.5 text-[10px] sm:text-xs font-bold border border-border/50 rounded text-muted-foreground"
+                        className="px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] md:text-xs font-bold border border-border/50 rounded text-muted-foreground"
                       >
                         {badge}
                       </span>
@@ -402,17 +402,17 @@ const Hero = () => {
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs sm:text-sm md:text-base text-foreground/80 mb-5 max-w-md leading-relaxed">
+                  <p className="text-[11px] sm:text-xs md:text-sm lg:text-base text-foreground/80 mb-4 sm:mb-5 max-w-sm sm:max-w-md leading-relaxed">
                     {slide.description}
                   </p>
 
                   {/* Action Buttons - Glass styled */}
-                  <div className="flex items-center gap-3 flex-wrap">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                     {slide.show_watch_live && (
                       <div className="relative">
                         {isLiveNow && (
                           <motion.div
-                            className="absolute -inset-2 rounded-xl bg-[#ff4500]/40 blur-xl"
+                            className="absolute -inset-1.5 sm:-inset-2 rounded-lg sm:rounded-xl bg-[#ff4500]/40 blur-lg sm:blur-xl"
                             animate={{
                               opacity: [0.4, 0.8, 0.4],
                               scale: [1, 1.1, 1],
@@ -426,14 +426,14 @@ const Hero = () => {
                         )}
                         <Button
                           onClick={() => handleProtectedNavigation("/metsxmfanzone-tv")}
-                          size="lg"
-                          className={`relative gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-6 sm:px-8 shadow-lg transition-all duration-300 ${
+                          size="default"
+                          className={`relative gap-1.5 sm:gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-4 sm:px-6 md:px-8 h-9 sm:h-10 md:h-11 text-xs sm:text-sm shadow-lg transition-all duration-300 ${
                             isLiveNow 
                               ? "shadow-[#ff4500]/50 hover:shadow-[#ff4500]/70 ring-2 ring-[#ff4500]/30" 
                               : "shadow-primary/30 hover:shadow-primary/50"
                           }`}
                         >
-                          <Play className="w-5 h-5 fill-current" />
+                          <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
                           Watch Live
                         </Button>
                       </div>
@@ -441,11 +441,11 @@ const Hero = () => {
                     {slide.link_url && slide.link_text && (
                       <Button
                         onClick={() => handleSlideClick(slide.link_url)}
-                        size="lg"
+                        size="default"
                         variant="outline"
-                        className="gap-2 glass-light border-border/30 hover:border-primary/50 transition-all duration-300"
+                        className="gap-1.5 sm:gap-2 glass-light border-border/30 hover:border-primary/50 transition-all duration-300 h-9 sm:h-10 md:h-11 text-xs sm:text-sm px-3 sm:px-4 md:px-6"
                       >
-                        <Info className="w-5 h-5" />
+                        <Info className="w-4 h-4 sm:w-5 sm:h-5" />
                         {slide.link_text}
                       </Button>
                     )}
@@ -453,11 +453,10 @@ const Hero = () => {
 
                   {/* Free Trial Banner for non-users - Glass styled */}
                   {!user && (
-                    <div className="mt-6">
-                      <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl glass-light glow-pulse">
-                        <span className="text-xs sm:text-sm text-foreground">
-                          ⚡ Start your <span className="text-primary font-bold">7-day FREE trial</span> for unlimited
-                          access
+                    <div className="mt-4 sm:mt-5 md:mt-6">
+                      <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-lg sm:rounded-xl glass-light glow-pulse">
+                        <span className="text-[10px] sm:text-xs md:text-sm text-foreground">
+                          ⚡ Start your <span className="text-primary font-bold">7-day FREE trial</span> for unlimited access
                         </span>
                       </div>
                     </div>
@@ -497,7 +496,7 @@ const Hero = () => {
             Quick Access
           </span>
         </div>
-        <div className="flex items-center justify-center gap-1 sm:gap-2 px-4 pb-4">
+        <div className="flex items-center justify-center gap-0.5 sm:gap-1 md:gap-2 px-2 sm:px-4 pb-3 sm:pb-4">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isLiveTab = tab.id === "live";
@@ -513,7 +512,7 @@ const Hero = () => {
                   if (tab.id === "community") handleProtectedNavigation("/community");
                 }}
                 className={`
-                  relative flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 text-[10px] sm:text-sm font-medium transition-all duration-300 rounded-xl
+                  relative flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 px-2 sm:px-3 md:px-4 lg:px-5 py-1.5 sm:py-2 md:py-2.5 text-[9px] sm:text-[10px] md:text-xs lg:text-sm font-medium transition-all duration-300 rounded-lg sm:rounded-xl
                   ${
                     activeTab === tab.id
                       ? "text-foreground glass-strong border-primary/50 shadow-lg"
@@ -524,17 +523,17 @@ const Hero = () => {
               >
                 {/* Live indicator dot - left side */}
                 {isLiveTab && isLiveNow && (
-                  <span className="absolute -top-1 -left-1 flex h-2.5 w-2.5">
+                  <span className="absolute -top-0.5 -left-0.5 sm:-top-1 sm:-left-1 flex h-2 w-2 sm:h-2.5 sm:w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff4500] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#ff4500]"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-[#ff4500]"></span>
                   </span>
                 )}
                 {tab.isImage ? (
-                  <Icon className="w-4 h-4 sm:w-4 sm:h-4 object-contain" />
+                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain" />
                 ) : (
-                  <Icon className="w-4 h-4 sm:w-4 sm:h-4" />
+                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 )}
-                <span>{tab.label}</span>
+                <span className="hidden xs:inline sm:inline">{tab.label}</span>
               </button>
             );
 
@@ -575,15 +574,15 @@ const Hero = () => {
         </div>
 
         {/* Slide Indicators - Enhanced */}
-        <div className="flex justify-center gap-2 pb-5">
+        <div className="flex justify-center gap-1.5 sm:gap-2 pb-4 sm:pb-5">
           {slidesToShow.map((_, index) => (
             <button
               key={index}
               onClick={() => emblaApi?.scrollTo(index)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
+              className={`h-1 sm:h-1.5 rounded-full transition-all duration-300 ${
                 selectedIndex === index 
-                  ? "w-8 bg-primary shadow-lg shadow-primary/50" 
-                  : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                  ? "w-6 sm:w-8 bg-primary shadow-lg shadow-primary/50" 
+                  : "w-1.5 sm:w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
               }`}
             />
           ))}

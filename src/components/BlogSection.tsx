@@ -85,37 +85,37 @@ const BlogSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8"
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-5 sm:mb-6 md:mb-8"
         >
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl glass-card">
-              <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 object-contain" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl glass-card">
+              <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
             </div>
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground leading-tight">
                 Latest News
               </h2>
-              <p className="text-sm text-muted-foreground">Stay updated with MetsXMFanZone</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Stay updated with MetsXMFanZone</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Button 
               variant="outline" 
               size="sm" 
               onClick={() => navigate("/whats-new")} 
-              className="group glass-card border-primary/50 bg-primary/10 hover:bg-primary/20 transition-all duration-300"
+              className="group glass-card border-primary/50 bg-primary/10 hover:bg-primary/20 transition-all duration-300 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             >
-              <img src={logo} alt="" className="w-4 h-4 object-contain" />
-              What's New
+              <img src={logo} alt="" className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain" />
+              <span className="hidden xs:inline ml-1">What's New</span>
             </Button>
             <Button 
               variant="outline" 
               size="sm" 
               onClick={() => navigate("/blog")} 
-              className="group glass-card border-border/30 hover:border-primary/50 transition-all duration-300"
+              className="group glass-card border-border/30 hover:border-primary/50 transition-all duration-300 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
             >
               View All
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1 sm:ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </motion.div>
