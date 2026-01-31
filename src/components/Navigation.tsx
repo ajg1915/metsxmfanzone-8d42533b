@@ -134,7 +134,7 @@ const Navigation = () => {
             </div>
           </div>
           
-          <div className="hidden md:flex items-center gap-2 text-xs">
+          <div className="hidden md:flex items-center gap-3 text-xs">
             <NavLink 
               to="/" 
               className="text-foreground hover:text-primary transition-colors"
@@ -143,22 +143,10 @@ const Navigation = () => {
               Home
             </NavLink>
             <button
-              onClick={() => handleProtectedNavigation("/spring-training-live")}
+              onClick={() => handleProtectedNavigation("/podcast")}
               className="text-foreground hover:text-primary transition-colors"
             >
-              Spring Training
-            </button>
-            <button
-              onClick={() => handleProtectedNavigation("/community")}
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Community
-            </button>
-            <button
-              onClick={() => handleProtectedNavigation("/blog")}
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Blog
+              Podcast
             </button>
             {user && (
               <button
@@ -168,24 +156,51 @@ const Navigation = () => {
                 Roster
               </button>
             )}
-            <button
-              onClick={() => handleProtectedNavigation("/podcast")}
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Podcast
-            </button>
-            <button
-              onClick={() => handleProtectedNavigation("/events")}
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Events
-            </button>
-            <button
-              onClick={() => navigate("/broadcast-schedule")}
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              TV Schedule
-            </button>
+            
+            {/* TV Schedule Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+                TV Schedule
+                <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 10 6">
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
+                </svg>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-background z-50 min-w-[160px]">
+                <DropdownMenuItem onClick={() => navigate("/broadcast-schedule")}>
+                  <Tv className="w-4 h-4 mr-2" />
+                  Broadcast Schedule
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleProtectedNavigation("/spring-training-live")}>
+                  <CalendarDays className="w-4 h-4 mr-2" />
+                  Spring Training
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Community Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+                Community
+                <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 10 6">
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
+                </svg>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-background z-50 min-w-[160px]">
+                <DropdownMenuItem onClick={() => handleProtectedNavigation("/community")}>
+                  <Users className="w-4 h-4 mr-2" />
+                  Fan Community
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleProtectedNavigation("/events")}>
+                  <CalendarDays className="w-4 h-4 mr-2" />
+                  Events
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleProtectedNavigation("/blog")}>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Blog
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {!user && (
               <NavLink 
                 to="/plans" 
@@ -289,32 +304,12 @@ const Navigation = () => {
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      handleProtectedNavigation("/spring-training-live");
+                      handleProtectedNavigation("/podcast");
                     }}
                     className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
                   >
-                    <img src={liveStreamIcon} alt="" className="w-5 h-5 object-contain" />
-                    Spring Training
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleProtectedNavigation("/community");
-                    }}
-                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                  >
-                    <Users className="w-5 h-5 text-orange-500" />
-                    Community
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleProtectedNavigation("/blog");
-                    }}
-                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                  >
-                    <img src={logo} alt="" className="w-5 h-5 object-contain" />
-                    Blog
+                    <img src={podcastIcon} alt="" className="w-5 h-5 object-contain" />
+                    Podcast
                   </button>
                   {user && (
                     <button
@@ -328,40 +323,71 @@ const Navigation = () => {
                       Roster
                     </button>
                   )}
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleProtectedNavigation("/podcast");
-                    }}
-                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                  >
-                    <img src={podcastIcon} alt="" className="w-5 h-5 object-contain" />
-                    Podcast
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleProtectedNavigation("/events");
-                    }}
-                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                  >
-                    <CalendarDays className="w-5 h-5 text-orange-500" />
-                    Events
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      navigate("/broadcast-schedule");
-                    }}
-                    className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                  >
-                    <Tv className="w-5 h-5 text-blue-500" />
-                    TV Schedule
-                  </button>
+                  
+                  {/* TV Schedule Section */}
+                  <div className="mt-2 pt-2 border-t border-border/50">
+                    <p className="text-xs text-muted-foreground px-3 py-1 font-medium">TV Schedule</p>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/broadcast-schedule");
+                      }}
+                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
+                    >
+                      <Tv className="w-5 h-5 text-blue-500" />
+                      Broadcast Schedule
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleProtectedNavigation("/spring-training-live");
+                      }}
+                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
+                    >
+                      <img src={liveStreamIcon} alt="" className="w-5 h-5 object-contain" />
+                      Spring Training
+                    </button>
+                  </div>
+
+                  {/* Community Section */}
+                  <div className="mt-2 pt-2 border-t border-border/50">
+                    <p className="text-xs text-muted-foreground px-3 py-1 font-medium">Community</p>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleProtectedNavigation("/community");
+                      }}
+                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
+                    >
+                      <Users className="w-5 h-5 text-orange-500" />
+                      Fan Community
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleProtectedNavigation("/events");
+                      }}
+                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
+                    >
+                      <CalendarDays className="w-5 h-5 text-orange-500" />
+                      Events
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleProtectedNavigation("/blog");
+                      }}
+                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
+                    >
+                      <Sparkles className="w-5 h-5 text-primary" />
+                      Blog
+                    </button>
+                  </div>
+
                   {!user && (
                     <NavLink 
                       to="/plans" 
-                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg touch-target"
+                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg touch-target mt-2"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <Shield className="w-4 h-4 text-[#ff4500]" />
