@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Loader2, Wand2, Calendar, Clock, Sparkles, Radio, RefreshCw, Upload, Image } from "lucide-react";
+import { Trash2, Loader2, Wand2, Calendar, Clock, Sparkles, Radio, RefreshCw, Upload, Image, Pencil, X } from "lucide-react";
 import { format } from "date-fns";
 
 interface PodcastShow {
@@ -75,10 +75,12 @@ export default function PodcastScheduleManagement() {
   const [generating, setGenerating] = useState(false);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     title: "",
     description: "",
     show_date: "",
@@ -87,7 +89,9 @@ export default function PodcastScheduleManagement() {
     thumbnail_url: "",
     is_featured: false,
     published: true,
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
 
   useEffect(() => {
     fetchShows();
@@ -278,12 +282,35 @@ export default function PodcastScheduleManagement() {
     toast({ title: "Full Show Generated!", description: `"${title}" with AI thumbnail` });
   };
 
+  const startEditing = (show: PodcastShow) => {
+    const showDate = new Date(show.show_date);
+    setEditingId(show.id);
+    setFormData({
+      title: show.title,
+      description: show.description || "",
+      show_date: format(showDate, "yyyy-MM-dd"),
+      show_time: format(showDate, "HH:mm"),
+      show_type: show.show_type,
+      thumbnail_url: show.thumbnail_url || "",
+      is_featured: show.is_featured,
+      published: show.published,
+    });
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setFormData(initialFormData);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
     
     const showDateTime = new Date(`${formData.show_date}T${formData.show_time}`);
     
-    const { error } = await supabase.from("podcast_shows").insert({
+    const showData = {
       title: formData.title,
       description: formData.description,
       show_date: showDateTime.toISOString(),
@@ -291,24 +318,37 @@ export default function PodcastScheduleManagement() {
       thumbnail_url: formData.thumbnail_url || null,
       is_featured: formData.is_featured,
       published: formData.published,
-    });
+    };
 
-    if (error) {
-      toast({ title: "Error creating show", description: error.message, variant: "destructive" });
+    if (editingId) {
+      // Update existing show
+      const { error } = await supabase
+        .from("podcast_shows")
+        .update(showData)
+        .eq("id", editingId);
+
+      if (error) {
+        toast({ title: "Error updating show", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Show updated successfully!" });
+        setEditingId(null);
+        setFormData(initialFormData);
+        fetchShows();
+      }
     } else {
-      toast({ title: "Show created successfully!" });
-      setFormData({
-        title: "",
-        description: "",
-        show_date: "",
-        show_time: "17:30",
-        show_type: "regular",
-        thumbnail_url: "",
-        is_featured: false,
-        published: true,
-      });
-      fetchShows();
+      // Create new show
+      const { error } = await supabase.from("podcast_shows").insert(showData);
+
+      if (error) {
+        toast({ title: "Error creating show", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Show created successfully!" });
+        setFormData(initialFormData);
+        fetchShows();
+      }
     }
+    
+    setSubmitting(false);
   };
 
   const togglePublished = async (id: string, current: boolean) => {
@@ -372,20 +412,35 @@ export default function PodcastScheduleManagement() {
         </Button>
       </div>
 
-      {/* Create Show Form */}
-      <Card>
+      {/* Create/Edit Show Form */}
+      <Card className={editingId ? "ring-2 ring-primary" : ""}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Create New Show</CardTitle>
-            <Button 
-              onClick={generateFullShow} 
-              disabled={generating}
-              size="sm"
-              className="bg-gradient-to-r from-primary to-orange-500"
-            >
-              {generating ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Sparkles className="w-4 h-4 mr-1" />}
-              AI Generate All
-            </Button>
+            <CardTitle className="text-base">
+              {editingId ? "Edit Show" : "Create New Show"}
+            </CardTitle>
+            <div className="flex gap-2">
+              {editingId && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={cancelEditing}
+                  className="text-muted-foreground"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Cancel
+                </Button>
+              )}
+              <Button 
+                onClick={generateFullShow} 
+                disabled={generating}
+                size="sm"
+                className="bg-gradient-to-r from-primary to-orange-500"
+              >
+                {generating ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Sparkles className="w-4 h-4 mr-1" />}
+                AI Generate All
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -550,9 +605,13 @@ export default function PodcastScheduleManagement() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full">
-              <Calendar className="w-4 h-4 mr-2" />
-              Schedule Show
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {submitting ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Calendar className="w-4 h-4 mr-2" />
+              )}
+              {editingId ? "Update Show" : "Schedule Show"}
             </Button>
           </form>
         </CardContent>
@@ -618,6 +677,14 @@ export default function PodcastScheduleManagement() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                          onClick={() => startEditing(show)}
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </Button>
                         <Button
                           variant={show.is_live ? "destructive" : "outline"}
                           size="sm"
