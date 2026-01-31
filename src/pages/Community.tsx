@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone, FileText } from "lucide-react";
+import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone, FileText, Pencil, X, Check } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import SocialShareButtons from "@/components/SocialShareButtons";
@@ -79,6 +79,8 @@ const Community = () => {
   const [newPost, setNewPost] = useState("");
   const [uploading, setUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -311,6 +313,73 @@ const Community = () => {
     }
   };
 
+  const handleEditPost = (post: Post & { type: 'post' }) => {
+    setEditingPostId(post.id);
+    setEditContent(post.content);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPostId(null);
+    setEditContent("");
+  };
+
+  const handleSaveEdit = async (postId: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to edit posts",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!editContent.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Post content cannot be empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      postSchema.parse({ content: editContent });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    try {
+      const { error } = await supabase
+        .from("posts")
+        .update({ content: editContent, updated_at: new Date().toISOString() })
+        .eq("id", postId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Post updated successfully",
+      });
+
+      setEditingPostId(null);
+      setEditContent("");
+      fetchFeed();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -485,13 +554,24 @@ const Community = () => {
                       </div>
                     </div>
                     {item.type === 'post' && item.user_id === user?.id && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeletePost(item.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        {editingPostId !== item.id && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditPost(item as Post & { type: 'post' })}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeletePost(item.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </CardHeader>
@@ -521,7 +601,34 @@ const Community = () => {
                     </div>
                   ) : (
                     <>
-                      <p className="mb-4 whitespace-pre-wrap">{item.content}</p>
+                      {editingPostId === item.id ? (
+                        <div className="space-y-3">
+                          <Textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            className="min-h-[100px]"
+                          />
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleSaveEdit(item.id)}
+                            >
+                              <Check className="w-4 h-4 mr-1" />
+                              Save
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleCancelEdit}
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="mb-4 whitespace-pre-wrap">{item.content}</p>
+                      )}
                       {item.image_url && (
                         <img
                           src={item.image_url}
