@@ -5,8 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Users, MessageSquare, ArrowRight } from "lucide-react";
+import { MessageSquare, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import logo from "@/assets/metsxmfanzone-logo.png";
 
 interface Post {
   id: string;
@@ -137,7 +138,7 @@ const CommunityPreviewSection = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
-              <Users className="w-7 h-7 text-primary" />
+              <img src={logo} alt="MetsXMFanZone" className="w-8 h-8" />
               MetsXMFanZone Community
             </h2>
             <p className="text-muted-foreground mt-1">
@@ -160,7 +161,7 @@ const CommunityPreviewSection = () => {
             {stats.postsCount.toLocaleString()} Posts
           </Badge>
           <Badge variant="secondary" className="bg-secondary/10 text-secondary px-4 py-2">
-            <Users className="w-4 h-4 mr-2" />
+            <img src={logo} alt="" className="w-4 h-4 mr-2" />
             {stats.membersCount.toLocaleString()} Members
           </Badge>
         </div>
@@ -311,7 +312,7 @@ const CommunityPreviewSection = () => {
           <Card className="bg-gradient-to-br from-primary/20 to-secondary/20 border-primary/30 mt-4">
             <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3 text-center sm:text-left">
-                <Users className="w-8 h-8 text-primary" />
+                <img src={logo} alt="MetsXMFanZone" className="w-8 h-8" />
                 <div>
                   <h4 className="font-semibold text-foreground">Join the Discussion</h4>
                   <p className="text-xs text-muted-foreground">

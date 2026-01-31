@@ -22,6 +22,7 @@ const MetsNewsTracker = lazy(() => import("@/components/MetsNewsTracker"));
 const BlogSection = lazy(() => import("@/components/BlogSection"));
 const HomeLineupCard = lazy(() => import("@/components/HomeLineupCard"));
 const PodcastSection = lazy(() => import("@/components/PodcastSection"));
+const PodcastScheduleSection = lazy(() => import("@/components/PodcastScheduleSection"));
 const JoinPodcastSection = lazy(() => import("@/components/JoinPodcastSection"));
 const HotStoveGuide = lazy(() => import("@/components/HotStoveGuide"));
 const StoriesSection = lazy(() => import("@/components/StoriesSection"));
@@ -257,6 +258,12 @@ const Index = () => {
         <Suspense fallback={<SectionSkeleton />}>
           <ScrollReveal direction="right" delay={100}>
             <PodcastSection />
+          </ScrollReveal>
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <ScrollReveal delay={150}>
+            <PodcastScheduleSection />
           </ScrollReveal>
         </Suspense>
 
