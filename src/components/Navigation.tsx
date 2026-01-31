@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles, Tv } from "lucide-react";
+import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles, Tv, ChevronDown } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import podcastIcon from "@/assets/podcast-icon.png";
@@ -27,6 +27,11 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
@@ -38,6 +43,8 @@ const Navigation = () => {
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [userProfile, setUserProfile] = useState<{ full_name: string | null; avatar_url: string | null }>({ full_name: null, avatar_url: null });
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [tvScheduleOpen, setTvScheduleOpen] = useState(false);
+  const [communityOpen, setCommunityOpen] = useState(false);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -337,65 +344,80 @@ const Navigation = () => {
                     </button>
                   )}
                   
-                  {/* TV Schedule Section */}
-                  <div className="mt-2 pt-2 border-t border-border/50">
-                    <p className="text-xs text-muted-foreground px-3 py-1 font-medium">TV Schedule</p>
-                    <button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        navigate("/broadcast-schedule");
-                      }}
-                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                    >
-                      <Tv className="w-5 h-5 text-blue-500" />
-                      Live Games
-                    </button>
-                    <button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        handleProtectedNavigation("/spring-training-live");
-                      }}
-                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                    >
-                      <img src={liveStreamIcon} alt="" className="w-5 h-5 object-contain" />
-                      Spring Training
-                    </button>
-                  </div>
+                  {/* TV Schedule Section - Collapsible */}
+                  <Collapsible open={tvScheduleOpen} onOpenChange={setTvScheduleOpen} className="mt-2 pt-2 border-t border-border/50">
+                    <CollapsibleTrigger className="flex items-center justify-between w-full text-xs text-muted-foreground px-3 py-2 font-medium hover:bg-muted/50 rounded-lg transition-colors">
+                      <span>TV Schedule</span>
+                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${tvScheduleOpen ? 'rotate-180' : ''}`} />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-1 mt-1">
+                      <button
+                        onClick={() => {
+                          setTvScheduleOpen(false);
+                          setMobileMenuOpen(false);
+                          navigate("/broadcast-schedule");
+                        }}
+                        className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target w-full"
+                      >
+                        <Tv className="w-5 h-5 text-blue-500" />
+                        Live Games
+                      </button>
+                      <button
+                        onClick={() => {
+                          setTvScheduleOpen(false);
+                          setMobileMenuOpen(false);
+                          handleProtectedNavigation("/spring-training-live");
+                        }}
+                        className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target w-full"
+                      >
+                        <img src={liveStreamIcon} alt="" className="w-5 h-5 object-contain" />
+                        Spring Training
+                      </button>
+                    </CollapsibleContent>
+                  </Collapsible>
 
-                  {/* Community Section */}
-                  <div className="mt-2 pt-2 border-t border-border/50">
-                    <p className="text-xs text-muted-foreground px-3 py-1 font-medium">Community</p>
-                    <button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        handleProtectedNavigation("/community");
-                      }}
-                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                    >
-                      <Users className="w-5 h-5 text-orange-500" />
-                      Fan Community
-                    </button>
-                    <button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        handleProtectedNavigation("/events");
-                      }}
-                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                    >
-                      <CalendarDays className="w-5 h-5 text-orange-500" />
-                      Events
-                    </button>
-                    <button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        handleProtectedNavigation("/blog");
-                      }}
-                      className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target"
-                    >
-                      <Sparkles className="w-5 h-5 text-primary" />
-                      Blog
-                    </button>
-                  </div>
+                  {/* Community Section - Collapsible */}
+                  <Collapsible open={communityOpen} onOpenChange={setCommunityOpen} className="mt-2 pt-2 border-t border-border/50">
+                    <CollapsibleTrigger className="flex items-center justify-between w-full text-xs text-muted-foreground px-3 py-2 font-medium hover:bg-muted/50 rounded-lg transition-colors">
+                      <span>Community</span>
+                      <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${communityOpen ? 'rotate-180' : ''}`} />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-1 mt-1">
+                      <button
+                        onClick={() => {
+                          setCommunityOpen(false);
+                          setMobileMenuOpen(false);
+                          handleProtectedNavigation("/community");
+                        }}
+                        className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target w-full"
+                      >
+                        <Users className="w-5 h-5 text-orange-500" />
+                        Fan Community
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCommunityOpen(false);
+                          setMobileMenuOpen(false);
+                          handleProtectedNavigation("/events");
+                        }}
+                        className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target w-full"
+                      >
+                        <CalendarDays className="w-5 h-5 text-orange-500" />
+                        Events
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCommunityOpen(false);
+                          setMobileMenuOpen(false);
+                          handleProtectedNavigation("/blog");
+                        }}
+                        className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-3 px-3 rounded-lg text-left touch-target w-full"
+                      >
+                        <Sparkles className="w-5 h-5 text-primary" />
+                        Blog
+                      </button>
+                    </CollapsibleContent>
+                  </Collapsible>
 
                   {!user && (
                     <NavLink 
