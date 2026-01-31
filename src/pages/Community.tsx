@@ -560,6 +560,8 @@ const Community = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEditPost(item as Post & { type: 'post' })}
+                            className="text-muted-foreground hover:text-primary"
+                            title="Edit post"
                           >
                             <Pencil className="w-4 h-4" />
                           </Button>
@@ -568,6 +570,8 @@ const Community = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeletePost(item.id)}
+                          className="text-muted-foreground hover:text-destructive"
+                          title="Delete post"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -600,7 +604,19 @@ const Community = () => {
                       </Button>
                     </div>
                   ) : (
-                    <>
+                    <div className="space-y-4">
+                      {/* Show image first/prominently if present */}
+                      {item.image_url && (
+                        <div className="relative -mx-6 -mt-2">
+                          <img
+                            src={item.image_url}
+                            alt="Post"
+                            className="w-full max-h-[500px] object-contain bg-black/5"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Text content */}
                       {editingPostId === item.id ? (
                         <div className="space-y-3">
                           <Textarea
@@ -627,16 +643,11 @@ const Community = () => {
                           </div>
                         </div>
                       ) : (
-                        <p className="mb-4 whitespace-pre-wrap">{item.content}</p>
+                        item.content && (
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.content}</p>
+                        )
                       )}
-                      {item.image_url && (
-                        <img
-                          src={item.image_url}
-                          alt="Post"
-                          className="rounded-lg max-w-full h-auto"
-                        />
-                      )}
-                    </>
+                    </div>
                   )}
                   <div className="flex items-center gap-4 mt-4 pt-4 border-t">
                     <Button variant="ghost" size="sm">
