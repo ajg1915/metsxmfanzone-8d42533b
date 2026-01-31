@@ -120,137 +120,66 @@ const BlogSection = () => {
           </div>
         </motion.div>
         
-        {/* Highlight Post */}
-        {highlightPost && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="mb-6"
-          >
-            <div
-              onClick={() => navigate(`/blog/${highlightPost.slug}`)}
-              className="cursor-pointer group glass-card hover-lift glow-blue rounded-xl overflow-hidden"
+        {/* All Posts Grid - Social Media Style */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {posts.map((post, index) => (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              onClick={() => navigate(`/blog/${post.slug}`)}
+              className="cursor-pointer group glass-card hover-lift glow-blue rounded-lg overflow-hidden"
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && navigate(`/blog/${highlightPost.slug}`)}
+              onKeyDown={(e) => e.key === 'Enter' && navigate(`/blog/${post.slug}`)}
             >
-              <article className="grid md:grid-cols-2 gap-0">
-                {/* Image */}
-                <div className="relative aspect-video md:aspect-[4/3] overflow-hidden">
-                  {highlightPost.featured_image_url ? (
+              <article className="flex gap-3 p-2.5">
+                {/* Thumbnail - Small square like social shares */}
+                <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-card">
+                  {post.featured_image_url ? (
                     <img
-                      src={highlightPost.featured_image_url}
-                      alt={highlightPost.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      src={post.featured_image_url}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20" />
+                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                      <img src={logo} alt="" className="w-8 h-8 opacity-30" />
+                    </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  
-                  {/* Badge */}
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <Badge className="text-xs px-2 py-0.5 bg-primary text-primary-foreground border-0">
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      Featured
-                    </Badge>
-                    <Badge className="text-xs px-2 py-0.5 bg-black/50 text-white border-0 backdrop-blur-sm">
-                      {highlightPost.category}
-                    </Badge>
-                  </div>
+                  {index === 0 && (
+                    <div className="absolute top-1 left-1">
+                      <Badge className="text-[10px] px-1.5 py-0 bg-primary text-primary-foreground border-0">
+                        <Sparkles className="w-2.5 h-2.5 mr-0.5" />
+                        New
+                      </Badge>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Content */}
-                <div className="p-4 sm:p-5 flex flex-col justify-center">
-                  <h3 className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
-                    {highlightPost.title}
-                  </h3>
+                <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                  <div>
+                    <Badge className="text-[10px] px-1.5 py-0 mb-1 bg-muted text-muted-foreground border-0">
+                      {post.category}
+                    </Badge>
+                    <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-tight">
+                      {post.title}
+                    </h3>
+                  </div>
                   
-                  {highlightPost.excerpt && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                      {highlightPost.excerpt}
-                    </p>
-                  )}
-                  
-                  <div className="flex items-center justify-between pt-2 border-t border-border/20">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{getTimeAgo(highlightPost.published_at)}</span>
-                    </div>
-                    <span className="text-xs font-medium text-primary flex items-center gap-1">
-                      Read more
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
+                    <Clock className="w-3 h-3" />
+                    <span>{getTimeAgo(post.published_at)}</span>
                   </div>
                 </div>
               </article>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          ))}
+        </div>
         
-        {/* Other Posts Grid */}
-        {otherPosts.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {otherPosts.map((post, index) => (
-              <motion.div
-                key={post.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                onClick={() => navigate(`/blog/${post.slug}`)}
-                className="cursor-pointer group glass-card hover-lift glow-blue rounded-xl overflow-hidden"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && navigate(`/blog/${post.slug}`)}
-              >
-                <article>
-                  {/* Image Container */}
-                  <div className="aspect-video overflow-hidden relative bg-card">
-                    {post.featured_image_url ? (
-                      <img
-                        src={post.featured_image_url}
-                        alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                        <img src={logo} alt="" className="w-12 h-12 opacity-30" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    
-                    {/* Category Badge */}
-                    <Badge className="absolute top-2 left-2 text-xs px-2 py-0.5 bg-primary/90 text-primary-foreground border-0">
-                      {post.category}
-                    </Badge>
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="p-3 space-y-2">
-                    <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-                      {post.title}
-                    </h3>
-                    
-                    {/* Footer */}
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{getTimeAgo(post.published_at)}</span>
-                      </div>
-                      <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                        Read
-                        <ArrowRight className="w-3 h-3" />
-                      </span>
-                    </div>
-                  </div>
-                </article>
-              </motion.div>
-            ))}
-          </div>
-        )}
       </div>
     </section>
   );
