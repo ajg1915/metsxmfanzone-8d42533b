@@ -193,8 +193,69 @@ const MetsNewsTracker = () => {
           )}
         </motion.div>
 
-        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-          {filteredNews.map((item, index) => {
+        {/* Featured First News Item */}
+        {filteredNews.length > 0 && (() => {
+          const featuredItem = filteredNews[0];
+          const featuredConfig = getTypeConfig(featuredItem.type);
+          const FeaturedIcon = featuredConfig.icon;
+          
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              onClick={() => featuredItem.link && window.open(featuredItem.link, '_blank')}
+              className={`glass-card hover-lift glow-blue rounded-2xl overflow-hidden group mb-6 ${featuredItem.link ? 'cursor-pointer' : ''}`}
+              role={featuredItem.link ? "button" : undefined}
+              tabIndex={featuredItem.link ? 0 : undefined}
+              onKeyDown={(e) => e.key === 'Enter' && featuredItem.link && window.open(featuredItem.link, '_blank')}
+            >
+              <div className="md:flex">
+                <div className="relative md:w-1/3 aspect-video md:aspect-auto">
+                  <img 
+                    src={featuredItem.image_url} 
+                    alt={featuredItem.player} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png";
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent md:bg-gradient-to-r" />
+                  <div className={`absolute top-4 left-4 p-2.5 rounded-full ${featuredConfig.iconBg} backdrop-blur-sm`}>
+                    <FeaturedIcon className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+                <div className="p-6 md:w-2/3 flex flex-col justify-center">
+                  <Badge className={`w-fit mb-3 ${featuredConfig.color} text-white backdrop-blur-sm`}>
+                    {featuredConfig.label}
+                  </Badge>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors mb-3">
+                    {featuredItem.title}
+                  </h3>
+                  <p className="text-lg font-semibold text-primary mb-2">{featuredItem.player}</p>
+                  <p className="text-base text-muted-foreground mb-4 line-clamp-3">{featuredItem.details}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4" />
+                      {featuredItem.time_ago}
+                    </div>
+                    {featuredItem.link && (
+                      <div className="flex items-center gap-1 text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span>Read full story</span>
+                        <ExternalLink className="w-4 h-4" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })()}
+
+        {/* Remaining News Items - Compact Grid */}
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredNews.slice(1).map((item, index) => {
             const typeConfig = getTypeConfig(item.type);
             const IconComponent = typeConfig.icon;
             
@@ -204,16 +265,16 @@ const MetsNewsTracker = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.5, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
                 onClick={() => item.link && window.open(item.link, '_blank')}
-                className={`glass-card hover-lift glow-blue rounded-2xl overflow-hidden group ${item.link ? 'cursor-pointer' : ''}`}
+                className={`glass-card hover-lift rounded-xl overflow-hidden group ${item.link ? 'cursor-pointer' : ''}`}
                 role={item.link ? "button" : undefined}
                 tabIndex={item.link ? 0 : undefined}
                 onKeyDown={(e) => e.key === 'Enter' && item.link && window.open(item.link, '_blank')}
               >
-                <div className="flex gap-4 p-6">
+                <div className="flex gap-3 p-3">
                   <div className="relative flex-shrink-0">
-                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 group-hover:border-primary/50 transition-colors">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-primary/20 group-hover:border-primary/40 transition-colors">
                       <img 
                         src={item.image_url} 
                         alt={item.player} 
@@ -223,35 +284,21 @@ const MetsNewsTracker = () => {
                         }}
                       />
                     </div>
-                    <div className={`absolute -top-1 -right-1 p-2 rounded-full ${typeConfig.iconBg} backdrop-blur-sm`}>
-                      <IconComponent className="w-4 h-4 text-white" />
+                    <div className={`absolute -top-1 -right-1 p-1.5 rounded-full ${typeConfig.iconBg} backdrop-blur-sm`}>
+                      <IconComponent className="w-3 h-3 text-white" />
                     </div>
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="mb-3">
-                      <Badge className={`w-fit mb-2 ${typeConfig.color} text-white backdrop-blur-sm`}>
-                        {typeConfig.label}
-                      </Badge>
-                      <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                        {item.title}
-                      </h3>
-                    </div>
-                    <div>
-                      <p className="text-base font-semibold text-primary mb-2">{item.player}</p>
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{item.details}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          {item.time_ago}
-                        </div>
-                        {item.link && (
-                          <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span>Read more</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </div>
-                        )}
-                      </div>
+                    <Badge className={`mb-1.5 text-[10px] px-1.5 py-0.5 ${typeConfig.color} text-white`}>
+                      {typeConfig.label}
+                    </Badge>
+                    <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug mb-1">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                      <Clock className="w-2.5 h-2.5" />
+                      {item.time_ago}
                     </div>
                   </div>
                 </div>

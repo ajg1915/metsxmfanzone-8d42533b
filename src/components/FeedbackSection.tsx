@@ -129,10 +129,16 @@ const FeedbackSection = () => {
                     ))}
                   </div>
                 )}
-                <p className="text-sm text-muted-foreground mb-3">{feedback.content}</p>
-                <p className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(feedback.created_at), { addSuffix: true })}
-                </p>
+                <p className="text-sm text-muted-foreground mb-3">"{feedback.content}"</p>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium text-foreground">{feedback.display_name || "Anonymous Fan"}</span>
+                    {feedback.location && (
+                      <span>• {feedback.location}</span>
+                    )}
+                  </div>
+                  <span>{formatDistanceToNow(new Date(feedback.created_at), { addSuffix: true })}</span>
+                </div>
               </CardContent>
             </Card>
           ))}
