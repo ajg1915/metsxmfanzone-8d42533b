@@ -63,9 +63,9 @@ const PodcastSection = () => {
             <div className="p-2 rounded-xl glass-card">
               <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
-              MetsXMFanZone Podcast
-            </h2>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+            MetsXMFanZone Radio
+          </h2>
             {!isPremium && <PremiumBadge size="md" noGlow />}
           </div>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
