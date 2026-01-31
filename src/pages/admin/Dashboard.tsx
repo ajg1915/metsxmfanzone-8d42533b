@@ -243,7 +243,7 @@ export default function AdminDashboard() {
             />
           </div>
         </div>
-        <div className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {filteredItems.length > 0 ? filteredItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -252,18 +252,18 @@ export default function AdminDashboard() {
                 className="cursor-pointer hover:border-primary transition-colors min-w-0"
                 onClick={() => navigate(item.url)}
               >
-                <CardHeader className="pb-1 pt-3 px-3">
+                <CardHeader className="pb-2 pt-4 px-4">
                   <div className="flex items-center justify-between">
-                    <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                    <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                    <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
+                    <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                   </div>
                 </CardHeader>
-                <CardContent className="px-3 pb-3">
-                  <CardTitle className="text-xs sm:text-sm mb-0.5 sm:mb-1 truncate">{item.title}</CardTitle>
-                  <CardDescription className="text-[10px] sm:text-xs mb-1 sm:mb-2 line-clamp-1">
+                <CardContent className="px-4 pb-4">
+                  <CardTitle className="text-sm sm:text-base mb-1 truncate">{item.title}</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm mb-2 line-clamp-2">
                     {item.description}
                   </CardDescription>
-                  <p className="text-[10px] sm:text-xs font-semibold text-primary">{item.stat}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-primary">{item.stat}</p>
                 </CardContent>
               </Card>
             );
