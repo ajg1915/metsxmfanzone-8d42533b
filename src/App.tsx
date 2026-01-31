@@ -40,6 +40,7 @@ const BlogManagement = lazy(() => import("./pages/admin/BlogManagement"));
 const VideoGalleryManagement = lazy(() => import("./pages/admin/VideoGalleryManagement"));
 const PodcastManagement = lazy(() => import("./pages/admin/PodcastManagement"));
 const PodcastLiveStreamManagement = lazy(() => import("./pages/admin/PodcastLiveStreamManagement"));
+const PodcastScheduleManagement = lazy(() => import("./pages/admin/PodcastScheduleManagement"));
 const QRCodeGenerator = lazy(() => import("./pages/admin/QRCodeGenerator"));
 const LiveStreamManagement = lazy(() => import("./pages/admin/LiveStreamManagement"));
 const LiveNotificationManagement = lazy(() => import("./pages/admin/LiveNotificationManagement"));
@@ -347,6 +348,7 @@ const AppContent = () => {
               <Route path="qr-generator" element={<QRCodeGenerator />} />
               <Route path="live-streams" element={<LiveStreamManagement />} />
               <Route path="podcast-live-stream" element={<PodcastLiveStreamManagement />} />
+              <Route path="podcast-schedule" element={<PodcastScheduleManagement />} />
               <Route path="stream-replays" element={<StreamReplayEditor />} />
               <Route path="live-notifications" element={<LiveNotificationManagement />} />
               <Route path="stories" element={<StoriesManagement />} />

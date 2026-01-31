@@ -57,6 +57,7 @@ const liveItems = [
   { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
   { title: "Replays", url: "/admin/stream-replays", icon: PlaySquare },
   { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
+  { title: "Podcast Schedule", url: "/admin/podcast-schedule", icon: CalendarDays },
 ];
 
 // Events & Schedules
