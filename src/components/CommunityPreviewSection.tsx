@@ -69,7 +69,7 @@ const CommunityPreviewSection = () => {
           )
         `)
         .order("created_at", { ascending: false })
-        .limit(3);
+        .limit(4);
 
       // Fetch recent blog posts
       const { data: blogData } = await supabase
@@ -87,7 +87,7 @@ const CommunityPreviewSection = () => {
         `)
         .eq("published", true)
         .order("published_at", { ascending: false })
-        .limit(2);
+        .limit(4);
 
       // Get counts
       const { count: postsCount } = await supabase
