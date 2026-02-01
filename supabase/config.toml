@@ -119,3 +119,6 @@ verify_jwt = false
 
 [functions.generate-fan-feedback]
 verify_jwt = false
+
+[functions.generate-weekly-podcast-shows]
+verify_jwt = false

@@ -72,8 +72,35 @@ const PodcastScheduleSection = () => {
       setShows(data);
       setIsLiveNow(data.some(show => show.is_live));
     } else {
-      // No shows in database, generate fallback
-      generateFallbackShows();
+      // No shows in database, try to generate weekly shows automatically
+      try {
+        console.log("No upcoming shows found, triggering weekly generation...");
+        const { data: generatedData, error: genError } = await supabase.functions.invoke("generate-weekly-podcast-shows");
+        
+        if (genError) {
+          console.error("Error generating weekly shows:", genError);
+          generateFallbackShows();
+        } else {
+          console.log("Weekly shows generated:", generatedData);
+          // Re-fetch after generation
+          const { data: refetchData } = await supabase
+            .from("podcast_shows")
+            .select("id, title, description, show_date, show_type, thumbnail_gradient, thumbnail_url, is_featured, is_live")
+            .eq("published", true)
+            .gte("show_date", now)
+            .order("show_date", { ascending: true })
+            .limit(4);
+          
+          if (refetchData && refetchData.length > 0) {
+            setShows(refetchData);
+          } else {
+            generateFallbackShows();
+          }
+        }
+      } catch (err) {
+        console.error("Failed to generate weekly shows:", err);
+        generateFallbackShows();
+      }
     }
     
     // Also check for any live shows
