@@ -166,13 +166,13 @@ export default function HomeLineupCard({
     refetchInterval: 10 * 60 * 1000
   });
 
-  // Real-time NL East Standings from MLB API
+  // Real-time NL East Standings from MLB API - 2026 Season
   const {
     data: standings
   } = useQuery({
-    queryKey: ["mlb-nl-east-standings"],
+    queryKey: ["mlb-nl-east-standings-2026"],
     queryFn: async () => {
-      const response = await fetch("https://statsapi.mlb.com/api/v1/standings?leagueId=104&season=2025&standingsTypes=regularSeason");
+      const response = await fetch("https://statsapi.mlb.com/api/v1/standings?leagueId=104&season=2026&standingsTypes=regularSeason");
       const data = await response.json();
       // NL East is division ID 204
       const nlEast = data.records?.find((r: any) => r.division?.id === 204);
@@ -190,13 +190,13 @@ export default function HomeLineupCard({
     refetchInterval: 5 * 60 * 1000 // Refetch every 5 minutes
   });
 
-  // Real-time Mets Team Leaders from MLB API
+  // Real-time Mets Team Leaders from MLB API - 2026 Season
   const {
     data: teamLeaders
   } = useQuery({
-    queryKey: ["mlb-mets-leaders"],
+    queryKey: ["mlb-mets-leaders-2026"],
     queryFn: async () => {
-      const [avgRes, hrRes, rbiRes, eraRes, winsRes, soRes] = await Promise.all([fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=battingAverage&season=2025&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=homeRuns&season=2025&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=runsBattedIn&season=2025&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=earnedRunAverage&season=2025&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=wins&season=2025&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=strikeouts&season=2025&limit=1")]);
+      const [avgRes, hrRes, rbiRes, eraRes, winsRes, soRes] = await Promise.all([fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=battingAverage&season=2026&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=homeRuns&season=2026&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=runsBattedIn&season=2026&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=earnedRunAverage&season=2026&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=wins&season=2026&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=strikeouts&season=2026&limit=1")]);
       const [avgData, hrData, rbiData, eraData, winsData, soData] = await Promise.all([avgRes.json(), hrRes.json(), rbiRes.json(), eraRes.json(), winsRes.json(), soRes.json()]);
       const getLeader = (data: any) => {
         const leaders = data.teamLeaders?.[0]?.leaders;
@@ -340,7 +340,7 @@ export default function HomeLineupCard({
                   {/* Quick Stats from MLB API */}
                   <div>
                     <p className="text-xs lg:text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2 lg:mb-3">
-                      2025 Season Stats
+                      2026 Season Stats
                     </p>
                     <div className="grid grid-cols-3 gap-2 lg:gap-3">
                       <div className="bg-muted/50 rounded p-2 lg:p-3 text-center">

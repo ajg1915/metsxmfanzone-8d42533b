@@ -38,13 +38,14 @@ const MetsNewsTracker = () => {
         .from("mets_news_tracker")
         .select("*")
         .eq("published", true)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(7);
       
       let apiNews: NewsItem[] = [];
       let manualNews: NewsItem[] = [];
       
       if (!fetchError && apiData?.success && apiData?.news) {
-        apiNews = [...apiData.news];
+        apiNews = [...apiData.news].slice(0, 7);
         setLastUpdated(new Date(apiData.fetched_at));
       }
       

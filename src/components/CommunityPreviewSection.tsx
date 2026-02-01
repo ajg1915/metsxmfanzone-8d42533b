@@ -197,7 +197,7 @@ const CommunityPreviewSection = () => {
                       <div className="w-full h-full min-h-[160px] bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
                         <Avatar className="w-20 h-20">
                           <AvatarFallback className="bg-primary/30 text-primary text-2xl">
-                            {posts[0].isAdmin ? "A" : (posts[0].profiles?.full_name?.[0] || "U")}
+                            {posts[0].isAdmin ? "M" : (posts[0].profiles?.full_name?.[0] || "M")}
                           </AvatarFallback>
                         </Avatar>
                       </div>
@@ -209,7 +209,7 @@ const CommunityPreviewSection = () => {
                     {/* Mobile overlay */}
                     <div className="absolute bottom-0 left-0 right-0 p-3 sm:hidden">
                       <span className="text-sm font-semibold text-white drop-shadow-lg">
-                        {posts[0].isAdmin ? "Admin" : (posts[0].profiles?.full_name || "Mets Fan")}
+                        {posts[0].isAdmin ? "MetsXMFanZone" : (posts[0].profiles?.full_name || "MetsXMFanZone")}
                       </span>
                     </div>
                   </div>
@@ -217,7 +217,7 @@ const CommunityPreviewSection = () => {
                   {/* Desktop Content */}
                   <div className="hidden sm:flex flex-1 p-4 sm:p-5 flex-col justify-center">
                     <span className="text-base font-bold text-foreground mb-2">
-                      {posts[0].isAdmin ? "Admin" : (posts[0].profiles?.full_name || "Mets Fan")}
+                      {posts[0].isAdmin ? "MetsXMFanZone" : (posts[0].profiles?.full_name || "MetsXMFanZone")}
                     </span>
                     {posts[0].content && (
                       <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
@@ -269,7 +269,7 @@ const CommunityPreviewSection = () => {
                         <div className="w-20 h-20 flex-shrink-0 rounded-md bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
                           <Avatar className="w-10 h-10">
                             <AvatarFallback className="bg-primary/20 text-primary">
-                              {post.isAdmin ? "A" : (post.profiles?.full_name?.[0] || "U")}
+                              {post.isAdmin ? "M" : (post.profiles?.full_name?.[0] || "M")}
                             </AvatarFallback>
                           </Avatar>
                         </div>
@@ -280,7 +280,7 @@ const CommunityPreviewSection = () => {
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-semibold text-foreground text-sm">
-                              {post.isAdmin ? "Admin" : (post.profiles?.full_name?.split(' ')[0] || "MetsXMFanZone")}
+                              {post.isAdmin ? "MetsXMFanZone" : (post.profiles?.full_name?.split(' ')[0] || "MetsXMFanZone")}
                             </span>
                           </div>
                           {post.content && (
