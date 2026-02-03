@@ -15,7 +15,6 @@ interface NewsItem {
   image_url: string;
   link?: string | null;
   is_mets_related?: boolean;
-  is_manual?: boolean;
 }
 
 const MetsNewsTracker = () => {
@@ -30,38 +29,20 @@ const MetsNewsTracker = () => {
 
     try {
       const { data: apiData, error: fetchError } = await supabase.functions.invoke("fetch-mets-news");
-      const { data: manualData, error: dbError } = await supabase
-        .from("mets_news_tracker")
-        .select("*")
-        .eq("published", true)
-        .order("created_at", { ascending: false })
-        .limit(7);
-
       let apiNews: NewsItem[] = [];
-      let manualNews: NewsItem[] = [];
 
       if (!fetchError && apiData?.success && apiData?.news) {
-        apiNews = [...apiData.news].slice(0, 7);
+        apiNews = [...apiData.news];
         setLastUpdated(new Date(apiData.fetched_at));
       }
 
-      if (!dbError && manualData && manualData.length > 0) {
-        manualNews = manualData.map((item) => ({
-          id: item.id,
-          type: item.type as NewsItem["type"],
-          title: item.title,
-          player: item.player,
-          details: item.details,
-          time_ago: item.time_ago,
-          image_url: item.image_url,
-          is_mets_related: true,
-          is_manual: true,
-        }));
-      }
-
-      setNewsItems([...manualNews, ...apiNews]);
+      // MLB-only feed: always show the latest MLB items from the automated API fetch.
+      // Prefer non-Mets MLB articles first, but still fill to 7 items if the feed is Mets-heavy.
+      const nonMets = apiNews.filter((n) => n.is_mets_related === false);
+      const remaining = apiNews.filter((n) => n.is_mets_related !== false);
+      setNewsItems([...nonMets, ...remaining].slice(0, 7));
     } catch (err) {
-      console.error("Failed to fetch Mets news:", err);
+      console.error("Failed to fetch MLB news:", err);
       setError("Unable to load news. Please try again later.");
       setNewsItems([]);
     } finally {
