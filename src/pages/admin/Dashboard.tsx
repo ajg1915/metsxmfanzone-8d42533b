@@ -254,8 +254,9 @@ export default function AdminDashboard() {
               >
                 <CardHeader className="pb-3 pt-5 px-5 sm:px-6">
                   <div className="flex items-center justify-between">
-                    <Icon className="h-10 w-10 sm:h-11 sm:w-11 text-primary" />
-                    <ArrowRight className="h-6 w-6 sm:h-7 sm:w-7 text-muted-foreground" />
+                    {/* Use explicit icon sizes (not just CSS) so mobile touch targets are reliably large */}
+                    <Icon size={56} className="text-primary flex-shrink-0" />
+                    <ArrowRight size={34} className="text-muted-foreground flex-shrink-0" />
                   </div>
                 </CardHeader>
                 <CardContent className="px-5 sm:px-6 pb-6">
