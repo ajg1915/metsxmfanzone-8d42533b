@@ -243,22 +243,22 @@ export default function AdminDashboard() {
             />
           </div>
         </div>
-        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {filteredItems.length > 0 ? filteredItems.map((item) => {
             const Icon = item.icon;
             return (
               <Card 
                 key={item.title}
-                className="cursor-pointer hover:border-primary transition-colors min-w-0"
+                className="cursor-pointer hover:border-primary transition-colors min-w-0 min-h-[132px] sm:min-h-[148px]"
                 onClick={() => navigate(item.url)}
               >
-                <CardHeader className="pb-3 pt-5 px-4 sm:px-5">
+                <CardHeader className="pb-3 pt-5 px-5 sm:px-6">
                   <div className="flex items-center justify-between">
-                    <Icon className="h-8 w-8 sm:h-9 sm:w-9 text-primary" />
-                    <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground" />
+                    <Icon className="h-10 w-10 sm:h-11 sm:w-11 text-primary" />
+                    <ArrowRight className="h-6 w-6 sm:h-7 sm:w-7 text-muted-foreground" />
                   </div>
                 </CardHeader>
-                <CardContent className="px-4 sm:px-5 pb-5">
+                <CardContent className="px-5 sm:px-6 pb-6">
                   <CardTitle className="text-base sm:text-lg mb-1.5 truncate">{item.title}</CardTitle>
                   <CardDescription className="text-sm sm:text-base mb-2.5 line-clamp-2">
                     {item.description}
