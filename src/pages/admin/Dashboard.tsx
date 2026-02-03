@@ -252,18 +252,18 @@ export default function AdminDashboard() {
                 className="cursor-pointer hover:border-primary transition-colors min-w-0"
                 onClick={() => navigate(item.url)}
               >
-                <CardHeader className="pb-2 pt-4 px-4">
+                <CardHeader className="pb-3 pt-5 px-4 sm:px-5">
                   <div className="flex items-center justify-between">
-                    <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
-                    <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+                    <Icon className="h-8 w-8 sm:h-9 sm:w-9 text-primary" />
+                    <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground" />
                   </div>
                 </CardHeader>
-                <CardContent className="px-4 pb-4">
-                  <CardTitle className="text-sm sm:text-base mb-1 truncate">{item.title}</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm mb-2 line-clamp-2">
+                <CardContent className="px-4 sm:px-5 pb-5">
+                  <CardTitle className="text-base sm:text-lg mb-1.5 truncate">{item.title}</CardTitle>
+                  <CardDescription className="text-sm sm:text-base mb-2.5 line-clamp-2">
                     {item.description}
                   </CardDescription>
-                  <p className="text-xs sm:text-sm font-semibold text-primary">{item.stat}</p>
+                  <p className="text-sm sm:text-base font-semibold text-primary">{item.stat}</p>
                 </CardContent>
               </Card>
             );

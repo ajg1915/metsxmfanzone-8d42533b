@@ -3,8 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, Clock, Newspaper, AlertCircle, ExternalLink, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 
 interface NewsItem {
@@ -25,7 +23,6 @@ const MetsNewsTracker = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [metsOnly, setMetsOnly] = useState(false);
 
   const fetchNewsItems = async () => {
     setLoading(true);
@@ -136,53 +133,9 @@ const MetsNewsTracker = () => {
 
   if (newsItems.length === 0) return null;
 
-  const filteredNews = metsOnly
-    ? newsItems.filter((item) => item.is_mets_related)
-    : newsItems.filter((item) => !item.is_manual);
+  // Show all news items (both manual and API), limited to 7 total
+  const filteredNews = newsItems.slice(0, 7);
 
-  if (filteredNews.length === 0 && metsOnly && newsItems.length > 0) {
-    return (
-      <section className="py-10 sm:py-12 md:py-16 relative overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-6 sm:mb-8"
-          >
-            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 glass-card rounded-full">
-              <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-              <span className="text-sm font-semibold text-primary uppercase tracking-wider">
-                Live MetsXMFanZone Newsroom
-              </span>
-            </div>
-            <h2 className="text-4xl font-bold text-foreground mb-4">MLB Live Tracker</h2>
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Label htmlFor="mets-filter" className="text-sm font-medium">
-                All MLB
-              </Label>
-              <Switch id="mets-filter" checked={metsOnly} onCheckedChange={setMetsOnly} />
-              <Label htmlFor="mets-filter" className="text-sm font-medium text-primary">
-                Mets Only
-              </Label>
-            </div>
-          </motion.div>
-          <div className="text-center py-8">
-            <img
-              src="https://a.espncdn.com/i/teamlogos/mlb/500/nym.png"
-              alt="Mets Logo"
-              className="w-20 h-20 mx-auto mb-4 opacity-50"
-            />
-            <p className="text-muted-foreground">No Mets-specific news at the moment.</p>
-            <Button onClick={() => setMetsOnly(false)} variant="outline" size="sm" className="mt-4 glass-card">
-              View All MLB News
-            </Button>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="py-10 sm:py-12 md:py-16 relative overflow-hidden">
@@ -204,16 +157,6 @@ const MetsNewsTracker = () => {
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mb-2">
             Real-time news, signings, trades, and updates from around the league
           </p>
-
-          <div className="flex items-center justify-center gap-3 mt-4 mb-2">
-            <Label htmlFor="mets-filter-main" className="text-sm font-medium cursor-pointer">
-              All MLB
-            </Label>
-            <Switch id="mets-filter-main" checked={metsOnly} onCheckedChange={setMetsOnly} />
-            <Label htmlFor="mets-filter-main" className="text-sm font-medium text-primary cursor-pointer">
-              Mets Only
-            </Label>
-          </div>
 
           {lastUpdated && (
             <p className="text-xs text-muted-foreground mt-2">Last updated: {lastUpdated.toLocaleTimeString()}</p>
