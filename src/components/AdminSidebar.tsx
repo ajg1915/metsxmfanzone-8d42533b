@@ -23,6 +23,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 // Home / Overview items
 const homeItems = [
   { title: "Dashboard", url: "/admin", icon: Home },
+  { title: "Blog", url: "/admin/blog", icon: FileText },
   { title: "Hero Slides", url: "/admin/hero", icon: Layers },
   { title: "Backgrounds", url: "/admin/backgrounds", icon: Wallpaper },
   { title: "Tutorials", url: "/admin/tutorials", icon: BookOpen },
