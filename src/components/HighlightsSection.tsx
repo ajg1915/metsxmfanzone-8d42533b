@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
-import { Play, Film, ChevronRight, ChevronLeft } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Play, Film, ChevronRight, ChevronLeft, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface Video {
   id: string;
@@ -27,13 +28,11 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [hoveredVideoId, setHoveredVideoId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    fetchHighlights();
-  }, []);
-
-  const fetchHighlights = async () => {
+  const fetchHighlights = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("videos")
@@ -50,7 +49,58 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  const fetchMLBHighlights = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      console.log("Fetching Mets highlights from MLB API...");
+      const { data, error } = await supabase.functions.invoke("fetch-mets-highlights", {
+        body: { lookbackDays: 60, year: 2025 }
+      });
+      
+      if (error) {
+        console.error("Error fetching MLB highlights:", error);
+        toast({
+          title: "Unable to fetch MLB highlights",
+          description: "The MLB API may not have recent highlights available.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      console.log("MLB highlights fetch result:", data);
+      
+      if (data?.highlights?.length > 0) {
+        toast({
+          title: "Highlights Updated",
+          description: `Found ${data.highlights.length} Mets highlights from MLB.`
+        });
+        // Refresh the local list
+        await fetchHighlights();
+      } else {
+        toast({
+          title: "No New Highlights",
+          description: "No recent Mets highlights found from MLB API."
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch MLB highlights:", err);
+      toast({
+        title: "Error",
+        description: "Failed to connect to MLB API.",
+        variant: "destructive"
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchHighlights, toast]);
+
+  useEffect(() => {
+    fetchHighlights();
+    // Auto-fetch from MLB API on mount
+    fetchMLBHighlights();
+  }, [fetchHighlights, fetchMLBHighlights]);
 
   const formatDuration = (seconds: number | null) => {
     if (!seconds) return "";
@@ -92,17 +142,34 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
           >
             <div className="flex items-center gap-2">
               <Film className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
-                MetsXMFanZone Highlights
-              </h2>
+              <div>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+                  Mets Video Highlights
+                </h2>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  Powered by MLB Stats API
+                </p>
+              </div>
             </div>
-            <a
-              href="/video-gallery"
-              className="flex items-center gap-1 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-            >
-              View All
-              <ChevronRight className="w-4 h-4" />
-            </a>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={fetchMLBHighlights}
+                disabled={refreshing}
+                className="gap-1 text-xs"
+              >
+                <RefreshCw className={cn("w-3 h-3", refreshing && "animate-spin")} />
+                {refreshing ? "Fetching..." : "Refresh"}
+              </Button>
+              <a
+                href="/video-gallery"
+                className="flex items-center gap-1 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                View All
+                <ChevronRight className="w-4 h-4" />
+              </a>
+            </div>
           </motion.div>
         </div>
 
