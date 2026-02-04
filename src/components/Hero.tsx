@@ -492,7 +492,7 @@ const Hero = () => {
       <div className="absolute bottom-0 left-0 right-0 z-20">
         {/* Quick Access Header */}
         <div className="flex justify-center mb-2">
-          <span className="text-[#ff4500] text-xs sm:text-sm font-semibold border-b-2 border-[#ff4500] pb-0.5">
+          <span className="text-[#ff4500] text-sm sm:text-base md:text-lg font-semibold border-b-2 border-[#ff4500] pb-0.5">
             Quick Access
           </span>
         </div>
@@ -512,7 +512,7 @@ const Hero = () => {
                   if (tab.id === "community") handleProtectedNavigation("/community");
                 }}
                 className={`
-                  relative flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 px-2 sm:px-3 md:px-4 lg:px-5 py-1.5 sm:py-2 md:py-2.5 text-[9px] sm:text-[10px] md:text-xs lg:text-sm font-medium transition-all duration-300 rounded-lg sm:rounded-xl
+                  relative flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 px-2 sm:px-3 md:px-4 lg:px-5 py-1.5 sm:py-2 md:py-2.5 text-[11px] sm:text-xs md:text-sm lg:text-base font-medium transition-all duration-300 rounded-lg sm:rounded-xl
                   ${
                     activeTab === tab.id
                       ? "text-foreground glass-strong border-primary/50 shadow-lg"
