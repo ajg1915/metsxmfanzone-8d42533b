@@ -131,6 +131,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_image_history: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          image_url: string
+          is_edited: boolean | null
+          prompt: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url: string
+          is_edited?: boolean | null
+          prompt: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string
+          is_edited?: boolean | null
+          prompt?: string
+        }
+        Relationships: []
+      }
       background_settings: {
         Row: {
           background_type: string
