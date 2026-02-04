@@ -529,9 +529,9 @@ const Hero = () => {
                   </span>
                 )}
                 {tab.isImage ? (
-                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain" />
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain" />
                 ) : (
-                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
                 )}
                 <span className="hidden xs:inline sm:inline">{tab.label}</span>
               </button>
