@@ -122,3 +122,12 @@ verify_jwt = false
 
 [functions.generate-weekly-podcast-shows]
 verify_jwt = false
+
+[functions.generate-daily-fanart]
+verify_jwt = true
+
+[functions.generate-ai-image]
+verify_jwt = true
+
+[functions.edit-ai-image]
+verify_jwt = true
