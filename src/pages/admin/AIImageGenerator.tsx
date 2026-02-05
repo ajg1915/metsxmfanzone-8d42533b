@@ -7,10 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, Image, Loader2, Sparkles, Copy, Check, Trash2, Upload, Wand2, History, RefreshCw } from "lucide-react";
+ import { Download, Image, Loader2, Sparkles, Copy, Check, Trash2, Upload, Wand2, History, RefreshCw, Newspaper, Youtube, Calendar, TrendingUp } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface GeneratedImage {
   id: string;
@@ -29,6 +30,20 @@ interface DBImage {
   created_by: string | null;
 }
 
+ interface PodcastShow {
+   id: string;
+   title: string;
+   show_date: string;
+   thumbnail_url: string | null;
+ }
+
+ interface DailyFanArtResult {
+   imageUrl: string;
+   prompt: string;
+   trendingTopics: string[];
+   updatedPodcastId: string | null;
+ }
+
 export default function AIImageGenerator() {
   const { toast } = useToast();
   const [prompt, setPrompt] = useState("");
@@ -44,10 +59,127 @@ export default function AIImageGenerator() {
   const [activeTab, setActiveTab] = useState<"session" | "history">("session");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+   // Daily fan art state
+   const [isGeneratingFanArt, setIsGeneratingFanArt] = useState(false);
+   const [todaysPodcasts, setTodaysPodcasts] = useState<PodcastShow[]>([]);
+   const [selectedPodcastId, setSelectedPodcastId] = useState<string>("auto");
+   const [lastFanArt, setLastFanArt] = useState<DailyFanArtResult | null>(null);
+   const [trendingNews, setTrendingNews] = useState<string[]>([]);
+   const [isLoadingNews, setIsLoadingNews] = useState(false);
+
   // Load history on mount
   useEffect(() => {
     loadHistory();
+     loadTodaysPodcasts();
+     fetchTrendingNews();
   }, []);
+
+   const loadTodaysPodcasts = async () => {
+     try {
+       const today = new Date().toISOString().split('T')[0];
+       const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+       
+       const { data, error } = await supabase
+         .from('podcast_shows')
+         .select('id, title, show_date, thumbnail_url')
+         .gte('show_date', today)
+         .lte('show_date', nextWeek)
+         .order('show_date', { ascending: true })
+         .limit(10);
+
+       if (error) throw error;
+       setTodaysPodcasts((data as PodcastShow[]) || []);
+     } catch (error) {
+       console.error("Error loading podcasts:", error);
+     }
+   };
+
+   const fetchTrendingNews = async () => {
+     setIsLoadingNews(true);
+     try {
+       const { data, error } = await supabase.functions.invoke('fetch-mets-news');
+       if (error) throw error;
+       
+       const metsNews = (data.news || [])
+         .filter((item: any) => item.is_mets_related)
+         .slice(0, 5)
+         .map((item: any) => item.title || item.details);
+       
+       setTrendingNews(metsNews);
+     } catch (error) {
+       console.error("Error fetching trending news:", error);
+     } finally {
+       setIsLoadingNews(false);
+     }
+   };
+
+   const handleGenerateDailyFanArt = async () => {
+     setIsGeneratingFanArt(true);
+     try {
+       const { data, error } = await supabase.functions.invoke('generate-daily-fanart', {
+         body: selectedPodcastId !== "auto" && selectedPodcastId !== "none" 
+           ? { podcast_id: selectedPodcastId } 
+           : {}
+       });
+
+       if (error) throw error;
+
+       if (data?.imageUrl) {
+         setLastFanArt({
+           imageUrl: data.imageUrl,
+           prompt: data.prompt,
+           trendingTopics: data.trendingTopics || [],
+           updatedPodcastId: data.updatedPodcastId
+         });
+
+         // Add to session images
+         const newImage: GeneratedImage = {
+           id: crypto.randomUUID(),
+           imageUrl: data.imageUrl,
+           prompt: `[Daily Fan Art] ${data.prompt}`,
+           createdAt: new Date(),
+         };
+         setGeneratedImages(prev => [newImage, ...prev]);
+         
+         // Reload history and podcasts
+         loadHistory();
+         loadTodaysPodcasts();
+
+         toast({
+           title: "Daily Fan Art Generated! 🎨",
+           description: data.updatedPodcastId 
+             ? "Image created and attached to podcast thumbnail"
+             : "Image created and saved to history",
+         });
+       } else {
+         throw new Error("No image generated");
+       }
+     } catch (error: any) {
+       console.error("Error generating daily fan art:", error);
+       
+       if (error.message?.includes("429") || error.message?.includes("rate limit")) {
+         toast({
+           title: "Rate Limited",
+           description: "Too many requests. Please wait a moment and try again.",
+           variant: "destructive",
+         });
+       } else if (error.message?.includes("402")) {
+         toast({
+           title: "Credits Depleted",
+           description: "AI credits are low. Please add more credits to continue.",
+           variant: "destructive",
+         });
+       } else {
+         toast({
+           title: "Error",
+           description: error.message || "Failed to generate daily fan art",
+           variant: "destructive",
+         });
+       }
+     } finally {
+       setIsGeneratingFanArt(false);
+     }
+   };
 
   const loadHistory = async () => {
     setIsLoadingHistory(true);
@@ -383,6 +515,148 @@ export default function AIImageGenerator() {
             Generate or edit images using AI for blog posts, stories, and social media
           </p>
         </div>
+
+         {/* Daily YouTube Fan Art Section */}
+          <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
+           <CardHeader className="pb-3">
+             <div className="flex items-center justify-between">
+               <div>
+                 <CardTitle className="flex items-center gap-2 text-lg">
+                    <Youtube className="h-5 w-5 text-destructive" />
+                   Daily YouTube Fan Art
+                 </CardTitle>
+                 <CardDescription className="text-xs sm:text-sm">
+                   Auto-generate trending Mets-themed podcast thumbnails
+                 </CardDescription>
+               </div>
+               <Badge variant="outline" className="text-xs">
+                 <TrendingUp className="h-3 w-3 mr-1" />
+                 News-Powered
+               </Badge>
+             </div>
+           </CardHeader>
+           <CardContent className="space-y-4">
+             {/* Trending News Preview */}
+             <div className="space-y-2">
+               <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                 <Newspaper className="h-3 w-3" />
+                 Trending Mets Topics (used for art generation)
+               </Label>
+               <div className="flex flex-wrap gap-1.5">
+                 {isLoadingNews ? (
+                   <span className="text-xs text-muted-foreground">Loading news...</span>
+                 ) : trendingNews.length > 0 ? (
+                   trendingNews.slice(0, 3).map((topic, i) => (
+                     <Badge key={i} variant="secondary" className="text-[10px] font-normal">
+                       {topic.length > 40 ? topic.substring(0, 37) + "..." : topic}
+                     </Badge>
+                   ))
+                 ) : (
+                   <span className="text-xs text-muted-foreground">No trending news - will use default themes</span>
+                 )}
+                 <Button
+                   variant="ghost"
+                   size="sm"
+                   onClick={fetchTrendingNews}
+                   disabled={isLoadingNews}
+                   className="h-5 w-5 p-0"
+                 >
+                   <RefreshCw className={`h-3 w-3 ${isLoadingNews ? 'animate-spin' : ''}`} />
+                 </Button>
+               </div>
+             </div>
+
+             {/* Podcast Selection */}
+             <div className="flex flex-col sm:flex-row gap-3">
+               <div className="flex-1 space-y-1.5">
+                 <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                   <Calendar className="h-3 w-3" />
+                   Attach to Podcast
+                 </Label>
+                 <Select value={selectedPodcastId} onValueChange={setSelectedPodcastId}>
+                   <SelectTrigger className="h-9 text-xs">
+                     <SelectValue placeholder="Select podcast" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="auto">Auto (first without thumbnail)</SelectItem>
+                     <SelectItem value="none">Don't attach to podcast</SelectItem>
+                     {todaysPodcasts.map((show) => (
+                       <SelectItem key={show.id} value={show.id}>
+                         <span className="flex items-center gap-2">
+                          {show.thumbnail_url && <Check className="h-3 w-3 text-primary" />}
+                           {format(new Date(show.show_date), "MMM d")} - {show.title.substring(0, 30)}...
+                         </span>
+                       </SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
+
+               <Button
+                 onClick={handleGenerateDailyFanArt}
+                 disabled={isGeneratingFanArt}
+                  className="sm:self-end"
+               >
+                 {isGeneratingFanArt ? (
+                   <>
+                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                     Generating...
+                   </>
+                 ) : (
+                   <>
+                     <Youtube className="h-4 w-4 mr-2" />
+                     Generate Daily Fan Art
+                   </>
+                 )}
+               </Button>
+             </div>
+
+             {/* Last Generated Preview */}
+             {lastFanArt && (
+               <div className="border rounded-lg p-3 bg-background/50 space-y-2">
+                 <div className="flex gap-3">
+                   <img 
+                     src={lastFanArt.imageUrl} 
+                     alt="Latest fan art" 
+                     className="w-24 h-16 object-cover rounded"
+                   />
+                   <div className="flex-1 min-w-0">
+                     <p className="text-xs font-medium truncate">Latest Fan Art</p>
+                     <p className="text-[10px] text-muted-foreground line-clamp-2">
+                       {lastFanArt.prompt}
+                     </p>
+                     {lastFanArt.updatedPodcastId && (
+                       <Badge variant="outline" className="text-[10px] mt-1">
+                         <Check className="h-2 w-2 mr-1" />
+                         Attached to podcast
+                       </Badge>
+                     )}
+                   </div>
+                 </div>
+                 <div className="flex gap-1.5">
+                   <Button
+                     variant="outline"
+                     size="sm"
+                     onClick={() => handleDownload(lastFanArt.imageUrl, lastFanArt.prompt)}
+                     className="flex-1 h-7 text-xs"
+                   >
+                     <Download className="h-3 w-3 mr-1" />
+                     Download
+                   </Button>
+                   <Button
+                     variant="outline"
+                     size="sm"
+                     onClick={() => handleCopyUrl("fanart", lastFanArt.imageUrl)}
+                     className="flex-1 h-7 text-xs"
+                   >
+                     <Copy className="h-3 w-3 mr-1" />
+                     Copy URL
+                   </Button>
+                 </div>
+               </div>
+             )}
+           </CardContent>
+         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Generator Panel */}
