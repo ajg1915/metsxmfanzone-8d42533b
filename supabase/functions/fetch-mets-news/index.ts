@@ -168,7 +168,7 @@ serve(async (req) => {
     const metsKeywords = ['mets', 'new york mets', 'nym', 'citi field', 'lindor', 'alonso', 'nimmo', 'mcneil', 'senga', 'diaz', 'baty', 'alvarez', 'mendez', 'grimace', 'manaea', 'megill', 'vientos', 'winker', 'francisco', 'pete alonso', 'jeff mcneil', 'mark vientos'];
 
     // Transform ESPN data to our format
-    const transformedNews = uniqueArticles.slice(0, 12).map((article, index) => {
+    const transformedNews = uniqueArticles.slice(0, 15).map((article, index) => {
       // Determine type based on article content
       const headline = article.headline?.toLowerCase() || '';
       const description = article.description?.toLowerCase() || '';
