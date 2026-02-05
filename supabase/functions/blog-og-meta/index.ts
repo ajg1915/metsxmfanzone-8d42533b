@@ -99,8 +99,12 @@ Deno.serve(async (req) => {
       });
     }
 
-     // Use the actual website URL for og:url so social platforms display metsxmfanzone.com
-     const displayUrl = postUrl;
+    // Important: set og:url to the *share URL* (this function endpoint), not the blog URL,
+    // otherwise some platforms canonicalize to /blog/:slug and fall back to your site-wide OG.
+    const supabaseUrl = (Deno.env.get("SUPABASE_URL") || "").replace(/\/$/, "");
+    const sharePageUrl = supabaseUrl
+      ? `${supabaseUrl}/functions/v1/blog-og-meta?slug=${encodeURIComponent(slug)}`
+      : url.toString();
 
 
     // Ensure proper absolute image URL (avoid base64)
@@ -153,7 +157,7 @@ Deno.serve(async (req) => {
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="article">
-     <meta property="og:url" content="${displayUrl}">
+    <meta property="og:url" content="${sharePageUrl}">
     <meta property="og:site_name" content="MetsXMFanZone">
     <meta property="og:title" content="${safeTitleAttr}">
     <meta property="og:description" content="${safeDescriptionAttr}">
@@ -175,7 +179,7 @@ Deno.serve(async (req) => {
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@metsxmfanzone">
     <meta name="twitter:creator" content="@metsxmfanzone">
-     <meta name="twitter:url" content="${displayUrl}">
+    <meta name="twitter:url" content="${sharePageUrl}">
     <meta name="twitter:title" content="${safeTitleAttr}">
     <meta name="twitter:description" content="${safeDescriptionAttr}">
     <meta name="twitter:image" content="${socialImage}">
