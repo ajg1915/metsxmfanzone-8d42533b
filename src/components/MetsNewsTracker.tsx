@@ -40,7 +40,7 @@ const MetsNewsTracker = () => {
       // Prefer non-Mets MLB articles first, but still fill to 7 items if the feed is Mets-heavy.
       const nonMets = apiNews.filter((n) => n.is_mets_related === false);
       const remaining = apiNews.filter((n) => n.is_mets_related !== false);
-      setNewsItems([...nonMets, ...remaining].slice(0, 7));
+      setNewsItems([...nonMets, ...remaining].slice(0, 8));
     } catch (err) {
       console.error("Failed to fetch MLB news:", err);
       setError("Unable to load news. Please try again later.");
@@ -115,7 +115,7 @@ const MetsNewsTracker = () => {
   if (newsItems.length === 0) return null;
 
   // Show all news items (both manual and API), limited to 7 total
-  const filteredNews = newsItems.slice(0, 7);
+  const filteredNews = newsItems.slice(0, 8);
 
 
   return (

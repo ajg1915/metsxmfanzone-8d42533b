@@ -57,7 +57,7 @@ const CommunityPreviewSection = () => {
           )
         `)
         .order("created_at", { ascending: false })
-        .limit(4);
+        .limit(5);
 
       // Get counts
       const { count: postsCount } = await supabase
