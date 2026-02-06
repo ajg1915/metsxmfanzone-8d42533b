@@ -1462,30 +1462,57 @@ export type Database = {
       }
       spring_training_games: {
         Row: {
+          away_team: string | null
           created_at: string | null
           display_order: number | null
           game_date: string
+          game_status: string | null
+          game_time: string | null
+          home_team: string | null
           id: string
+          is_auto_generated: boolean | null
+          is_home_game: boolean | null
+          last_synced_at: string | null
+          location: string | null
+          mlb_game_pk: number | null
           opponent: string
           preview_image_url: string
           published: boolean | null
           updated_at: string | null
         }
         Insert: {
+          away_team?: string | null
           created_at?: string | null
           display_order?: number | null
           game_date: string
+          game_status?: string | null
+          game_time?: string | null
+          home_team?: string | null
           id?: string
+          is_auto_generated?: boolean | null
+          is_home_game?: boolean | null
+          last_synced_at?: string | null
+          location?: string | null
+          mlb_game_pk?: number | null
           opponent: string
           preview_image_url: string
           published?: boolean | null
           updated_at?: string | null
         }
         Update: {
+          away_team?: string | null
           created_at?: string | null
           display_order?: number | null
           game_date?: string
+          game_status?: string | null
+          game_time?: string | null
+          home_team?: string | null
           id?: string
+          is_auto_generated?: boolean | null
+          is_home_game?: boolean | null
+          last_synced_at?: string | null
+          location?: string | null
+          mlb_game_pk?: number | null
           opponent?: string
           preview_image_url?: string
           published?: boolean | null
