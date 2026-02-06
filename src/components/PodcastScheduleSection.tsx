@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Radio, Zap, Tv, Play } from "lucide-react";
-import { motion } from "framer-motion";
+
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import GlassCard from "@/components/GlassCard";
@@ -206,13 +206,7 @@ const PodcastScheduleSection = () => {
     <section className="py-10 sm:py-12 md:py-16 px-4 relative overflow-hidden">
       <div className="container mx-auto max-w-7xl relative z-10">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-8 sm:mb-10"
-        >
+        <div className="text-center mb-8 sm:mb-10">
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl glass-card">
               <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
@@ -230,15 +224,11 @@ const PodcastScheduleSection = () => {
           <p className="text-muted-foreground max-w-xl sm:max-w-2xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed px-2">
             Catch us live on Mon, Tue & Fri @ 5:30 PM • Weekends @ 2:00 PM • Game day pregame shows!
           </p>
-        </motion.div>
+        </div>
 
         {/* Live Now Banner */}
         {isLiveNow && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-8"
-          >
+          <div className="mb-8 animate-fade-in">
             <GlassCard variant="interactive" glow="orange" className="p-4 sm:p-6 border-2 border-red-500/50">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -261,89 +251,75 @@ const PodcastScheduleSection = () => {
                 </Button>
               </div>
             </GlassCard>
-          </motion.div>
+          </div>
         )}
 
         {/* Upcoming Shows Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {shows.map((show, index) => (
-            <motion.div
-              key={show.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <GlassCard variant="interactive" glow="blue" className="h-full overflow-hidden">
-                {/* Thumbnail - AI Image or Gradient Fallback */}
-                <div className="relative h-24 sm:h-28 md:h-32 overflow-hidden">
-                  {show.thumbnail_url ? (
-                    <img 
-                      src={show.thumbnail_url} 
-                      alt={show.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className={`w-full h-full bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'}`} />
-                  )}
-                  
-                  {/* Overlay Content */}
-                  <div className="absolute inset-0 p-2 sm:p-3 flex flex-col justify-between">
-                    <div className="flex items-start justify-between gap-1">
-                      <Badge className="bg-black/50 backdrop-blur-sm text-white border-0 text-[9px] sm:text-[10px] md:text-xs px-1.5 sm:px-2 py-0.5">
-                        {show.show_type === "weekend" ? "Weekend" : show.show_type === "pregame" ? "Pregame" : "Live"}
-                      </Badge>
-                      <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 opacity-90 drop-shadow-lg" />
-                    </div>
-                    {show.is_live && (
-                      <Badge className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white animate-pulse text-[10px] sm:text-xs">
-                        <Radio className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
-                        LIVE
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  {/* Bottom Gradient with Date/Time */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1.5 sm:p-2">
-                    <div className="flex items-center justify-center gap-1 sm:gap-1.5 text-white/95 text-[10px] sm:text-xs">
-                      <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
-                      <span className="font-medium truncate">{formatDate(show.show_date)}</span>
-                      <span className="opacity-70">•</span>
-                      <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
-                      <span className="font-medium">{formatTime(show.show_date)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Show Info */}
-                <div className="p-2 sm:p-3">
-                  <h3 className="font-bold text-foreground text-xs sm:text-sm md:text-base mb-0.5 sm:mb-1 line-clamp-1 leading-tight">
-                    {show.title}
-                  </h3>
-                  <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground line-clamp-2 leading-snug">
-                    {show.description}
-                  </p>
-
-                  <div className="mt-1.5 sm:mt-2 flex items-center">
-                    <Badge variant="outline" className="text-[9px] sm:text-[10px] md:text-xs border-primary/30 text-primary px-1.5 sm:px-2 py-0.5">
-                      <Tv className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5 sm:mr-1" />
-                      MetsXMFanZone
+          {shows.map((show) => (
+            <GlassCard key={show.id} variant="interactive" glow="blue" className="h-full overflow-hidden">
+              {/* Thumbnail - AI Image or Gradient Fallback */}
+              <div className="relative h-24 sm:h-28 md:h-32 overflow-hidden">
+                {show.thumbnail_url ? (
+                  <img 
+                    src={show.thumbnail_url} 
+                    alt={show.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className={`w-full h-full bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'}`} />
+                )}
+                
+                {/* Overlay Content */}
+                <div className="absolute inset-0 p-2 sm:p-3 flex flex-col justify-between">
+                  <div className="flex items-start justify-between gap-1">
+                    <Badge className="bg-black/50 backdrop-blur-sm text-white border-0 text-[9px] sm:text-[10px] md:text-xs px-1.5 sm:px-2 py-0.5">
+                      {show.show_type === "weekend" ? "Weekend" : show.show_type === "pregame" ? "Pregame" : "Live"}
                     </Badge>
+                    <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 opacity-90 drop-shadow-lg" />
+                  </div>
+                  {show.is_live && (
+                    <Badge className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white animate-pulse text-[10px] sm:text-xs">
+                      <Radio className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
+                      LIVE
+                    </Badge>
+                  )}
+                </div>
+                
+                {/* Bottom Gradient with Date/Time */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1.5 sm:p-2">
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 text-white/95 text-[10px] sm:text-xs">
+                    <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
+                    <span className="font-medium truncate">{formatDate(show.show_date)}</span>
+                    <span className="opacity-70">•</span>
+                    <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
+                    <span className="font-medium">{formatTime(show.show_date)}</span>
                   </div>
                 </div>
-              </GlassCard>
-            </motion.div>
+              </div>
+
+              {/* Show Info */}
+              <div className="p-2 sm:p-3">
+                <h3 className="font-bold text-foreground text-xs sm:text-sm md:text-base mb-0.5 sm:mb-1 line-clamp-1 leading-tight">
+                  {show.title}
+                </h3>
+                <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground line-clamp-2 leading-snug">
+                  {show.description}
+                </p>
+
+                <div className="mt-1.5 sm:mt-2 flex items-center">
+                  <Badge variant="outline" className="text-[9px] sm:text-[10px] md:text-xs border-primary/30 text-primary px-1.5 sm:px-2 py-0.5">
+                    <Tv className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5 sm:mr-1" />
+                    MetsXMFanZone
+                  </Badge>
+                </div>
+              </div>
+            </GlassCard>
           ))}
         </div>
 
         {/* Schedule Info & CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-6 sm:mt-8 text-center"
-        >
+        <div className="mt-6 sm:mt-8 text-center">
           <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 md:gap-3 mb-3 sm:mb-4 md:mb-6 px-2">
             <Badge variant="secondary" className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 bg-primary/10 text-primary text-[10px] sm:text-xs md:text-sm">
               <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 mr-0.5 sm:mr-1" />
@@ -365,7 +341,7 @@ const PodcastScheduleSection = () => {
               View All Shows
             </Link>
           </Button>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

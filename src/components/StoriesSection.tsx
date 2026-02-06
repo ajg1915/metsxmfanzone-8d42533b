@@ -119,21 +119,53 @@ const StoriesSection = () => {
   };
 
   const fetchAllStoryStats = async () => {
-    const stats: Record<string, StoryStats> = {};
+    if (stories.length === 0) return;
     
-    for (const story of stories) {
-      const [likesResult, commentsResult, userLikeResult] = await Promise.all([
-        supabase.from("story_likes").select("id", { count: "exact" }).eq("story_id", story.id),
-        supabase.from("story_comments").select("id", { count: "exact" }).eq("story_id", story.id),
-        user ? supabase.from("story_likes").select("id").eq("story_id", story.id).eq("user_id", user.id).maybeSingle() : Promise.resolve({ data: null })
-      ]);
+    const storyIds = stories.map(s => s.id);
+    
+    // Batch fetch all likes and comments counts in single queries
+    const [likesResult, commentsResult, userLikesResult] = await Promise.all([
+      supabase
+        .from("story_likes")
+        .select("story_id")
+        .in("story_id", storyIds),
+      supabase
+        .from("story_comments")
+        .select("story_id")
+        .in("story_id", storyIds),
+      user 
+        ? supabase
+            .from("story_likes")
+            .select("story_id")
+            .in("story_id", storyIds)
+            .eq("user_id", user.id)
+        : Promise.resolve({ data: [] })
+    ]);
 
+    // Count likes per story
+    const likeCounts: Record<string, number> = {};
+    (likesResult.data || []).forEach(like => {
+      likeCounts[like.story_id] = (likeCounts[like.story_id] || 0) + 1;
+    });
+
+    // Count comments per story
+    const commentCounts: Record<string, number> = {};
+    (commentsResult.data || []).forEach(comment => {
+      commentCounts[comment.story_id] = (commentCounts[comment.story_id] || 0) + 1;
+    });
+
+    // Track user's liked stories
+    const userLikedStories = new Set((userLikesResult.data || []).map(l => l.story_id));
+
+    // Build stats object
+    const stats: Record<string, StoryStats> = {};
+    stories.forEach(story => {
       stats[story.id] = {
-        likesCount: likesResult.count || 0,
-        commentsCount: commentsResult.count || 0,
-        isLiked: !!userLikeResult.data
+        likesCount: likeCounts[story.id] || 0,
+        commentsCount: commentCounts[story.id] || 0,
+        isLiked: userLikedStories.has(story.id)
       };
-    }
+    });
     
     setStoryStats(stats);
   };
@@ -315,11 +347,7 @@ const StoriesSection = () => {
     <>
       <div className="w-full">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+          <div 
             className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6"
           >
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
@@ -333,7 +361,7 @@ const StoriesSection = () => {
               <span className="hidden sm:inline">Mets Scores</span>
               <span className="sm:hidden">Scores</span>
             </Link>
-          </motion.div>
+          </div>
           
           <Carousel
             opts={{
