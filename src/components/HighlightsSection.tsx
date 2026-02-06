@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+
 
 interface Video {
   id: string;
@@ -30,7 +30,7 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const { toast } = useToast();
+  
 
   const fetchHighlights = useCallback(async () => {
     try {
@@ -61,40 +61,21 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
       
       if (error) {
         console.error("Error fetching MLB highlights:", error);
-        toast({
-          title: "Unable to fetch MLB highlights",
-          description: "The MLB API may not have recent highlights available.",
-          variant: "destructive"
-        });
         return;
       }
       
       console.log("MLB highlights fetch result:", data);
       
       if (data?.highlights?.length > 0) {
-        toast({
-          title: "Highlights Updated",
-          description: `Found ${data.highlights.length} Mets highlights from MLB.`
-        });
-        // Refresh the local list
+        // Refresh the local list silently
         await fetchHighlights();
-      } else {
-        toast({
-          title: "No New Highlights",
-          description: "No recent Mets highlights found from MLB API."
-        });
       }
     } catch (err) {
       console.error("Failed to fetch MLB highlights:", err);
-      toast({
-        title: "Error",
-        description: "Failed to connect to MLB API.",
-        variant: "destructive"
-      });
     } finally {
       setRefreshing(false);
     }
-  }, [fetchHighlights, toast]);
+  }, [fetchHighlights]);
 
   useEffect(() => {
     fetchHighlights();
