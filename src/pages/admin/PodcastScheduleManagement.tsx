@@ -321,26 +321,31 @@ export default function PodcastScheduleManagement() {
     };
 
     if (editingId) {
+      // Capture the ID before clearing it
+      const idToUpdate = editingId;
+      
       // Optimistic update - update UI immediately
       setShows(prev => prev.map(show => 
-        show.id === editingId 
+        show.id === idToUpdate 
           ? { ...show, ...showData, thumbnail_gradient: show.thumbnail_gradient, thumbnail_colors: show.thumbnail_colors, is_live: show.is_live, created_at: show.created_at }
           : show
       ));
       setEditingId(null);
       setFormData(initialFormData);
+      setSubmitting(false);
       toast({ title: "Show updated!" });
 
-      // Update database in background
-      const { error } = await supabase
+      // Update database in background (non-blocking)
+      supabase
         .from("podcast_shows")
         .update(showData)
-        .eq("id", editingId);
-
-      if (error) {
-        toast({ title: "Error syncing", description: error.message, variant: "destructive" });
-        fetchShows(); // Revert on error
-      }
+        .eq("id", idToUpdate)
+        .then(({ error }) => {
+          if (error) {
+            toast({ title: "Error syncing", description: error.message, variant: "destructive" });
+            fetchShows(); // Revert on error
+          }
+        });
     } else {
       // Create new show - need to get the ID back
       const { data, error } = await supabase
@@ -359,9 +364,8 @@ export default function PodcastScheduleManagement() {
         toast({ title: "Show created!" });
         setFormData(initialFormData);
       }
+      setSubmitting(false);
     }
-    
-    setSubmitting(false);
   };
 
   const togglePublished = async (id: string, current: boolean) => {
