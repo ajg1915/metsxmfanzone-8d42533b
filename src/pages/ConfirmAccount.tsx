@@ -167,7 +167,7 @@ export default function ConfirmAccount() {
   
   const handleContinueAfterConfirmation = () => {
     if (hasPendingPlan) {
-      navigate("/plans?required=true");
+      navigate("/pricing?required=true");
     } else {
       navigate("/auth?mode=login");
     }

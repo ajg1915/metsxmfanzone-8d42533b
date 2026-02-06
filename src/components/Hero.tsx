@@ -207,7 +207,7 @@ const Hero = () => {
       title: "Join Mets Fans Discusing Mets News Daily",
       description: "Join Anthony and The Mets Universe on his daily Show The MetsXMFanZone podcast",
       image: heroImage,
-      link_url: "/plans",
+      link_url: "/pricing",
       link_text: "Membership",
       show_watch_live: false,
       badges: ["Podcasts", "UNLIMITED"],

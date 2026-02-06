@@ -170,16 +170,16 @@ const Plans = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Mets Fan Subscription Plans - Premium Access | MetsXMFanZone</title>
+        <title>Mets Fan Pricing - Premium Access | MetsXMFanZone</title>
         <meta
           name="description"
-          content="Choose your MetsXMFanZone plan. Get unlimited access to live Mets streams, game replays, exclusive content, and more. Start your free trial today."
+          content="Choose your MetsXMFanZone membership. Get unlimited access to live Mets streams, game replays, exclusive content, and more. Start your free trial today."
         />
         <meta
           name="keywords"
-          content="Mets subscription, Mets premium, baseball streaming plans, Mets fan membership, live stream subscription"
+          content="Mets subscription, Mets premium, baseball streaming pricing, Mets fan membership, live stream subscription"
         />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/plans" />
+        <link rel="canonical" href="https://www.metsxmfanzone.com/pricing" />
       </Helmet>
       {!mustSelectPlan && <Navigation />}
       <main className={mustSelectPlan ? "pt-8" : "pt-12"}>

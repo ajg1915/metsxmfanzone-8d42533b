@@ -230,7 +230,7 @@ const SortableSlide = ({
                 id={`customlink-${slide.id}`}
                 value={slide.link_url || ""}
                 onChange={(e) => onUpdate(slide.id, "link_url", e.target.value || null)}
-                placeholder="/plans or https://external-link.com"
+                placeholder="/pricing or https://external-link.com"
               />
             </div>
           </div>
@@ -258,7 +258,7 @@ const SortableSlide = ({
                 <SelectItem value="/community">Community</SelectItem>
                 <SelectItem value="/podcast">Podcast</SelectItem>
                 <SelectItem value="/blog">Blog</SelectItem>
-                <SelectItem value="/plans">Plans</SelectItem>
+                <SelectItem value="/pricing">Pricing</SelectItem>
                 <SelectItem value="/merch">Merch</SelectItem>
                 <SelectItem value="/events">Events</SelectItem>
                 <SelectItem value="/mets-schedule-2026">Mets Schedule 2026</SelectItem>

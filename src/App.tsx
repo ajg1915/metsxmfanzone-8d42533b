@@ -292,7 +292,7 @@ const AppContent = () => {
             <Route path="/" element={<Index />} />
             <Route path="/community" element={<Community />} />
             <Route path="/gallery" element={<Gallery />} />
-            <Route path="/plans" element={<Plans />} />
+            <Route path="/pricing" element={<Plans />} />
             <Route path="/paypal-success" element={<PayPalSuccess />} />
             <Route path="/helcim-checkout" element={<HelcimCheckout />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
