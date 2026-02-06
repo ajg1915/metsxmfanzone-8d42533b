@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit, Radio } from "lucide-react";
+import { Trash2, Plus, Edit, Radio, Upload, X, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +40,8 @@ export default function LiveStreamManagement() {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStream, setEditingStream] = useState<LiveStream | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -183,6 +185,68 @@ export default function LiveStreamManagement() {
     });
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file",
+        description: "Please upload an image file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Image must be less than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `stream-${Date.now()}.${fileExt}`;
+      const filePath = `live-streams/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('content_uploads')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('content_uploads')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, thumbnail_url: publicUrl });
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload image",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const clearThumbnail = () => {
+    setFormData({ ...formData, thumbnail_url: "" });
+  };
+
   const handleDialogClose = (open: boolean) => {
     setIsDialogOpen(open);
     if (!open) {
@@ -254,14 +318,65 @@ export default function LiveStreamManagement() {
               </div>
 
               <div>
-                <Label htmlFor="thumbnail_url">Thumbnail URL</Label>
-                <Input
-                  id="thumbnail_url"
-                  type="url"
-                  value={formData.thumbnail_url}
-                  onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
-                  placeholder="https://..."
-                />
+                <Label>Thumbnail</Label>
+                <div className="space-y-3 mt-2">
+                  {formData.thumbnail_url && (
+                    <div className="relative w-full aspect-video rounded-md overflow-hidden bg-muted">
+                      <img
+                        src={formData.thumbnail_url}
+                        alt="Thumbnail preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-7 w-7"
+                        onClick={clearThumbnail}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="flex-1"
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Upload Image
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">or URL:</span>
+                    <Input
+                      type="url"
+                      value={formData.thumbnail_url}
+                      onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
+                      placeholder="https://..."
+                      className="pl-14"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
