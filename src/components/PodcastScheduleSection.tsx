@@ -56,13 +56,17 @@ const PodcastScheduleSection = () => {
     
     // Fetch upcoming shows from database
     const now = new Date().toISOString();
+    // Fetch all shows for the next 2 weeks (no limit to show full weekly schedule)
+    const twoWeeksFromNow = new Date();
+    twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
+    
     const { data, error } = await supabase
       .from("podcast_shows")
       .select("id, title, description, show_date, show_type, thumbnail_gradient, thumbnail_url, is_featured, is_live")
       .eq("published", true)
       .gte("show_date", now)
-      .order("show_date", { ascending: true })
-      .limit(4);
+      .lte("show_date", twoWeeksFromNow.toISOString())
+      .order("show_date", { ascending: true });
 
     if (error) {
       console.error("Error fetching podcast shows:", error);
@@ -82,14 +86,17 @@ const PodcastScheduleSection = () => {
           generateFallbackShows();
         } else {
           console.log("Weekly shows generated:", generatedData);
-          // Re-fetch after generation
+          // Re-fetch after generation - get all shows for 2 weeks
+          const refetchTwoWeeks = new Date();
+          refetchTwoWeeks.setDate(refetchTwoWeeks.getDate() + 14);
+          
           const { data: refetchData } = await supabase
             .from("podcast_shows")
             .select("id, title, description, show_date, show_type, thumbnail_gradient, thumbnail_url, is_featured, is_live")
             .eq("published", true)
             .gte("show_date", now)
-            .order("show_date", { ascending: true })
-            .limit(4);
+            .lte("show_date", refetchTwoWeeks.toISOString())
+            .order("show_date", { ascending: true });
           
           if (refetchData && refetchData.length > 0) {
             setShows(refetchData);
