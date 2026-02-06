@@ -37,26 +37,28 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6"
+          className="flex flex-col gap-2 mb-4 sm:mb-6"
         >
-          <div className="flex items-center gap-3">
-            <h2 className="font-bold text-lg sm:text-xl md:text-2xl text-foreground">
-              Spring Training 2026
-            </h2>
-            {!isPremium && <PremiumBadge size="sm" noGlow />}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h2 className="font-bold text-sm sm:text-base md:text-lg lg:text-xl text-foreground whitespace-nowrap">
+                Spring Training 2026
+              </h2>
+              {!isPremium && <PremiumBadge size="sm" noGlow />}
+            </div>
+            <Link 
+              to="/mets-schedule-2026" 
+              className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium text-[10px] sm:text-xs transition-colors group flex-shrink-0"
+            >
+              <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span className="hidden sm:inline">Full 2026 Schedule</span>
+              <span className="sm:hidden">Schedule</span>
+              <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
           </div>
-          <p className="text-muted-foreground text-xs sm:text-sm mt-1">
-            Get ready for the upcoming spring training season
+          <p className="text-muted-foreground text-[10px] sm:text-xs">
+            Get ready for spring training
           </p>
-          <Link 
-            to="/mets-schedule-2026" 
-            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-xs sm:text-sm transition-colors group"
-          >
-            <Calendar className="w-4 h-4" />
-            <span className="hidden sm:inline">View Full 2026 Schedule</span>
-            <span className="sm:hidden">Full Schedule</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
         </motion.div>
 
         {isLoading ? (
@@ -98,11 +100,11 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
                     </div>
                     
                     {/* Content */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-                      <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 line-clamp-1 drop-shadow-lg">
+                    <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 md:p-4">
+                      <h3 className="text-xs sm:text-sm md:text-base font-bold text-foreground mb-0.5 line-clamp-1 drop-shadow-lg">
                         vs {game.opponent}
                       </h3>
-                      <p className="text-xs sm:text-sm text-foreground/80 drop-shadow">Spring Training</p>
+                      <p className="text-[10px] sm:text-xs text-foreground/80 drop-shadow">Spring Training</p>
                     </div>
                   </div>
                 </GlassCard>
