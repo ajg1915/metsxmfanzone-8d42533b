@@ -121,7 +121,7 @@ const StreamTimeLimit = ({ children }: StreamTimeLimitProps) => {
   const handleUpgrade = () => {
     sessionStorage.removeItem(STORAGE_KEY);
     setShowUpgradePrompt(false);
-    window.location.href = "/plans";
+    window.location.href = "/pricing";
   };
 
   const handleGoHome = () => {

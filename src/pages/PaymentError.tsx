@@ -50,7 +50,7 @@ const PaymentError = () => {
             <div className="space-y-3">
               <Button 
                 size="lg" 
-                onClick={() => navigate('/plans')}
+                onClick={() => navigate('/pricing')}
                 className="w-full gap-2"
               >
                 <RefreshCw className="w-4 h-4" />

@@ -223,10 +223,10 @@ const Navigation = () => {
 
             {!user && (
               <NavLink 
-                to="/plans" 
+                to="/pricing" 
                 className="text-foreground hover:text-primary transition-colors"
               >
-                Plans
+                Pricing
               </NavLink>
             )}
           </div>
@@ -362,14 +362,14 @@ const Navigation = () => {
                     )}
                     {!user && (
                       <NavLink 
-                        to="/plans" 
+                        to="/pricing" 
                         className="flex items-center gap-3 text-foreground hover:text-primary hover:bg-primary/10 transition-all py-2.5 px-3 rounded-xl"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
                           <Shield className="w-4 h-4 text-orange-500" />
                         </div>
-                        <span className="font-medium text-sm">Plans</span>
+                        <span className="font-medium text-sm">Pricing</span>
                       </NavLink>
                     )}
                   </div>
