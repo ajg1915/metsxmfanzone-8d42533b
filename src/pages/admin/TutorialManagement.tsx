@@ -70,21 +70,46 @@ export default function TutorialManagement() {
     e.preventDefault();
     setLoading(true);
 
+    // Capture ID before any state changes
+    const idToUpdate = editingId;
+
     try {
-      if (editingId) {
-        const { error } = await supabase.from("tutorial_steps").update(formData).eq("id", editingId);
-
-        if (error) throw error;
+      if (idToUpdate) {
+        // Optimistic update
+        setSteps(prev => prev.map(step => 
+          step.id === idToUpdate 
+            ? { ...step, ...formData }
+            : step
+        ));
+        resetForm();
         toast({ title: "Tutorial step updated" });
+
+        // Update database in background
+        const { error } = await supabase
+          .from("tutorial_steps")
+          .update(formData)
+          .eq("id", idToUpdate);
+
+        if (error) {
+          toast({ title: "Error syncing", description: error.message, variant: "destructive" });
+          fetchSteps(); // Revert on error
+        }
       } else {
-        const { error } = await supabase.from("tutorial_steps").insert([formData]);
+        // Create new - need the ID back
+        const { data, error } = await supabase
+          .from("tutorial_steps")
+          .insert([formData])
+          .select()
+          .single();
 
         if (error) throw error;
+        
+        if (data) {
+          setSteps(prev => [...prev, data as TutorialStep].sort((a, b) => a.step_number - b.step_number));
+        }
         toast({ title: "Tutorial step created" });
+        resetForm();
       }
-
-      resetForm();
-      fetchSteps();
     } catch (error: any) {
       toast({
         title: "Error saving step",

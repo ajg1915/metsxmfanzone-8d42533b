@@ -18,20 +18,24 @@ interface TVSchedule {
   description?: string;
   time_slot: string;
   is_live: boolean;
+  created_at?: string;
 }
 
 const TVScheduleManagement = () => {
   const [schedules, setSchedules] = useState<TVSchedule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     network: "ESPN Network",
     show_title: "",
     description: "",
     time_slot: "",
     is_live: false,
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
 
   useEffect(() => {
     fetchSchedules();
@@ -58,82 +62,123 @@ const TVScheduleManagement = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setEditingId(null);
+  };
+
+  const startEditing = (schedule: TVSchedule) => {
+    setEditingId(schedule.id);
+    setFormData({
+      network: schedule.network,
+      show_title: schedule.show_title,
+      description: schedule.description || "",
+      time_slot: schedule.time_slot,
+      is_live: schedule.is_live,
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      const { error } = await supabase.from("tv_schedules").insert([formData]);
+    // Capture ID before any state changes
+    const idToUpdate = editingId;
 
-      if (error) throw error;
+    if (idToUpdate) {
+      // Optimistic update for editing
+      setSchedules(prev => prev.map(schedule => 
+        schedule.id === idToUpdate 
+          ? { ...schedule, ...formData }
+          : schedule
+      ));
+      resetForm();
+      toast({ title: "Success", description: "TV schedule updated" });
 
-      toast({
-        title: "Success",
-        description: "TV schedule added successfully",
-      });
+      // Update database in background
+      const { error } = await supabase
+        .from("tv_schedules")
+        .update(formData)
+        .eq("id", idToUpdate);
 
-      setFormData({
-        network: "ESPN Network",
-        show_title: "",
-        description: "",
-        time_slot: "",
-        is_live: false,
-      });
+      if (error) {
+        toast({ title: "Error syncing", description: error.message, variant: "destructive" });
+        fetchSchedules(); // Revert on error
+      }
+    } else {
+      // Create new
+      try {
+        const { data, error } = await supabase
+          .from("tv_schedules")
+          .insert([formData])
+          .select()
+          .single();
 
-      fetchSchedules();
-    } catch (error) {
-      console.error("Error adding schedule:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add TV schedule",
-        variant: "destructive",
-      });
+        if (error) throw error;
+
+        if (data) {
+          setSchedules(prev => [...prev, data]);
+        }
+        
+        toast({ title: "Success", description: "TV schedule added" });
+        resetForm();
+      } catch (error: any) {
+        console.error("Error adding schedule:", error);
+        toast({
+          title: "Error",
+          description: "Failed to add TV schedule",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      const { error } = await supabase.from("tv_schedules").delete().eq("id", id);
+    // Optimistic delete
+    const deletedSchedule = schedules.find(s => s.id === id);
+    setSchedules(prev => prev.filter(schedule => schedule.id !== id));
+    toast({ title: "Success", description: "TV schedule deleted" });
 
-      if (error) throw error;
+    const { error } = await supabase.from("tv_schedules").delete().eq("id", id);
 
-      toast({
-        title: "Success",
-        description: "TV schedule deleted successfully",
-      });
-
-      fetchSchedules();
-    } catch (error) {
+    if (error) {
       console.error("Error deleting schedule:", error);
       toast({
-        title: "Error",
-        description: "Failed to delete TV schedule",
+        title: "Error syncing",
+        description: error.message,
         variant: "destructive",
       });
+      // Revert on error
+      if (deletedSchedule) {
+        setSchedules(prev => [...prev, deletedSchedule]);
+      }
     }
   };
 
   const toggleLiveStatus = async (id: string, currentStatus: boolean) => {
-    try {
-      const { error } = await supabase
-        .from("tv_schedules")
-        .update({ is_live: !currentStatus })
-        .eq("id", id);
+    // Optimistic update
+    setSchedules(prev => prev.map(schedule => 
+      schedule.id === id ? { ...schedule, is_live: !currentStatus } : schedule
+    ));
 
-      if (error) throw error;
+    const { error } = await supabase
+      .from("tv_schedules")
+      .update({ is_live: !currentStatus })
+      .eq("id", id);
 
-      toast({
-        title: "Success",
-        description: "Live status updated",
-      });
-
-      fetchSchedules();
-    } catch (error) {
+    if (error) {
       console.error("Error updating status:", error);
       toast({
         title: "Error",
         description: "Failed to update live status",
         variant: "destructive",
       });
+      // Revert on error
+      setSchedules(prev => prev.map(schedule => 
+        schedule.id === id ? { ...schedule, is_live: currentStatus } : schedule
+      ));
+    } else {
+      toast({ title: "Success", description: "Live status updated" });
     }
   };
 
@@ -148,11 +193,11 @@ const TVScheduleManagement = () => {
         <p className="text-xs text-muted-foreground">ESPN & MLB Networks</p>
       </div>
 
-      <Card>
+      <Card className={editingId ? "ring-2 ring-primary" : ""}>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-1.5">
             <Plus className="w-3.5 h-3.5" />
-            Add Schedule
+            {editingId ? "Edit Schedule" : "Add Schedule"}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-3">
@@ -201,10 +246,17 @@ const TVScheduleManagement = () => {
                 />
                 <Label className="text-xs">Live</Label>
               </div>
-              <Button type="submit" size="sm" className="h-8 text-xs">
-                <Plus className="w-3.5 h-3.5 mr-1" />
-                Add
-              </Button>
+              <div className="flex gap-2">
+                {editingId && (
+                  <Button type="button" variant="outline" size="sm" className="h-8 text-xs" onClick={resetForm}>
+                    Cancel
+                  </Button>
+                )}
+                <Button type="submit" size="sm" className="h-8 text-xs">
+                  <Plus className="w-3.5 h-3.5 mr-1" />
+                  {editingId ? "Update" : "Add"}
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>
@@ -229,6 +281,14 @@ const TVScheduleManagement = () => {
                     <p className="text-xs text-muted-foreground">{schedule.time_slot}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-7 w-7 p-0" 
+                      onClick={() => startEditing(schedule)}
+                    >
+                      <Clock className="w-3.5 h-3.5" />
+                    </Button>
                     <Switch
                       checked={schedule.is_live}
                       onCheckedChange={() => toggleLiveStatus(schedule.id, schedule.is_live)}

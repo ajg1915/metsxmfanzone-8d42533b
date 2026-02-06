@@ -123,8 +123,11 @@ export default function SpringTrainingManagement() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingId) {
-      updateMutation.mutate({ id: editingId, data: formData });
+    // Capture ID before any state changes to prevent null issues
+    const idToUpdate = editingId;
+    
+    if (idToUpdate) {
+      updateMutation.mutate({ id: idToUpdate, data: formData });
     } else {
       createMutation.mutate(formData);
     }
