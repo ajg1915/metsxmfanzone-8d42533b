@@ -100,11 +100,11 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
                     </div>
                     
                     {/* Content */}
-                    <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 md:p-4">
-                      <h3 className="text-xs sm:text-sm md:text-base font-bold text-foreground mb-0.5 line-clamp-1 drop-shadow-lg">
+                    <div className="absolute bottom-0 left-0 right-0 p-1.5 sm:p-2 md:p-3">
+                      <h3 className="text-[10px] sm:text-xs md:text-sm font-bold text-white mb-0.5 truncate drop-shadow-lg">
                         vs {game.opponent}
                       </h3>
-                      <p className="text-[10px] sm:text-xs text-foreground/80 drop-shadow">Spring Training</p>
+                      <p className="text-[8px] sm:text-[10px] md:text-xs text-white/90 drop-shadow">Spring Training</p>
                     </div>
                   </div>
                 </GlassCard>
