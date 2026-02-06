@@ -14,7 +14,7 @@ const ImmersiveBackground = lazy(() => import("@/components/ImmersiveBackground"
 const LiveNotificationBar = lazy(() => import("@/components/LiveNotificationBar"));
 const LiveNetworks = lazy(() => import("@/components/LiveNetworks"));
 const LiveStreamsSection = lazy(() => import("@/components/LiveStreamsSection"));
-const HighlightsSection = lazy(() => import("@/components/HighlightsSection"));
+
 const SpringTraining = lazy(() => import("@/components/SpringTraining"));
 const PlayersToWatch = lazy(() => import("@/components/PlayersToWatch"));
 const TalentAssessmentSection = lazy(() => import("@/components/TalentAssessmentSection"));
@@ -193,13 +193,6 @@ const Index = () => {
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal delay={100}>
-            <HighlightsSection />
-          </ScrollReveal>
-        </Suspense>
-
-        <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
           <ScrollReveal direction="left">
