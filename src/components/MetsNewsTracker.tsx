@@ -52,7 +52,7 @@ const MetsNewsTracker = () => {
 
   useEffect(() => {
     fetchNewsItems();
-    const interval = setInterval(fetchNewsItems, 6 * 60 * 1000);
+    const interval = setInterval(fetchNewsItems, 20 * 60 * 1000); // Refresh every 20 minutes
     return () => clearInterval(interval);
   }, []);
 
