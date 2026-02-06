@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Calendar, ChevronRight, Play } from "lucide-react";
-import { motion } from "framer-motion";
+
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import PremiumBadge from "@/components/PremiumBadge";
@@ -32,13 +32,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
   return (
     <section className="py-8 sm:py-10 md:py-12 relative overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col gap-2 mb-4 sm:mb-6"
-        >
+        <div className="flex flex-col gap-2 mb-4 sm:mb-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <h2 className="font-bold text-sm sm:text-base md:text-lg lg:text-xl text-foreground whitespace-nowrap">
@@ -59,7 +53,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
           <p className="text-muted-foreground text-[10px] sm:text-xs">
             Get ready for spring training
           </p>
-        </motion.div>
+        </div>
 
         {isLoading ? (
           <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -118,13 +112,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
         )}
         
         {games && games.length > 0 && (
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex justify-center mt-4"
-          >
+          <div className="flex justify-center mt-4">
             <Button 
               variant="outline" 
               asChild
@@ -135,7 +123,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
                 See Matchup Overview
               </Link>
             </Button>
-          </motion.div>
+          </div>
         )}
       </div>
     </section>
