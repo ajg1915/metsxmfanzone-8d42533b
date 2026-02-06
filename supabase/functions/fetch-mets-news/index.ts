@@ -132,24 +132,32 @@ serve(async (req) => {
       }
     }
 
-    // Also fetch MLB general news
+    // Also fetch MLB general news - multiple endpoints for more coverage
     console.log("Fetching MLB general news...");
-    try {
-      const mlbResponse = await fetch("https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news");
-      if (mlbResponse.ok) {
-        const mlbData: ESPNResponse = await mlbResponse.json();
-        const mlbArticles = mlbData.articles || [];
-        console.log(`Received ${mlbArticles.length} MLB general articles`);
-        
-        // Add MLB articles that aren't duplicates
-        for (const article of mlbArticles) {
-          if (!allArticles.find(a => a.headline === article.headline)) {
-            allArticles.push(article);
+    const mlbEndpoints = [
+      "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news",
+      "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news?limit=25"
+    ];
+    
+    for (const url of mlbEndpoints) {
+      try {
+        console.log(`Fetching from: ${url}`);
+        const mlbResponse = await fetch(url);
+        if (mlbResponse.ok) {
+          const mlbData: ESPNResponse = await mlbResponse.json();
+          const mlbArticles = mlbData.articles || [];
+          console.log(`Received ${mlbArticles.length} articles from ${url}`);
+          
+          // Add MLB articles that aren't duplicates
+          for (const article of mlbArticles) {
+            if (!allArticles.find(a => a.headline === article.headline)) {
+              allArticles.push(article);
+            }
           }
         }
+      } catch (e) {
+        console.log(`Error fetching from ${url}:`, e);
       }
-    } catch (e) {
-      console.log("Error fetching MLB general news:", e);
     }
 
     console.log(`Total articles collected: ${allArticles.length}`);
@@ -168,7 +176,7 @@ serve(async (req) => {
     const metsKeywords = ['mets', 'new york mets', 'nym', 'citi field', 'lindor', 'alonso', 'nimmo', 'mcneil', 'senga', 'diaz', 'baty', 'alvarez', 'mendez', 'grimace', 'manaea', 'megill', 'vientos', 'winker', 'francisco', 'pete alonso', 'jeff mcneil', 'mark vientos'];
 
     // Transform ESPN data to our format
-    const transformedNews = uniqueArticles.slice(0, 15).map((article, index) => {
+    const transformedNews = uniqueArticles.slice(0, 20).map((article, index) => {
       // Determine type based on article content
       const headline = article.headline?.toLowerCase() || '';
       const description = article.description?.toLowerCase() || '';
