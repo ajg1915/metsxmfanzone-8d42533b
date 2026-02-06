@@ -4,7 +4,7 @@ import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import podcastIcon from "@/assets/podcast-icon.png";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
-import { motion } from "framer-motion";
+
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
@@ -411,18 +411,7 @@ const Hero = () => {
                     {slide.show_watch_live && (
                       <div className="relative">
                         {isLiveNow && (
-                          <motion.div
-                            className="absolute -inset-1.5 sm:-inset-2 rounded-lg sm:rounded-xl bg-[#ff4500]/40 blur-lg sm:blur-xl"
-                            animate={{
-                              opacity: [0.4, 0.8, 0.4],
-                              scale: [1, 1.1, 1],
-                            }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                            }}
-                          />
+                          <div className="absolute -inset-1.5 sm:-inset-2 rounded-lg sm:rounded-xl bg-[#ff4500]/40 blur-lg sm:blur-xl animate-pulse" />
                         )}
                         <Button
                           onClick={() => handleProtectedNavigation("/metsxmfanzone-tv")}
@@ -541,18 +530,7 @@ const Hero = () => {
               <div key={tab.id} className="relative">
                 {/* Orange glow for Live Streams tab when live */}
                 {isLiveTab && isLiveNow && (
-                  <motion.div
-                    className="absolute -inset-1 rounded-xl bg-[#ff4500]/30 blur-md"
-                    animate={{
-                      opacity: [0.3, 0.6, 0.3],
-                      scale: [1, 1.05, 1],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  />
+                  <div className="absolute -inset-1 rounded-xl bg-[#ff4500]/30 blur-md animate-pulse" />
                 )}
                 {isOverviewTab ? (
                   <Popover open={showOverviewInfo} onOpenChange={setShowOverviewInfo}>
