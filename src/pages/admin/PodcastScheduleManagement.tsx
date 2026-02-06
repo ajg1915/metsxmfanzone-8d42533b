@@ -321,30 +321,43 @@ export default function PodcastScheduleManagement() {
     };
 
     if (editingId) {
-      // Update existing show
+      // Optimistic update - update UI immediately
+      setShows(prev => prev.map(show => 
+        show.id === editingId 
+          ? { ...show, ...showData, thumbnail_gradient: show.thumbnail_gradient, thumbnail_colors: show.thumbnail_colors, is_live: show.is_live, created_at: show.created_at }
+          : show
+      ));
+      setEditingId(null);
+      setFormData(initialFormData);
+      toast({ title: "Show updated!" });
+
+      // Update database in background
       const { error } = await supabase
         .from("podcast_shows")
         .update(showData)
         .eq("id", editingId);
 
       if (error) {
-        toast({ title: "Error updating show", description: error.message, variant: "destructive" });
-      } else {
-        toast({ title: "Show updated successfully!" });
-        setEditingId(null);
-        setFormData(initialFormData);
-        fetchShows();
+        toast({ title: "Error syncing", description: error.message, variant: "destructive" });
+        fetchShows(); // Revert on error
       }
     } else {
-      // Create new show
-      const { error } = await supabase.from("podcast_shows").insert(showData);
+      // Create new show - need to get the ID back
+      const { data, error } = await supabase
+        .from("podcast_shows")
+        .insert(showData)
+        .select()
+        .single();
 
       if (error) {
         toast({ title: "Error creating show", description: error.message, variant: "destructive" });
-      } else {
-        toast({ title: "Show created successfully!" });
+      } else if (data) {
+        // Add to local state immediately
+        setShows(prev => [...prev, data].sort((a, b) => 
+          new Date(a.show_date).getTime() - new Date(b.show_date).getTime()
+        ));
+        toast({ title: "Show created!" });
         setFormData(initialFormData);
-        fetchShows();
       }
     }
     
@@ -352,6 +365,11 @@ export default function PodcastScheduleManagement() {
   };
 
   const togglePublished = async (id: string, current: boolean) => {
+    // Optimistic update
+    setShows(prev => prev.map(show => 
+      show.id === id ? { ...show, published: !current } : show
+    ));
+
     const { error } = await supabase
       .from("podcast_shows")
       .update({ published: !current })
@@ -359,12 +377,20 @@ export default function PodcastScheduleManagement() {
 
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      fetchShows();
+      setShows(prev => prev.map(show => 
+        show.id === id ? { ...show, published: current } : show
+      )); // Revert
     }
   };
 
   const toggleLive = async (id: string, current: boolean) => {
+    // Optimistic update - set all to not live, then toggle the target
+    setShows(prev => prev.map(show => ({
+      ...show,
+      is_live: show.id === id ? !current : false
+    })));
+    toast({ title: !current ? "Show is now LIVE!" : "Show ended" });
+
     if (!current) {
       await supabase.from("podcast_shows").update({ is_live: false }).neq("id", "none");
     }
@@ -376,22 +402,27 @@ export default function PodcastScheduleManagement() {
 
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: !current ? "Show is now LIVE!" : "Show ended" });
-      fetchShows();
+      fetchShows(); // Revert on error
     }
   };
 
   const deleteShow = async (id: string) => {
     if (!confirm("Delete this show?")) return;
 
+    // Optimistic delete
+    const deletedShow = shows.find(s => s.id === id);
+    setShows(prev => prev.filter(show => show.id !== id));
+    toast({ title: "Show deleted" });
+
     const { error } = await supabase.from("podcast_shows").delete().eq("id", id);
 
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Show deleted" });
-      fetchShows();
+      if (deletedShow) {
+        setShows(prev => [...prev, deletedShow].sort((a, b) => 
+          new Date(a.show_date).getTime() - new Date(b.show_date).getTime()
+        )); // Revert
+      }
     }
   };
 
