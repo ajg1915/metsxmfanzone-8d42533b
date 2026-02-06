@@ -34,7 +34,7 @@ const InstallPrompt = lazy(() => import("@/components/InstallPrompt"));
 const OnboardingWalkthrough = lazy(() => import("@/components/OnboardingWalkthrough"));
 const NotificationPrompt = lazy(() => import("@/components/NotificationPrompt"));
 const WelcomeBackToast = lazy(() => import("@/components/WelcomeBackToast"));
-const ScrollReveal = lazy(() => import("@/components/ScrollReveal"));
+
 
 // Section loading skeleton
 const SectionSkeleton = ({ height = "h-64" }: { height?: string }) => (
@@ -174,130 +174,95 @@ const Index = () => {
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton height="h-32" />}>
-          <ScrollReveal delay={100}>
-            <StoriesSection />
-          </ScrollReveal>
+          <StoriesSection />
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal>
-            <LiveNetworks />
-          </ScrollReveal>
+          <LiveNetworks />
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal delay={100}>
-            <LiveStreamsSection />
-          </ScrollReveal>
+          <LiveStreamsSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
-
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal direction="left">
-            <BlogSection />
-          </ScrollReveal>
+          <BlogSection />
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton height="h-48" />}>
-          <ScrollReveal delay={100}>
-            <HomeLineupCard />
-          </ScrollReveal>
+          <HomeLineupCard />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal>
-            <CommunityPreviewSection />
-          </ScrollReveal>
+          <CommunityPreviewSection />
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal delay={150}>
-            <PodcastScheduleSection />
-          </ScrollReveal>
+          <PodcastScheduleSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal>
-            <SpringTraining />
-          </ScrollReveal>
+          <SpringTraining />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal delay={100}>
-            <PlayersToWatch />
-          </ScrollReveal>
+          <PlayersToWatch />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal delay={100}>
-            <TalentAssessmentSection />
-          </ScrollReveal>
+          <TalentAssessmentSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal>
-            <MetsNewsTracker />
-          </ScrollReveal>
+          <MetsNewsTracker />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal direction="right" delay={100}>
-            <PodcastSection />
-          </ScrollReveal>
+          <PodcastSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton height="h-48" />}>
-          <ScrollReveal delay={100}>
-            <JoinPodcastSection />
-          </ScrollReveal>
+          <JoinPodcastSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal direction="scale">
-            <FAQSection />
-          </ScrollReveal>
+          <FAQSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal>
-            <TestimonialsSection />
-          </ScrollReveal>
+          <TestimonialsSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton height="h-48" />}>
-          <ScrollReveal>
-            <AppInstallSection />
-          </ScrollReveal>
+          <AppInstallSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
-          <ScrollReveal delay={100}>
-            <HotStoveGuide />
-          </ScrollReveal>
+          <HotStoveGuide />
         </Suspense>
       </main>
       <Footer />
