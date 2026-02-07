@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Input } from "@/components/ui/input";
 import { Lock, Shield, AlertTriangle, Fingerprint, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,7 +52,7 @@ export default function AdminPortal() {
   };
 
   const handleLogin = useCallback(async () => {
-    if (pin.length !== 8 || loading) return;
+    if (pin.length < 6 || loading) return;
 
     setLoading(true);
     try {
@@ -179,9 +179,9 @@ export default function AdminPortal() {
     }
   }, [pin, deviceFingerprint, loading, navigate, toast, attemptsRemaining]);
 
-  // Auto-submit when PIN is complete (8 digits)
+  // Auto-submit when PIN is complete (minimum 6 characters, auto-submit at 8)
   useEffect(() => {
-    if (pin.length === 8 && !loading && !isLocked) {
+    if (pin.length >= 8 && !loading && !isLocked) {
       handleLogin();
     }
   }, [pin, loading, isLocked, handleLogin]);
@@ -206,7 +206,7 @@ export default function AdminPortal() {
           </div>
           <CardTitle className="text-2xl font-bold">Admin Portal</CardTitle>
           <CardDescription className="text-base">
-            Enter your 8-digit security PIN to access the admin dashboard
+            Enter your security PIN to access the admin dashboard
           </CardDescription>
         </CardHeader>
 
@@ -238,24 +238,23 @@ export default function AdminPortal() {
                 <CheckCircle className="w-3 h-3 text-green-500" />
               </div>
 
-              <div className="flex justify-center">
-                <InputOTP
+              <div className="flex flex-col items-center gap-3">
+                <Input
+                  type="password"
                   value={pin}
-                  onChange={setPin}
-                  maxLength={8}
+                  onChange={(e) => setPin(e.target.value)}
+                  placeholder="Enter your PIN"
+                  className="text-center text-xl tracking-widest max-w-[200px] h-14"
+                  maxLength={20}
+                  autoComplete="off"
                   disabled={loading}
-                >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} className="w-10 h-12 text-lg" />
-                    <InputOTPSlot index={1} className="w-10 h-12 text-lg" />
-                    <InputOTPSlot index={2} className="w-10 h-12 text-lg" />
-                    <InputOTPSlot index={3} className="w-10 h-12 text-lg" />
-                    <InputOTPSlot index={4} className="w-10 h-12 text-lg" />
-                    <InputOTPSlot index={5} className="w-10 h-12 text-lg" />
-                    <InputOTPSlot index={6} className="w-10 h-12 text-lg" />
-                    <InputOTPSlot index={7} className="w-10 h-12 text-lg" />
-                  </InputOTPGroup>
-                </InputOTP>
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && pin.length >= 6) {
+                      handleLogin();
+                    }
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
               </div>
 
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
@@ -265,7 +264,7 @@ export default function AdminPortal() {
 
               <Button
                 onClick={handleLogin}
-                disabled={pin.length !== 8 || loading}
+                disabled={pin.length < 6 || loading}
                 className="w-full h-12 text-base"
               >
                 {loading ? (
