@@ -539,15 +539,18 @@ const Auth = () => {
       }
 
       if (data.user) {
-        // Update profile with phone number and SMS preference
-        if (validated.phoneNumber || validated.smsOptIn) {
+        // Update profile with phone number, SMS preference, and ensure email_verified is false
+        try {
+          const updateData: Record<string, any> = { email_verified: false };
+          if (validated.phoneNumber) updateData.phone_number = validated.phoneNumber;
+          if (validated.smsOptIn) updateData.sms_notifications_enabled = true;
+          
           await supabase
             .from("profiles")
-            .update({
-              phone_number: validated.phoneNumber || null,
-              sms_notifications_enabled: validated.smsOptIn || false,
-            })
+            .update(updateData)
             .eq("id", data.user.id);
+        } catch (profileUpdateErr) {
+          console.error("Profile update error (non-blocking):", profileUpdateErr);
         }
 
         // Send confirmation email - the edge function handles token creation with service role
@@ -691,7 +694,8 @@ const Auth = () => {
           return;
         }
 
-        if (!profile?.email_verified) {
+        // Check if email_verified is explicitly true (handles null case)
+        if (profile?.email_verified !== true) {
           // Sign out the user since they haven't confirmed their email
           await supabase.auth.signOut();
           toast({
