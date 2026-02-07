@@ -102,8 +102,8 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'login') {
-      if (!pin || pin.length !== 8 || !/^\d{8}$/.test(pin)) {
-        return new Response(JSON.stringify({ error: 'PIN must be exactly 8 digits' }), {
+      if (!pin || pin.length < 6) {
+        return new Response(JSON.stringify({ error: 'PIN must be at least 6 characters' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -265,8 +265,8 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'setup-pin') {
-      if (!setupUserId || !setupPin || setupPin.length !== 8 || !/^\d{8}$/.test(setupPin)) {
-        return new Response(JSON.stringify({ error: 'PIN must be exactly 8 digits' }), {
+      if (!setupUserId || !setupPin || setupPin.length < 6) {
+        return new Response(JSON.stringify({ error: 'PIN must be at least 6 characters' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
