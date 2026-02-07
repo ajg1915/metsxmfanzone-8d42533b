@@ -34,6 +34,7 @@ const InstallPrompt = lazy(() => import("@/components/InstallPrompt"));
 const OnboardingWalkthrough = lazy(() => import("@/components/OnboardingWalkthrough"));
 const NotificationPrompt = lazy(() => import("@/components/NotificationPrompt"));
 const WelcomeBackToast = lazy(() => import("@/components/WelcomeBackToast"));
+const FeedbackToast = lazy(() => import("@/components/FeedbackToast"));
 
 
 // Section loading skeleton
@@ -276,6 +277,9 @@ const Index = () => {
       </Suspense>
       <Suspense fallback={null}>
         <OnboardingWalkthrough onComplete={() => setOnboardingShown(true)} />
+      </Suspense>
+      <Suspense fallback={null}>
+        <FeedbackToast />
       </Suspense>
     </div>
   );
