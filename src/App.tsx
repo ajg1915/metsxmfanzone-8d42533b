@@ -13,7 +13,7 @@ import { usePresenceTracking } from "@/hooks/usePresenceTracking";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { StreamExitDialog } from "@/components/StreamExitDialog";
 import { LiveStreamToast } from "@/components/LiveStreamToast";
-import ToastPoll from "@/components/ToastPoll";
+
 import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
 import { useDevice } from "@/hooks/use-device";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -277,7 +277,7 @@ const AppContent = () => {
         {/* LiveStreamToast removed per user request */}
         <ExitIntentPopup />
         <StreamExitDialog />
-        <ToastPoll />
+        
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* TV Mode Routes */}
