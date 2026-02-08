@@ -28,7 +28,7 @@ export function UpgradePrompt({ open, onOpenChange }: UpgradePromptProps) {
           <Button variant="outline" onClick={handleClose}>
             Maybe Later
           </Button>
-          <Button onClick={() => navigate("/plans")}>
+          <Button onClick={() => navigate("/pricing")}>
             View Membership
           </Button>
         </DialogFooter>

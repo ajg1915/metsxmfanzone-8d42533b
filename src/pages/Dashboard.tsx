@@ -358,7 +358,7 @@ const Dashboard = () => {
                       </p>
                       <Button 
                         className="w-full gap-2"
-                        onClick={() => navigate("/plans")}
+                        onClick={() => navigate("/pricing")}
                       >
                         <ArrowUpCircle className="w-4 h-4" />
                         Upgrade to Premium
@@ -417,7 +417,7 @@ const Dashboard = () => {
                                 className="w-full"
                                 onClick={() => {
                                   setSubscriptionDialogOpen(false);
-                                  navigate("/plans");
+                                  navigate("/pricing");
                                 }}
                               >
                                 Change Plan
@@ -504,7 +504,7 @@ const Dashboard = () => {
                     </p>
                     <Button 
                       className="w-full md:w-auto"
-                      onClick={() => navigate("/plans")}
+                      onClick={() => navigate("/pricing")}
                     >
                       Start Free Trial
                     </Button>
