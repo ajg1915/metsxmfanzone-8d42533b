@@ -38,7 +38,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "helcim">("paypal");
+  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "helcim">("helcim");
   const [showPromoCode, setShowPromoCode] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
@@ -282,15 +282,6 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
                 className="space-y-2"
               >
                 <label
-                  htmlFor="paypal"
-                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
-                >
-                  <RadioGroupItem value="paypal" id="paypal" />
-                  <div className="flex items-center gap-2 flex-1">
-                    <span className="text-sm font-medium">PayPal</span>
-                  </div>
-                </label>
-                <label
                   htmlFor="helcim"
                   className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
                 >
@@ -298,6 +289,17 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
                   <div className="flex items-center gap-2 flex-1">
                     <CreditCard className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm font-medium">Credit/Debit Card</span>
+                    <span className="text-xs text-primary ml-auto">Primary</span>
+                  </div>
+                </label>
+                <label
+                  htmlFor="paypal"
+                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
+                >
+                  <RadioGroupItem value="paypal" id="paypal" />
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="text-sm font-medium">PayPal</span>
+                    <span className="text-xs text-muted-foreground ml-auto">Backup</span>
                   </div>
                 </label>
               </RadioGroup>

@@ -58,7 +58,7 @@ const generateExpiringEmailHtml = (
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5; padding: 20px; margin: 0;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
     <div style="background: linear-gradient(135deg, #002D72 0%, #FF5910 100%); padding: 30px; text-align: center;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">MetsXM FanZone</h1>
+      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">MetsXMFanZone</h1>
     </div>
     <div style="padding: 30px;">
       <h2 style="color: #002D72; margin-top: 0;">Hi ${userName || "Fan"}!</h2>
@@ -91,7 +91,7 @@ const generateExpiringEmailHtml = (
     </div>
     <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
       <p style="color: #9CA3AF; font-size: 12px; margin: 0;">
-        © 2026 MetsXM FanZone. All rights reserved.
+        © 2026 MetsXMFanZone. All rights reserved.
       </p>
     </div>
   </div>
@@ -111,7 +111,7 @@ const generateExpiredEmailHtml = (userName: string, planName: string) => {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5; padding: 20px; margin: 0;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
     <div style="background: linear-gradient(135deg, #002D72 0%, #FF5910 100%); padding: 30px; text-align: center;">
-      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">MetsXM FanZone</h1>
+      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">MetsXMFanZone</h1>
     </div>
     <div style="padding: 30px;">
       <h2 style="color: #002D72; margin-top: 0;">Hi ${userName || "Fan"}!</h2>
@@ -144,7 +144,7 @@ const generateExpiredEmailHtml = (userName: string, planName: string) => {
     </div>
     <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
       <p style="color: #9CA3AF; font-size: 12px; margin: 0;">
-        © 2026 MetsXM FanZone. All rights reserved.
+        © 2026 MetsXMFanZone. All rights reserved.
       </p>
     </div>
   </div>
@@ -217,7 +217,7 @@ serve(async (req) => {
         if (endDate <= now) {
           // Subscription has expired
           notificationType = NOTIFICATION_TYPES.EXPIRED;
-          emailSubject = "Your MetsXM FanZone subscription has expired";
+          emailSubject = "Your MetsXMFanZone subscription has expired";
           emailHtml = generateExpiredEmailHtml(profile.full_name || "", planName);
 
           // Update subscription status
@@ -244,7 +244,7 @@ serve(async (req) => {
       } else if (sub.status === "expired" && endDate <= now) {
         // Already expired, check if we sent the expired notification
         notificationType = NOTIFICATION_TYPES.EXPIRED;
-        emailSubject = "Your MetsXM FanZone subscription has expired";
+        emailSubject = "Your MetsXMFanZone subscription has expired";
         emailHtml = generateExpiredEmailHtml(profile.full_name || "", planName);
       }
 
@@ -266,7 +266,7 @@ serve(async (req) => {
       // Send the email
       try {
         const emailResponse = await resend.emails.send({
-          from: "MetsXM FanZone <noreply@metsxmfanzone.com>",
+          from: "MetsXMFanZone <noreply@metsxmfanzone.com>",
           to: [profile.email],
           subject: emailSubject,
           html: emailHtml,
