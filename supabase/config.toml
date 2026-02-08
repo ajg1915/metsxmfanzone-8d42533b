@@ -134,3 +134,6 @@ verify_jwt = true
 
 [functions.generate-ai-video]
 verify_jwt = true
+
+[functions.subscription-expiry-notifications]
+verify_jwt = false
