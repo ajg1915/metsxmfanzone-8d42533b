@@ -88,7 +88,7 @@ const organizationSchema = {
   "@type": "Organization",
   "@id": "https://www.metsxmfanzone.com/#organization",
   name: "MetsXMFanZone",
-  alternateName: "Mets XM Fan Zone",
+  alternateName: "MetsXMFanZone",
   url: "https://www.metsxmfanzone.com",
   logo: "https://www.metsxmfanzone.com/logo-512.png",
   description: "The ultimate fan-created platform for New York Mets fans featuring live streams, podcasts, news, and community.",
