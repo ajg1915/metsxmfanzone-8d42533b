@@ -43,7 +43,7 @@ const AppInstallSection = () => {
             </span>
           </div>
           <Button 
-            onClick={() => navigate("/plans")}
+            onClick={() => navigate("/pricing")}
             size="lg"
             className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-8 shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all duration-300"
           >

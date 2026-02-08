@@ -108,8 +108,8 @@ const PremiumContent = () => {
                 <ol className="space-y-3 text-muted-foreground list-decimal list-inside">
                   <li>
                     Navigate to the{" "}
-                    <Link to="/plans" className="text-primary hover:underline font-medium">
-                      Plans
+                    <Link to="/pricing" className="text-primary hover:underline font-medium">
+                      Pricing
                     </Link>{" "}
                     page
                   </li>
