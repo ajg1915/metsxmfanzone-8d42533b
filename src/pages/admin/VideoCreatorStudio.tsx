@@ -23,7 +23,9 @@ import {
   GripVertical,
   Clock,
   Sparkles,
-  Edit3
+  Edit3,
+  Film,
+  Zap
 } from "lucide-react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 
@@ -59,6 +61,14 @@ export default function VideoCreatorStudio() {
   const [isCreatingVideo, setIsCreatingVideo] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [videoProgress, setVideoProgress] = useState(0);
+  
+  // AI Video Generation State
+  const [aiVideoImageUrl, setAiVideoImageUrl] = useState("");
+  const [aiVideoPrompt, setAiVideoPrompt] = useState("");
+  const [isGeneratingAiVideo, setIsGeneratingAiVideo] = useState(false);
+  const [generatedAiVideoUrl, setGeneratedAiVideoUrl] = useState<string | null>(null);
+  const [aiVideoDuration, setAiVideoDuration] = useState<5 | 10>(5);
+  const aiVideoFileInputRef = useRef<HTMLInputElement>(null);
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -135,6 +145,66 @@ export default function VideoCreatorStudio() {
     } finally {
       setIsEditingImage(false);
     }
+  };
+
+  // Handle AI video image upload
+  const handleAiVideoImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setAiVideoImageUrl(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Generate AI video from image using Lovable's free API
+  const handleGenerateAiVideo = async () => {
+    if (!aiVideoImageUrl.trim()) {
+      toast({ title: "Upload an image", description: "Please upload or provide an image URL to animate", variant: "destructive" });
+      return;
+    }
+
+    if (!aiVideoPrompt.trim()) {
+      toast({ title: "Enter a prompt", description: "Describe how you want the image to be animated", variant: "destructive" });
+      return;
+    }
+
+    setIsGeneratingAiVideo(true);
+    setGeneratedAiVideoUrl(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-ai-video', {
+        body: { 
+          imageUrl: aiVideoImageUrl,
+          prompt: aiVideoPrompt,
+          duration: aiVideoDuration
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.videoUrl) {
+        setGeneratedAiVideoUrl(data.videoUrl);
+        toast({ title: "AI Video generated!", description: "Your animated video is ready" });
+      }
+    } catch (error: any) {
+      console.error("AI video generation error:", error);
+      toast({ 
+        title: "Video generation failed", 
+        description: error.message || "Failed to generate AI video", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsGeneratingAiVideo(false);
+    }
+  };
+
+  // Use generated image for AI video
+  const useImageForAiVideo = (url: string) => {
+    setAiVideoImageUrl(url);
+    toast({ title: "Image selected", description: "Switch to AI Video tab to animate it" });
   };
 
   // Add image to video timeline
@@ -305,18 +375,22 @@ export default function VideoCreatorStudio() {
         </div>
 
         <Tabs defaultValue="generate" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="generate" className="flex items-center gap-2">
               <Wand2 className="w-4 h-4" />
-              Generate Images
+              <span className="hidden sm:inline">Generate</span> Images
             </TabsTrigger>
             <TabsTrigger value="edit" className="flex items-center gap-2">
               <Edit3 className="w-4 h-4" />
-              Edit Images
+              <span className="hidden sm:inline">Edit</span> Images
+            </TabsTrigger>
+            <TabsTrigger value="ai-video" className="flex items-center gap-2">
+              <Film className="w-4 h-4" />
+              AI Video
             </TabsTrigger>
             <TabsTrigger value="video" className="flex items-center gap-2">
               <Video className="w-4 h-4" />
-              Create Video
+              Slideshow
             </TabsTrigger>
           </TabsList>
 
@@ -386,13 +460,23 @@ export default function VideoCreatorStudio() {
                           />
                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
                             <p className="text-xs text-white text-center line-clamp-2">{img.prompt}</p>
-                            <Button 
-                              size="sm" 
-                              onClick={() => addToTimeline(img.url)}
-                            >
-                              <Plus className="w-3 h-3 mr-1" />
-                              Add to Video
-                            </Button>
+                            <div className="flex gap-1">
+                              <Button 
+                                size="sm" 
+                                onClick={() => addToTimeline(img.url)}
+                              >
+                                <Plus className="w-3 h-3 mr-1" />
+                                Slideshow
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="secondary"
+                                onClick={() => useImageForAiVideo(img.url)}
+                              >
+                                <Film className="w-3 h-3 mr-1" />
+                                AI Video
+                              </Button>
+                            </div>
                           </div>
                         </motion.div>
                       ))}
@@ -459,6 +543,155 @@ export default function VideoCreatorStudio() {
                     </>
                   )}
                 </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* AI Video Generation Tab - FREE */}
+          <TabsContent value="ai-video" className="space-y-6">
+            <Card className="glass-card border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Film className="w-5 h-5 text-primary" />
+                  AI Video Generator
+                  <span className="ml-2 px-2 py-0.5 text-xs bg-primary/20 text-primary rounded-full flex items-center gap-1">
+                    <Zap className="w-3 h-3" />
+                    FREE
+                  </span>
+                </CardTitle>
+                <CardDescription>
+                  Upload an image and AI will animate it into a video - no API keys required!
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Image Upload */}
+                <div className="space-y-2">
+                  <Label>Starting Image</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={aiVideoImageUrl}
+                      onChange={(e) => setAiVideoImageUrl(e.target.value)}
+                      placeholder="Paste image URL or upload below"
+                      className="flex-1"
+                    />
+                    <Button 
+                      variant="outline" 
+                      onClick={() => aiVideoFileInputRef.current?.click()}
+                    >
+                      <Upload className="w-4 h-4 mr-1" />
+                      Upload
+                    </Button>
+                    <input
+                      ref={aiVideoFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAiVideoImageUpload}
+                    />
+                  </div>
+                </div>
+
+                {/* Image Preview */}
+                {aiVideoImageUrl && (
+                  <div className="aspect-video rounded-lg overflow-hidden border bg-muted">
+                    <img 
+                      src={aiVideoImageUrl} 
+                      alt="Preview" 
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                )}
+
+                {/* Animation Prompt */}
+                <div className="space-y-2">
+                  <Label>Animation Description</Label>
+                  <Textarea
+                    value={aiVideoPrompt}
+                    onChange={(e) => setAiVideoPrompt(e.target.value)}
+                    placeholder="Describe the motion: gentle ocean waves, slow camera pan, crowd cheering, player swinging bat..."
+                    rows={2}
+                  />
+                </div>
+
+                {/* Duration Selection */}
+                <div className="space-y-2">
+                  <Label>Video Duration</Label>
+                  <Select 
+                    value={String(aiVideoDuration)} 
+                    onValueChange={(v) => setAiVideoDuration(Number(v) as 5 | 10)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5 seconds (faster)</SelectItem>
+                      <SelectItem value="10">10 seconds</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Generate Button */}
+                <Button 
+                  onClick={handleGenerateAiVideo} 
+                  disabled={isGeneratingAiVideo || !aiVideoImageUrl || !aiVideoPrompt}
+                  className="w-full"
+                  size="lg"
+                >
+                  {isGeneratingAiVideo ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating AI Video... (this may take 1-2 min)
+                    </>
+                  ) : (
+                    <>
+                      <Film className="w-4 h-4 mr-2" />
+                      Generate AI Video
+                    </>
+                  )}
+                </Button>
+
+                {/* Generated Video */}
+                {generatedAiVideoUrl && (
+                  <div className="space-y-3 pt-4 border-t">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      Generated Video
+                    </h4>
+                    <video 
+                      src={generatedAiVideoUrl} 
+                      controls 
+                      autoPlay
+                      loop
+                      className="w-full rounded-lg"
+                    />
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        const a = document.createElement('a');
+                        a.href = generatedAiVideoUrl;
+                        a.download = `ai-video-${Date.now()}.mp4`;
+                        a.click();
+                      }}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Video
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Tips Card */}
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-sm">Tips for Best Results</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground space-y-2">
+                <p>• Use high-quality images (1080p or higher)</p>
+                <p>• Describe specific motion: "slow pan left", "zoom in", "waves crashing"</p>
+                <p>• Mention camera movement for cinematic effects</p>
+                <p>• The AI works best with photos and illustrations</p>
               </CardContent>
             </Card>
           </TabsContent>
