@@ -1789,6 +1789,44 @@ export type Database = {
           },
         ]
       }
+      subscription_notifications: {
+        Row: {
+          created_at: string
+          email_sent_to: string
+          id: string
+          notification_type: string
+          sent_at: string
+          subscription_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_sent_to: string
+          id?: string
+          notification_type: string
+          sent_at?: string
+          subscription_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_sent_to?: string
+          id?: string
+          notification_type?: string
+          sent_at?: string
+          subscription_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_notifications_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_payments: {
         Row: {
           amount: number
