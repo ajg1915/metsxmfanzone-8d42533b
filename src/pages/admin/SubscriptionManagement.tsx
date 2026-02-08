@@ -6,17 +6,90 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Mail } from "lucide-react";
+import { 
+  Calendar, 
+  Mail, 
+  DollarSign, 
+  Clock, 
+  ChevronRight, 
+  X, 
+  Check, 
+  Ban, 
+  RotateCcw, 
+  CalendarPlus,
+  CreditCard,
+  History,
+  Eye
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 
 interface UserSubscription {
   id: string;
   user_id: string;
   plan_type: string;
   status: string;
+  amount: number | null;
+  currency: string;
   start_date: string;
   end_date: string | null;
+  cancellation_status: string | null;
+  cancellation_requested_at: string | null;
+  next_payment_date: string | null;
+  next_payment_amount: number | null;
+  payment_method: string;
+  total_payments_received: number;
+  last_payment_date: string | null;
+  last_payment_amount: number | null;
+  notes: string | null;
   email: string;
+  created_at: string;
+}
+
+interface PaymentRecord {
+  id: string;
+  subscription_id: string;
+  user_id: string;
+  amount: number;
+  currency: string;
+  payment_method: string;
+  payment_date: string;
+  status: string;
+  notes: string | null;
+  created_at: string;
+}
+
+interface ActivityRecord {
+  id: string;
+  action: string;
+  details: unknown;
+  created_at: string;
 }
 
 export default function SubscriptionManagement() {
@@ -25,6 +98,23 @@ export default function SubscriptionManagement() {
   const { toast } = useToast();
   const [subscriptions, setSubscriptions] = useState<UserSubscription[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSubscription, setSelectedSubscription] = useState<UserSubscription | null>(null);
+  const [showDetailSheet, setShowDetailSheet] = useState(false);
+  const [paymentHistory, setPaymentHistory] = useState<PaymentRecord[]>([]);
+  const [activityHistory, setActivityHistory] = useState<ActivityRecord[]>([]);
+  
+  // Dialog states
+  const [showMarkAsPaidDialog, setShowMarkAsPaidDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showExtendDialog, setShowExtendDialog] = useState(false);
+  
+  // Form states
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [paymentNotes, setPaymentNotes] = useState("");
+  const [extendDays, setExtendDays] = useState("30");
+  const [cancelType, setCancelType] = useState<"immediate" | "pending">("pending");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (!authLoading && (!user || user.email !== "ajg1915@gmail.com")) {
@@ -40,10 +130,9 @@ export default function SubscriptionManagement() {
 
   const fetchSubscriptions = async () => {
     try {
-      // Admin view - select fields needed for management, mask payment IDs in display
       const { data: subs, error: subsError } = await supabase
         .from("subscriptions")
-        .select("id, user_id, plan_type, status, amount, currency, start_date, end_date, created_at, updated_at")
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (subsError) throw subsError;
@@ -74,64 +163,234 @@ export default function SubscriptionManagement() {
     }
   };
 
-  const updateSubscription = async (subscriptionId: string, newPlan: string) => {
-    try {
-      const endDate = new Date();
-      if (newPlan === "premium") {
-        endDate.setMonth(endDate.getMonth() + 1);
-      } else if (newPlan === "annual") {
-        endDate.setFullYear(endDate.getFullYear() + 1);
-      }
+  const fetchSubscriptionDetails = async (subscription: UserSubscription) => {
+    setSelectedSubscription(subscription);
+    setShowDetailSheet(true);
+    
+    // Fetch payment history
+    const { data: payments } = await supabase
+      .from("subscription_payments")
+      .select("*")
+      .eq("subscription_id", subscription.id)
+      .order("payment_date", { ascending: false });
+    
+    setPaymentHistory(payments || []);
+    
+    // Fetch activity history
+    const { data: activity } = await supabase
+      .from("subscription_activity")
+      .select("*")
+      .eq("subscription_id", subscription.id)
+      .order("created_at", { ascending: false });
+    
+    setActivityHistory(activity || []);
+  };
 
-      const { error } = await supabase
+  const handleMarkAsPaid = async () => {
+    if (!selectedSubscription || !paymentAmount) return;
+    setIsProcessing(true);
+    
+    try {
+      const amount = parseFloat(paymentAmount);
+      
+      // Create payment record
+      const { error: paymentError } = await supabase
+        .from("subscription_payments")
+        .insert({
+          subscription_id: selectedSubscription.id,
+          user_id: selectedSubscription.user_id,
+          amount,
+          currency: selectedSubscription.currency || "USD",
+          payment_method: paymentMethod,
+          payment_date: new Date().toISOString(),
+          status: "completed",
+          notes: paymentNotes || null,
+          recorded_by: user?.id,
+        });
+
+      if (paymentError) throw paymentError;
+
+      // Update subscription
+      const { error: subError } = await supabase
         .from("subscriptions")
         .update({
-          plan_type: newPlan,
+          last_payment_date: new Date().toISOString(),
+          last_payment_amount: amount,
+          payment_method: paymentMethod,
+          total_payments_received: (selectedSubscription.total_payments_received || 0) + 1,
           status: "active",
-          end_date: newPlan !== "free" ? endDate.toISOString() : null,
         })
-        .eq("id", subscriptionId);
+        .eq("id", selectedSubscription.id);
 
-      if (error) throw error;
+      if (subError) throw subError;
 
-      toast({
-        title: "Success",
-        description: "Subscription updated successfully",
+      // Log activity
+      await supabase.from("subscription_activity").insert({
+        subscription_id: selectedSubscription.id,
+        user_id: selectedSubscription.user_id,
+        action: "payment_recorded",
+        details: { amount, method: paymentMethod, notes: paymentNotes },
+        performed_by: user?.id,
       });
 
+      toast({ title: "Success", description: `Payment of $${amount} recorded successfully` });
+      setShowMarkAsPaidDialog(false);
+      setPaymentAmount("");
+      setPaymentNotes("");
       fetchSubscriptions();
+      fetchSubscriptionDetails(selectedSubscription);
     } catch (error) {
-      console.error("Error updating subscription:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update subscription",
-        variant: "destructive",
-      });
+      console.error("Error recording payment:", error);
+      toast({ title: "Error", description: "Failed to record payment", variant: "destructive" });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  const updateStatus = async (subscriptionId: string, newStatus: string) => {
+  const handleCancelSubscription = async () => {
+    if (!selectedSubscription) return;
+    setIsProcessing(true);
+    
     try {
-      const { error } = await supabase
-        .from("subscriptions")
-        .update({ status: newStatus })
-        .eq("id", subscriptionId);
+      if (cancelType === "immediate") {
+        await supabase
+          .from("subscriptions")
+          .update({
+            status: "cancelled",
+            cancellation_status: null,
+            end_date: new Date().toISOString(),
+          })
+          .eq("id", selectedSubscription.id);
+      } else {
+        await supabase
+          .from("subscriptions")
+          .update({
+            cancellation_status: "pending",
+            cancellation_requested_at: new Date().toISOString(),
+          })
+          .eq("id", selectedSubscription.id);
+      }
 
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Status updated successfully",
+      await supabase.from("subscription_activity").insert({
+        subscription_id: selectedSubscription.id,
+        user_id: selectedSubscription.user_id,
+        action: cancelType === "immediate" ? "subscription_cancelled" : "cancellation_requested",
+        details: { type: cancelType },
+        performed_by: user?.id,
       });
 
+      toast({ 
+        title: "Success", 
+        description: cancelType === "immediate" 
+          ? "Subscription cancelled immediately" 
+          : "Subscription set to pending cancellation" 
+      });
+      setShowCancelDialog(false);
       fetchSubscriptions();
+      setShowDetailSheet(false);
     } catch (error) {
-      console.error("Error updating status:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update status",
-        variant: "destructive",
+      console.error("Error cancelling subscription:", error);
+      toast({ title: "Error", description: "Failed to cancel subscription", variant: "destructive" });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleUndoCancellation = async () => {
+    if (!selectedSubscription) return;
+    setIsProcessing(true);
+    
+    try {
+      await supabase
+        .from("subscriptions")
+        .update({
+          cancellation_status: null,
+          cancellation_requested_at: null,
+        })
+        .eq("id", selectedSubscription.id);
+
+      await supabase.from("subscription_activity").insert({
+        subscription_id: selectedSubscription.id,
+        user_id: selectedSubscription.user_id,
+        action: "cancellation_undone",
+        details: {},
+        performed_by: user?.id,
       });
+
+      toast({ title: "Success", description: "Cancellation request undone" });
+      fetchSubscriptions();
+      fetchSubscriptionDetails({ ...selectedSubscription, cancellation_status: null });
+    } catch (error) {
+      console.error("Error undoing cancellation:", error);
+      toast({ title: "Error", description: "Failed to undo cancellation", variant: "destructive" });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleExtendSubscription = async () => {
+    if (!selectedSubscription || !extendDays) return;
+    setIsProcessing(true);
+    
+    try {
+      const days = parseInt(extendDays);
+      const currentEnd = selectedSubscription.end_date 
+        ? new Date(selectedSubscription.end_date) 
+        : new Date();
+      const newEnd = new Date(currentEnd);
+      newEnd.setDate(newEnd.getDate() + days);
+
+      await supabase
+        .from("subscriptions")
+        .update({
+          end_date: newEnd.toISOString(),
+          status: "active",
+        })
+        .eq("id", selectedSubscription.id);
+
+      await supabase.from("subscription_activity").insert({
+        subscription_id: selectedSubscription.id,
+        user_id: selectedSubscription.user_id,
+        action: "subscription_extended",
+        details: { days_added: days, new_end_date: newEnd.toISOString() },
+        performed_by: user?.id,
+      });
+
+      toast({ title: "Success", description: `Subscription extended by ${days} days` });
+      setShowExtendDialog(false);
+      setExtendDays("30");
+      fetchSubscriptions();
+      setShowDetailSheet(false);
+    } catch (error) {
+      console.error("Error extending subscription:", error);
+      toast({ title: "Error", description: "Failed to extend subscription", variant: "destructive" });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const getStatusBadge = (sub: UserSubscription) => {
+    if (sub.cancellation_status === "pending") {
+      return <Badge variant="outline" className="text-warning border-warning">Pending Cancellation</Badge>;
+    }
+    
+    switch (sub.status) {
+      case "active":
+        return <Badge className="bg-affirmative">Active</Badge>;
+      case "cancelled":
+        return <Badge variant="destructive">Cancelled</Badge>;
+      case "suspended":
+        return <Badge variant="secondary">Suspended</Badge>;
+      default:
+        return <Badge variant="outline">{sub.status}</Badge>;
+    }
+  };
+
+  const getPlanPrice = (planType: string) => {
+    switch (planType) {
+      case "premium": return "$4.99 / month";
+      case "annual": return "$49.99 / year";
+      default: return "Free";
     }
   };
 
@@ -148,13 +407,69 @@ export default function SubscriptionManagement() {
       <div>
         <h1 className="text-3xl font-bold text-primary mb-2">Subscription Management</h1>
         <p className="text-muted-foreground">
-          Manage user subscriptions and access levels
+          Manage user subscriptions, record payments, and handle cancellations
         </p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Active</p>
+                <p className="text-2xl font-bold text-affirmative">
+                  {subscriptions.filter(s => s.status === "active" && !s.cancellation_status).length}
+                </p>
+              </div>
+              <Check className="w-8 h-8 text-affirmative opacity-50" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Pending Cancel</p>
+                <p className="text-2xl font-bold text-warning">
+                  {subscriptions.filter(s => s.cancellation_status === "pending").length}
+                </p>
+              </div>
+              <Clock className="w-8 h-8 text-warning opacity-50" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Cancelled</p>
+                <p className="text-2xl font-bold text-destructive">
+                  {subscriptions.filter(s => s.status === "cancelled").length}
+                </p>
+              </div>
+              <Ban className="w-8 h-8 text-destructive opacity-50" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Premium/Annual</p>
+                <p className="text-2xl font-bold text-primary">
+                  {subscriptions.filter(s => s.plan_type !== "free" && s.status === "active").length}
+                </p>
+              </div>
+              <DollarSign className="w-8 h-8 text-primary opacity-50" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Active Subscriptions</CardTitle>
+          <CardTitle>All Subscriptions</CardTitle>
         </CardHeader>
         <CardContent>
           {subscriptions.length === 0 ? (
@@ -164,76 +479,60 @@ export default function SubscriptionManagement() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User Email</TableHead>
+                    <TableHead>User</TableHead>
                     <TableHead>Plan</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Start Date</TableHead>
+                    <TableHead>Payments</TableHead>
+                    <TableHead>Last Payment</TableHead>
                     <TableHead>End Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {subscriptions.map((sub) => (
-                    <TableRow key={sub.id}>
+                    <TableRow 
+                      key={sub.id} 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => fetchSubscriptionDetails(sub)}
+                    >
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Mail className="w-4 h-4 text-muted-foreground" />
-                          {sub.email}
+                          <span className="font-medium">{sub.email}</span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Select
-                          defaultValue={sub.plan_type}
-                          onValueChange={(value) => updateSubscription(sub.id, value)}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="free">Free</SelectItem>
-                            <SelectItem value="premium">Premium</SelectItem>
-                            <SelectItem value="annual">Annual</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={sub.status === "active" ? "default" : "secondary"}
-                        >
-                          {sub.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="w-4 h-4" />
-                          {new Date(sub.start_date).toLocaleDateString()}
+                        <div>
+                          <p className="font-medium capitalize">{sub.plan_type}</p>
+                          <p className="text-xs text-muted-foreground">{getPlanPrice(sub.plan_type)}</p>
                         </div>
                       </TableCell>
+                      <TableCell>{getStatusBadge(sub)}</TableCell>
                       <TableCell>
-                        {sub.end_date ? (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Calendar className="w-4 h-4" />
-                            {new Date(sub.end_date).toLocaleDateString()}
+                        <Badge variant="outline">{sub.total_payments_received || 0}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        {sub.last_payment_date ? (
+                          <div className="text-sm">
+                            <p>{new Date(sub.last_payment_date).toLocaleDateString()}</p>
+                            <p className="text-muted-foreground">${sub.last_payment_amount}</p>
                           </div>
                         ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
                       <TableCell>
-                        <Select
-                          defaultValue={sub.status}
-                          onValueChange={(value) => updateStatus(sub.id, value)}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
-                            <SelectItem value="suspended">Suspended</SelectItem>
-                            <SelectItem value="pending">Pending</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        {sub.end_date ? (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                            {new Date(sub.end_date).toLocaleDateString()}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -243,6 +542,334 @@ export default function SubscriptionManagement() {
           )}
         </CardContent>
       </Card>
+
+      {/* Subscription Detail Sheet */}
+      <Sheet open={showDetailSheet} onOpenChange={setShowDetailSheet}>
+        <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
+          <SheetHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <SheetTitle>Subscription Overview</SheetTitle>
+                {selectedSubscription && getStatusBadge(selectedSubscription)}
+              </div>
+            </div>
+            <SheetDescription>{selectedSubscription?.email}</SheetDescription>
+          </SheetHeader>
+
+          {selectedSubscription && (
+            <div className="mt-6 space-y-6">
+              {/* Plan Info */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold text-lg capitalize">{selectedSubscription.plan_type} Membership</h3>
+                      <p className="text-sm text-muted-foreground">Pricing Plan</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-bold">{getPlanPrice(selectedSubscription.plan_type)}</p>
+                    </div>
+                  </div>
+
+                  <Separator className="my-4" />
+
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Start date</p>
+                      <p className="font-medium">{new Date(selectedSubscription.start_date).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">End date</p>
+                      <p className="font-medium">
+                        {selectedSubscription.end_date 
+                          ? new Date(selectedSubscription.end_date).toLocaleDateString() 
+                          : "-"}
+                      </p>
+                      {selectedSubscription.cancellation_status === "pending" && (
+                        <p className="text-xs text-warning">Pending cancellation</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Payments received</p>
+                      <p className="font-medium">{selectedSubscription.total_payments_received || 0}</p>
+                    </div>
+                  </div>
+
+                  <Separator className="my-4" />
+
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Last payment</p>
+                      {selectedSubscription.last_payment_date ? (
+                        <>
+                          <p className="font-medium">{new Date(selectedSubscription.last_payment_date).toLocaleDateString()}</p>
+                          <p className="text-muted-foreground">${selectedSubscription.last_payment_amount}</p>
+                        </>
+                      ) : (
+                        <p className="font-medium">-</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Next payment</p>
+                      {selectedSubscription.next_payment_date ? (
+                        <>
+                          <p className="font-medium">{new Date(selectedSubscription.next_payment_date).toLocaleDateString()}</p>
+                          <p className="text-muted-foreground">${selectedSubscription.next_payment_amount}</p>
+                        </>
+                      ) : (
+                        <p className="font-medium">-</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Payment method</p>
+                      <p className="font-medium capitalize">{selectedSubscription.payment_method || "Online"}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={() => setShowMarkAsPaidDialog(true)} className="gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  Mark as Paid
+                </Button>
+                <Button variant="outline" onClick={() => setShowExtendDialog(true)} className="gap-2">
+                  <CalendarPlus className="w-4 h-4" />
+                  Extend
+                </Button>
+                {selectedSubscription.cancellation_status === "pending" ? (
+                  <Button variant="outline" onClick={handleUndoCancellation} disabled={isProcessing} className="gap-2">
+                    <RotateCcw className="w-4 h-4" />
+                    Undo Cancellation
+                  </Button>
+                ) : selectedSubscription.status === "active" && (
+                  <Button variant="destructive" onClick={() => setShowCancelDialog(true)} className="gap-2">
+                    <Ban className="w-4 h-4" />
+                    Cancel
+                  </Button>
+                )}
+              </div>
+
+              {/* Payment History */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <History className="w-4 h-4" />
+                    Payment History
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {paymentHistory.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">No payments recorded</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {paymentHistory.map((payment) => (
+                        <div key={payment.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                          <div>
+                            <p className="font-medium">${payment.amount} {payment.currency}</p>
+                            <p className="text-xs text-muted-foreground capitalize">{payment.payment_method}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm">{new Date(payment.payment_date).toLocaleDateString()}</p>
+                            <Badge variant={payment.status === "completed" ? "default" : "secondary"} className="text-xs">
+                              {payment.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Activity History */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Clock className="w-4 h-4" />
+                    Subscription History
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {activityHistory.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">No activity recorded</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {activityHistory.map((activity) => (
+                        <div key={activity.id} className="flex items-start gap-3 text-sm">
+                          <div className="w-2 h-2 mt-2 bg-primary rounded-full" />
+                          <div>
+                            <p className="font-medium capitalize">{activity.action.replace(/_/g, " ")}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(activity.created_at).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* Mark as Paid Dialog */}
+      <Dialog open={showMarkAsPaidDialog} onOpenChange={setShowMarkAsPaidDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Record Payment</DialogTitle>
+            <DialogDescription>
+              Record an offline payment for this subscription
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="amount">Amount ($)</Label>
+              <Input
+                id="amount"
+                type="number"
+                placeholder="0.00"
+                value={paymentAmount}
+                onChange={(e) => setPaymentAmount(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="method">Payment Method</Label>
+              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="check">Check</SelectItem>
+                  <SelectItem value="zelle">Zelle</SelectItem>
+                  <SelectItem value="venmo">Venmo</SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="notes">Notes (optional)</Label>
+              <Textarea
+                id="notes"
+                placeholder="Add any notes about this payment..."
+                value={paymentNotes}
+                onChange={(e) => setPaymentNotes(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowMarkAsPaidDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleMarkAsPaid} disabled={!paymentAmount || isProcessing}>
+              {isProcessing ? "Recording..." : "Record Payment"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Dialog */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Subscription</DialogTitle>
+            <DialogDescription>
+              Choose how to cancel this subscription
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex flex-col gap-2">
+              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50">
+                <input
+                  type="radio"
+                  name="cancelType"
+                  value="pending"
+                  checked={cancelType === "pending"}
+                  onChange={() => setCancelType("pending")}
+                />
+                <div>
+                  <p className="font-medium">Pending Cancellation</p>
+                  <p className="text-sm text-muted-foreground">Ends at the end of the billing period</p>
+                </div>
+              </label>
+              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50">
+                <input
+                  type="radio"
+                  name="cancelType"
+                  value="immediate"
+                  checked={cancelType === "immediate"}
+                  onChange={() => setCancelType("immediate")}
+                />
+                <div>
+                  <p className="font-medium">Cancel Immediately</p>
+                  <p className="text-sm text-muted-foreground">Access ends right now</p>
+                </div>
+              </label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCancelDialog(false)}>
+              Back
+            </Button>
+            <Button variant="destructive" onClick={handleCancelSubscription} disabled={isProcessing}>
+              {isProcessing ? "Cancelling..." : "Confirm Cancel"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Extend Dialog */}
+      <Dialog open={showExtendDialog} onOpenChange={setShowExtendDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Extend Subscription</DialogTitle>
+            <DialogDescription>
+              Add extra days to this subscription
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="days">Days to extend</Label>
+              <Select value={extendDays} onValueChange={setExtendDays}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7">7 days</SelectItem>
+                  <SelectItem value="14">14 days</SelectItem>
+                  <SelectItem value="30">30 days (1 month)</SelectItem>
+                  <SelectItem value="60">60 days (2 months)</SelectItem>
+                  <SelectItem value="90">90 days (3 months)</SelectItem>
+                  <SelectItem value="365">365 days (1 year)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {selectedSubscription?.end_date && (
+              <p className="text-sm text-muted-foreground">
+                New end date will be:{" "}
+                <span className="font-medium">
+                  {new Date(
+                    new Date(selectedSubscription.end_date).getTime() + parseInt(extendDays) * 24 * 60 * 60 * 1000
+                  ).toLocaleDateString()}
+                </span>
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowExtendDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleExtendSubscription} disabled={isProcessing}>
+              {isProcessing ? "Extending..." : "Extend Subscription"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
