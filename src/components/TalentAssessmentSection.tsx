@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "./GlassCard";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { Loader2, Users, Sparkles } from "lucide-react";
+import { Loader2, Users, Sparkles, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
@@ -201,6 +201,12 @@ const TalentAssessmentSection = () => {
                             )}
                           </div>
                         </div>
+                      </div>
+
+                      {/* Anthony Approved Badge */}
+                      <div className="px-4 py-2 flex items-center justify-center gap-1.5">
+                        <CheckCircle2 className="h-4 w-4 text-primary" />
+                        <span className="text-xs font-bold text-primary tracking-wide">Anthony Approved</span>
                       </div>
 
                       {/* Tap hint */}
