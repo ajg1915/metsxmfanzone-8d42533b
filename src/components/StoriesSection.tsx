@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Play, BarChart3, Heart, MessageCircle, Share2, Send, X, Trash2 } from "lucide-react";
+import { Play, BarChart3, Heart, MessageCircle, Share2, Send, X, Trash2, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
