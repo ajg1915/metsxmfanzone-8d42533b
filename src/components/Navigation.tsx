@@ -214,7 +214,7 @@ const Navigation = () => {
                     onClick={() => handleProtectedNavigation("/blog")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <Sparkles className="w-4 h-4" />
+                    <img src={logo} alt="" className="w-4 h-4 object-contain" />
                     Blog
                   </button>
                 </div>
