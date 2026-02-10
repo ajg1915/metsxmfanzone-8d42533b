@@ -7,6 +7,25 @@ import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, ChevronDown, Refres
 import { format } from "date-fns";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+
+import springAstros from "@/assets/spring-mets-astros.jpg";
+import springBraves from "@/assets/spring-mets-braves.jpg";
+import springCards from "@/assets/spring-mets-cards.jpg";
+import springNats from "@/assets/spring-mets-nats.jpg";
+import springRedsox from "@/assets/spring-mets-redsox.jpg";
+import springYankees from "@/assets/spring-mets-yankees.jpg";
+import springDefault from "@/assets/spring-training.jpg";
+
+const getSpringFallback = (opponent: string): string => {
+  const name = opponent.toLowerCase();
+  if (name.includes("astros") || name.includes("houston")) return springAstros;
+  if (name.includes("braves") || name.includes("atlanta")) return springBraves;
+  if (name.includes("cardinal") || name.includes("stl")) return springCards;
+  if (name.includes("national") || name.includes("washington")) return springNats;
+  if (name.includes("red sox") || name.includes("boston")) return springRedsox;
+  if (name.includes("yankee") || name.includes("new york")) return springYankees;
+  return springDefault;
+};
 interface LineupPlayer {
   position: number;
   name: string;
@@ -500,7 +519,7 @@ export default function HomeLineupCard({
             <CardContent className="p-2.5">
               {springGames && springGames.length > 0 ? <div className="space-y-2">
                   {springGames.map(game => <Link key={game.id} to="/spring-training-live" className="flex items-center gap-2 p-2 rounded bg-muted/30 hover:bg-muted/50 transition-colors">
-                      <img src={game.preview_image_url} alt={game.opponent} className="w-10 h-10 rounded object-cover" />
+                      <img src={game.preview_image_url || getSpringFallback(game.opponent)} alt={game.opponent} className="w-10 h-10 rounded object-cover" />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-xs truncate">vs {game.opponent}</p>
                         <p className="text-[10px] text-muted-foreground">
