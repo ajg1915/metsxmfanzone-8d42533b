@@ -234,65 +234,76 @@ export default function VideoGalleryManagement() {
       if (uploadMethod === 'file' && videoFile) {
         const fileExt = videoFile.name.split('.').pop();
         const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExt}`;
+        const objectUrl = URL.createObjectURL(videoFile);
 
-        // Get duration while uploading (parallel)
-        const durationPromise = new Promise<number>((resolve) => {
-          const vid = document.createElement('video');
-          vid.preload = 'metadata';
-          vid.onloadedmetadata = () => {
-            resolve(Math.round(vid.duration));
-            URL.revokeObjectURL(vid.src);
-          };
-          vid.onerror = () => resolve(0);
-          vid.src = URL.createObjectURL(videoFile);
-        });
+        // Build all promises to run in parallel
+        const promises: Promise<any>[] = [];
 
-        // Upload video
-        const uploadPromise = supabase.storage
-          .from('videos')
-          .upload(fileName, videoFile, { cacheControl: '3600', upsert: false });
-
-        // Upload thumbnail in parallel if provided
-        let thumbPromise: Promise<string | null> = Promise.resolve(null);
-        if (thumbnailFile) {
-          const thumbExt = thumbnailFile.name.split('.').pop();
-          const thumbName = `thumb_${Date.now()}.${thumbExt}`;
-          thumbPromise = supabase.storage
+        // 1. Upload video file
+        promises.push(
+          supabase.storage
             .from('videos')
-            .upload(thumbName, thumbnailFile)
-            .then(({ error }) => {
-              if (error) throw error;
-              return supabase.storage.from('videos').getPublicUrl(thumbName).data.publicUrl;
-            });
+            .upload(fileName, videoFile, { cacheControl: '3600', upsert: false })
+        );
+
+        // 2. Get duration from object URL (fast, no re-read)
+        promises.push(
+          new Promise<number>((resolve) => {
+            const vid = document.createElement('video');
+            vid.preload = 'metadata';
+            vid.onloadedmetadata = () => { resolve(Math.round(vid.duration)); };
+            vid.onerror = () => resolve(0);
+            vid.src = objectUrl;
+          })
+        );
+
+        // 3. Thumbnail: use provided file, already-set URL, or auto-generate from video
+        const needsAutoThumb = !thumbnailUrl && !thumbnailFile;
+        if (thumbnailFile) {
+          const thumbName = `thumb_${Date.now()}.${thumbnailFile.name.split('.').pop()}`;
+          promises.push(
+            supabase.storage.from('videos').upload(thumbName, thumbnailFile)
+              .then(({ error }) => {
+                if (error) throw error;
+                return supabase.storage.from('videos').getPublicUrl(thumbName).data.publicUrl;
+              })
+          );
+        } else if (needsAutoThumb) {
+          // Auto-generate thumbnail in parallel using the same object URL
+          promises.push(
+            new Promise<string>((resolve, reject) => {
+              const vid2 = document.createElement('video');
+              vid2.preload = 'auto';
+              vid2.muted = true;
+              vid2.onloadedmetadata = () => { vid2.currentTime = 1; };
+              vid2.onseeked = () => {
+                const c = document.createElement('canvas');
+                c.width = vid2.videoWidth;
+                c.height = vid2.videoHeight;
+                c.getContext('2d')!.drawImage(vid2, 0, 0, c.width, c.height);
+                c.toBlob(async (blob) => {
+                  if (!blob) { resolve(''); return; }
+                  const name = `thumb_auto_${Date.now()}.jpg`;
+                  const { error } = await supabase.storage.from('videos').upload(name, blob);
+                  resolve(error ? '' : supabase.storage.from('videos').getPublicUrl(name).data.publicUrl);
+                }, 'image/jpeg', 0.8);
+              };
+              vid2.onerror = () => resolve('');
+              vid2.src = objectUrl;
+            })
+          );
+        } else {
+          promises.push(Promise.resolve(null)); // placeholder
         }
 
-        // Wait for all parallel operations
-        const [uploadResult, thumbUrl, dur] = await Promise.all([
-          uploadPromise,
-          thumbPromise,
-          durationPromise,
-        ]);
+        const [uploadResult, dur, thumbUrl] = await Promise.all(promises);
+        URL.revokeObjectURL(objectUrl);
 
         if (uploadResult.error) throw uploadResult.error;
 
         videoUrl = supabase.storage.from('videos').getPublicUrl(fileName).data.publicUrl;
         duration = dur;
         if (thumbUrl) thumbnailUrl = thumbUrl;
-
-        // Auto-generate thumbnail from video only if no thumbnail was provided or selected
-        if (!thumbnailUrl && !thumbnailFile) {
-          try {
-            const thumbDataUrl = await generateThumbnailFromVideo(videoFile);
-            const thumbBlob = await fetch(thumbDataUrl).then(r => r.blob());
-            const thumbName = `thumb_${Date.now()}.jpg`;
-            const { error: thumbError } = await supabase.storage.from('videos').upload(thumbName, thumbBlob);
-            if (!thumbError) {
-              thumbnailUrl = supabase.storage.from('videos').getPublicUrl(thumbName).data.publicUrl;
-            }
-          } catch (err) {
-            console.error('Auto-thumbnail failed:', err);
-          }
-        }
       }
 
       if (editingVideo) {
