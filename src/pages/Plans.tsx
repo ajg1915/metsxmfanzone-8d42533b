@@ -148,7 +148,7 @@ const Plans = () => {
     {
       question: "What payment methods do you accept?",
       answer:
-        "We accept PayPal and all major credit/debit cards through Helcim secure payment processing.",
+        "We accept all major credit and debit cards through Helcim secure payment processing.",
     },
     {
       question: "Can I cancel my subscription anytime?",

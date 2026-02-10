@@ -73,7 +73,7 @@ const BusinessPartner = lazy(() => import("./pages/BusinessPartner"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Feedback = lazy(() => import("./pages/Feedback"));
 const Sitemap = lazy(() => import("./pages/Sitemap"));
-const PayPalSuccess = lazy(() => import("./pages/PayPalSuccess"));
+// PayPal removed - Helcim is the sole payment processor
 const HelcimCheckout = lazy(() => import("./pages/HelcimCheckout"));
 const SpringTrainingLive = lazy(() => import("./pages/SpringTrainingLive"));
 const Merch = lazy(() => import("./pages/Merch"));
@@ -294,7 +294,7 @@ const AppContent = () => {
             <Route path="/community" element={<Community />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/pricing" element={<Plans />} />
-            <Route path="/paypal-success" element={<PayPalSuccess />} />
+            {/* PayPal removed - redirect old URLs to plans */}
             <Route path="/helcim-checkout" element={<HelcimCheckout />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-error" element={<PaymentError />} />
