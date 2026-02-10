@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
 import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles, Tv, ChevronDown } from "lucide-react";
@@ -114,7 +115,8 @@ const Navigation = () => {
   return (
     <>
       <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
-      <nav className="fixed top-0 left-0 right-0 z-50 glass-nav">
+      {createPortal(
+      <nav className="fixed top-0 left-0 right-0 z-[9999] glass-nav">
         <div className="container mx-auto px-3 sm:px-4">
         <div className="flex items-center justify-between h-12">
           <div className="flex items-center gap-2">
@@ -563,7 +565,9 @@ const Navigation = () => {
           </div>
         </div>
       </div>
-    </nav>
+    </nav>,
+      document.body
+      )}
     </>
   );
 };
