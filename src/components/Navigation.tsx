@@ -355,7 +355,7 @@ const Navigation = () => {
                         className="flex items-center gap-3 w-full text-foreground hover:text-primary hover:bg-primary/10 transition-all py-2.5 px-3 rounded-xl text-left"
                       >
                         <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                          <Users className="w-4 h-4 text-blue-500" />
+                          <img src={logo} alt="" className="w-4 h-4 object-contain" />
                         </div>
                         <span className="font-medium text-sm">Roster</span>
                       </button>
@@ -367,7 +367,7 @@ const Navigation = () => {
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                          <Shield className="w-4 h-4 text-orange-500" />
+                          <img src={logo} alt="" className="w-4 h-4 object-contain" />
                         </div>
                         <span className="font-medium text-sm">Pricing</span>
                       </NavLink>
@@ -380,7 +380,7 @@ const Navigation = () => {
                       <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-xl hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                            <Tv className="w-4 h-4 text-blue-500" />
+                            <img src={logo} alt="" className="w-4 h-4 object-contain" />
                           </div>
                           <span className="font-medium text-sm">TV Schedule</span>
                         </div>
@@ -419,7 +419,7 @@ const Navigation = () => {
                       <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-xl hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                            <Users className="w-4 h-4 text-orange-500" />
+                            <img src={logo} alt="" className="w-4 h-4 object-contain" />
                           </div>
                           <span className="font-medium text-sm">Community</span>
                         </div>
@@ -489,7 +489,7 @@ const Navigation = () => {
                           className="flex items-center gap-3 w-full text-foreground hover:text-primary hover:bg-primary/10 transition-all py-2.5 px-3 rounded-xl text-left"
                         >
                           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                            <LayoutDashboard className="w-4 h-4 text-primary" />
+                            <img src={logo} alt="" className="w-4 h-4 object-contain" />
                           </div>
                           <span className="font-medium text-sm">Dashboard</span>
                         </button>
@@ -503,7 +503,7 @@ const Navigation = () => {
                               className="flex items-center gap-3 w-full text-foreground hover:text-primary hover:bg-primary/10 transition-all py-2.5 px-3 rounded-xl text-left"
                             >
                               <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                                <Sparkles className="w-4 h-4 text-purple-500" />
+                                <img src={logo} alt="" className="w-4 h-4 object-contain" />
                               </div>
                               <span className="font-medium text-sm">Admin Stories</span>
                             </button>
@@ -515,7 +515,7 @@ const Navigation = () => {
                               className="flex items-center gap-3 w-full text-foreground hover:text-primary hover:bg-primary/10 transition-all py-2.5 px-3 rounded-xl text-left"
                             >
                               <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
-                                <Shield className="w-4 h-4 text-red-500" />
+                                <img src={logo} alt="" className="w-4 h-4 object-contain" />
                               </div>
                               <span className="font-medium text-sm">Admin Portal</span>
                             </button>
@@ -528,7 +528,7 @@ const Navigation = () => {
                           className="flex items-center gap-3 w-full text-destructive hover:bg-destructive/10 transition-all py-2.5 px-3 rounded-xl text-left"
                         >
                           <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
-                            <LogOut className="w-4 h-4 text-destructive" />
+                            <img src={logo} alt="" className="w-4 h-4 object-contain" />
                           </div>
                           <span className="font-medium text-sm">Sign Out</span>
                         </button>
