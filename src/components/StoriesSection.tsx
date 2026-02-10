@@ -350,9 +350,18 @@ const StoriesSection = () => {
           <div 
             className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6"
           >
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
-              MetsXMFanZone Stories
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+                MetsXMFanZone Stories
+              </h2>
+              <button
+                onClick={() => window.location.reload()}
+                className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                aria-label="Refresh page"
+              >
+                <RefreshCw className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </div>
             <Link 
               to="/mets-scores" 
               className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
