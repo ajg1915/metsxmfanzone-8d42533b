@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit, Upload, Sparkles, Film, Download, RefreshCw, ImagePlus, Wand2 } from "lucide-react";
+import { Trash2, Plus, Edit, Upload, Sparkles, Film, Download, RefreshCw, ImagePlus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -46,8 +46,8 @@ export default function VideoGalleryManagement() {
   const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
   const [generatingGif, setGeneratingGif] = useState(false);
   const [fetchingMLBHighlights, setFetchingMLBHighlights] = useState(false);
-  const [generatingAIThumbnail, setGeneratingAIThumbnail] = useState(false);
-  const [aiThumbnailPrompt, setAiThumbnailPrompt] = useState("");
+  const [extractedFrames, setExtractedFrames] = useState<string[]>([]);
+  const [extractingFrames, setExtractingFrames] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<'file' | 'youtube' | 'link'>('file');
   const [formData, setFormData] = useState({
     title: "",
@@ -141,33 +141,51 @@ export default function VideoGalleryManagement() {
     }
   };
 
-  const generateAIThumbnail = async () => {
-    if (!aiThumbnailPrompt.trim() && !formData.title.trim()) {
-      toast({ title: "Enter a prompt or title first", variant: "destructive" });
-      return;
-    }
-    setGeneratingAIThumbnail(true);
+  const extractFramesFromVideo = async (file: File) => {
+    setExtractingFrames(true);
+    setExtractedFrames([]);
     try {
-      const prompt = aiThumbnailPrompt.trim() || `Create a vibrant, eye-catching YouTube-style thumbnail for a baseball video titled "${formData.title}". Include bold text, dramatic lighting, and baseball imagery. High quality, 16:9 aspect ratio.`;
-      
-      const response = await supabase.functions.invoke("generate-ai-image", {
-        body: { prompt, width: 1280, height: 720 },
+      const video = document.createElement('video');
+      video.preload = 'auto';
+      video.muted = true;
+      video.src = URL.createObjectURL(file);
+
+      await new Promise<void>((resolve, reject) => {
+        video.onloadedmetadata = () => resolve();
+        video.onerror = () => reject(new Error('Failed to load video'));
       });
 
-      if (response.error) throw new Error(response.error.message);
+      const duration = video.duration;
+      // Extract 6 frames at evenly spaced intervals
+      const frameCount = 6;
+      const times = Array.from({ length: frameCount }, (_, i) =>
+        Math.min(duration * ((i + 1) / (frameCount + 1)), duration - 0.1)
+      );
 
-      const imageUrl = response.data?.imageUrl;
-      if (imageUrl) {
-        setFormData(prev => ({ ...prev, thumbnail_url: imageUrl }));
-        toast({ title: "AI Thumbnail Generated!", description: "Thumbnail has been set." });
-      } else {
-        throw new Error("No image returned");
+      const frames: string[] = [];
+      for (const time of times) {
+        video.currentTime = time;
+        await new Promise<void>((resolve) => {
+          video.onseeked = () => resolve();
+        });
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          frames.push(canvas.toDataURL('image/jpeg', 0.85));
+        }
       }
+
+      URL.revokeObjectURL(video.src);
+      setExtractedFrames(frames);
+      toast({ title: `${frames.length} frames extracted`, description: "Select one as your thumbnail." });
     } catch (error: any) {
-      console.error("AI thumbnail error:", error);
-      toast({ title: "Failed to generate thumbnail", description: error.message, variant: "destructive" });
+      console.error('Frame extraction error:', error);
+      toast({ title: "Failed to extract frames", description: error.message, variant: "destructive" });
     } finally {
-      setGeneratingAIThumbnail(false);
+      setExtractingFrames(false);
     }
   };
 
@@ -405,7 +423,7 @@ export default function VideoGalleryManagement() {
     setVideoFile(null);
     setThumbnailFile(null);
     setUploadMethod('file');
-    setAiThumbnailPrompt("");
+    setExtractedFrames([]);
   };
 
   if (loading) {
@@ -534,41 +552,77 @@ export default function VideoGalleryManagement() {
                 </>
               )}
 
-              {/* AI Thumbnail Generator */}
-              <div className="space-y-2 border border-dashed border-primary/30 rounded-lg p-3 bg-primary/5">
-                <Label className="flex items-center gap-1.5 text-primary">
-                  <Wand2 className="w-4 h-4" />
-                  AI Thumbnail Generator
-                </Label>
-                <Input
-                  placeholder="Describe the thumbnail you want (or leave blank to auto-generate from title)"
-                  value={aiThumbnailPrompt}
-                  onChange={(e) => setAiThumbnailPrompt(e.target.value)}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  disabled={generatingAIThumbnail}
-                  onClick={generateAIThumbnail}
-                >
-                  {generatingAIThumbnail ? (
-                    <>
-                      <ImagePlus className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                      Generating AI Thumbnail...
-                    </>
-                  ) : (
-                    <>
-                      <ImagePlus className="mr-1.5 h-3.5 w-3.5" />
-                      Generate AI Thumbnail
-                    </>
+              {/* Video Frame Thumbnail Selector */}
+              {(videoFile || extractedFrames.length > 0) && (
+                <div className="space-y-2 border border-dashed border-primary/30 rounded-lg p-3 bg-primary/5">
+                  <Label className="flex items-center gap-1.5 text-primary">
+                    <ImagePlus className="w-4 h-4" />
+                    Select Thumbnail from Video
+                  </Label>
+                  {videoFile && extractedFrames.length === 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      disabled={extractingFrames}
+                      onClick={() => extractFramesFromVideo(videoFile)}
+                    >
+                      {extractingFrames ? (
+                        <>
+                          <Film className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                          Extracting Frames...
+                        </>
+                      ) : (
+                        <>
+                          <Film className="mr-1.5 h-3.5 w-3.5" />
+                          Extract Frames from Video
+                        </>
+                      )}
+                    </Button>
                   )}
-                </Button>
-                {formData.thumbnail_url && (
-                  <img src={formData.thumbnail_url} alt="Thumbnail preview" className="w-full h-32 object-cover rounded-md" />
-                )}
-              </div>
+                  {extractedFrames.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2">
+                      {extractedFrames.map((frame, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          className={`relative rounded-md overflow-hidden border-2 transition-all hover:scale-105 ${
+                            formData.thumbnail_url === frame
+                              ? 'border-primary ring-2 ring-primary/40'
+                              : 'border-transparent hover:border-primary/50'
+                          }`}
+                          onClick={async () => {
+                            // Upload selected frame to storage
+                            try {
+                              const blob = await fetch(frame).then(r => r.blob());
+                              const thumbName = `thumb_frame_${Date.now()}_${idx}.jpg`;
+                              const { error } = await supabase.storage.from('videos').upload(thumbName, blob);
+                              if (error) throw error;
+                              const { data: { publicUrl } } = supabase.storage.from('videos').getPublicUrl(thumbName);
+                              setFormData(prev => ({ ...prev, thumbnail_url: publicUrl }));
+                              toast({ title: "Thumbnail selected!" });
+                            } catch (err: any) {
+                              toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+                            }
+                          }}
+                        >
+                          <img src={frame} alt={`Frame ${idx + 1}`} className="w-full aspect-video object-cover" />
+                          <span className="absolute bottom-1 right-1 bg-background/80 text-[10px] px-1 rounded">
+                            Frame {idx + 1}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {formData.thumbnail_url && (
+                    <div className="mt-2">
+                      <p className="text-xs text-muted-foreground mb-1">Selected thumbnail:</p>
+                      <img src={formData.thumbnail_url} alt="Selected thumbnail" className="w-full h-32 object-cover rounded-md" />
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
