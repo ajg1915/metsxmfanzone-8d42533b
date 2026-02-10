@@ -578,6 +578,20 @@ const Auth = () => {
           console.error("Error sending confirmation email:", err);
         }
 
+        // Notify admins about new signup
+        try {
+          await supabase.functions.invoke('notify-admin-new-member', {
+            body: {
+              userId: data.user.id,
+              planType: validated.selectedPlan,
+              amount: validated.selectedPlan === 'annual' ? '$99.99' : validated.selectedPlan === 'premium' ? '$9.99' : 'Free',
+              source: 'Signup',
+            },
+          });
+        } catch (notifyErr) {
+          console.error("Admin notification error (non-blocking):", notifyErr);
+        }
+
         // Store selected plan in localStorage for after confirmation
         localStorage.setItem("pending_signup_plan", validated.selectedPlan);
         
