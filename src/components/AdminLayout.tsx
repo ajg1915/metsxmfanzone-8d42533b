@@ -203,11 +203,11 @@ export function AdminLayout() {
 
   return (
     <SidebarProvider defaultOpen={false}>
-      <div className="min-h-screen flex w-full overflow-x-hidden">
+      <div className="min-h-screen flex w-full overflow-hidden">
         <AdminSidebar />
-        <div className="flex-1 flex flex-col min-w-0 w-full max-w-full">
+        <div className="flex-1 flex flex-col min-w-0 w-0">
           <AdminHeader navigate={navigate} />
-          <main className="admin-main flex-1 overflow-x-hidden overflow-y-auto p-1.5 sm:p-2 md:p-4 max-w-full">
+          <main className="admin-main flex-1 overflow-x-hidden overflow-y-auto p-1.5 sm:p-2 md:p-4 w-full">
             <Outlet />
           </main>
         </div>

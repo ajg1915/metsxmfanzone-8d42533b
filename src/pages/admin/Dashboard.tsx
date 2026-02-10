@@ -243,28 +243,27 @@ export default function AdminDashboard() {
             />
           </div>
         </div>
-        <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {filteredItems.length > 0 ? filteredItems.map((item) => {
             const Icon = item.icon;
             return (
               <Card 
                 key={item.title}
-                className="cursor-pointer hover:border-primary transition-colors min-w-0 min-h-[132px] sm:min-h-[148px]"
+                className="cursor-pointer hover:border-primary transition-colors min-w-0"
                 onClick={() => navigate(item.url)}
               >
-                <CardHeader className="pb-3 pt-5 px-5 sm:px-6">
+                <CardHeader className="pb-2 pt-4 px-4">
                   <div className="flex items-center justify-between">
-                    {/* Use explicit icon sizes (not just CSS) so mobile touch targets are reliably large */}
-                    <Icon size={56} className="text-primary flex-shrink-0" />
-                    <ArrowRight size={34} className="text-muted-foreground flex-shrink-0" />
+                    <Icon style={{ width: 36, height: 36 }} className="text-primary flex-shrink-0 !w-9 !h-9" />
+                    <ArrowRight style={{ width: 20, height: 20 }} className="text-muted-foreground flex-shrink-0 !w-5 !h-5" />
                   </div>
                 </CardHeader>
-                <CardContent className="px-5 sm:px-6 pb-6">
-                  <CardTitle className="text-base sm:text-lg mb-1.5 truncate">{item.title}</CardTitle>
-                  <CardDescription className="text-sm sm:text-base mb-2.5 line-clamp-2">
+                <CardContent className="px-4 pb-4">
+                  <CardTitle className="text-sm sm:text-base mb-1 truncate">{item.title}</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm mb-1.5 line-clamp-1">
                     {item.description}
                   </CardDescription>
-                  <p className="text-sm sm:text-base font-semibold text-primary">{item.stat}</p>
+                  <p className="text-xs sm:text-sm font-semibold text-primary">{item.stat}</p>
                 </CardContent>
               </Card>
             );
