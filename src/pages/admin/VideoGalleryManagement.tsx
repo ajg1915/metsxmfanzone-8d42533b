@@ -141,6 +141,66 @@ export default function VideoGalleryManagement() {
     }
   };
 
+  const extractYouTubeVideoId = (url: string): string | null => {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+    ];
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) return match[1];
+    }
+    return null;
+  };
+
+  const extractFramesFromYouTube = async (url: string) => {
+    setExtractingFrames(true);
+    setExtractedFrames([]);
+    try {
+      const videoId = extractYouTubeVideoId(url);
+      if (!videoId) throw new Error('Invalid YouTube URL');
+
+      // YouTube provides these thumbnail variants for every video
+      const thumbUrls = [
+        `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+        `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,
+        `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+        `https://img.youtube.com/vi/${videoId}/0.jpg`,
+        `https://img.youtube.com/vi/${videoId}/1.jpg`,
+        `https://img.youtube.com/vi/${videoId}/2.jpg`,
+        `https://img.youtube.com/vi/${videoId}/3.jpg`,
+      ];
+
+      // Check which thumbnails actually exist (maxres may not exist for all videos)
+      const validFrames: string[] = [];
+      await Promise.all(
+        thumbUrls.map(async (thumbUrl) => {
+          try {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise<void>((resolve, reject) => {
+              img.onload = () => {
+                // YouTube returns a tiny grey placeholder (120x90) for missing thumbs
+                if (img.naturalWidth > 120) validFrames.push(thumbUrl);
+                resolve();
+              };
+              img.onerror = () => resolve(); // skip failed ones
+              img.src = thumbUrl;
+            });
+          } catch {}
+        })
+      );
+
+      // Sort to maintain original order
+      const ordered = thumbUrls.filter(u => validFrames.includes(u));
+      setExtractedFrames(ordered);
+      toast({ title: `${ordered.length} YouTube frames found`, description: "Select one as your thumbnail." });
+    } catch (error: any) {
+      toast({ title: "Failed to extract YouTube frames", description: error.message, variant: "destructive" });
+    } finally {
+      setExtractingFrames(false);
+    }
+  };
+
   const extractFramesFromVideo = async (file: File) => {
     setExtractingFrames(true);
     setExtractedFrames([]);
@@ -156,7 +216,6 @@ export default function VideoGalleryManagement() {
       });
 
       const duration = video.duration;
-      // Extract 6 frames at evenly spaced intervals
       const frameCount = 6;
       const times = Array.from({ length: frameCount }, (_, i) =>
         Math.min(duration * ((i + 1) / (frameCount + 1)), duration - 0.1)
@@ -528,7 +587,7 @@ export default function VideoGalleryManagement() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="thumbnail-url">Thumbnail URL</Label>
+                    <Label htmlFor="thumbnail-url">Thumbnail URL (or select from frames below)</Label>
                     <Input
                       id="thumbnail-url"
                       value={formData.thumbnail_url}
@@ -536,20 +595,20 @@ export default function VideoGalleryManagement() {
                         setFormData({ ...formData, thumbnail_url: e.target.value })
                       }
                       placeholder="https://..."
-                      required
                     />
                   </div>
                 </>
               )}
 
               {/* Video Frame Thumbnail Selector */}
-              {(videoFile || extractedFrames.length > 0) && (
+              {(videoFile || extractedFrames.length > 0 || (uploadMethod === 'youtube' && formData.video_url)) && (
                 <div className="space-y-2 border border-dashed border-primary/30 rounded-lg p-3 bg-primary/5">
                   <Label className="flex items-center gap-1.5 text-primary">
                     <ImagePlus className="w-4 h-4" />
                     Select Thumbnail from Video
                   </Label>
-                  {videoFile && extractedFrames.length === 0 && (
+                  {/* File-based extraction */}
+                  {uploadMethod === 'file' && videoFile && extractedFrames.length === 0 && (
                     <Button
                       type="button"
                       variant="outline"
@@ -571,39 +630,82 @@ export default function VideoGalleryManagement() {
                       )}
                     </Button>
                   )}
+                  {/* YouTube extraction */}
+                  {uploadMethod === 'youtube' && formData.video_url && extractedFrames.length === 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      disabled={extractingFrames}
+                      onClick={() => extractFramesFromYouTube(formData.video_url)}
+                    >
+                      {extractingFrames ? (
+                        <>
+                          <Film className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                          Fetching YouTube Frames...
+                        </>
+                      ) : (
+                        <>
+                          <Film className="mr-1.5 h-3.5 w-3.5" />
+                          Extract Frames from YouTube
+                        </>
+                      )}
+                    </Button>
+                  )}
                   {extractedFrames.length > 0 && (
                     <div className="grid grid-cols-3 gap-2">
-                      {extractedFrames.map((frame, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          className={`relative rounded-md overflow-hidden border-2 transition-all hover:scale-105 ${
-                            formData.thumbnail_url === frame
-                              ? 'border-primary ring-2 ring-primary/40'
-                              : 'border-transparent hover:border-primary/50'
-                          }`}
-                          onClick={async () => {
-                            // Upload selected frame to storage
-                            try {
-                              const blob = await fetch(frame).then(r => r.blob());
-                              const thumbName = `thumb_frame_${Date.now()}_${idx}.jpg`;
-                              const { error } = await supabase.storage.from('videos').upload(thumbName, blob);
-                              if (error) throw error;
-                              const { data: { publicUrl } } = supabase.storage.from('videos').getPublicUrl(thumbName);
-                              setFormData(prev => ({ ...prev, thumbnail_url: publicUrl }));
-                              toast({ title: "Thumbnail selected!" });
-                            } catch (err: any) {
-                              toast({ title: "Upload failed", description: err.message, variant: "destructive" });
-                            }
-                          }}
-                        >
-                          <img src={frame} alt={`Frame ${idx + 1}`} className="w-full aspect-video object-cover" />
-                          <span className="absolute bottom-1 right-1 bg-background/80 text-[10px] px-1 rounded">
-                            Frame {idx + 1}
-                          </span>
-                        </button>
-                      ))}
+                      {extractedFrames.map((frame, idx) => {
+                        const isYouTubeFrame = frame.startsWith('https://img.youtube.com');
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            className={`relative rounded-md overflow-hidden border-2 transition-all hover:scale-105 ${
+                              formData.thumbnail_url === frame
+                                ? 'border-primary ring-2 ring-primary/40'
+                                : 'border-transparent hover:border-primary/50'
+                            }`}
+                            onClick={async () => {
+                              if (isYouTubeFrame) {
+                                // YouTube frames are direct URLs - use as-is
+                                setFormData(prev => ({ ...prev, thumbnail_url: frame }));
+                                toast({ title: "Thumbnail selected!" });
+                              } else {
+                                // File-based frames need uploading
+                                try {
+                                  const blob = await fetch(frame).then(r => r.blob());
+                                  const thumbName = `thumb_frame_${Date.now()}_${idx}.jpg`;
+                                  const { error } = await supabase.storage.from('videos').upload(thumbName, blob);
+                                  if (error) throw error;
+                                  const { data: { publicUrl } } = supabase.storage.from('videos').getPublicUrl(thumbName);
+                                  setFormData(prev => ({ ...prev, thumbnail_url: publicUrl }));
+                                  toast({ title: "Thumbnail selected!" });
+                                } catch (err: any) {
+                                  toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+                                }
+                              }
+                            }}
+                          >
+                            <img src={frame} alt={`Frame ${idx + 1}`} className="w-full aspect-video object-cover" />
+                            <span className="absolute bottom-1 right-1 bg-background/80 text-[10px] px-1 rounded">
+                              Frame {idx + 1}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
+                  )}
+                  {extractedFrames.length > 0 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-xs"
+                      onClick={() => setExtractedFrames([])}
+                    >
+                      <RefreshCw className="mr-1 h-3 w-3" /> Re-extract Frames
+                    </Button>
                   )}
                   {formData.thumbnail_url && (
                     <div className="mt-2">
