@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit, Upload, Sparkles, Film, Download, RefreshCw } from "lucide-react";
+import { Trash2, Plus, Edit, Upload, Sparkles, Film, Download, RefreshCw, ImagePlus, Wand2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -46,6 +46,8 @@ export default function VideoGalleryManagement() {
   const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
   const [generatingGif, setGeneratingGif] = useState(false);
   const [fetchingMLBHighlights, setFetchingMLBHighlights] = useState(false);
+  const [generatingAIThumbnail, setGeneratingAIThumbnail] = useState(false);
+  const [aiThumbnailPrompt, setAiThumbnailPrompt] = useState("");
   const [uploadMethod, setUploadMethod] = useState<'file' | 'youtube' | 'link'>('file');
   const [formData, setFormData] = useState({
     title: "",
@@ -136,6 +138,36 @@ export default function VideoGalleryManagement() {
       return null;
     } finally {
       setGeneratingGif(false);
+    }
+  };
+
+  const generateAIThumbnail = async () => {
+    if (!aiThumbnailPrompt.trim() && !formData.title.trim()) {
+      toast({ title: "Enter a prompt or title first", variant: "destructive" });
+      return;
+    }
+    setGeneratingAIThumbnail(true);
+    try {
+      const prompt = aiThumbnailPrompt.trim() || `Create a vibrant, eye-catching YouTube-style thumbnail for a baseball video titled "${formData.title}". Include bold text, dramatic lighting, and baseball imagery. High quality, 16:9 aspect ratio.`;
+      
+      const response = await supabase.functions.invoke("generate-ai-image", {
+        body: { prompt, width: 1280, height: 720 },
+      });
+
+      if (response.error) throw new Error(response.error.message);
+
+      const imageUrl = response.data?.imageUrl;
+      if (imageUrl) {
+        setFormData(prev => ({ ...prev, thumbnail_url: imageUrl }));
+        toast({ title: "AI Thumbnail Generated!", description: "Thumbnail has been set." });
+      } else {
+        throw new Error("No image returned");
+      }
+    } catch (error: any) {
+      console.error("AI thumbnail error:", error);
+      toast({ title: "Failed to generate thumbnail", description: error.message, variant: "destructive" });
+    } finally {
+      setGeneratingAIThumbnail(false);
     }
   };
 
@@ -373,6 +405,7 @@ export default function VideoGalleryManagement() {
     setVideoFile(null);
     setThumbnailFile(null);
     setUploadMethod('file');
+    setAiThumbnailPrompt("");
   };
 
   if (loading) {
@@ -500,6 +533,42 @@ export default function VideoGalleryManagement() {
                   </div>
                 </>
               )}
+
+              {/* AI Thumbnail Generator */}
+              <div className="space-y-2 border border-dashed border-primary/30 rounded-lg p-3 bg-primary/5">
+                <Label className="flex items-center gap-1.5 text-primary">
+                  <Wand2 className="w-4 h-4" />
+                  AI Thumbnail Generator
+                </Label>
+                <Input
+                  placeholder="Describe the thumbnail you want (or leave blank to auto-generate from title)"
+                  value={aiThumbnailPrompt}
+                  onChange={(e) => setAiThumbnailPrompt(e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  disabled={generatingAIThumbnail}
+                  onClick={generateAIThumbnail}
+                >
+                  {generatingAIThumbnail ? (
+                    <>
+                      <ImagePlus className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                      Generating AI Thumbnail...
+                    </>
+                  ) : (
+                    <>
+                      <ImagePlus className="mr-1.5 h-3.5 w-3.5" />
+                      Generate AI Thumbnail
+                    </>
+                  )}
+                </Button>
+                {formData.thumbnail_url && (
+                  <img src={formData.thumbnail_url} alt="Thumbnail preview" className="w-full h-32 object-cover rounded-md" />
+                )}
+              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
