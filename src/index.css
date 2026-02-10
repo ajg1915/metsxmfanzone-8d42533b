@@ -926,6 +926,68 @@ All colors MUST be HSL.
 
   .admin-main button {
     font-size: 0.6875rem !important;
+    padding: 0.25rem 0.5rem !important;
+    min-height: 0 !important;
+    height: auto !important;
+    line-height: 1.2 !important;
+  }
+
+  .admin-main button svg,
+  .admin-main a svg,
+  .admin-main svg.lucide {
+    width: 14px !important;
+    height: 14px !important;
+    flex-shrink: 0;
+  }
+
+  /* Icon-only buttons */
+  .admin-main button:has(svg:only-child) {
+    padding: 0.25rem !important;
+  }
+
+  .admin-main input,
+  .admin-main textarea,
+  .admin-main select,
+  .admin-main [role="combobox"] {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  .admin-main [class*="grid-cols-2"],
+  .admin-main [class*="grid-cols-3"],
+  .admin-main [class*="grid-cols-4"] {
+    gap: 0.25rem !important;
+  }
+
+  .admin-main [class*="flex"][class*="items-center"] > svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .admin-main [class*="w-5"],
+  .admin-main [class*="h-5"],
+  .admin-main [class*="w-6"],
+  .admin-main [class*="h-6"],
+  .admin-main [class*="w-7"],
+  .admin-main [class*="h-7"],
+  .admin-main [class*="w-8"],
+  .admin-main [class*="h-8"] {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .admin-main [class*="text-sm"] {
+    font-size: 0.6875rem !important;
+  }
+
+  .admin-main [class*="text-base"] {
+    font-size: 0.75rem !important;
+  }
+
+  .admin-main p {
+    font-size: 0.6875rem !important;
+    line-height: 1.3 !important;
   }
 
   .admin-main label {
