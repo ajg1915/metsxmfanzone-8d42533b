@@ -94,8 +94,8 @@ Deno.serve(async (req: Request) => {
           description: `MetsXMFanZone ${planType} subscription`,
         }],
         application_context: {
-          return_url: 'https://metsxmfanzone.com/payment-success',
-          cancel_url: 'https://metsxmfanzone.com/plans',
+          return_url: 'https://metsxmfanzone.lovable.app/payment-success',
+          cancel_url: 'https://metsxmfanzone.lovable.app/plans',
         },
       }),
     });
