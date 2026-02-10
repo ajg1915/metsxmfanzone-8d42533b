@@ -165,6 +165,18 @@ Deno.serve(async (req: Request) => {
             console.error('Error updating subscription:', updateError);
           } else {
             console.log('Subscription activated:', subscription.id);
+            // Notify admins about new member
+            try {
+              await supabase.functions.invoke('notify-admin-new-member', {
+                body: {
+                  userId: subscription.user_id,
+                  planType: subscription.plan_type,
+                  source: 'PayPal Webhook',
+                },
+              });
+            } catch (notifyErr) {
+              console.error('Admin notification failed:', notifyErr);
+            }
           }
         }
         break;

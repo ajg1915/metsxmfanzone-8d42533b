@@ -141,7 +141,20 @@ Deno.serve(async (req) => {
       });
     } catch (emailError) {
       console.error('Error sending confirmation email:', emailError);
-      // Don't fail the payment if email fails
+    }
+
+    // Notify admins about new member signup
+    try {
+      await supabase.functions.invoke('notify-admin-new-member', {
+        body: {
+          userId: user.id,
+          planType: subscription.plan_type,
+          amount: subscription.plan_type === 'annual' ? '$99.99' : '$9.99',
+          source: 'PayPal',
+        },
+      });
+    } catch (notifyError) {
+      console.error('Error notifying admins:', notifyError);
     }
 
     // Return only safe subscription data - never expose payment IDs
