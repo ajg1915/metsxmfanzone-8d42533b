@@ -37,11 +37,7 @@ const SeasonalVideoSection = () => {
         .order("published_at", { ascending: false })
         .limit(12);
 
-      if (isSpringTraining) {
-        query = query.eq("category", "Spring Training");
-      } else {
-        query = query.eq("video_type", "highlight");
-      }
+      // Show all published videos as highlights regardless of season
 
       const { data, error } = await query;
       if (error) throw error;
