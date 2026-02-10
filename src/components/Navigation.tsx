@@ -33,8 +33,21 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+// Singleton guard: only one Navigation renders at a time
+let navMountCount = 0;
 
 const Navigation = () => {
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    navMountCount++;
+    if (navMountCount === 1) {
+      setIsMounted(true);
+    }
+    return () => {
+      navMountCount--;
+    };
+  }, []);
   const { user, signOut } = useAuth();
   const { tier } = useSubscription();
   const navigate = useNavigate();
@@ -112,11 +125,16 @@ const Navigation = () => {
     }
   };
 
+  const navRoot = document.getElementById("nav-root");
+
+  // Only the first mounted Navigation instance renders
+  if (!isMounted) return null;
+
   return (
     <>
       <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
-      {createPortal(
-      <nav className="fixed top-0 left-0 right-0 z-[9999] glass-nav">
+      {navRoot ? createPortal(
+      <nav className="glass-nav w-full">
         <div className="container mx-auto px-3 sm:px-4">
         <div className="flex items-center justify-between h-12">
           <div className="flex items-center gap-2">
@@ -566,8 +584,8 @@ const Navigation = () => {
         </div>
       </div>
     </nav>,
-      document.body
-      )}
+      navRoot
+      ) : null}
     </>
   );
 };

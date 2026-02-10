@@ -22,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Index from "./pages/Index";
 import Maintenance from "./pages/Maintenance";
 import Auth from "./pages/Auth";
+import Navigation from "./components/Navigation";
 
 // Lazy load all other pages
 const Community = lazy(() => import("./pages/Community"));
@@ -260,6 +261,9 @@ const AppContent = () => {
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isAuthRoute = location.pathname === "/auth" || location.pathname === "/logout";
   const isMaintenancePreview = location.pathname === "/maintenance-preview";
+  const isTVRoute = location.pathname.startsWith("/tv");
+  const isWriterAuthRoute = location.pathname === "/writer-auth" || location.pathname === "/writer-register";
+  const showNavigation = !isAdminRoute && !isTVRoute && !isMaintenancePreview && !(maintenanceEnabled && !isAdminRoute && !isAuthRoute);
 
   // Show maintenance page for non-admin routes when enabled (or preview route)
   if (isMaintenancePreview) {
@@ -272,7 +276,8 @@ const AppContent = () => {
   
   return (
     <TooltipProvider>
-      <PullToRefresh>
+     <PullToRefresh>
+        {showNavigation && <Navigation />}
         <Toaster />
         <Sonner />
         {/* LiveStreamToast removed per user request */}

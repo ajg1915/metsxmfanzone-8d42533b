@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import SEOHead from "@/components/SEOHead";
-import Navigation from "@/components/Navigation";
+
 import Hero from "@/components/Hero";
 import LiveGameTicker from "@/components/LiveGameTicker";
 import Footer from "@/components/Footer";
@@ -167,7 +167,7 @@ const Index = () => {
         pageType="home"
         breadcrumbs={[{ name: "Home", url: "/" }]}
       />
-      <Navigation />
+      
       <LiveGameTicker />
       <main className="pt-14 sm:pt-16 relative z-10">
         <Hero />
