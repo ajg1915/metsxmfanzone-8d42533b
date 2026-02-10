@@ -224,8 +224,8 @@ export function AdminLayout() {
             [&_h1]:text-base [&_h1]:sm:text-lg [&_h1]:md:text-xl
             [&_h2]:text-sm [&_h2]:sm:text-base [&_h2]:md:text-lg
             [&_h3]:text-xs [&_h3]:sm:text-sm [&_h3]:md:text-base
-            [&_.container]:px-0 [&_.container]:sm:px-2 [&_.container]:max-w-full
-            [&_.card]:text-sm [&_.card-header]:p-3 [&_.card-content]:p-3
+            [&_.container]:px-0 [&_.container]:sm:px-2 [&_.container]:max-w-full [&_.container]:mx-0
+            [&_.card]:text-sm [&_.card-header]:p-2 [&_.card-header]:sm:p-3 [&_.card-content]:p-2 [&_.card-content]:sm:p-3
             [&_input]:text-sm [&_input]:h-8
             [&_textarea]:text-sm
             [&_select]:text-sm
@@ -233,7 +233,20 @@ export function AdminLayout() {
             [&_label]:text-xs
             [&_.badge]:text-xs
             [&_table]:text-xs [&_table]:sm:text-sm
-            [&_th]:p-2 [&_td]:p-2
+            [&_th]:p-1.5 [&_th]:sm:p-2 [&_th]:text-xs
+            [&_td]:p-1.5 [&_td]:sm:p-2
+            [&_.max-w-7xl]:max-w-full
+            [&_.max-w-6xl]:max-w-full
+            [&_.max-w-5xl]:max-w-full
+            [&_.text-3xl]:text-base [&_.text-3xl]:sm:text-lg [&_.text-3xl]:md:text-xl
+            [&_.text-2xl]:text-sm [&_.text-2xl]:sm:text-base [&_.text-2xl]:md:text-lg
+            [&_.px-4]:px-1 [&_.px-4]:sm:px-2 [&_.px-4]:md:px-4
+            [&_.px-6]:px-2 [&_.px-6]:sm:px-3 [&_.px-6]:md:px-6
+            [&_.py-6]:py-2 [&_.py-6]:sm:py-3 [&_.py-6]:md:py-6
+            [&_.gap-4]:gap-2 [&_.gap-4]:sm:gap-3 [&_.gap-4]:md:gap-4
+            [&_.gap-6]:gap-2 [&_.gap-6]:sm:gap-3 [&_.gap-6]:md:gap-4
+            [&_.space-y-6>*+*]:mt-2 [&_.space-y-6>*+*]:sm:mt-3 [&_.space-y-6>*+*]:md:mt-4
+            [&_.pt-6]:pt-2 [&_.pt-6]:sm:pt-3 [&_.pt-6]:md:pt-6
           ">
             <Outlet />
           </main>
