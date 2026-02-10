@@ -48,6 +48,7 @@ export default function VideoGalleryManagement() {
   const [fetchingMLBHighlights, setFetchingMLBHighlights] = useState(false);
   const [extractedFrames, setExtractedFrames] = useState<string[]>([]);
   const [extractingFrames, setExtractingFrames] = useState(false);
+  const [generatingDescription, setGeneratingDescription] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<'file' | 'youtube' | 'link'>('file');
   const [formData, setFormData] = useState({
     title: "",
@@ -729,7 +730,38 @@ export default function VideoGalleryManagement() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="description">Description</Label>
+                  {formData.thumbnail_url && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs gap-1"
+                      disabled={generatingDescription}
+                      onClick={async () => {
+                        setGeneratingDescription(true);
+                        try {
+                          const { data, error } = await supabase.functions.invoke('describe-video-thumbnail', {
+                            body: { imageUrl: formData.thumbnail_url },
+                          });
+                          if (error) throw error;
+                          if (data?.description) {
+                            setFormData(prev => ({ ...prev, description: data.description }));
+                            toast({ title: "AI description generated!" });
+                          }
+                        } catch (err: any) {
+                          toast({ title: "Failed to generate description", description: err.message, variant: "destructive" });
+                        } finally {
+                          setGeneratingDescription(false);
+                        }
+                      }}
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      {generatingDescription ? "Generating..." : "AI Describe"}
+                    </Button>
+                  )}
+                </div>
                 <Textarea
                   id="description"
                   value={formData.description}
