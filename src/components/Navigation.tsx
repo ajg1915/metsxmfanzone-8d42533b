@@ -33,22 +33,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-// Singleton guard: only one Navigation renders at a time
-let navMountCount = 0;
 
 const Navigation = () => {
-  const [isMounted, setIsMounted] = useState(false);
-  
-  useEffect(() => {
-    navMountCount++;
-    if (navMountCount === 1) {
-      setIsMounted(true);
-    }
-    return () => {
-      navMountCount--;
-    };
-  }, []);
-
   // Hide nav on scroll down, show on scroll up
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -146,9 +132,6 @@ const Navigation = () => {
   };
 
   const navRoot = document.getElementById("nav-root");
-
-  // Only the first mounted Navigation instance renders
-  if (!isMounted) return null;
 
   return (
     <>
