@@ -327,7 +327,7 @@ export default function NewsletterGenerator() {
   const previewHtml = generateNewsletterHtml(subject || "Newsletter Preview", generatedContent || "<p>Your newsletter content will appear here...</p>");
 
   return (
-    <div className="container mx-auto max-w-6xl px-3 sm:px-4 py-4 sm:py-6">
+    <div className="max-w-full px-1 sm:px-2 md:px-4 py-2 sm:py-3 md:py-6 overflow-x-hidden">
       <div className="mb-4 sm:mb-6">
         <div className="flex items-center justify-between">
           <div>

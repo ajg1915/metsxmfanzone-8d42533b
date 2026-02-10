@@ -115,7 +115,7 @@ export default function BusinessAdsManagement() {
 
   if (loading) {
     return (
-      <div className="container mx-auto max-w-6xl px-3 sm:px-4 py-4 sm:py-6">
+      <div className="max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
         <p className="text-sm text-muted-foreground">Loading...</p>
       </div>
     );
