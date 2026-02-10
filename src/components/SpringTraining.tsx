@@ -8,6 +8,25 @@ import { Button } from "@/components/ui/button";
 import PremiumBadge from "@/components/PremiumBadge";
 import { useSubscription } from "@/hooks/useSubscription";
 
+import springAstros from "@/assets/spring-mets-astros.jpg";
+import springBraves from "@/assets/spring-mets-braves.jpg";
+import springCards from "@/assets/spring-mets-cards.jpg";
+import springNats from "@/assets/spring-mets-nats.jpg";
+import springRedsox from "@/assets/spring-mets-redsox.jpg";
+import springYankees from "@/assets/spring-mets-yankees.jpg";
+import springDefault from "@/assets/spring-training.jpg";
+
+const getFallbackImage = (opponent: string): string => {
+  const name = opponent.toLowerCase();
+  if (name.includes("astros") || name.includes("houston")) return springAstros;
+  if (name.includes("braves") || name.includes("atlanta")) return springBraves;
+  if (name.includes("cardinal") || name.includes("stl")) return springCards;
+  if (name.includes("national") || name.includes("washington")) return springNats;
+  if (name.includes("red sox") || name.includes("boston")) return springRedsox;
+  if (name.includes("yankee") || name.includes("new york")) return springYankees;
+  return springDefault;
+};
+
 interface SpringTrainingProps {
   className?: string;
 }
@@ -75,7 +94,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
                 >
                   <div className="relative w-full h-full">
                     <img 
-                      src={game.preview_image_url} 
+                      src={game.preview_image_url || getFallbackImage(game.opponent)} 
                       alt={`Mets vs ${game.opponent}`} 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
                     />
