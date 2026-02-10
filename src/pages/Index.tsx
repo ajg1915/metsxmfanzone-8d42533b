@@ -168,14 +168,15 @@ const Index = () => {
       />
       <Navigation />
       <LiveGameTicker />
-      <Suspense fallback={null}>
-        <GameAlertsBanner />
-      </Suspense>
       <main className="pt-14 sm:pt-16 relative z-10">
         <Hero />
         
         <Suspense fallback={null}>
           <LiveNotificationBar />
+        </Suspense>
+
+        <Suspense fallback={null}>
+          <GameAlertsBanner />
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton height="h-32" />}>
