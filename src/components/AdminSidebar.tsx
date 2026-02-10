@@ -54,7 +54,8 @@ const settingsNavItems = [
 // Live & Streaming
 const liveItems = [
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
-  { title: "Game Alerts", url: "/admin/game-notifications", icon: Bell },
+  { title: "Push Notifications", url: "/admin/game-notifications", icon: Bell },
+  { title: "Game Alerts", url: "/admin/game-alerts", icon: Megaphone },
   { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
   { title: "Replays", url: "/admin/stream-replays", icon: PlaySquare },
   { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },

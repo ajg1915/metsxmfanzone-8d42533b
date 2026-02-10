@@ -102,6 +102,7 @@ const SEOManagement = lazy(() => import("./pages/admin/SEOManagement"));
 const HeroManagement = lazy(() => import("./pages/admin/HeroManagement"));
 const NewsTrackerManagement = lazy(() => import("./pages/admin/NewsTrackerManagement"));
 const GameNotifications = lazy(() => import("./pages/admin/GameNotifications"));
+const GameAlertsManagement = lazy(() => import("./pages/admin/GameAlertsManagement"));
 const WriterRegister = lazy(() => import("./pages/WriterRegister"));
 const CreateAccount = lazy(() => import("./pages/help/CreateAccount"));
 const BiometricLogin = lazy(() => import("./pages/help/BiometricLogin"));
@@ -372,6 +373,7 @@ const AppContent = () => {
               <Route path="seo" element={<SEOManagement />} />
               <Route path="news-tracker" element={<NewsTrackerManagement />} />
               <Route path="game-notifications" element={<GameNotifications />} />
+              <Route path="game-alerts" element={<GameAlertsManagement />} />
               <Route path="podcaster-applications" element={<PodcasterApplicationsManagement />} />
               <Route path="video-creator" element={<VideoCreatorStudio />} />
               <Route path="ai-images" element={<AIImageGenerator />} />
