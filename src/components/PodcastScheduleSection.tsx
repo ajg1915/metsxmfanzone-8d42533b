@@ -3,11 +3,9 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Radio, Zap, Tv, Play } from "lucide-react";
-
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import GlassCard from "@/components/GlassCard";
-
 interface PodcastShow {
   id: string;
   title: string;
@@ -21,53 +19,30 @@ interface PodcastShow {
 }
 
 // Fallback data generation for when no shows are in database
-const FALLBACK_TITLES = [
-  "🔥 Hot Stove Report Live",
-  "⚾ Mets Daily Rundown",
-  "🎙️ The FanZone Hour",
-  "📊 Stats & Analysis Live",
-];
-
-const FALLBACK_DESCRIPTIONS = [
-  "Join us for live Mets analysis, hot takes, and fan interaction!",
-  "Breaking down all the latest Mets news and roster updates.",
-  "Your daily dose of Mets content with special guest appearances.",
-  "Pre-game predictions, lineup analysis, and betting insights.",
-];
-
-const FALLBACK_GRADIENTS = [
-  "from-[#002D72] via-[#003087] to-[#FF5910]",
-  "from-[#FF5910] via-[#FF8C00] to-[#FFD700]",
-  "from-[#002D72] via-[#0047AB] to-[#6495ED]",
-  "from-[#6366f1] via-[#8b5cf6] to-[#a855f7]",
-];
-
+const FALLBACK_TITLES = ["🔥 Hot Stove Report Live", "⚾ Mets Daily Rundown", "🎙️ The FanZone Hour", "📊 Stats & Analysis Live"];
+const FALLBACK_DESCRIPTIONS = ["Join us for live Mets analysis, hot takes, and fan interaction!", "Breaking down all the latest Mets news and roster updates.", "Your daily dose of Mets content with special guest appearances.", "Pre-game predictions, lineup analysis, and betting insights."];
+const FALLBACK_GRADIENTS = ["from-[#002D72] via-[#003087] to-[#FF5910]", "from-[#FF5910] via-[#FF8C00] to-[#FFD700]", "from-[#002D72] via-[#0047AB] to-[#6495ED]", "from-[#6366f1] via-[#8b5cf6] to-[#a855f7]"];
 const PodcastScheduleSection = () => {
   const [shows, setShows] = useState<PodcastShow[]>([]);
   const [isLiveNow, setIsLiveNow] = useState(false);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     fetchShows();
   }, []);
-
   const fetchShows = async () => {
     setLoading(true);
-    
+
     // Fetch upcoming shows from database
     const now = new Date().toISOString();
     // Fetch all shows for the next 2 weeks (no limit to show full weekly schedule)
     const twoWeeksFromNow = new Date();
     twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
-    
-    const { data, error } = await supabase
-      .from("podcast_shows")
-      .select("id, title, description, show_date, show_type, thumbnail_gradient, thumbnail_url, is_featured, is_live")
-      .eq("published", true)
-      .gte("show_date", now)
-      .lte("show_date", twoWeeksFromNow.toISOString())
-      .order("show_date", { ascending: true });
-
+    const {
+      data,
+      error
+    } = await supabase.from("podcast_shows").select("id, title, description, show_date, show_type, thumbnail_gradient, thumbnail_url, is_featured, is_live").eq("published", true).gte("show_date", now).lte("show_date", twoWeeksFromNow.toISOString()).order("show_date", {
+      ascending: true
+    });
     if (error) {
       console.error("Error fetching podcast shows:", error);
       // Use fallback generated shows
@@ -79,8 +54,10 @@ const PodcastScheduleSection = () => {
       // No shows in database, try to generate weekly shows automatically
       try {
         console.log("No upcoming shows found, triggering weekly generation...");
-        const { data: generatedData, error: genError } = await supabase.functions.invoke("generate-weekly-podcast-shows");
-        
+        const {
+          data: generatedData,
+          error: genError
+        } = await supabase.functions.invoke("generate-weekly-podcast-shows");
         if (genError) {
           console.error("Error generating weekly shows:", genError);
           generateFallbackShows();
@@ -89,15 +66,11 @@ const PodcastScheduleSection = () => {
           // Re-fetch after generation - get all shows for 2 weeks
           const refetchTwoWeeks = new Date();
           refetchTwoWeeks.setDate(refetchTwoWeeks.getDate() + 14);
-          
-          const { data: refetchData } = await supabase
-            .from("podcast_shows")
-            .select("id, title, description, show_date, show_type, thumbnail_gradient, thumbnail_url, is_featured, is_live")
-            .eq("published", true)
-            .gte("show_date", now)
-            .lte("show_date", refetchTwoWeeks.toISOString())
-            .order("show_date", { ascending: true });
-          
+          const {
+            data: refetchData
+          } = await supabase.from("podcast_shows").select("id, title, description, show_date, show_type, thumbnail_gradient, thumbnail_url, is_featured, is_live").eq("published", true).gte("show_date", now).lte("show_date", refetchTwoWeeks.toISOString()).order("show_date", {
+            ascending: true
+          });
           if (refetchData && refetchData.length > 0) {
             setShows(refetchData);
           } else {
@@ -109,21 +82,16 @@ const PodcastScheduleSection = () => {
         generateFallbackShows();
       }
     }
-    
+
     // Also check for any live shows
-    const { data: liveData } = await supabase
-      .from("podcast_shows")
-      .select("is_live")
-      .eq("is_live", true)
-      .limit(1);
-    
+    const {
+      data: liveData
+    } = await supabase.from("podcast_shows").select("is_live").eq("is_live", true).limit(1);
     if (liveData && liveData.length > 0) {
       setIsLiveNow(true);
     }
-    
     setLoading(false);
   };
-
   const generateFallbackShows = () => {
     const fallbackShows: PodcastShow[] = [];
     const now = new Date();
@@ -133,11 +101,9 @@ const PodcastScheduleSection = () => {
       const date = new Date(now);
       date.setDate(date.getDate() + i);
       const dayOfWeek = date.getDay();
-
       if (scheduleDays.includes(dayOfWeek)) {
         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
         date.setHours(isWeekend ? 14 : 17, isWeekend ? 0 : 30, 0, 0);
-
         if (date > now) {
           const idx = fallbackShows.length;
           fallbackShows.push({
@@ -149,30 +115,26 @@ const PodcastScheduleSection = () => {
             thumbnail_gradient: FALLBACK_GRADIENTS[idx % FALLBACK_GRADIENTS.length],
             thumbnail_url: null,
             is_featured: idx === 0,
-            is_live: false,
+            is_live: false
           });
         }
       }
     }
-
     setShows(fallbackShows);
   };
-
   const formatTime = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleTimeString("en-US", {
       hour: "numeric",
       minute: "2-digit",
-      hour12: true,
+      hour12: true
     });
   };
-
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-
     if (date.toDateString() === today.toDateString()) {
       return "Today";
     } else if (date.toDateString() === tomorrow.toDateString()) {
@@ -181,29 +143,22 @@ const PodcastScheduleSection = () => {
     return date.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
-      day: "numeric",
+      day: "numeric"
     });
   };
-
   if (loading) {
-    return (
-      <section className="py-10 sm:py-12 md:py-16 px-4">
+    return <section className="py-10 sm:py-12 md:py-16 px-4">
         <div className="container mx-auto max-w-7xl">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-64 mx-auto" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-48 bg-muted rounded-xl" />
-              ))}
+              {[1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-muted rounded-xl" />)}
             </div>
           </div>
         </div>
-      </section>
-    );
+      </section>;
   }
-
-  return (
-    <section className="py-10 sm:py-12 md:py-16 px-4 relative overflow-hidden">
+  return <section className="py-10 sm:py-12 md:py-16 px-4 relative overflow-hidden">
       <div className="container mx-auto max-w-7xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-10">
@@ -214,21 +169,18 @@ const PodcastScheduleSection = () => {
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
               Live Podcast Schedule
             </h2>
-            {isLiveNow && (
-              <Badge className="bg-red-500 text-white animate-pulse text-[10px] sm:text-xs">
+            {isLiveNow && <Badge className="bg-red-500 text-white animate-pulse text-[10px] sm:text-xs">
                 <Radio className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                 LIVE NOW
-              </Badge>
-            )}
+              </Badge>}
           </div>
-          <p className="text-muted-foreground max-w-xl sm:max-w-2xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed px-2">
+          <p className="text-muted-foreground max-w-xl sm:max-w-2xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed px-2 text-center font-thin">
             Catch us live on Mon, Tue & Fri @ 5:30 PM • Weekends @ 2:00 PM • Game day pregame shows!
           </p>
         </div>
 
         {/* Live Now Banner */}
-        {isLiveNow && (
-          <div className="mb-8 animate-fade-in">
+        {isLiveNow && <div className="mb-8 animate-fade-in">
             <GlassCard variant="interactive" glow="orange" className="p-4 sm:p-6 border-2 border-red-500/50">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -251,24 +203,14 @@ const PodcastScheduleSection = () => {
                 </Button>
               </div>
             </GlassCard>
-          </div>
-        )}
+          </div>}
 
         {/* Upcoming Shows Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {shows.map((show) => (
-            <GlassCard key={show.id} variant="interactive" glow="blue" className="h-full overflow-hidden">
+          {shows.map(show => <GlassCard key={show.id} variant="interactive" glow="blue" className="h-full overflow-hidden">
               {/* Thumbnail - AI Image or Gradient Fallback */}
               <div className="relative h-24 sm:h-28 md:h-32 overflow-hidden">
-                {show.thumbnail_url ? (
-                  <img 
-                    src={show.thumbnail_url} 
-                    alt={show.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className={`w-full h-full bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'}`} />
-                )}
+                {show.thumbnail_url ? <img src={show.thumbnail_url} alt={show.title} className="w-full h-full object-cover" /> : <div className={`w-full h-full bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'}`} />}
                 
                 {/* Overlay Content */}
                 <div className="absolute inset-0 p-2 sm:p-3 flex flex-col justify-between">
@@ -278,12 +220,10 @@ const PodcastScheduleSection = () => {
                     </Badge>
                     <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 opacity-90 drop-shadow-lg" />
                   </div>
-                  {show.is_live && (
-                    <Badge className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white animate-pulse text-[10px] sm:text-xs">
+                  {show.is_live && <Badge className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white animate-pulse text-[10px] sm:text-xs">
                       <Radio className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
                       LIVE
-                    </Badge>
-                  )}
+                    </Badge>}
                 </div>
                 
                 {/* Bottom Gradient with Date/Time */}
@@ -314,8 +254,7 @@ const PodcastScheduleSection = () => {
                   </Badge>
                 </div>
               </div>
-            </GlassCard>
-          ))}
+            </GlassCard>)}
         </div>
 
         {/* Schedule Info & CTA */}
@@ -343,8 +282,6 @@ const PodcastScheduleSection = () => {
           </Button>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default PodcastScheduleSection;
