@@ -233,86 +233,65 @@ export default function VideoGalleryManagement() {
       // Handle file upload method
       if (uploadMethod === 'file' && videoFile) {
         const fileExt = videoFile.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
+        const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExt}`;
+
+        // Get duration while uploading (parallel)
+        const durationPromise = new Promise<number>((resolve) => {
+          const vid = document.createElement('video');
+          vid.preload = 'metadata';
+          vid.onloadedmetadata = () => {
+            resolve(Math.round(vid.duration));
+            URL.revokeObjectURL(vid.src);
+          };
+          vid.onerror = () => resolve(0);
+          vid.src = URL.createObjectURL(videoFile);
+        });
+
+        // Upload video
+        const uploadPromise = supabase.storage
           .from('videos')
-          .upload(fileName, videoFile, {
-            cacheControl: '3600',
-            upsert: false
-          });
+          .upload(fileName, videoFile, { cacheControl: '3600', upsert: false });
 
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('videos')
-          .getPublicUrl(fileName);
-
-        videoUrl = publicUrl;
-
-        const videoElement = document.createElement('video');
-        videoElement.preload = 'metadata';
-        videoElement.onloadedmetadata = () => {
-          duration = Math.round(videoElement.duration);
-        };
-        videoElement.src = URL.createObjectURL(videoFile);
-
+        // Upload thumbnail in parallel if provided
+        let thumbPromise: Promise<string | null> = Promise.resolve(null);
         if (thumbnailFile) {
           const thumbExt = thumbnailFile.name.split('.').pop();
-          const thumbName = `thumb_${Math.random()}.${thumbExt}`;
-          const { error: thumbError } = await supabase.storage
+          const thumbName = `thumb_${Date.now()}.${thumbExt}`;
+          thumbPromise = supabase.storage
             .from('videos')
-            .upload(thumbName, thumbnailFile);
+            .upload(thumbName, thumbnailFile)
+            .then(({ error }) => {
+              if (error) throw error;
+              return supabase.storage.from('videos').getPublicUrl(thumbName).data.publicUrl;
+            });
+        }
 
-          if (thumbError) throw thumbError;
+        // Wait for all parallel operations
+        const [uploadResult, thumbUrl, dur] = await Promise.all([
+          uploadPromise,
+          thumbPromise,
+          durationPromise,
+        ]);
 
-          const { data: { publicUrl: thumbUrl } } = supabase.storage
-            .from('videos')
-            .getPublicUrl(thumbName);
+        if (uploadResult.error) throw uploadResult.error;
 
-          thumbnailUrl = thumbUrl;
-        } else {
-          setGeneratingThumbnail(true);
+        videoUrl = supabase.storage.from('videos').getPublicUrl(fileName).data.publicUrl;
+        duration = dur;
+        if (thumbUrl) thumbnailUrl = thumbUrl;
+
+        // Auto-generate thumbnail from video only if no thumbnail was provided or selected
+        if (!thumbnailUrl && !thumbnailFile) {
           try {
             const thumbDataUrl = await generateThumbnailFromVideo(videoFile);
             const thumbBlob = await fetch(thumbDataUrl).then(r => r.blob());
-            const thumbName = `thumb_${Math.random()}.jpg`;
-            
-            const { error: thumbError } = await supabase.storage
-              .from('videos')
-              .upload(thumbName, thumbBlob);
-
-            if (thumbError) throw thumbError;
-
-            const { data: { publicUrl: thumbUrl } } = supabase.storage
-              .from('videos')
-              .getPublicUrl(thumbName);
-
-            thumbnailUrl = thumbUrl;
-          } catch (error) {
-            console.error('Error generating thumbnail:', error);
-          } finally {
-            setGeneratingThumbnail(false);
+            const thumbName = `thumb_${Date.now()}.jpg`;
+            const { error: thumbError } = await supabase.storage.from('videos').upload(thumbName, thumbBlob);
+            if (!thumbError) {
+              thumbnailUrl = supabase.storage.from('videos').getPublicUrl(thumbName).data.publicUrl;
+            }
+          } catch (err) {
+            console.error('Auto-thumbnail failed:', err);
           }
-        }
-      }
-
-      // Auto-generate GIF preview for highlight videos
-      const isHighlight = formData.video_type === 'highlight';
-      const needsGif = isHighlight && !thumbnailGifUrl && videoUrl;
-      
-      if (needsGif) {
-        toast({
-          title: "Generating preview",
-          description: "Creating animated preview for your highlight...",
-        });
-        
-        const gifUrl = await generateGifPreview(videoUrl);
-        if (gifUrl) {
-          thumbnailGifUrl = gifUrl;
-          toast({
-            title: "Preview generated",
-            description: "Animated preview created successfully!",
-          });
         }
       }
 
