@@ -18,17 +18,17 @@ interface GameAlert {
 
 const severityConfig = {
   info: {
-    bg: "bg-primary/90",
+    bgStyle: { backgroundColor: "#ff4500" },
     icon: Info,
     border: "border-primary/50",
   },
   warning: {
-    bg: "bg-amber-600/90",
+    bgStyle: { backgroundColor: "#ff4500" },
     icon: AlertTriangle,
     border: "border-amber-500/50",
   },
   urgent: {
-    bg: "bg-red-600/90",
+    bgStyle: { backgroundColor: "#ff4500" },
     icon: Siren,
     border: "border-red-500/50",
   },
@@ -94,7 +94,8 @@ const GameAlertsBanner = () => {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className={`${config.bg} text-white relative overflow-hidden`}
+              className="text-white relative overflow-hidden"
+              style={config.bgStyle}
             >
               <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-2.5">
                 <div className="flex items-center gap-2.5 flex-1 min-w-0">
