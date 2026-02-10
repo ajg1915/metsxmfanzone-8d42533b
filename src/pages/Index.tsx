@@ -14,6 +14,7 @@ const ImmersiveBackground = lazy(() => import("@/components/ImmersiveBackground"
 const LiveNotificationBar = lazy(() => import("@/components/LiveNotificationBar"));
 const LiveNetworks = lazy(() => import("@/components/LiveNetworks"));
 const LiveStreamsSection = lazy(() => import("@/components/LiveStreamsSection"));
+const SeasonalVideoSection = lazy(() => import("@/components/SeasonalVideoSection"));
 
 const SpringTraining = lazy(() => import("@/components/SpringTraining"));
 const PlayersToWatch = lazy(() => import("@/components/PlayersToWatch"));
@@ -189,6 +190,10 @@ const Index = () => {
 
         <Suspense fallback={<SectionSkeleton />}>
           <LiveStreamsSection />
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <SeasonalVideoSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
