@@ -35,6 +35,7 @@ const OnboardingWalkthrough = lazy(() => import("@/components/OnboardingWalkthro
 const NotificationPrompt = lazy(() => import("@/components/NotificationPrompt"));
 const WelcomeBackToast = lazy(() => import("@/components/WelcomeBackToast"));
 const FeedbackToast = lazy(() => import("@/components/FeedbackToast"));
+const GameAlertsBanner = lazy(() => import("@/components/GameAlertsBanner"));
 
 
 // Section loading skeleton
@@ -167,6 +168,9 @@ const Index = () => {
       />
       <Navigation />
       <LiveGameTicker />
+      <Suspense fallback={null}>
+        <GameAlertsBanner />
+      </Suspense>
       <main className="pt-14 sm:pt-16 relative z-10">
         <Hero />
         

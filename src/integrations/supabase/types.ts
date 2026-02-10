@@ -573,6 +573,51 @@ export type Database = {
         }
         Relationships: []
       }
+      game_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          created_by: string | null
+          email_sent: boolean
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          link_url: string | null
+          message: string
+          push_sent: boolean
+          severity: string
+          title: string
+        }
+        Insert: {
+          alert_type?: string
+          created_at?: string
+          created_by?: string | null
+          email_sent?: boolean
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          link_url?: string | null
+          message: string
+          push_sent?: boolean
+          severity?: string
+          title: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          created_by?: string | null
+          email_sent?: boolean
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          link_url?: string | null
+          message?: string
+          push_sent?: boolean
+          severity?: string
+          title?: string
+        }
+        Relationships: []
+      }
       hero_slides: {
         Row: {
           blog_post_id: string | null

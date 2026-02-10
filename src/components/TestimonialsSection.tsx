@@ -45,7 +45,7 @@ const TestimonialsSection = () => {
         .from("feedbacks")
         .select("id, content, rating, location, display_name, created_at, user_id")
         .order("created_at", { ascending: false })
-        .limit(4);
+        .limit(8);
 
       if (error) throw error;
 
@@ -163,8 +163,8 @@ const TestimonialsSection = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {[1, 2, 3, 4].map((i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="bg-card/50 rounded-lg sm:rounded-xl p-4 sm:p-5 md:p-6 animate-pulse">
                 <div className="h-3 sm:h-4 bg-muted rounded w-3/4 mb-3 sm:mb-4" />
                 <div className="h-12 sm:h-16 bg-muted rounded mb-3 sm:mb-4" />
@@ -173,7 +173,7 @@ const TestimonialsSection = () => {
             ))}
           </div>
         ) : testimonials.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.id}
