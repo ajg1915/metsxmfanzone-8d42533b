@@ -156,12 +156,12 @@ export default function AdminSettings() {
   }
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Settings className="h-7 w-7 text-primary" />
+    <div className="w-full max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
+      <div className="flex items-center gap-2 mb-3">
+        <Settings className="h-5 w-5 text-primary flex-shrink-0" />
         <div>
-          <h2 className="text-2xl font-bold">Site Settings</h2>
-          <p className="text-sm text-muted-foreground">Configure your website settings</p>
+          <h2 className="text-base sm:text-lg font-bold">Site Settings</h2>
+          <p className="text-xs text-muted-foreground">Configure your website settings</p>
         </div>
       </div>
 
