@@ -99,14 +99,14 @@ export default function StreamReplayEditor() {
 
   if (loading) {
     return (
-      <div className="container mx-auto max-w-4xl px-3 sm:px-4 py-4 sm:py-6">
+      <div className="max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
         <p className="text-sm text-muted-foreground">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-4xl px-3 sm:px-4 py-4 sm:py-6">
+    <div className="max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
       <div className="mb-4 sm:mb-6">
         <h2 className="text-xl sm:text-2xl font-bold mb-1">Stream Replay Editor</h2>
         <p className="text-xs sm:text-sm text-muted-foreground">
