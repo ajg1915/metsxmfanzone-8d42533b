@@ -175,14 +175,14 @@ const Navigation = () => {
                     onClick={() => navigate("/broadcast-schedule")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <Tv className="w-4 h-4" />
+                    <img src={logo} alt="" className="w-4 h-4 object-contain" />
                     Live Games
                   </button>
                   <button
                     onClick={() => handleProtectedNavigation("/spring-training-live")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <CalendarDays className="w-4 h-4" />
+                    <img src={logo} alt="" className="w-4 h-4 object-contain" />
                     Spring Training
                   </button>
                 </div>
@@ -200,14 +200,14 @@ const Navigation = () => {
                     onClick={() => handleProtectedNavigation("/community")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <Users className="w-4 h-4" />
+                    <img src={logo} alt="" className="w-4 h-4 object-contain" />
                     Fan Community
                   </button>
                   <button
                     onClick={() => handleProtectedNavigation("/events")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <CalendarDays className="w-4 h-4" />
+                    <img src={logo} alt="" className="w-4 h-4 object-contain" />
                     Events
                   </button>
                   <button
