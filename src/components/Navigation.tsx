@@ -35,20 +35,17 @@ import {
 } from "@/components/ui/collapsible";
 
 const Navigation = () => {
-  // Hide nav on scroll down, show on scroll up
+  // Hide nav once user scrolls past threshold
   useEffect(() => {
-    let lastScrollY = window.scrollY;
     const navRoot = document.getElementById("nav-root");
     if (!navRoot) return;
 
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 60) {
+      if (window.scrollY > 60) {
         navRoot.classList.add("nav-hidden");
       } else {
         navRoot.classList.remove("nav-hidden");
       }
-      lastScrollY = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
