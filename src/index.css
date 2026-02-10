@@ -877,138 +877,129 @@ All colors MUST be HSL.
 /* ── Admin Mobile Overrides ── */
 @media (max-width: 639px) {
   .admin-main {
-    font-size: 13px;
+    font-size: 12px !important;
+    -webkit-text-size-adjust: 100%;
   }
 
-  .admin-main h1 {
-    font-size: 0.875rem !important;
-    line-height: 1.25rem;
+  .admin-main * {
+    font-size: inherit;
   }
 
-  .admin-main h2 {
-    font-size: 0.8125rem !important;
-    line-height: 1.125rem;
-  }
+  .admin-main h1 { font-size: 0.8125rem !important; line-height: 1.1 !important; font-weight: 600 !important; }
+  .admin-main h2 { font-size: 0.75rem !important; line-height: 1.1 !important; }
+  .admin-main h3, .admin-main h4 { font-size: 0.6875rem !important; line-height: 1.1 !important; }
+  .admin-main p, .admin-main span, .admin-main label, .admin-main li, .admin-main a { font-size: 0.6875rem !important; line-height: 1.3 !important; }
 
-  .admin-main h3 {
-    font-size: 0.75rem !important;
-  }
+  .admin-main [class*="text-3xl"],
+  .admin-main [class*="text-2xl"] { font-size: 0.8125rem !important; }
+  .admin-main [class*="text-xl"],
+  .admin-main [class*="text-lg"] { font-size: 0.75rem !important; }
+  .admin-main [class*="text-base"],
+  .admin-main [class*="text-sm"] { font-size: 0.6875rem !important; }
+  .admin-main [class*="text-xs"] { font-size: 0.625rem !important; }
 
+  /* Cards */
   .admin-main .card,
-  .admin-main [class*="Card"] {
-    font-size: 12px;
-  }
-
-  .admin-main [class*="CardHeader"] {
-    padding: 0.5rem 0.625rem !important;
-  }
-
-  .admin-main [class*="CardContent"] {
-    padding: 0.5rem 0.625rem !important;
-  }
-
-  .admin-main [class*="CardTitle"] {
-    font-size: 0.75rem !important;
-  }
-
-  .admin-main [class*="CardDescription"] {
+  .admin-main [class*="Card"],
+  .admin-main [data-slot="card"] {
     font-size: 0.6875rem !important;
+    border-radius: 0.375rem !important;
   }
+  .admin-main [class*="CardHeader"],
+  .admin-main [data-slot="card-header"] { padding: 0.375rem 0.5rem !important; }
+  .admin-main [class*="CardContent"],
+  .admin-main [data-slot="card-content"] { padding: 0.375rem 0.5rem !important; }
+  .admin-main [class*="CardTitle"],
+  .admin-main [data-slot="card-title"] { font-size: 0.6875rem !important; }
+  .admin-main [class*="CardDescription"],
+  .admin-main [data-slot="card-description"] { font-size: 0.625rem !important; }
 
-  .admin-main input,
-  .admin-main textarea,
-  .admin-main select,
-  .admin-main [role="combobox"] {
-    font-size: 13px !important;
-    height: auto;
-    min-height: 1.75rem;
-  }
-
-  .admin-main button {
-    font-size: 0.6875rem !important;
-    padding: 0.25rem 0.5rem !important;
+  /* Buttons - compact */
+  .admin-main button,
+  .admin-main [role="button"] {
+    font-size: 0.625rem !important;
+    padding: 0.1875rem 0.375rem !important;
     min-height: 0 !important;
     height: auto !important;
     line-height: 1.2 !important;
+    border-radius: 0.25rem !important;
+    gap: 0.125rem !important;
+  }
+  .admin-main button:has(svg:only-child) { padding: 0.1875rem !important; }
+
+  /* Icons - force small */
+  .admin-main svg,
+  .admin-main .lucide {
+    width: 12px !important;
+    height: 12px !important;
+    flex-shrink: 0 !important;
   }
 
-  .admin-main button svg,
-  .admin-main a svg,
-  .admin-main svg.lucide {
-    width: 14px !important;
-    height: 14px !important;
-    flex-shrink: 0;
-  }
-
-  /* Icon-only buttons */
-  .admin-main button:has(svg:only-child) {
-    padding: 0.25rem !important;
-  }
-
+  /* Inputs */
   .admin-main input,
   .admin-main textarea,
   .admin-main select,
   .admin-main [role="combobox"] {
+    font-size: 0.6875rem !important;
     min-height: 0 !important;
     height: auto !important;
-    padding: 0.25rem 0.5rem !important;
+    padding: 0.1875rem 0.375rem !important;
+    border-radius: 0.25rem !important;
   }
 
-  .admin-main [class*="grid-cols-2"],
-  .admin-main [class*="grid-cols-3"],
-  .admin-main [class*="grid-cols-4"] {
-    gap: 0.25rem !important;
-  }
-
-  .admin-main [class*="flex"][class*="items-center"] > svg {
-    width: 14px !important;
-    height: 14px !important;
-  }
-
-  .admin-main [class*="w-5"],
-  .admin-main [class*="h-5"],
-  .admin-main [class*="w-6"],
-  .admin-main [class*="h-6"],
-  .admin-main [class*="w-7"],
-  .admin-main [class*="h-7"],
-  .admin-main [class*="w-8"],
-  .admin-main [class*="h-8"] {
-    width: 14px !important;
-    height: 14px !important;
-  }
-
-  .admin-main [class*="text-sm"] {
-    font-size: 0.6875rem !important;
-  }
-
-  .admin-main [class*="text-base"] {
-    font-size: 0.75rem !important;
-  }
-
-  .admin-main p {
-    font-size: 0.6875rem !important;
-    line-height: 1.3 !important;
-  }
-
-  .admin-main label {
-    font-size: 0.6875rem !important;
-  }
-
+  /* Badges */
   .admin-main [class*="Badge"],
   .admin-main .badge {
+    font-size: 0.5625rem !important;
+    padding: 0.0625rem 0.25rem !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Tables */
+  .admin-main table { font-size: 0.625rem !important; }
+  .admin-main th, .admin-main td { padding: 0.125rem 0.25rem !important; }
+
+  /* Tabs */
+  .admin-main [role="tablist"] { height: auto !important; }
+  .admin-main [role="tab"] {
     font-size: 0.625rem !important;
-    padding: 0.0625rem 0.375rem !important;
+    padding: 0.1875rem 0.375rem !important;
+    height: auto !important;
   }
 
-  .admin-main table {
-    font-size: 0.6875rem !important;
-  }
+  /* Spacing collapse */
+  .admin-main [class*="gap-8"],
+  .admin-main [class*="gap-6"],
+  .admin-main [class*="gap-5"],
+  .admin-main [class*="gap-4"] { gap: 0.25rem !important; }
+  .admin-main [class*="gap-3"],
+  .admin-main [class*="gap-2"] { gap: 0.125rem !important; }
 
-  .admin-main th,
-  .admin-main td {
-    padding: 0.25rem 0.375rem !important;
-  }
+  .admin-main [class*="space-y-8"] > * + *,
+  .admin-main [class*="space-y-6"] > * + *,
+  .admin-main [class*="space-y-5"] > * + *,
+  .admin-main [class*="space-y-4"] > * + * { margin-top: 0.25rem !important; }
+  .admin-main [class*="space-y-3"] > * + *,
+  .admin-main [class*="space-y-2"] > * + * { margin-top: 0.125rem !important; }
 
+  /* Padding collapse */
+  .admin-main [class*="p-6"],
+  .admin-main [class*="p-5"],
+  .admin-main [class*="p-4"] { padding: 0.25rem !important; }
+  .admin-main [class*="px-6"],
+  .admin-main [class*="px-5"],
+  .admin-main [class*="px-4"] { padding-left: 0.25rem !important; padding-right: 0.25rem !important; }
+  .admin-main [class*="py-6"],
+  .admin-main [class*="py-5"],
+  .admin-main [class*="py-4"] { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+  .admin-main [class*="mb-6"],
+  .admin-main [class*="mb-5"],
+  .admin-main [class*="mb-4"] { margin-bottom: 0.25rem !important; }
+  .admin-main [class*="mt-6"],
+  .admin-main [class*="mt-5"],
+  .admin-main [class*="mt-4"] { margin-top: 0.25rem !important; }
+
+  /* Container fluid */
   .admin-main .container,
   .admin-main [class*="max-w-7xl"],
   .admin-main [class*="max-w-6xl"],
@@ -1021,82 +1012,48 @@ All colors MUST be HSL.
     padding-right: 0 !important;
   }
 
-  .admin-main [class*="text-3xl"] {
-    font-size: 0.875rem !important;
+  /* Grids */
+  .admin-main [class*="grid-cols-3"],
+  .admin-main [class*="grid-cols-4"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.25rem !important;
   }
 
-  .admin-main [class*="text-2xl"] {
-    font-size: 0.8125rem !important;
-  }
-
-  .admin-main [class*="text-xl"] {
-    font-size: 0.75rem !important;
-  }
-
-  .admin-main [class*="text-lg"] {
-    font-size: 0.75rem !important;
-  }
-
-  /* Reduce gaps and spacing */
-  .admin-main [class*="gap-6"] {
-    gap: 0.375rem !important;
-  }
-
-  .admin-main [class*="gap-5"] {
-    gap: 0.375rem !important;
-  }
-
-  .admin-main [class*="gap-4"] {
-    gap: 0.375rem !important;
-  }
-
-  .admin-main [class*="space-y-8"] > * + *,
-  .admin-main [class*="space-y-6"] > * + * {
-    margin-top: 0.375rem !important;
-  }
-
-  .admin-main [class*="space-y-4"] > * + *,
-  .admin-main [class*="space-y-3"] > * + * {
-    margin-top: 0.25rem !important;
-  }
-
-  .admin-main [class*="px-6"],
-  .admin-main [class*="px-5"] {
-    padding-left: 0.375rem !important;
-    padding-right: 0.375rem !important;
-  }
-
-  .admin-main [class*="py-6"],
-  .admin-main [class*="py-5"] {
-    padding-top: 0.375rem !important;
-    padding-bottom: 0.375rem !important;
-  }
-
-  .admin-main [class*="p-6"],
-  .admin-main [class*="p-5"] {
-    padding: 0.375rem !important;
-  }
-
-  .admin-main [class*="pt-6"] {
-    padding-top: 0.375rem !important;
-  }
-
-  .admin-main [class*="pb-6"] {
-    padding-bottom: 0.375rem !important;
-  }
-
-  .admin-main [class*="mb-6"] {
-    margin-bottom: 0.375rem !important;
-  }
-
-  .admin-main [class*="mt-6"] {
-    margin-top: 0.375rem !important;
-  }
-
-  /* Dialog content on mobile */
+  /* Dialog */
   .admin-main [role="dialog"],
   [role="dialog"] {
-    max-width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 0.5rem) !important;
     max-height: 90vh !important;
+    font-size: 0.6875rem !important;
+  }
+
+  /* Switch */
+  .admin-main [role="switch"] {
+    width: 28px !important;
+    height: 16px !important;
+  }
+
+  /* Separator spacing */
+  .admin-main [role="separator"] {
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+}
+
+/* ── Sidebar Mobile Overrides ── */
+@media (max-width: 639px) {
+  [data-sidebar] {
+    font-size: 0.6875rem !important;
+  }
+  [data-sidebar] svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  [data-sidebar] button,
+  [data-sidebar] a {
+    font-size: 0.625rem !important;
+    padding: 0.1875rem 0.375rem !important;
+    min-height: 0 !important;
+    height: auto !important;
   }
 }
