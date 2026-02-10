@@ -39,7 +39,7 @@ const GameAlertsManagement = () => {
   const [severity, setSeverity] = useState("info");
   const [linkUrl, setLinkUrl] = useState("/");
   const [sendPush, setSendPush] = useState(true);
-  const [sendEmail, setSendEmail] = useState(false);
+  const [sendEmail, setSendEmail] = useState(true);
 
   useEffect(() => {
     fetchAlerts();
