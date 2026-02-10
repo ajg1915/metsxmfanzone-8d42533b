@@ -101,10 +101,6 @@ const GameAlertsBanner = () => {
                 <div className="flex items-center gap-2.5 flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <img src={logo} alt="" className="w-5 h-5" />
-                    {alert.severity === "urgent" && (
-                      <Icon className="w-4 h-4 animate-pulse" />
-                    )}
-                    {alert.severity !== "urgent" && <Icon className="w-4 h-4" />}
                   </div>
                   <div className="min-w-0 flex-1">
                     <span className="text-xs sm:text-sm font-semibold mr-1.5">
