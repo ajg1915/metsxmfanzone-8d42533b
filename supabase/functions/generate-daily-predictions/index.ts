@@ -205,7 +205,7 @@ For relief/bullpen pitchers: set predicted_hr, predicted_walks, predicted_sb, pr
         player_name: pred.name,
         player_id: player?.id,
         player_image_url: player ? getPlayerImageUrl(player.id) : null,
-        status: pred.status.toLowerCase(),
+        status: ["hot", "cold"].includes(pred.status?.toLowerCase()) ? pred.status.toLowerCase() : "hot",
         description: pred.description,
         prediction_date: today,
         is_pitcher: pred.is_pitcher || false,
