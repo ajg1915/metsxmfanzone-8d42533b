@@ -26,13 +26,18 @@ const STAR_PLAYERS = [
   { id: 596019, name: "Francisco Lindor" },
   { id: 665742, name: "Juan Soto" },
   { id: 607043, name: "Brandon Nimmo" },
-  { id: 643446, name: "Jeff McNeil" },
+  { id: 608385, name: "Jesse Winker" },
   { id: 668901, name: "Mark Vientos" },
   { id: 682626, name: "Francisco Alvarez" },
-  { id: 516782, name: "Starling Marte" },
+  { id: 578428, name: "Jose Iglesias" },
+  { id: 694389, name: "Luisangel Acuña" },
   { id: 673085, name: "Kodai Senga" },
-  { id: 621242, name: "Edwin Diaz" },
+  { id: 593423, name: "Frankie Montas" },
+  { id: 605280, name: "Clay Holmes" },
   { id: 640455, name: "Sean Manaea" },
+  { id: 656849, name: "David Peterson" },
+  { id: 500779, name: "Jose Quintana" },
+  { id: 621242, name: "Edwin Diaz" },
 ];
 
 interface Prediction {
