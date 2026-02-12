@@ -5,6 +5,7 @@ import metsLogo from "@/assets/metsxmfanzone-logo.png";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import GlassCard from "@/components/GlassCard";
 
 interface PlayerPrediction {
@@ -329,9 +330,16 @@ const PlayersToWatch = () => {
           )}
 
           {predictions && predictions.length > 0 && (
-            <p className="text-center text-xs text-muted-foreground mt-6">
-              🎲 Parlay predictions for entertainment purposes. Always bet responsibly.
-            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
+              <Link to="/parlays">
+                <Button variant="outline" size="sm" className="text-xs">
+                  🎯 View Full Parlay Board →
+                </Button>
+              </Link>
+              <p className="text-xs text-muted-foreground">
+                🎲 Parlay predictions for entertainment purposes. Always bet responsibly.
+              </p>
+            </div>
           )}
         </GlassCard>
       </div>
