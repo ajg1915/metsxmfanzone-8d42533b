@@ -13,6 +13,7 @@ import { BackButton } from "@/components/BackButton";
 import Footer from "@/components/Footer";
 import ActiveRosterSection from "@/components/parlays/ActiveRosterSection";
 import LineupCardsSection from "@/components/parlays/LineupCardsSection";
+import StatsFlipCardsSection from "@/components/parlays/StatsFlipCardsSection";
 
 interface PlayerPrediction {
   id: string;
@@ -476,6 +477,9 @@ const PlayerParlays = () => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* 2026 Stats Flip Cards */}
+          <StatsFlipCardsSection />
 
           {/* Active Roster */}
           <ActiveRosterSection
