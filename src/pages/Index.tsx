@@ -212,10 +212,6 @@ const Index = () => {
           <CommunityPreviewSection />
         </Suspense>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <PodcastScheduleSection />
-        </Suspense>
-
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
@@ -232,6 +228,10 @@ const Index = () => {
 
         <Suspense fallback={<SectionSkeleton />}>
           <TalentAssessmentSection />
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <PodcastScheduleSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
