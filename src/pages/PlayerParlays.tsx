@@ -478,13 +478,10 @@ const PlayerParlays = () => {
           </AnimatePresence>
 
           {/* Active Roster */}
-          {predictions && predictions.length > 0 && (
-            <ActiveRosterSection
-              players={predictions}
-              parlaySlip={parlaySlip}
-              onTogglePlayer={toggleParlaySlip}
-            />
-          )}
+          <ActiveRosterSection
+            parlaySlip={parlaySlip}
+            onTogglePlayer={toggleParlaySlip}
+          />
 
           {/* Lineup Cards */}
           <LineupCardsSection />
