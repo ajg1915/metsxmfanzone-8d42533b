@@ -100,14 +100,6 @@ const TalentAssessmentSection = () => {
               <p className="text-muted-foreground text-sm">Anthony's weekly player grades & analysis</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Link to="/mets-roster">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Users className="h-4 w-4" />
-                Full Roster
-              </Button>
-            </Link>
-          </div>
         </div>
 
         {isLoading ? (
