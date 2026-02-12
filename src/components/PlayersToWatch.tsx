@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Flame, Snowflake, TrendingUp, RefreshCw, Target, Trophy, XCircle, Shield } from "lucide-react";
+import metsLogo from "@/assets/metsxmfanzone-logo.png";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -79,7 +80,7 @@ const PlayersToWatch = () => {
           {/* Section Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6 md:mb-8">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Target className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-primary flex-shrink-0" />
+              <img src={metsLogo} alt="MetsXMFanZone" className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 flex-shrink-0 object-contain" />
               <div>
                 <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white">
                   Anthony's Player Parlays
