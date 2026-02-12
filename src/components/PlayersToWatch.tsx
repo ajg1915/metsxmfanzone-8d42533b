@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Flame, Snowflake, TrendingUp, RefreshCw, Target } from "lucide-react";
+import { Flame, Snowflake, TrendingUp, RefreshCw, Target, Trophy, XCircle, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -18,9 +18,14 @@ interface PlayerPrediction {
   predicted_hr: number;
   predicted_walks: number;
   predicted_sb: number;
+  predicted_rbis: number;
+  predicted_runs: number;
   predicted_strikeouts: number;
+  predicted_innings_pitched: number;
   predicted_hr_allowed: number;
   predicted_walks_allowed: number;
+  predicted_saves: number;
+  predicted_win_loss: string | null;
   confidence: number;
 }
 
@@ -62,6 +67,10 @@ const PlayersToWatch = () => {
   };
 
   const shouldGenerate = !isLoading && (!predictions || predictions.length === 0);
+
+  const isReliefPitcher = (player: PlayerPrediction) => {
+    return player.is_pitcher && (player.predicted_saves > 0 || player.predicted_win_loss === null);
+  };
 
   return (
     <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 overflow-hidden w-full box-border">
@@ -115,6 +124,7 @@ const PlayersToWatch = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-3 md:gap-4">
               {predictions.map((player) => {
                 const isFlipped = flippedCards[player.id];
+                const isRP = isReliefPitcher(player);
 
                 return (
                   <div
@@ -160,6 +170,26 @@ const PlayersToWatch = () => {
                           {player.confidence}%
                         </div>
 
+                        {/* W/L or SV Badge for Pitchers */}
+                        {player.is_pitcher && player.predicted_win_loss && (
+                          <div className={`absolute top-12 left-3 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
+                            player.predicted_win_loss === "W" 
+                              ? "bg-green-500/90 text-white" 
+                              : "bg-red-500/90 text-white"
+                          }`}>
+                            {player.predicted_win_loss === "W" ? (
+                              <><Trophy className="w-3 h-3" />WIN</>
+                            ) : (
+                              <><XCircle className="w-3 h-3" />LOSS</>
+                            )}
+                          </div>
+                        )}
+                        {player.is_pitcher && isRP && player.predicted_saves > 0 && (
+                          <div className="absolute top-12 left-3 z-10 flex items-center gap-1 bg-yellow-500/90 text-white px-2 py-1 rounded-full text-xs font-bold">
+                            <Shield className="w-3 h-3" />SV
+                          </div>
+                        )}
+
                         {/* Player Image */}
                         <div className="relative h-48 sm:h-44 bg-gradient-to-b from-background to-card overflow-hidden flex items-center justify-center">
                           {player.player_image_url ? (
@@ -195,16 +225,16 @@ const PlayersToWatch = () => {
                                 <div className="text-[10px] text-muted-foreground">K's</div>
                               </div>
                               <div className="bg-background/60 rounded-lg p-1.5 text-center">
-                                <div className="text-lg font-bold text-white">{player.predicted_walks_allowed}</div>
-                                <div className="text-[10px] text-muted-foreground">BB</div>
+                                <div className="text-lg font-bold text-white">{player.predicted_innings_pitched}</div>
+                                <div className="text-[10px] text-muted-foreground">IP</div>
                               </div>
                               <div className="bg-background/60 rounded-lg p-1.5 text-center">
-                                <div className="text-lg font-bold text-red-400">{player.predicted_hr_allowed}</div>
-                                <div className="text-[10px] text-muted-foreground">HR</div>
+                                <div className="text-lg font-bold text-yellow-400">{player.predicted_walks_allowed}</div>
+                                <div className="text-[10px] text-muted-foreground">BB</div>
                               </div>
                             </div>
                           ) : (
-                            <div className="grid grid-cols-3 gap-1.5 mb-2">
+                            <div className="grid grid-cols-4 gap-1 mb-2">
                               <div className="bg-background/60 rounded-lg p-1.5 text-center">
                                 <div className="text-lg font-bold text-primary">{player.predicted_hr}</div>
                                 <div className="text-[10px] text-muted-foreground">HR</div>
@@ -214,8 +244,12 @@ const PlayersToWatch = () => {
                                 <div className="text-[10px] text-muted-foreground">BB</div>
                               </div>
                               <div className="bg-background/60 rounded-lg p-1.5 text-center">
-                                <div className="text-lg font-bold text-green-400">{player.predicted_sb}</div>
-                                <div className="text-[10px] text-muted-foreground">SB</div>
+                                <div className="text-lg font-bold text-green-400">{player.predicted_rbis}</div>
+                                <div className="text-[10px] text-muted-foreground">RBI</div>
+                              </div>
+                              <div className="bg-background/60 rounded-lg p-1.5 text-center">
+                                <div className="text-lg font-bold text-cyan-400">{player.predicted_runs}</div>
+                                <div className="text-[10px] text-muted-foreground">R</div>
                               </div>
                             </div>
                           )}

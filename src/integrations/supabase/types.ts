@@ -390,10 +390,15 @@ export type Database = {
           player_name: string
           predicted_hr: number | null
           predicted_hr_allowed: number | null
+          predicted_innings_pitched: number | null
+          predicted_rbis: number | null
+          predicted_runs: number | null
+          predicted_saves: number | null
           predicted_sb: number | null
           predicted_strikeouts: number | null
           predicted_walks: number | null
           predicted_walks_allowed: number | null
+          predicted_win_loss: string | null
           prediction_date: string
           status: string
           updated_at: string
@@ -409,10 +414,15 @@ export type Database = {
           player_name: string
           predicted_hr?: number | null
           predicted_hr_allowed?: number | null
+          predicted_innings_pitched?: number | null
+          predicted_rbis?: number | null
+          predicted_runs?: number | null
+          predicted_saves?: number | null
           predicted_sb?: number | null
           predicted_strikeouts?: number | null
           predicted_walks?: number | null
           predicted_walks_allowed?: number | null
+          predicted_win_loss?: string | null
           prediction_date?: string
           status: string
           updated_at?: string
@@ -428,10 +438,15 @@ export type Database = {
           player_name?: string
           predicted_hr?: number | null
           predicted_hr_allowed?: number | null
+          predicted_innings_pitched?: number | null
+          predicted_rbis?: number | null
+          predicted_runs?: number | null
+          predicted_saves?: number | null
           predicted_sb?: number | null
           predicted_strikeouts?: number | null
           predicted_walks?: number | null
           predicted_walks_allowed?: number | null
+          predicted_win_loss?: string | null
           prediction_date?: string
           status?: string
           updated_at?: string
