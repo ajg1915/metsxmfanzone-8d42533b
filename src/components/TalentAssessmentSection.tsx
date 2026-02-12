@@ -7,6 +7,7 @@ import { Badge } from "./ui/badge";
 import { Loader2, Users, Sparkles, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
+import StatsFlipCardsSection from "@/components/parlays/StatsFlipCardsSection";
 
 interface TalentAssessment {
   id: string;
@@ -260,6 +261,9 @@ const TalentAssessmentSection = () => {
             <Badge className="bg-secondary/10 text-blue-700 border-secondary/30">D - Below Avg</Badge>
           </div>
         </div>
+
+        {/* 2026 Stats Flip Cards */}
+        <StatsFlipCardsSection />
       </GlassCard>
     </section>
   );
