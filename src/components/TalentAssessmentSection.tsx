@@ -254,8 +254,6 @@ const TalentAssessmentSection = () => {
           </div>
         </div>
 
-        {/* 2026 Stats Flip Cards */}
-        <StatsFlipCardsSection />
       </GlassCard>
     </section>
   );
