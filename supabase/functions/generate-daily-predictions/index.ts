@@ -121,8 +121,9 @@ For each player below, predict their SPECIFIC stat line for today's game. Be rea
 Players and their positions:
 ${selectedPlayers.map(p => `- ${p.name} (${p.position})`).join("\n")}
 
-For HITTERS (non-pitchers), predict: home runs, walks, stolen bases for today.
-For PITCHERS (SP, RP, P, CL), predict: strikeouts, walks allowed, home runs allowed for today.
+For HITTERS (non-pitchers), predict: home runs, walks, RBIs, runs scored, stolen bases for today.
+For STARTING PITCHERS (SP), predict: strikeouts, innings pitched (as a decimal like 6.0 or 5.2), walks allowed, home runs allowed, and whether they get a Win or Loss (W or L).
+For RELIEF/BULLPEN PITCHERS (RP, CL), predict: strikeouts, innings pitched (as a decimal like 1.0 or 2.1), walks allowed, home runs allowed, and saves (SV).
 
 Also give a confidence level (1-100) and a short parlay tip.
 
@@ -131,20 +132,27 @@ Respond with ONLY a valid JSON array (no markdown):
   {
     "name": "Player Name",
     "is_pitcher": false,
+    "position": "SS",
     "status": "hot" or "cold",
     "predicted_hr": 1,
     "predicted_walks": 0,
-    "predicted_sb": 1,
+    "predicted_rbis": 2,
+    "predicted_runs": 1,
+    "predicted_sb": 0,
     "predicted_strikeouts": 0,
-    "predicted_hr_allowed": 0,
+    "predicted_innings_pitched": 0,
     "predicted_walks_allowed": 0,
+    "predicted_hr_allowed": 0,
+    "predicted_saves": 0,
+    "predicted_win_loss": null,
     "confidence": 75,
     "description": "Brief parlay tip about this player"
   }
 ]
 
-For hitters: set predicted_strikeouts, predicted_hr_allowed, predicted_walks_allowed to 0.
-For pitchers: set predicted_hr, predicted_walks, predicted_sb to 0.`;
+For hitters: set predicted_strikeouts, predicted_innings_pitched, predicted_hr_allowed, predicted_walks_allowed, predicted_saves to 0, predicted_win_loss to null.
+For starting pitchers: set predicted_hr, predicted_walks, predicted_sb, predicted_rbis, predicted_runs, predicted_saves to 0. Set predicted_win_loss to "W" or "L".
+For relief/bullpen pitchers: set predicted_hr, predicted_walks, predicted_sb, predicted_rbis, predicted_runs to 0. Set predicted_win_loss to null. Set predicted_saves to 0 or 1.`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -201,9 +209,14 @@ For pitchers: set predicted_hr, predicted_walks, predicted_sb to 0.`;
         predicted_hr: pred.predicted_hr || 0,
         predicted_walks: pred.predicted_walks || 0,
         predicted_sb: pred.predicted_sb || 0,
+        predicted_rbis: pred.predicted_rbis || 0,
+        predicted_runs: pred.predicted_runs || 0,
         predicted_strikeouts: pred.predicted_strikeouts || 0,
+        predicted_innings_pitched: pred.predicted_innings_pitched || 0,
         predicted_hr_allowed: pred.predicted_hr_allowed || 0,
         predicted_walks_allowed: pred.predicted_walks_allowed || 0,
+        predicted_saves: pred.predicted_saves || 0,
+        predicted_win_loss: pred.predicted_win_loss || null,
         confidence: pred.confidence || 50,
       };
     });
