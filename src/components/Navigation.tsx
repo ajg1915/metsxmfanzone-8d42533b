@@ -128,7 +128,16 @@ const Navigation = () => {
     }
   };
 
-  const navRoot = document.getElementById("nav-root");
+  const [navRoot, setNavRoot] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const el = document.getElementById("nav-root");
+    if (el) {
+      // Clear any stale portal content to prevent duplicates
+      el.innerHTML = '';
+      setNavRoot(el);
+    }
+  }, []);
 
   return (
     <>
