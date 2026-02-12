@@ -1,0 +1,1 @@
+ALTER TABLE public.admin_verification_codes ADD COLUMN IF NOT EXISTS backup_code_hash text;
