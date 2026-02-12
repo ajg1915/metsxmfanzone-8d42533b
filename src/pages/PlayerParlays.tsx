@@ -11,6 +11,8 @@ import GlassCard from "@/components/GlassCard";
 import SEOHead from "@/components/SEOHead";
 import { BackButton } from "@/components/BackButton";
 import Footer from "@/components/Footer";
+import ActiveRosterSection from "@/components/parlays/ActiveRosterSection";
+import LineupCardsSection from "@/components/parlays/LineupCardsSection";
 
 interface PlayerPrediction {
   id: string;
@@ -474,6 +476,18 @@ const PlayerParlays = () => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Active Roster */}
+          {predictions && predictions.length > 0 && (
+            <ActiveRosterSection
+              players={predictions}
+              parlaySlip={parlaySlip}
+              onTogglePlayer={toggleParlaySlip}
+            />
+          )}
+
+          {/* Lineup Cards */}
+          <LineupCardsSection />
 
           {/* Disclaimer */}
           {predictions && predictions.length > 0 && (
