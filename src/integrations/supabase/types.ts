@@ -109,6 +109,7 @@ export type Database = {
       }
       admin_verification_codes: {
         Row: {
+          backup_code_hash: string | null
           code_hash: string
           created_at: string
           id: string
@@ -116,6 +117,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          backup_code_hash?: string | null
           code_hash: string
           created_at?: string
           id?: string
@@ -123,6 +125,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          backup_code_hash?: string | null
           code_hash?: string
           created_at?: string
           id?: string
