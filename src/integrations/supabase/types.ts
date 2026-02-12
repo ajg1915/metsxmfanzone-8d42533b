@@ -380,34 +380,58 @@ export type Database = {
       }
       daily_player_predictions: {
         Row: {
+          confidence: number | null
           created_at: string
           description: string
           id: string
+          is_pitcher: boolean | null
           player_id: number | null
           player_image_url: string | null
           player_name: string
+          predicted_hr: number | null
+          predicted_hr_allowed: number | null
+          predicted_sb: number | null
+          predicted_strikeouts: number | null
+          predicted_walks: number | null
+          predicted_walks_allowed: number | null
           prediction_date: string
           status: string
           updated_at: string
         }
         Insert: {
+          confidence?: number | null
           created_at?: string
           description: string
           id?: string
+          is_pitcher?: boolean | null
           player_id?: number | null
           player_image_url?: string | null
           player_name: string
+          predicted_hr?: number | null
+          predicted_hr_allowed?: number | null
+          predicted_sb?: number | null
+          predicted_strikeouts?: number | null
+          predicted_walks?: number | null
+          predicted_walks_allowed?: number | null
           prediction_date?: string
           status: string
           updated_at?: string
         }
         Update: {
+          confidence?: number | null
           created_at?: string
           description?: string
           id?: string
+          is_pitcher?: boolean | null
           player_id?: number | null
           player_image_url?: string | null
           player_name?: string
+          predicted_hr?: number | null
+          predicted_hr_allowed?: number | null
+          predicted_sb?: number | null
+          predicted_strikeouts?: number | null
+          predicted_walks?: number | null
+          predicted_walks_allowed?: number | null
           prediction_date?: string
           status?: string
           updated_at?: string
