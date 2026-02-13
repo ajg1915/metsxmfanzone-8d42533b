@@ -87,7 +87,7 @@ export const useNotifications = () => {
 
       // Always unsubscribe existing and create fresh subscription with current VAPID key
       // This ensures the subscription matches the server's VAPID credentials
-      let subscription = await registration.pushManager.getSubscription();
+      let subscription = await (registration as any).pushManager.getSubscription();
 
       if (subscription) {
         // Unsubscribe old subscription to ensure fresh key match
@@ -96,7 +96,7 @@ export const useNotifications = () => {
       }
 
       // Create new subscription with current VAPID key
-      subscription = await registration.pushManager.subscribe({
+      subscription = await (registration as any).pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       });
@@ -164,7 +164,7 @@ export const useNotifications = () => {
       if (!user) return;
 
       const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
+      const subscription = await (registration as any).pushManager.getSubscription();
       
       if (subscription) {
         await subscription.unsubscribe();
