@@ -109,6 +109,7 @@ export type Database = {
       }
       admin_verification_codes: {
         Row: {
+          backup_code_hash: string | null
           code_hash: string
           created_at: string
           id: string
@@ -116,6 +117,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          backup_code_hash?: string | null
           code_hash: string
           created_at?: string
           id?: string
@@ -123,6 +125,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          backup_code_hash?: string | null
           code_hash?: string
           created_at?: string
           id?: string
@@ -380,34 +383,73 @@ export type Database = {
       }
       daily_player_predictions: {
         Row: {
+          confidence: number | null
           created_at: string
           description: string
           id: string
+          is_pitcher: boolean | null
           player_id: number | null
           player_image_url: string | null
           player_name: string
+          predicted_hr: number | null
+          predicted_hr_allowed: number | null
+          predicted_innings_pitched: number | null
+          predicted_rbis: number | null
+          predicted_runs: number | null
+          predicted_saves: number | null
+          predicted_sb: number | null
+          predicted_strikeouts: number | null
+          predicted_walks: number | null
+          predicted_walks_allowed: number | null
+          predicted_win_loss: string | null
           prediction_date: string
           status: string
           updated_at: string
         }
         Insert: {
+          confidence?: number | null
           created_at?: string
           description: string
           id?: string
+          is_pitcher?: boolean | null
           player_id?: number | null
           player_image_url?: string | null
           player_name: string
+          predicted_hr?: number | null
+          predicted_hr_allowed?: number | null
+          predicted_innings_pitched?: number | null
+          predicted_rbis?: number | null
+          predicted_runs?: number | null
+          predicted_saves?: number | null
+          predicted_sb?: number | null
+          predicted_strikeouts?: number | null
+          predicted_walks?: number | null
+          predicted_walks_allowed?: number | null
+          predicted_win_loss?: string | null
           prediction_date?: string
           status: string
           updated_at?: string
         }
         Update: {
+          confidence?: number | null
           created_at?: string
           description?: string
           id?: string
+          is_pitcher?: boolean | null
           player_id?: number | null
           player_image_url?: string | null
           player_name?: string
+          predicted_hr?: number | null
+          predicted_hr_allowed?: number | null
+          predicted_innings_pitched?: number | null
+          predicted_rbis?: number | null
+          predicted_runs?: number | null
+          predicted_saves?: number | null
+          predicted_sb?: number | null
+          predicted_strikeouts?: number | null
+          predicted_walks?: number | null
+          predicted_walks_allowed?: number | null
+          predicted_win_loss?: string | null
           prediction_date?: string
           status?: string
           updated_at?: string
