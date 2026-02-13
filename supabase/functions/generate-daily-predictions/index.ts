@@ -14,25 +14,17 @@ function getPlayerImageUrl(playerId: number): string {
 
 async function fetchMetsRoster(): Promise<Array<{ name: string; id: number }>> {
   try {
-    // Fetch 40-man roster from MLB Stats API
     const response = await fetch(
       `https://statsapi.mlb.com/api/v1/teams/${METS_TEAM_ID}/roster?rosterType=40Man`
     );
-    
-    if (!response.ok) {
-      throw new Error("Failed to fetch roster data");
-    }
-    
+    if (!response.ok) throw new Error("Failed to fetch roster data");
     const data = await response.json();
-    
-    // Map roster to simple format
     return data.roster.map((player: any) => ({
       name: player.person.fullName,
       id: player.person.id,
     }));
   } catch (error) {
     console.error("Error fetching Mets roster:", error);
-    // Fallback to current 2026 Mets roster if API fails
     return [
       { name: "Francisco Lindor", id: 596019 },
       { name: "Juan Soto", id: 665742 },
@@ -62,112 +54,84 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
-
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Parse request body for options
     let forceStarPlayers: number[] = [];
     let forceRegenerate = false;
-    let triggerType = "manual"; // manual, morning, pregame
+    let triggerType = "manual";
     
     try {
       const body = await req.json();
-      if (body.forceStarPlayers && Array.isArray(body.forceStarPlayers)) {
-        forceStarPlayers = body.forceStarPlayers;
-      }
-      if (body.forceRegenerate === true) {
-        forceRegenerate = true;
-      }
-      if (body.triggerType) {
-        triggerType = body.triggerType;
-      }
-    } catch {
-      // No body or invalid JSON, continue with defaults
-    }
+      if (body.forceStarPlayers && Array.isArray(body.forceStarPlayers)) forceStarPlayers = body.forceStarPlayers;
+      if (body.forceRegenerate === true) forceRegenerate = true;
+      if (body.triggerType) triggerType = body.triggerType;
+    } catch { /* defaults */ }
 
     const today = new Date().toISOString().split('T')[0];
     
-    // Check if we already have predictions for today
     const { data: existingPredictions } = await supabase
       .from("daily_player_predictions")
       .select("*")
       .eq("prediction_date", today);
 
-    // Only skip if predictions exist AND we're not forcing regeneration
-    const shouldSkip = existingPredictions && 
-                       existingPredictions.length > 0 && 
-                       !forceRegenerate && 
-                       forceStarPlayers.length === 0;
+    const shouldSkip = existingPredictions && existingPredictions.length > 0 && !forceRegenerate && forceStarPlayers.length === 0;
 
     if (shouldSkip) {
-      console.log(`Predictions already exist for today (${today}), skipping generation`);
       return new Response(
-        JSON.stringify({ 
-          message: "Predictions already exist for today", 
-          predictions: existingPredictions 
-        }),
+        JSON.stringify({ message: "Predictions already exist for today", predictions: existingPredictions }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Delete existing predictions for today if force regenerating
     if (forceRegenerate && existingPredictions && existingPredictions.length > 0) {
-      console.log(`Force regenerating: deleting ${existingPredictions.length} existing predictions`);
-      await supabase
-        .from("daily_player_predictions")
-        .delete()
-        .eq("prediction_date", today);
+      await supabase.from("daily_player_predictions").delete().eq("prediction_date", today);
     }
 
-    if (!lovableApiKey) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+    if (!lovableApiKey) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Fetch current Mets roster from MLB API
     const metsPlayers = await fetchMetsRoster();
     console.log(`Fetched ${metsPlayers.length} players from Mets roster`);
 
-    // Handle star players selection
     let selectedPlayers: Array<{ name: string; id: number }> = [];
-    
-    // If force star players are specified, include them first
     if (forceStarPlayers.length > 0) {
-      const starPlayersFromRoster = metsPlayers.filter(p => forceStarPlayers.includes(p.id));
-      selectedPlayers = [...starPlayersFromRoster];
-      console.log(`Added ${starPlayersFromRoster.length} forced star players`);
+      selectedPlayers = [...metsPlayers.filter(p => forceStarPlayers.includes(p.id))];
     }
-
-    // Fill remaining slots with random players (up to 6 total)
     const remainingSlots = 6 - selectedPlayers.length;
     if (remainingSlots > 0) {
-      const availablePlayers = metsPlayers.filter(
-        p => !selectedPlayers.some(sp => sp.id === p.id)
-      );
-      const shuffled = [...availablePlayers].sort(() => 0.5 - Math.random());
+      const available = metsPlayers.filter(p => !selectedPlayers.some(sp => sp.id === p.id));
+      const shuffled = [...available].sort(() => 0.5 - Math.random());
       selectedPlayers = [...selectedPlayers, ...shuffled.slice(0, remainingSlots)];
     }
 
-    // Customize prompt based on trigger type
     let contextNote = "";
-    if (triggerType === "morning") {
-      contextNote = "It's early morning and you're giving your daily picks before the games start. Focus on who's been trending lately.";
-    } else if (triggerType === "pregame") {
-      contextNote = "It's pre-game time! Games are about to start soon. Give your hottest takes for tonight's action.";
-    }
+    if (triggerType === "morning") contextNote = "It's early morning. Focus on trending players.";
+    else if (triggerType === "pregame") contextNote = "Pre-game time! Give your hottest takes.";
 
-    // Generate AI predictions for each player
     const prompt = `You are Anthony, a passionate Mets baseball analyst and betting expert. ${contextNote}
 
-For each of these current Mets players, determine if they are currently "hot" or "cold" based on typical performance patterns and provide a brief betting tip or prediction. Be realistic and vary between hot and cold. Make your tips sound like insider knowledge.
+For each player, determine their role (hitter, starter, or closer) and predict their stat line for today's game. Be realistic with numbers.
 
 Players: ${selectedPlayers.map(p => p.name).join(", ")}
 
-Respond with ONLY a valid JSON array (no markdown, no extra text) in this exact format:
+Respond with ONLY a valid JSON array (no markdown, no extra text):
 [
   {
     "name": "Player Name",
     "status": "hot" or "cold",
-    "description": "Brief 1-2 sentence betting tip or prediction about this player's performance"
+    "is_pitcher": true/false,
+    "description": "1-2 sentence betting tip about this player",
+    "confidence": 50-95,
+    "predicted_hr": 0-2 (hitters only, 0 for pitchers),
+    "predicted_rbis": 0-5 (hitters only, 0 for pitchers),
+    "predicted_runs": 0-3 (hitters only, 0 for pitchers),
+    "predicted_sb": 0-2 (hitters only, 0 for pitchers),
+    "predicted_strikeouts": 0-12 (pitchers: strikeouts thrown, hitters: 0),
+    "predicted_innings_pitched": 0-9 (pitchers only, 0 for hitters),
+    "predicted_saves": 0-1 (closers only, 0 for others),
+    "predicted_win_loss": "W" or "L" or null (starters only, null for hitters/closers),
+    "predicted_walks_allowed": 0-5 (pitchers only, 0 for hitters),
+    "predicted_hr_allowed": 0-3 (pitchers only, 0 for hitters),
+    "predicted_walks": 0-3 (hitters only, 0 for pitchers)
   }
 ]`;
 
@@ -180,57 +144,39 @@ Respond with ONLY a valid JSON array (no markdown, no extra text) in this exact 
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are Anthony, a knowledgeable Mets baseball analyst and betting tipster. Respond only with valid JSON." },
+          { role: "system", content: "You are Anthony, a Mets baseball analyst. Respond only with valid JSON. Be realistic with stat predictions." },
           { role: "user", content: prompt }
         ],
       }),
     });
 
     if (!aiResponse.ok) {
-      if (aiResponse.status === 429) {
-        throw new Error("Rate limit exceeded. Please try again later.");
-      }
-      if (aiResponse.status === 402) {
-        throw new Error("AI credits depleted. Please add credits.");
-      }
+      if (aiResponse.status === 429) throw new Error("Rate limit exceeded. Please try again later.");
+      if (aiResponse.status === 402) throw new Error("AI credits depleted. Please add credits.");
       throw new Error(`AI API error: ${aiResponse.status}`);
     }
 
     const aiData = await aiResponse.json();
     const aiContent = aiData.choices?.[0]?.message?.content;
+    if (!aiContent) throw new Error("No content in AI response");
 
-    if (!aiContent) {
-      throw new Error("No content in AI response");
-    }
-
-    // Parse AI response - handle potential markdown formatting
     let predictions;
     try {
-      // Remove markdown code blocks if present
       let cleanContent = aiContent.trim();
-      if (cleanContent.startsWith("```json")) {
-        cleanContent = cleanContent.slice(7);
-      } else if (cleanContent.startsWith("```")) {
-        cleanContent = cleanContent.slice(3);
-      }
-      if (cleanContent.endsWith("```")) {
-        cleanContent = cleanContent.slice(0, -3);
-      }
+      if (cleanContent.startsWith("```json")) cleanContent = cleanContent.slice(7);
+      else if (cleanContent.startsWith("```")) cleanContent = cleanContent.slice(3);
+      if (cleanContent.endsWith("```")) cleanContent = cleanContent.slice(0, -3);
       predictions = JSON.parse(cleanContent.trim());
-    } catch (parseError) {
+    } catch {
       console.error("Failed to parse AI response:", aiContent);
       throw new Error("Failed to parse AI predictions");
     }
 
-    // Delete old predictions (keep only last 7 days)
+    // Cleanup old predictions
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    await supabase
-      .from("daily_player_predictions")
-      .delete()
-      .lt("prediction_date", weekAgo.toISOString().split('T')[0]);
+    await supabase.from("daily_player_predictions").delete().lt("prediction_date", weekAgo.toISOString().split('T')[0]);
 
-    // Insert new predictions with player images
     const predictionsToInsert = predictions.map((pred: any) => {
       const player = selectedPlayers.find(p => p.name.toLowerCase() === pred.name.toLowerCase());
       return {
@@ -240,6 +186,19 @@ Respond with ONLY a valid JSON array (no markdown, no extra text) in this exact 
         status: pred.status.toLowerCase(),
         description: pred.description,
         prediction_date: today,
+        is_pitcher: pred.is_pitcher ?? false,
+        confidence: pred.confidence ?? 50,
+        predicted_hr: pred.predicted_hr ?? 0,
+        predicted_rbis: pred.predicted_rbis ?? 0,
+        predicted_runs: pred.predicted_runs ?? 0,
+        predicted_sb: pred.predicted_sb ?? 0,
+        predicted_strikeouts: pred.predicted_strikeouts ?? 0,
+        predicted_innings_pitched: pred.predicted_innings_pitched ?? 0,
+        predicted_saves: pred.predicted_saves ?? 0,
+        predicted_win_loss: pred.predicted_win_loss ?? null,
+        predicted_walks: pred.predicted_walks ?? 0,
+        predicted_walks_allowed: pred.predicted_walks_allowed ?? 0,
+        predicted_hr_allowed: pred.predicted_hr_allowed ?? 0,
       };
     });
 
@@ -248,18 +207,12 @@ Respond with ONLY a valid JSON array (no markdown, no extra text) in this exact 
       .insert(predictionsToInsert)
       .select();
 
-    if (insertError) {
-      throw insertError;
-    }
+    if (insertError) throw insertError;
 
     console.log(`Successfully generated ${insertedPredictions?.length} predictions (trigger: ${triggerType})`);
 
     return new Response(
-      JSON.stringify({ 
-        message: "Predictions generated successfully", 
-        triggerType,
-        predictions: insertedPredictions 
-      }),
+      JSON.stringify({ message: "Predictions generated successfully", triggerType, predictions: insertedPredictions }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "./GlassCard";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { Loader2, Users, Sparkles } from "lucide-react";
+import { Loader2, Users, Sparkles, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
@@ -204,8 +204,12 @@ const TalentAssessmentSection = () => {
                       </div>
 
                       {/* Tap hint */}
-                      <div className="absolute bottom-3 left-0 right-0 text-center">
-                        <span className="text-xs text-white flex items-center justify-center gap-1">
+                      <div className="absolute bottom-3 left-0 right-0 text-center space-y-1">
+                        <span className="text-xs text-primary font-semibold flex items-center justify-center gap-1">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                          Anthony Approved
+                        </span>
+                        <span className="text-xs text-white/70 flex items-center justify-center gap-1">
                           <Sparkles className="h-3 w-3" />
                           Tap for Anthony's Take
                         </span>
