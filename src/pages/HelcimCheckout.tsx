@@ -3,8 +3,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Shield, CreditCard, ArrowLeft, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
@@ -23,6 +21,45 @@ declare global {
   }
 }
 
+const FORM_HTML = `
+<div id="helcimResults" style="font-size:14px;color:#ef4444;margin-bottom:8px;"></div>
+<input type="hidden" id="token" />
+<input type="hidden" id="amount" />
+<input type="hidden" id="response" value="" />
+<input type="hidden" id="responseMessage" value="" />
+<input type="hidden" id="cardToken" value="" />
+
+<div style="margin-bottom:16px;">
+  <label for="cardNumber" style="display:block;font-size:14px;font-weight:500;margin-bottom:6px;">Card number</label>
+  <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" inputmode="numeric" autocomplete="cc-number"
+    style="width:100%;height:44px;padding:8px 12px 8px 36px;border:1px solid hsl(var(--border));border-radius:6px;font-size:16px;background:hsl(var(--background));color:hsl(var(--foreground));" />
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+  <div>
+    <label for="cardExpiryMonth" style="display:block;font-size:14px;font-weight:500;margin-bottom:6px;">Month</label>
+    <input type="text" id="cardExpiryMonth" placeholder="MM" maxlength="2" inputmode="numeric" autocomplete="cc-exp-month"
+      style="width:100%;height:44px;padding:8px 12px;border:1px solid hsl(var(--border));border-radius:6px;font-size:16px;background:hsl(var(--background));color:hsl(var(--foreground));" />
+  </div>
+  <div>
+    <label for="cardExpiryYear" style="display:block;font-size:14px;font-weight:500;margin-bottom:6px;">Year</label>
+    <input type="text" id="cardExpiryYear" placeholder="YY" maxlength="2" inputmode="numeric" autocomplete="cc-exp-year"
+      style="width:100%;height:44px;padding:8px 12px;border:1px solid hsl(var(--border));border-radius:6px;font-size:16px;background:hsl(var(--background));color:hsl(var(--foreground));" />
+  </div>
+  <div>
+    <label for="cardCVV" style="display:block;font-size:14px;font-weight:500;margin-bottom:6px;">CVV</label>
+    <input type="text" id="cardCVV" placeholder="123" maxlength="4" inputmode="numeric" autocomplete="cc-csc"
+      style="width:100%;height:44px;padding:8px 12px;border:1px solid hsl(var(--border));border-radius:6px;font-size:16px;background:hsl(var(--background));color:hsl(var(--foreground));" />
+  </div>
+</div>
+
+<div style="margin-bottom:16px;">
+  <label for="cardHolderName" style="display:block;font-size:14px;font-weight:500;margin-bottom:6px;">Name on card</label>
+  <input type="text" id="cardHolderName" placeholder="John Doe" autocomplete="cc-name"
+    style="width:100%;height:44px;padding:8px 12px;border:1px solid hsl(var(--border));border-radius:6px;font-size:16px;background:hsl(var(--background));color:hsl(var(--foreground));" />
+</div>
+`;
+
 const HelcimCheckout = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -31,7 +68,8 @@ const HelcimCheckout = () => {
   const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  const formContainerRef = useRef<HTMLDivElement>(null);
+  const formInjected = useRef(false);
 
   const helcimJsToken = import.meta.env.VITE_HELCIM_JS_TOKEN;
 
@@ -58,6 +96,51 @@ const HelcimCheckout = () => {
     };
   }, []);
 
+  // Inject form HTML into unmanaged container
+  useEffect(() => {
+    if (!formContainerRef.current || formInjected.current) return;
+    
+    const form = document.createElement('form');
+    form.name = 'helcimForm';
+    form.id = 'helcimForm';
+    form.method = 'POST';
+    form.innerHTML = FORM_HTML;
+    formContainerRef.current.appendChild(form);
+    formInjected.current = true;
+
+    // Set token and amount
+    const tokenEl = form.querySelector('#token') as HTMLInputElement;
+    if (tokenEl) tokenEl.value = helcimJsToken || '';
+
+    // Listen for Helcim.js response
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      setIsProcessing(false);
+      const responseField = form.querySelector('#response') as HTMLInputElement;
+      const responseMessageField = form.querySelector('#responseMessage') as HTMLInputElement;
+
+      if (responseField?.value === '1') {
+        sessionStorage.removeItem('checkout_plan_info');
+        navigate(`/payment-success?session_id=${checkoutToken}`);
+      } else {
+        const msg = responseMessageField?.value || 'Payment was declined. Please try again.';
+        toast({ title: "Payment Failed", description: msg, variant: "destructive" });
+      }
+    });
+
+    return () => {
+      // Don't remove on cleanup - let the container handle it
+    };
+  }, [helcimJsToken, checkoutToken, navigate, toast]);
+
+  // Update amount when planInfo changes
+  useEffect(() => {
+    const amountEl = document.getElementById('amount') as HTMLInputElement;
+    if (amountEl && planInfo) {
+      amountEl.value = planInfo.priceValue?.toFixed(2) || '0.00';
+    }
+  }, [planInfo]);
+
   // Load Helcim.js script
   useEffect(() => {
     if (!helcimJsToken) {
@@ -77,32 +160,6 @@ const HelcimCheckout = () => {
       if (script.parentNode) script.parentNode.removeChild(script);
     };
   }, [helcimJsToken, toast]);
-
-  // Listen for Helcim.js form submission results
-  useEffect(() => {
-    if (!formRef.current) return;
-
-    const form = formRef.current;
-    const handleSubmit = (e: Event) => {
-      e.preventDefault();
-      setIsProcessing(false);
-
-      // Check for response fields injected by Helcim.js
-      const responseField = document.getElementById('response') as HTMLInputElement;
-      const responseMessageField = document.getElementById('responseMessage') as HTMLInputElement;
-
-      if (responseField?.value === '1') {
-        sessionStorage.removeItem('checkout_plan_info');
-        navigate(`/payment-success?session_id=${checkoutToken}`);
-      } else {
-        const msg = responseMessageField?.value || 'Payment was declined. Please try again.';
-        toast({ title: "Payment Failed", description: msg, variant: "destructive" });
-      }
-    };
-
-    form.addEventListener('submit', handleSubmit);
-    return () => form.removeEventListener('submit', handleSubmit);
-  }, [checkoutToken, navigate, toast]);
 
   const handleProcessPayment = () => {
     if (!scriptLoaded || !helcimJsToken) {
@@ -188,130 +245,32 @@ const HelcimCheckout = () => {
           <h2 className="text-xl font-bold text-foreground mb-1">Payment</h2>
           <p className="text-sm text-muted-foreground mb-6">Enter your card details to complete your purchase.</p>
 
-          {/* Helcim.js Form */}
-          <form
-            ref={formRef}
-            name="helcimForm"
-            id="helcimForm"
-            method="POST"
-            className="space-y-4 flex-1"
+          {/* Unmanaged container for Helcim.js form - React won't touch this */}
+          <div ref={formContainerRef} className="flex-1" />
+
+          <Separator className="my-4" />
+
+          {/* Pay Button - kept in React for state management */}
+          <Button
+            type="button"
+            id="buttonProcess"
+            className="w-full h-12 text-base font-semibold"
+            size="lg"
+            onClick={handleProcessPayment}
+            disabled={isProcessing || !scriptLoaded}
           >
-            {/* Hidden results div for Helcim.js */}
-            <div id="helcimResults" className="text-sm text-destructive"></div>
-
-            {/* Helcim.js config token */}
-            <input type="hidden" id="token" value={helcimJsToken || ''} />
-
-            {/* Amount */}
-            <input type="hidden" id="amount" value={planInfo?.priceValue?.toFixed(2) || '0.00'} />
-
-            {/* Hidden response fields */}
-            <input type="hidden" id="response" value="" />
-            <input type="hidden" id="responseMessage" value="" />
-            <input type="hidden" id="cardToken" value="" />
-
-            {/* Card Number */}
-            <div className="space-y-2">
-              <Label htmlFor="cardNumber" className="text-sm font-medium text-foreground">
-                Card number
-              </Label>
-              <div className="relative">
-                <Input
-                  type="text"
-                  id="cardNumber"
-                  placeholder="1234 5678 9012 3456"
-                  className="h-11 pl-10 text-[16px]"
-                  inputMode="numeric"
-                  autoComplete="cc-number"
-                />
-                <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              </div>
-            </div>
-
-            {/* Expiry & CVV Row */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="cardExpiryMonth" className="text-sm font-medium text-foreground">
-                  Month
-                </Label>
-                <Input
-                  type="text"
-                  id="cardExpiryMonth"
-                  placeholder="MM"
-                  maxLength={2}
-                  className="h-11 text-[16px]"
-                  inputMode="numeric"
-                  autoComplete="cc-exp-month"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cardExpiryYear" className="text-sm font-medium text-foreground">
-                  Year
-                </Label>
-                <Input
-                  type="text"
-                  id="cardExpiryYear"
-                  placeholder="YY"
-                  maxLength={2}
-                  className="h-11 text-[16px]"
-                  inputMode="numeric"
-                  autoComplete="cc-exp-year"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cardCVV" className="text-sm font-medium text-foreground">
-                  CVV
-                </Label>
-                <Input
-                  type="text"
-                  id="cardCVV"
-                  placeholder="123"
-                  maxLength={4}
-                  className="h-11 text-[16px]"
-                  inputMode="numeric"
-                  autoComplete="cc-csc"
-                />
-              </div>
-            </div>
-
-            {/* Cardholder Name */}
-            <div className="space-y-2">
-              <Label htmlFor="cardHolderName" className="text-sm font-medium text-foreground">
-                Name on card
-              </Label>
-              <Input
-                type="text"
-                id="cardHolderName"
-                placeholder="John Doe"
-                className="h-11 text-[16px]"
-                autoComplete="cc-name"
-              />
-            </div>
-
-            <Separator className="my-2" />
-
-            {/* Pay Button */}
-            <Button
-              type="button"
-              id="buttonProcess"
-              className="w-full h-12 text-base font-semibold"
-              size="lg"
-              onClick={handleProcessPayment}
-              disabled={isProcessing || !scriptLoaded}
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <Lock className="w-4 h-4 mr-2" />
-                  Pay {planInfo?.price || ''}
-                </>
-              )}
-            </Button>
-          </form>
+            {isProcessing ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <Lock className="w-4 h-4 mr-2" />
+                Pay {planInfo?.price || ''}
+              </>
+            )}
+          </Button>
 
           {/* Trust badges */}
           <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
