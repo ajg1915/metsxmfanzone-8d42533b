@@ -73,9 +73,9 @@ const HelcimCheckout = () => {
     };
   }, [checkoutToken, navigate]);
 
-  // Once Helcim iframe launches, return nothing — the iframe renders via the DOM
+  // Once Helcim iframe launches, hide loading UI but keep a minimal container
   if (!isLoading) {
-    return null;
+    return <div className="fixed inset-0 z-[9998]" />;
   }
 
   return (
