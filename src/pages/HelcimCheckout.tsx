@@ -48,7 +48,7 @@ const HelcimCheckout = () => {
       const key = 'helcim-pay-js-' + checkoutToken;
       if (event.data.eventName === key) {
         if (event.data.eventStatus === 'SUCCESS') {
-          navigate(`/payment-success?session_id=${checkoutToken}`);
+          navigate('/dashboard');
         }
         if (event.data.eventStatus === 'ABORTED') {
           navigate('/payment-error');
