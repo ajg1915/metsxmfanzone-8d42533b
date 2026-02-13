@@ -73,9 +73,9 @@ const HelcimCheckout = () => {
     };
   }, [checkoutToken, navigate]);
 
-  // Once Helcim iframe launches, show minimal backdrop
+  // Once Helcim iframe launches, return nothing — the iframe renders via the DOM
   if (!isLoading) {
-    return <div className="fixed inset-0 bg-background z-[9998]" />;
+    return null;
   }
 
   return (
