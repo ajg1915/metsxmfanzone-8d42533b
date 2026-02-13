@@ -12,8 +12,24 @@ body.helcim-active #root {
   overflow: visible;
 }
 
-body.helcim-active #nav-root {
+body.helcim-active #nav-root,
+body.helcim-active .sonner-toaster,
+body.helcim-active [data-sonner-toaster],
+body.helcim-active [data-radix-popper-content-wrapper] {
   display: none !important;
+}
+
+/* Hide the entire app content behind the Helcim iframe */
+body.helcim-active #root > *:not(div[id^="helcim-pay-js-"]) {
+  visibility: hidden !important;
+}
+
+body.helcim-active {
+  background: white !important;
+}
+
+body.helcim-active #root {
+  background: white !important;
 }
 
 /* Force ALL Helcim injected elements to fill the entire screen */
