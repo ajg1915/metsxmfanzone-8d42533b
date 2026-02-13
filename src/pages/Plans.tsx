@@ -59,7 +59,8 @@ const Plans = () => {
       return;
     }
     
-    setCheckoutOpen(true);
+    // Navigate to custom checkout page
+    navigate(`/checkout/${planId}`);
   };
   
   const handleCheckoutClose = (open: boolean) => {
