@@ -317,10 +317,10 @@ const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
             {!user && (
               <Button 
                 size="sm" 
-                className="md:hidden text-xs h-9 px-3 rounded-xl font-semibold"
+                className="md:hidden text-[10px] h-7 px-2 rounded-lg font-medium"
                 onClick={() => navigate("/auth")}
               >
-                Login / Register
+                Login
               </Button>
             )}
 
