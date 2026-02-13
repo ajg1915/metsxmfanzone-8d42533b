@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
 
     // Send confirmation email
     try {
-      const amount = subscription.plan_type === 'annual' ? '99.99' : '9.99';
+      const amount = subscription.plan_type === 'annual' ? '129.99' : '12.99';
       await supabase.functions.invoke('send-confirmation-email', {
         body: {
           type: 'subscription',
@@ -149,7 +149,7 @@ Deno.serve(async (req) => {
         body: {
           userId: user.id,
           planType: subscription.plan_type,
-          amount: subscription.plan_type === 'annual' ? '$99.99' : '$9.99',
+          amount: subscription.plan_type === 'annual' ? '$129.99' : '$12.99',
           source: 'PayPal',
         },
       });
