@@ -76,6 +76,7 @@ const Feedback = lazy(() => import("./pages/Feedback"));
 const Sitemap = lazy(() => import("./pages/Sitemap"));
 // PayPal removed - Helcim is the sole payment processor
 const HelcimCheckout = lazy(() => import("./pages/HelcimCheckout"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 const SpringTrainingLive = lazy(() => import("./pages/SpringTrainingLive"));
 const Merch = lazy(() => import("./pages/Merch"));
 const Product = lazy(() => import("./pages/Product"));
@@ -265,7 +266,8 @@ const AppContent = () => {
   const isTVRoute = location.pathname.startsWith("/tv");
   const isWriterAuthRoute = location.pathname === "/writer-auth" || location.pathname === "/writer-register";
   const isHelcimCheckout = location.pathname === "/helcim-checkout";
-  const showNavigation = !isAdminRoute && !isTVRoute && !isMaintenancePreview && !isHelcimCheckout && !(maintenanceEnabled && !isAdminRoute && !isAuthRoute);
+  const isCheckoutPage = location.pathname.startsWith("/checkout/");
+  const showNavigation = !isAdminRoute && !isTVRoute && !isMaintenancePreview && !isHelcimCheckout && !isCheckoutPage && !(maintenanceEnabled && !isAdminRoute && !isAuthRoute);
 
   // Show maintenance page for non-admin routes when enabled (or preview route)
   if (isMaintenancePreview) {
@@ -302,6 +304,7 @@ const AppContent = () => {
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/pricing" element={<Plans />} />
             {/* PayPal removed - redirect old URLs to plans */}
+            <Route path="/checkout/:planId" element={<Checkout />} />
             <Route path="/helcim-checkout" element={<HelcimCheckout />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-error" element={<PaymentError />} />
