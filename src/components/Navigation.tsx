@@ -142,7 +142,7 @@ const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
       {navRoot ? createPortal(
       <nav className="glass-nav w-full">
         <div className="container mx-auto px-3 sm:px-4">
-        <div className="flex items-center justify-between h-12">
+        <div className="flex items-center justify-between h-14 sm:h-12">
           <div className="flex items-center gap-2">
             {!isHomePage && (
               <Button
@@ -317,7 +317,7 @@ const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
             {!user && (
               <Button 
                 size="sm" 
-                className="md:hidden text-[10px] h-7 px-2"
+                className="md:hidden text-xs h-9 px-3 rounded-xl font-semibold"
                 onClick={() => navigate("/auth")}
               >
                 Login / Register
@@ -327,7 +327,7 @@ const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
             {/* Modern Mobile Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 transition-all">
+                <Button variant="ghost" size="icon" className="md:hidden h-10 w-10 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 transition-all">
                   <Menu className="w-5 h-5 text-primary" />
                 </Button>
               </SheetTrigger>

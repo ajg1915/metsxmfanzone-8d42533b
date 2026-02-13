@@ -146,6 +146,10 @@ All colors MUST be HSL.
     overflow-x: clip;
     min-height: 100vh;
     min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
+    /* Smooth font rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     /* Subtle noise texture for depth */
     background-image: 
       radial-gradient(ellipse 80% 50% at 50% -20%, hsl(220 80% 20% / 0.3), transparent),
@@ -707,6 +711,32 @@ All colors MUST be HSL.
 
   .safe-area-top {
     padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* ========================================
+     MOBILE MODERNIZATION UTILITIES
+     ======================================== */
+
+  /* Modern mobile section spacing */
+  .mobile-section {
+    @apply px-4 py-6;
+  }
+
+  @media (min-width: 640px) {
+    .mobile-section {
+      @apply px-6 py-8;
+    }
+  }
+
+  /* Modern card with better mobile padding */
+  .mobile-card {
+    @apply rounded-2xl p-4;
+  }
+
+  @media (min-width: 640px) {
+    .mobile-card {
+      @apply rounded-2xl p-6;
+    }
   }
 
   /* Gradient text */

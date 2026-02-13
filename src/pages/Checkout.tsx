@@ -138,17 +138,17 @@ const Checkout = () => {
       </Helmet>
 
       {/* Top bar */}
-      <header className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3">
+      <header className="border-b border-border/40 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3.5">
           <button
             onClick={() => navigate("/plans")}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] justify-center"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-5 h-5" />
             <span className="hidden sm:inline">Back to Plans</span>
           </button>
           <img src={logo} alt="MetsXMFanZone" className="h-8" />
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Lock className="w-3.5 h-3.5" />
             <span>Secure</span>
           </div>
@@ -156,8 +156,8 @@ const Checkout = () => {
       </header>
 
       {/* Main content — split layout */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-14">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-14">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
           {/* LEFT — Plan details */}
           <div className="order-2 lg:order-1">
             <div className="flex items-center gap-2 mb-1">
@@ -202,7 +202,7 @@ const Checkout = () => {
 
           {/* RIGHT — Order summary */}
           <div className="order-1 lg:order-2">
-            <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm">
+            <div className="bg-card border border-border rounded-2xl p-5 sm:p-8 shadow-lg">
               <h2 className="text-lg font-semibold text-foreground mb-6">
                 Order Summary
               </h2>
@@ -289,7 +289,7 @@ const Checkout = () => {
 
               {/* Pay button */}
               <Button
-                className="w-full h-12 text-base font-semibold"
+                className="w-full h-13 sm:h-12 text-base font-semibold rounded-xl"
                 size="lg"
                 onClick={handlePay}
                 disabled={isProcessing}
