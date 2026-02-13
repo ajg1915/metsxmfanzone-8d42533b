@@ -28,7 +28,7 @@ const STAR_PLAYERS = [
   { id: 665742, name: "Juan Soto" },
   { id: 668901, name: "Mark Vientos" },
   { id: 682626, name: "Francisco Alvarez" },
-  { id: 607043, name: "Brandon Nimmo" },
+  
   { id: 608385, name: "Jesse Winker" },
   { id: 543760, name: "Marcus Semien" },
   { id: 666182, name: "Bo Bichette" },
