@@ -83,8 +83,15 @@ Deno.serve(async (req) => {
 
     if (!helcimResponse.ok) {
       const errorData = await helcimResponse.text();
-      console.error('Helcim API error:', errorData);
+      console.error('Helcim API error:', helcimResponse.status, errorData.substring(0, 200));
       throw new Error(`Helcim API error: ${helcimResponse.status}`);
+    }
+
+    const contentType = helcimResponse.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      const textBody = await helcimResponse.text();
+      console.error('Helcim returned non-JSON:', contentType, textBody.substring(0, 200));
+      throw new Error('Helcim returned unexpected response format');
     }
 
     const helcimData = await helcimResponse.json();
