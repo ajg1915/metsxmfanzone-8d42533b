@@ -279,7 +279,7 @@ const AppContent = () => {
   return (
     <TooltipProvider>
      <PullToRefresh>
-        {showNavigation && <Navigation />}
+        <Navigation hidden={!showNavigation} />
         <Toaster />
         <Sonner />
         {/* LiveStreamToast removed per user request */}
