@@ -34,11 +34,18 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-const Navigation = () => {
+const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
   // Hide nav once user scrolls past threshold
   useEffect(() => {
     const navRoot = document.getElementById("nav-root");
     if (!navRoot) return;
+
+    if (hidden) {
+      navRoot.style.display = 'none';
+      return () => { navRoot.style.display = ''; };
+    }
+
+    navRoot.style.display = '';
 
     const handleScroll = () => {
       if (window.scrollY > 60) {
@@ -50,7 +57,7 @@ const Navigation = () => {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [hidden]);
   const { user, signOut } = useAuth();
   const { tier } = useSubscription();
   const navigate = useNavigate();
