@@ -5,3 +5,24 @@
   padding: 0;
   overflow-x: clip;
 }
+
+/* Ensure Helcim payment iframe is fully visible on mobile */
+.helcim-pay-iframe-wrapper,
+div[id^="helcim-pay-js-"] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  z-index: 99999 !important;
+  overflow: auto !important;
+}
+
+div[id^="helcim-pay-js-"] iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100vh !important;
+  border: none !important;
+}
