@@ -42,7 +42,8 @@ const PlayersToWatch = () => {
         .from("daily_player_predictions")
         .select("*")
         .eq("prediction_date", today)
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: true })
+        .limit(6);
       if (error) throw error;
       return data as PlayerPrediction[];
     },
