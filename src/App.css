@@ -12,6 +12,10 @@ body.helcim-active #root {
   overflow: visible;
 }
 
+body.helcim-active #nav-root {
+  display: none !important;
+}
+
 /* Ensure Helcim payment iframe is fully visible on mobile */
 .helcim-pay-iframe-wrapper,
 div[id^="helcim-pay-js-"] {
@@ -25,6 +29,7 @@ div[id^="helcim-pay-js-"] {
   z-index: 99999 !important;
   overflow: auto !important;
   -webkit-overflow-scrolling: touch !important;
+  background: white !important;
 }
 
 div[id^="helcim-pay-js-"] iframe {
@@ -32,4 +37,5 @@ div[id^="helcim-pay-js-"] iframe {
   height: 100% !important;
   min-height: 100dvh !important;
   border: none !important;
+  display: block !important;
 }
