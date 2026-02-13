@@ -32,9 +32,12 @@ const HelcimCheckout = () => {
     script.async = true;
 
     script.onload = () => {
-      setIsLoading(false);
       if (typeof window.appendHelcimPayIframe === 'function') {
         window.appendHelcimPayIframe(checkoutToken, true);
+        // Delay hiding loading screen to let iframe render
+        setTimeout(() => setIsLoading(false), 2000);
+      } else {
+        navigate('/payment-error');
       }
     };
 
