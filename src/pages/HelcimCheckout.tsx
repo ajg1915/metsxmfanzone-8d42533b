@@ -1,107 +1,142 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Loader2 } from "lucide-react";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+import { Loader2, Shield, CreditCard, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const HelcimCheckout = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [errorMsg, setErrorMsg] = useState("");
   const checkoutToken = searchParams.get('token') || sessionStorage.getItem('helcim_checkout_token');
+
+  const handleMessage = useCallback((event: MessageEvent) => {
+    if (!checkoutToken) return;
+    const helcimPayJsIdentifierKey = 'helcim-pay-js-' + checkoutToken;
+
+    if (event.data.eventName === helcimPayJsIdentifierKey) {
+      if (event.data.eventStatus === 'SUCCESS') {
+        navigate(`/payment-success?session_id=${checkoutToken}`);
+      }
+      if (event.data.eventStatus === 'ABORTED') {
+        navigate('/payment-error');
+      }
+      if (event.data.eventStatus === 'HIDE') {
+        navigate('/pricing');
+      }
+    }
+  }, [checkoutToken, navigate]);
 
   useEffect(() => {
     if (!checkoutToken) {
-      navigate('/plans');
+      navigate('/pricing');
       return;
     }
 
-    // Load HelcimPay.js script from correct URL
+    // Load HelcimPay.js script
     const script = document.createElement('script');
     script.src = 'https://secure.helcim.app/helcim-pay/services/start.js';
     script.async = true;
     
     script.onload = () => {
-      console.log('HelcimPay.js script loaded');
-      setIsLoading(false);
+      setStatus('ready');
       
-      // Call appendHelcimPayIframe to display the modal
-      if (typeof window.appendHelcimPayIframe === 'function') {
-        window.appendHelcimPayIframe(checkoutToken, true);
-      } else {
-        console.error('appendHelcimPayIframe function not found');
-      }
+      // Small delay to ensure script is fully initialized
+      setTimeout(() => {
+        if (typeof window.appendHelcimPayIframe === 'function') {
+          window.appendHelcimPayIframe(checkoutToken, true);
+        } else {
+          setStatus('error');
+          setErrorMsg('Payment form failed to initialize. Please try again.');
+        }
+      }, 500);
     };
 
     script.onerror = () => {
-      console.error('Failed to load HelcimPay.js script');
-      navigate('/payment-error');
+      setStatus('error');
+      setErrorMsg('Failed to load payment system. Please check your connection and try again.');
     };
 
     document.head.appendChild(script);
-
-    // Listen for HelcimPay.js iFrame events
-    const handleMessage = (event: MessageEvent) => {
-      const helcimPayJsIdentifierKey = 'helcim-pay-js-' + checkoutToken;
-
-      if (event.data.eventName === helcimPayJsIdentifierKey) {
-        console.log('Helcim event received:', event.data);
-
-        if (event.data.eventStatus === 'SUCCESS') {
-          console.log('Transaction success!', event.data.eventMessage);
-          // Redirect to success page with checkout token
-          navigate(`/payment-success?session_id=${checkoutToken}`);
-        }
-
-        if (event.data.eventStatus === 'ABORTED') {
-          console.error('Transaction failed!', event.data.eventMessage);
-          navigate('/payment-error');
-        }
-
-        if (event.data.eventStatus === 'HIDE') {
-          console.log('Modal closed by user');
-          navigate('/plans');
-        }
-      }
-    };
-
     window.addEventListener('message', handleMessage);
 
     return () => {
       window.removeEventListener('message', handleMessage);
-      // Only remove script if it exists in the DOM
       if (script.parentNode) {
         script.parentNode.removeChild(script);
       }
     };
-  }, [checkoutToken, navigate]);
+  }, [checkoutToken, navigate, handleMessage]);
+
+  // Add CSS to ensure Helcim iframe is visible above everything
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.id = 'helcim-checkout-styles';
+    style.textContent = `
+      .helcim-pay-iframe-wrapper,
+      .helcim-pay-iframe-wrapper iframe,
+      div[id*="helcimPayIframe"] {
+        z-index: 999999 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        border: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      const existing = document.getElementById('helcim-checkout-styles');
+      if (existing) existing.remove();
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <main className="pt-12">
-        <section className="py-16">
-          <div className="container mx-auto px-4 max-w-2xl">
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center space-y-4">
-                <Loader2 className="w-16 h-16 text-primary animate-spin" />
-                <h2 className="text-2xl font-bold text-foreground">Loading Payment</h2>
-                <p className="text-muted-foreground text-center">
-                  Please wait while we prepare your secure payment form...
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center space-y-4">
-                <h2 className="text-2xl font-bold text-foreground">Complete Your Payment</h2>
-                <p className="text-muted-foreground text-center">
-                  The secure payment form should appear above. If it doesn't, please refresh the page.
-                </p>
-              </div>
-            )}
+    <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center p-4">
+      {status === 'loading' && (
+        <div className="flex flex-col items-center justify-center space-y-6 max-w-sm text-center">
+          <Loader2 className="w-12 h-12 text-primary animate-spin" />
+          <h2 className="text-xl font-bold text-foreground">Preparing Secure Payment</h2>
+          <p className="text-muted-foreground text-sm">
+            Loading your payment form...
+          </p>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Shield className="w-4 h-4" />
+            <span>256-bit SSL encrypted</span>
           </div>
-        </section>
-      </main>
-      <Footer />
+        </div>
+      )}
+
+      {status === 'ready' && (
+        <div className="flex flex-col items-center justify-center space-y-4 max-w-sm text-center">
+          <CreditCard className="w-10 h-10 text-primary" />
+          <h2 className="text-xl font-bold text-foreground">Complete Your Payment</h2>
+          <p className="text-muted-foreground text-sm">
+            The secure payment form should appear. If it doesn't load, try refreshing.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+            Refresh Page
+          </Button>
+        </div>
+      )}
+
+      {status === 'error' && (
+        <div className="flex flex-col items-center justify-center space-y-4 max-w-sm text-center">
+          <AlertCircle className="w-10 h-10 text-destructive" />
+          <h2 className="text-xl font-bold text-foreground">Payment Error</h2>
+          <p className="text-muted-foreground text-sm">{errorMsg}</p>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => navigate('/pricing')}>
+              Back to Plans
+            </Button>
+            <Button onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
