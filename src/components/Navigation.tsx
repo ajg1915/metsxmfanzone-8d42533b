@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/collapsible";
 
 const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
-  // Hide nav once user scrolls past threshold
+  // Show/hide nav based on hidden prop only (no scroll-based hiding)
   useEffect(() => {
     const navRoot = document.getElementById("nav-root");
     if (!navRoot) return;
@@ -46,17 +46,7 @@ const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
     }
 
     navRoot.style.display = '';
-
-    const handleScroll = () => {
-      if (window.scrollY > 60) {
-        navRoot.classList.add("nav-hidden");
-      } else {
-        navRoot.classList.remove("nav-hidden");
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    navRoot.classList.remove("nav-hidden");
   }, [hidden]);
   const { user, signOut } = useAuth();
   const { tier } = useSubscription();
