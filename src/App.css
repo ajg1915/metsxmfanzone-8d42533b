@@ -16,9 +16,11 @@ body.helcim-active #nav-root {
   display: none !important;
 }
 
-/* Ensure Helcim payment iframe is fully visible on mobile */
+/* Force ALL Helcim injected elements to fill the entire screen */
 .helcim-pay-iframe-wrapper,
-div[id^="helcim-pay-js-"] {
+div[id^="helcim-pay-js-"],
+div[id^="helcim-pay-js-"] > div,
+div[id^="helcim-pay-js-"] > div > div {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -27,8 +29,12 @@ div[id^="helcim-pay-js-"] {
   width: 100vw !important;
   height: 100vh !important;
   height: 100dvh !important;
-  max-width: none !important;
-  max-height: none !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
   margin: 0 !important;
   padding: 0 !important;
   z-index: 99999 !important;
@@ -36,14 +42,19 @@ div[id^="helcim-pay-js-"] {
   -webkit-overflow-scrolling: touch !important;
   background: white !important;
   border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  inset: 0 !important;
 }
 
 div[id^="helcim-pay-js-"] iframe {
-  position: absolute !important;
+  position: fixed !important;
   top: 0 !important;
   left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
   min-width: 100vw !important;
   min-height: 100vh !important;
   min-height: 100dvh !important;
@@ -51,4 +62,6 @@ div[id^="helcim-pay-js-"] iframe {
   display: block !important;
   margin: 0 !important;
   padding: 0 !important;
+  border-radius: 0 !important;
+  z-index: 99999 !important;
 }
