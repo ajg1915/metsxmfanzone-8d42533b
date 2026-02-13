@@ -9,6 +9,9 @@ const HelcimCheckout = () => {
   const checkoutToken = searchParams.get('token') || sessionStorage.getItem('helcim_checkout_token');
 
   useEffect(() => {
+    // Add class to body to disable overflow clipping on #root
+    document.body.classList.add('helcim-active');
+    
     if (!checkoutToken) {
       navigate('/plans');
       return;
@@ -46,18 +49,14 @@ const HelcimCheckout = () => {
         console.log('Helcim event received:', event.data);
 
         if (event.data.eventStatus === 'SUCCESS') {
-          console.log('Transaction success!', event.data.eventMessage);
-          // Redirect to success page with checkout token
           navigate(`/payment-success?session_id=${checkoutToken}`);
         }
 
         if (event.data.eventStatus === 'ABORTED') {
-          console.error('Transaction failed!', event.data.eventMessage);
           navigate('/payment-error');
         }
 
         if (event.data.eventStatus === 'HIDE') {
-          console.log('Modal closed by user');
           navigate('/plans');
         }
       }
@@ -66,8 +65,8 @@ const HelcimCheckout = () => {
     window.addEventListener('message', handleMessage);
 
     return () => {
+      document.body.classList.remove('helcim-active');
       window.removeEventListener('message', handleMessage);
-      // Only remove script if it exists in the DOM
       if (script.parentNode) {
         script.parentNode.removeChild(script);
       }
