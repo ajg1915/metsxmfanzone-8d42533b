@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Tag, X, CreditCard, Shield, ArrowLeft } from "lucide-react";
+import { Tag, X, CreditCard, Shield, ArrowLeft, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
 import { useToast } from "@/hooks/use-toast";
@@ -41,6 +41,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"helcim" | "paypal">("paypal");
 
   const handleSubscribe = async () => {
     if (!plan) return;
@@ -83,28 +84,53 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
         return;
       }
 
-      toast({
-        title: "Processing...",
-        description: "Creating your payment session",
-      });
-
-      const { data, error } = await supabase.functions.invoke("create-helcim-checkout", {
-        body: { planType: plan.id, promoCode: appliedPromo },
-      });
-
-      if (error) throw error;
-
-      if (data?.checkoutToken && data?.secretToken) {
-        sessionStorage.setItem("helcim_checkout_token", data.checkoutToken);
-        sessionStorage.setItem("helcim_secret_token", data.secretToken);
-        onOpenChange(false);
-        navigate(`/helcim-checkout?token=${data.checkoutToken}`);
-      } else {
+      if (paymentMethod === "paypal") {
+        // PayPal flow
         toast({
-          title: "Error",
-          description: "Failed to get payment tokens. Please try again.",
-          variant: "destructive",
+          title: "Processing...",
+          description: "Connecting to PayPal",
         });
+
+        const { data, error } = await supabase.functions.invoke("create-paypal-order", {
+          body: { planType: plan.id, promoCode: appliedPromo },
+        });
+
+        if (error) throw error;
+
+        if (data?.approvalUrl) {
+          window.location.href = data.approvalUrl;
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to create PayPal order. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        // Helcim flow
+        toast({
+          title: "Processing...",
+          description: "Creating your payment session",
+        });
+
+        const { data, error } = await supabase.functions.invoke("create-helcim-checkout", {
+          body: { planType: plan.id, promoCode: appliedPromo },
+        });
+
+        if (error) throw error;
+
+        if (data?.checkoutToken && data?.secretToken) {
+          sessionStorage.setItem("helcim_checkout_token", data.checkoutToken);
+          sessionStorage.setItem("helcim_secret_token", data.secretToken);
+          onOpenChange(false);
+          navigate(`/helcim-checkout?token=${data.checkoutToken}`);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to get payment tokens. Please try again.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error("Error creating payment:", error);
@@ -250,13 +276,41 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
 
           <Separator />
 
-          {/* Payment Method Info - Only show for paid plans */}
+          {/* Payment Method Selection - Only show for paid plans */}
           {plan.priceValue > 0 && (
-            <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30">
-              <CreditCard className="w-5 h-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium text-foreground">Credit/Debit Card</p>
-                <p className="text-xs text-muted-foreground">Secure payment via Helcim</p>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Payment Method</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("paypal")}
+                  className={`flex items-center gap-2 p-3 rounded-lg border transition-all ${
+                    paymentMethod === "paypal"
+                      ? "border-primary bg-primary/10 ring-1 ring-primary"
+                      : "border-border bg-muted/30 hover:border-primary/50"
+                  }`}
+                >
+                  <Wallet className="w-5 h-5 text-[#0070ba]" />
+                  <div className="text-left">
+                    <p className="text-sm font-medium text-foreground">PayPal</p>
+                    <p className="text-[10px] text-muted-foreground">Fast & secure</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("helcim")}
+                  className={`flex items-center gap-2 p-3 rounded-lg border transition-all ${
+                    paymentMethod === "helcim"
+                      ? "border-primary bg-primary/10 ring-1 ring-primary"
+                      : "border-border bg-muted/30 hover:border-primary/50"
+                  }`}
+                >
+                  <CreditCard className="w-5 h-5 text-muted-foreground" />
+                  <div className="text-left">
+                    <p className="text-sm font-medium text-foreground">Card</p>
+                    <p className="text-[10px] text-muted-foreground">Credit/Debit</p>
+                  </div>
+                </button>
               </div>
             </div>
           )}
@@ -268,13 +322,19 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
             onClick={handleSubscribe}
             disabled={isProcessing}
           >
-            {isProcessing ? "Processing..." : plan.priceValue === 0 ? "Activate Free Plan" : `Pay ${plan.price}`}
+            {isProcessing
+              ? "Processing..."
+              : plan.priceValue === 0
+              ? "Activate Free Plan"
+              : paymentMethod === "paypal"
+              ? `Pay with PayPal - ${plan.price}`
+              : `Pay ${plan.price}`}
           </Button>
 
           {/* Security Badge */}
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <Shield className="w-4 h-4" />
-            <span>Secure checkout powered by Helcim</span>
+            <span>Secure checkout • 256-bit encryption</span>
           </div>
         </div>
       </DialogContent>
