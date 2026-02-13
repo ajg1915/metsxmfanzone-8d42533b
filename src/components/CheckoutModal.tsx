@@ -106,7 +106,9 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
     style.id = 'helcim-modal-styles';
     style.textContent = `
       .helcim-pay-iframe-wrapper,
-      div[id*="helcimPayIframe"] {
+      .helcim-pay-iframe-wrapper iframe,
+      div[id*="helcimPayIframe"],
+      div[id*="helcimPayIframe"] iframe {
         z-index: 999999 !important;
         position: fixed !important;
         top: 0 !important;
@@ -115,12 +117,8 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
         height: 100dvh !important;
         border: none !important;
         background: #fff !important;
-      }
-      .helcim-pay-iframe-wrapper iframe,
-      div[id*="helcimPayIframe"] iframe {
-        width: 100% !important;
-        height: 100% !important;
-        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
     `;
     document.head.appendChild(style);
