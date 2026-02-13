@@ -6,6 +6,12 @@
   overflow-x: clip;
 }
 
+/* When Helcim checkout is active, remove overflow clipping so fixed iframe isn't cut off */
+body.helcim-active #root {
+  overflow-x: visible;
+  overflow: visible;
+}
+
 /* Ensure Helcim payment iframe is fully visible on mobile */
 .helcim-pay-iframe-wrapper,
 div[id^="helcim-pay-js-"] {
@@ -13,16 +19,17 @@ div[id^="helcim-pay-js-"] {
   top: 0 !important;
   left: 0 !important;
   width: 100vw !important;
-  height: 100vh !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  max-height: none !important;
   z-index: 99999 !important;
   overflow: auto !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 div[id^="helcim-pay-js-"] iframe {
   width: 100% !important;
   height: 100% !important;
-  min-height: 100vh !important;
+  min-height: 100dvh !important;
   border: none !important;
 }
