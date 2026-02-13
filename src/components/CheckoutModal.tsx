@@ -109,29 +109,18 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
       div[id*="helcimPayIframe"] {
         z-index: 999999 !important;
         position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        width: min(480px, 95vw) !important;
-        height: min(680px, 90dvh) !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
         border: none !important;
         background: #fff !important;
-        border-radius: 16px !important;
-        box-shadow: 0 25px 60px rgba(0,0,0,0.3) !important;
-        overflow: hidden !important;
       }
       .helcim-pay-iframe-wrapper iframe,
       div[id*="helcimPayIframe"] iframe {
         width: 100% !important;
         height: 100% !important;
         border: none !important;
-      }
-      .helcim-pay-iframe-wrapper::before {
-        content: '' !important;
-        position: fixed !important;
-        inset: 0 !important;
-        background: rgba(0,0,0,0.5) !important;
-        z-index: -1 !important;
       }
     `;
     document.head.appendChild(style);
