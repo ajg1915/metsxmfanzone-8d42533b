@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 
 const HelcimCheckout = () => {
   const [searchParams] = useSearchParams();
@@ -76,30 +74,20 @@ const HelcimCheckout = () => {
     };
   }, [checkoutToken, navigate]);
 
+  // Once the Helcim iframe launches, hide everything else
+  if (!isLoading) {
+    return (
+      <div className="min-h-screen bg-background" />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Navigation />
-      <main className="flex-1 pt-16 pb-8 px-2 sm:px-4">
-        <div className="w-full max-w-2xl mx-auto">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center space-y-4 py-16">
-              <Loader2 className="w-16 h-16 text-primary animate-spin" />
-              <h2 className="text-2xl font-bold text-foreground">Loading Payment</h2>
-              <p className="text-muted-foreground text-center">
-                Please wait while we prepare your secure payment form...
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center space-y-4 py-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground text-center">Complete Your Payment</h2>
-              <p className="text-sm text-muted-foreground text-center">
-                The secure payment form should appear above. If it doesn't, please refresh the page.
-              </p>
-            </div>
-          )}
-        </div>
-      </main>
-      <Footer />
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+      <Loader2 className="w-16 h-16 text-primary animate-spin" />
+      <h2 className="text-2xl font-bold text-foreground mt-4">Loading Payment</h2>
+      <p className="text-muted-foreground text-center mt-2">
+        Please wait while we prepare your secure payment form...
+      </p>
     </div>
   );
 };
