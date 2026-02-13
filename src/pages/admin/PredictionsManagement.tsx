@@ -23,16 +23,23 @@ import { format } from "date-fns";
 
 // Star players that can be forced into predictions
 const STAR_PLAYERS = [
+  // Everyday Hitters
   { id: 596019, name: "Francisco Lindor" },
   { id: 665742, name: "Juan Soto" },
-  { id: 607043, name: "Brandon Nimmo" },
-  { id: 643446, name: "Jeff McNeil" },
   { id: 668901, name: "Mark Vientos" },
   { id: 682626, name: "Francisco Alvarez" },
-  { id: 516782, name: "Starling Marte" },
-  { id: 673085, name: "Kodai Senga" },
-  { id: 621242, name: "Edwin Diaz" },
+  { id: 607043, name: "Brandon Nimmo" },
+  { id: 608385, name: "Jesse Winker" },
+  { id: 543760, name: "Marcus Semien" },
+  { id: 666182, name: "Bo Bichette" },
+  { id: 673357, name: "Luis Robert Jr." },
+  { id: 669004, name: "MJ Melendez" },
+  // Pitchers
+  { id: 673540, name: "Kodai Senga" },
   { id: 640455, name: "Sean Manaea" },
+  { id: 642547, name: "Freddy Peralta" },
+  { id: 605280, name: "Clay Holmes" },
+  { id: 642207, name: "Devin Williams" },
 ];
 
 interface Prediction {
