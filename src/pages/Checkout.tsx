@@ -115,7 +115,7 @@ const Checkout = () => {
       if (data?.checkoutToken && data?.secretToken) {
         sessionStorage.setItem("helcim_checkout_token", data.checkoutToken);
         sessionStorage.setItem("helcim_secret_token", data.secretToken);
-        window.open(`/helcim-checkout?token=${data.checkoutToken}`, '_blank');
+        navigate(`/helcim-checkout?token=${data.checkoutToken}`);
       } else {
         throw new Error("Failed to create payment session");
       }

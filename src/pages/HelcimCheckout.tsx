@@ -48,10 +48,12 @@ const HelcimCheckout = () => {
       const key = 'helcim-pay-js-' + checkoutToken;
       if (event.data.eventName === key) {
         if (event.data.eventStatus === 'SUCCESS') {
+          sessionStorage.removeItem('helcim_checkout_token');
+          sessionStorage.removeItem('helcim_secret_token');
           navigate('/dashboard');
         }
         if (event.data.eventStatus === 'ABORTED') {
-          navigate('/payment-error');
+          navigate('/plans');
         }
         if (event.data.eventStatus === 'HIDE') {
           navigate('/plans');
