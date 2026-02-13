@@ -12,45 +12,45 @@ function getPlayerImageUrl(playerId: number): string {
   return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${playerId}/headshot/67/current`;
 }
 
-async function fetchMetsRoster(): Promise<Array<{ name: string; id: number; position: string }>> {
+async function fetchMetsRoster(): Promise<Array<{ name: string; id: number }>> {
   try {
+    // Fetch 40-man roster from MLB Stats API
     const response = await fetch(
       `https://statsapi.mlb.com/api/v1/teams/${METS_TEAM_ID}/roster?rosterType=40Man`
     );
-    if (!response.ok) throw new Error("Failed to fetch roster data");
+    
+    if (!response.ok) {
+      throw new Error("Failed to fetch roster data");
+    }
+    
     const data = await response.json();
+    
+    // Map roster to simple format
     return data.roster.map((player: any) => ({
       name: player.person.fullName,
       id: player.person.id,
-      position: player.position?.abbreviation || "UTIL",
     }));
   } catch (error) {
     console.error("Error fetching Mets roster:", error);
+    // Fallback to current 2026 Mets roster if API fails
     return [
-      { name: "Francisco Lindor", id: 596019, position: "SS" },
-      { name: "Juan Soto", id: 665742, position: "RF" },
-      { name: "Mark Vientos", id: 668901, position: "3B" },
-      { name: "Francisco Alvarez", id: 682626, position: "C" },
-      { name: "Luis Robert Jr.", id: 673357, position: "CF" },
-      { name: "Marcus Semien", id: 543760, position: "2B" },
-      { name: "Bo Bichette", id: 666182, position: "SS" },
-      { name: "MJ Melendez", id: 669004, position: "LF" },
-      { name: "Jorge Polanco", id: 593871, position: "2B" },
-      { name: "Brett Baty", id: 683146, position: "3B" },
-      { name: "Kodai Senga", id: 673540, position: "SP" },
-      { name: "Sean Manaea", id: 640455, position: "SP" },
-      { name: "Freddy Peralta", id: 642547, position: "SP" },
-      { name: "Clay Holmes", id: 605280, position: "SP" },
-      { name: "David Peterson", id: 656849, position: "SP" },
-      { name: "Devin Williams", id: 642207, position: "RP" },
-      { name: "Luke Weaver", id: 596133, position: "RP" },
-      { name: "Christian Scott", id: 681035, position: "SP" },
+      { name: "Francisco Lindor", id: 596019 },
+      { name: "Juan Soto", id: 665742 },
+      { name: "Brandon Nimmo", id: 607043 },
+      { name: "Jesse Winker", id: 608385 },
+      { name: "Mark Vientos", id: 668901 },
+      { name: "Francisco Alvarez", id: 682626 },
+      { name: "Jose Iglesias", id: 578428 },
+      { name: "Luisangel Acuña", id: 694389 },
+      { name: "Kodai Senga", id: 673085 },
+      { name: "Frankie Montas", id: 593423 },
+      { name: "Clay Holmes", id: 605280 },
+      { name: "Sean Manaea", id: 640455 },
+      { name: "David Peterson", id: 656849 },
+      { name: "Jose Quintana", id: 500779 },
+      { name: "Edwin Diaz", id: 621242 },
     ];
   }
-}
-
-function isPitcherPosition(position: string): boolean {
-  return ["P", "SP", "RP", "CL"].includes(position);
 }
 
 serve(async (req) => {
@@ -62,100 +62,114 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Parse request body for options
     let forceStarPlayers: number[] = [];
     let forceRegenerate = false;
-    let triggerType = "manual";
-
+    let triggerType = "manual"; // manual, morning, pregame
+    
     try {
       const body = await req.json();
-      if (body.forceStarPlayers && Array.isArray(body.forceStarPlayers)) forceStarPlayers = body.forceStarPlayers;
-      if (body.forceRegenerate === true) forceRegenerate = true;
-      if (body.triggerType) triggerType = body.triggerType;
-    } catch { /* defaults */ }
+      if (body.forceStarPlayers && Array.isArray(body.forceStarPlayers)) {
+        forceStarPlayers = body.forceStarPlayers;
+      }
+      if (body.forceRegenerate === true) {
+        forceRegenerate = true;
+      }
+      if (body.triggerType) {
+        triggerType = body.triggerType;
+      }
+    } catch {
+      // No body or invalid JSON, continue with defaults
+    }
 
     const today = new Date().toISOString().split('T')[0];
-
+    
+    // Check if we already have predictions for today
     const { data: existingPredictions } = await supabase
       .from("daily_player_predictions")
       .select("*")
       .eq("prediction_date", today);
 
-    const shouldSkip = existingPredictions && existingPredictions.length > 0 && !forceRegenerate && forceStarPlayers.length === 0;
+    // Only skip if predictions exist AND we're not forcing regeneration
+    const shouldSkip = existingPredictions && 
+                       existingPredictions.length > 0 && 
+                       !forceRegenerate && 
+                       forceStarPlayers.length === 0;
 
     if (shouldSkip) {
+      console.log(`Predictions already exist for today (${today}), skipping generation`);
       return new Response(
-        JSON.stringify({ message: "Predictions already exist for today", predictions: existingPredictions }),
+        JSON.stringify({ 
+          message: "Predictions already exist for today", 
+          predictions: existingPredictions 
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    // Delete existing predictions for today if force regenerating
     if (forceRegenerate && existingPredictions && existingPredictions.length > 0) {
-      await supabase.from("daily_player_predictions").delete().eq("prediction_date", today);
+      console.log(`Force regenerating: deleting ${existingPredictions.length} existing predictions`);
+      await supabase
+        .from("daily_player_predictions")
+        .delete()
+        .eq("prediction_date", today);
     }
 
-    if (!lovableApiKey) throw new Error("LOVABLE_API_KEY is not configured");
+    if (!lovableApiKey) {
+      throw new Error("LOVABLE_API_KEY is not configured");
+    }
 
+    // Fetch current Mets roster from MLB API
     const metsPlayers = await fetchMetsRoster();
     console.log(`Fetched ${metsPlayers.length} players from Mets roster`);
 
-    let selectedPlayers: Array<{ name: string; id: number; position: string }> = [];
-
+    // Handle star players selection
+    let selectedPlayers: Array<{ name: string; id: number }> = [];
+    
+    // If force star players are specified, include them first
     if (forceStarPlayers.length > 0) {
-      selectedPlayers = metsPlayers.filter(p => forceStarPlayers.includes(p.id));
+      const starPlayersFromRoster = metsPlayers.filter(p => forceStarPlayers.includes(p.id));
+      selectedPlayers = [...starPlayersFromRoster];
+      console.log(`Added ${starPlayersFromRoster.length} forced star players`);
     }
 
+    // Fill remaining slots with random players (up to 6 total)
     const remainingSlots = 6 - selectedPlayers.length;
     if (remainingSlots > 0) {
-      const available = metsPlayers.filter(p => !selectedPlayers.some(sp => sp.id === p.id));
-      const shuffled = [...available].sort(() => 0.5 - Math.random());
+      const availablePlayers = metsPlayers.filter(
+        p => !selectedPlayers.some(sp => sp.id === p.id)
+      );
+      const shuffled = [...availablePlayers].sort(() => 0.5 - Math.random());
       selectedPlayers = [...selectedPlayers, ...shuffled.slice(0, remainingSlots)];
     }
 
+    // Customize prompt based on trigger type
     let contextNote = "";
-    if (triggerType === "morning") contextNote = "It's early morning. Give your daily parlay picks before games start.";
-    else if (triggerType === "pregame") contextNote = "Pre-game time! Give your hottest parlay predictions for tonight.";
+    if (triggerType === "morning") {
+      contextNote = "It's early morning and you're giving your daily picks before the games start. Focus on who's been trending lately.";
+    } else if (triggerType === "pregame") {
+      contextNote = "It's pre-game time! Games are about to start soon. Give your hottest takes for tonight's action.";
+    }
 
-    const prompt = `You are Anthony, a passionate Mets baseball analyst and parlay betting expert. ${contextNote}
+    // Generate AI predictions for each player
+    const prompt = `You are Anthony, a passionate Mets baseball analyst and betting expert. ${contextNote}
 
-For each player below, predict their SPECIFIC stat line for today's game. Be realistic based on player tendencies and matchups.
+For each of these current Mets players, determine if they are currently "hot" or "cold" based on typical performance patterns and provide a brief betting tip or prediction. Be realistic and vary between hot and cold. Make your tips sound like insider knowledge.
 
-Players and their positions:
-${selectedPlayers.map(p => `- ${p.name} (${p.position})`).join("\n")}
+Players: ${selectedPlayers.map(p => p.name).join(", ")}
 
-For HITTERS (non-pitchers), predict: home runs, walks, RBIs, runs scored, stolen bases for today.
-For STARTING PITCHERS (SP), predict: strikeouts, innings pitched (as a decimal like 6.0 or 5.2), walks allowed, home runs allowed, and whether they get a Win or Loss (W or L).
-For RELIEF/BULLPEN PITCHERS (RP, CL), predict: strikeouts, innings pitched (as a decimal like 1.0 or 2.1), walks allowed, home runs allowed, and saves (SV).
-
-Also give a confidence level (1-100) and a short parlay tip.
-
-Respond with ONLY a valid JSON array (no markdown):
+Respond with ONLY a valid JSON array (no markdown, no extra text) in this exact format:
 [
   {
     "name": "Player Name",
-    "is_pitcher": false,
-    "position": "SS",
     "status": "hot" or "cold",
-    "predicted_hr": 1,
-    "predicted_walks": 0,
-    "predicted_rbis": 2,
-    "predicted_runs": 1,
-    "predicted_sb": 0,
-    "predicted_strikeouts": 0,
-    "predicted_innings_pitched": 0,
-    "predicted_walks_allowed": 0,
-    "predicted_hr_allowed": 0,
-    "predicted_saves": 0,
-    "predicted_win_loss": null,
-    "confidence": 75,
-    "description": "Brief parlay tip about this player"
+    "description": "Brief 1-2 sentence betting tip or prediction about this player's performance"
   }
-]
-
-For hitters: set predicted_strikeouts, predicted_innings_pitched, predicted_hr_allowed, predicted_walks_allowed, predicted_saves to 0, predicted_win_loss to null.
-For starting pitchers: set predicted_hr, predicted_walks, predicted_sb, predicted_rbis, predicted_runs, predicted_saves to 0. Set predicted_win_loss to "W" or "L".
-For relief/bullpen pitchers: set predicted_hr, predicted_walks, predicted_sb, predicted_rbis, predicted_runs to 0. Set predicted_win_loss to null. Set predicted_saves to 0 or 1.`;
+]`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -166,61 +180,66 @@ For relief/bullpen pitchers: set predicted_hr, predicted_walks, predicted_sb, pr
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are Anthony, a Mets baseball parlay expert. Respond only with valid JSON." },
+          { role: "system", content: "You are Anthony, a knowledgeable Mets baseball analyst and betting tipster. Respond only with valid JSON." },
           { role: "user", content: prompt }
         ],
       }),
     });
 
     if (!aiResponse.ok) {
-      if (aiResponse.status === 429) throw new Error("Rate limit exceeded. Please try again later.");
-      if (aiResponse.status === 402) throw new Error("AI credits depleted. Please add credits.");
+      if (aiResponse.status === 429) {
+        throw new Error("Rate limit exceeded. Please try again later.");
+      }
+      if (aiResponse.status === 402) {
+        throw new Error("AI credits depleted. Please add credits.");
+      }
       throw new Error(`AI API error: ${aiResponse.status}`);
     }
 
     const aiData = await aiResponse.json();
     const aiContent = aiData.choices?.[0]?.message?.content;
-    if (!aiContent) throw new Error("No content in AI response");
 
+    if (!aiContent) {
+      throw new Error("No content in AI response");
+    }
+
+    // Parse AI response - handle potential markdown formatting
     let predictions;
     try {
+      // Remove markdown code blocks if present
       let cleanContent = aiContent.trim();
-      if (cleanContent.startsWith("```json")) cleanContent = cleanContent.slice(7);
-      else if (cleanContent.startsWith("```")) cleanContent = cleanContent.slice(3);
-      if (cleanContent.endsWith("```")) cleanContent = cleanContent.slice(0, -3);
+      if (cleanContent.startsWith("```json")) {
+        cleanContent = cleanContent.slice(7);
+      } else if (cleanContent.startsWith("```")) {
+        cleanContent = cleanContent.slice(3);
+      }
+      if (cleanContent.endsWith("```")) {
+        cleanContent = cleanContent.slice(0, -3);
+      }
       predictions = JSON.parse(cleanContent.trim());
-    } catch {
+    } catch (parseError) {
       console.error("Failed to parse AI response:", aiContent);
       throw new Error("Failed to parse AI predictions");
     }
 
-    // Cleanup old predictions (keep 7 days)
+    // Delete old predictions (keep only last 7 days)
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    await supabase.from("daily_player_predictions").delete().lt("prediction_date", weekAgo.toISOString().split('T')[0]);
+    await supabase
+      .from("daily_player_predictions")
+      .delete()
+      .lt("prediction_date", weekAgo.toISOString().split('T')[0]);
 
+    // Insert new predictions with player images
     const predictionsToInsert = predictions.map((pred: any) => {
       const player = selectedPlayers.find(p => p.name.toLowerCase() === pred.name.toLowerCase());
       return {
         player_name: pred.name,
         player_id: player?.id,
         player_image_url: player ? getPlayerImageUrl(player.id) : null,
-        status: ["hot", "cold"].includes(pred.status?.toLowerCase()) ? pred.status.toLowerCase() : "hot",
+        status: pred.status.toLowerCase(),
         description: pred.description,
         prediction_date: today,
-        is_pitcher: pred.is_pitcher || false,
-        predicted_hr: pred.predicted_hr || 0,
-        predicted_walks: pred.predicted_walks || 0,
-        predicted_sb: pred.predicted_sb || 0,
-        predicted_rbis: pred.predicted_rbis || 0,
-        predicted_runs: pred.predicted_runs || 0,
-        predicted_strikeouts: pred.predicted_strikeouts || 0,
-        predicted_innings_pitched: pred.predicted_innings_pitched || 0,
-        predicted_hr_allowed: pred.predicted_hr_allowed || 0,
-        predicted_walks_allowed: pred.predicted_walks_allowed || 0,
-        predicted_saves: pred.predicted_saves || 0,
-        predicted_win_loss: pred.predicted_win_loss || null,
-        confidence: pred.confidence || 50,
       };
     });
 
@@ -229,14 +248,21 @@ For relief/bullpen pitchers: set predicted_hr, predicted_walks, predicted_sb, pr
       .insert(predictionsToInsert)
       .select();
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      throw insertError;
+    }
 
-    console.log(`Successfully generated ${insertedPredictions?.length} parlay predictions (trigger: ${triggerType})`);
+    console.log(`Successfully generated ${insertedPredictions?.length} predictions (trigger: ${triggerType})`);
 
     return new Response(
-      JSON.stringify({ message: "Predictions generated successfully", triggerType, predictions: insertedPredictions }),
+      JSON.stringify({ 
+        message: "Predictions generated successfully", 
+        triggerType,
+        predictions: insertedPredictions 
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
+
   } catch (error) {
     console.error("Error generating predictions:", error);
     return new Response(

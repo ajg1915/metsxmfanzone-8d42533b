@@ -137,6 +137,3 @@ verify_jwt = true
 
 [functions.subscription-expiry-notifications]
 verify_jwt = false
-
-[functions.describe-video-thumbnail]
-verify_jwt = true

@@ -403,16 +403,16 @@ export default function SubscriptionManagement() {
   }
 
   return (
-    <div className="w-full max-w-full px-1 sm:px-2 py-2 sm:py-3 space-y-3 overflow-x-hidden">
+    <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
       <div>
-        <h1 className="text-base sm:text-lg font-bold text-primary mb-1">Subscriptions</h1>
-        <p className="text-xs sm:text-sm text-muted-foreground">
-          Manage subscriptions, payments & cancellations
+        <h1 className="text-3xl font-bold text-primary mb-2">Subscription Management</h1>
+        <p className="text-muted-foreground">
+          Manage user subscriptions, record payments, and handle cancellations
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -475,17 +475,17 @@ export default function SubscriptionManagement() {
           {subscriptions.length === 0 ? (
             <p className="text-center py-8 text-muted-foreground">No subscriptions found</p>
           ) : (
-             <div className="overflow-x-auto -mx-2 sm:mx-0">
+            <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-xs">User</TableHead>
-                    <TableHead className="text-xs hidden sm:table-cell">Plan</TableHead>
-                    <TableHead className="text-xs">Status</TableHead>
-                    <TableHead className="text-xs hidden md:table-cell">Payments</TableHead>
-                    <TableHead className="text-xs hidden lg:table-cell">Last Payment</TableHead>
-                    <TableHead className="text-xs hidden md:table-cell">End Date</TableHead>
-                    <TableHead className="text-xs w-8"></TableHead>
+                    <TableHead>User</TableHead>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Payments</TableHead>
+                    <TableHead>Last Payment</TableHead>
+                    <TableHead>End Date</TableHead>
+                    <TableHead></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -496,43 +496,43 @@ export default function SubscriptionManagement() {
                       onClick={() => fetchSubscriptionDetails(sub)}
                     >
                       <TableCell>
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <Mail className="w-3 h-3 text-muted-foreground flex-shrink-0 hidden sm:block" />
-                          <span className="font-medium truncate max-w-[100px] sm:max-w-[180px] text-xs sm:text-sm">{sub.email}</span>
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-muted-foreground" />
+                          <span className="font-medium">{sub.email}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell">
+                      <TableCell>
                         <div>
-                          <p className="font-medium capitalize text-xs">{sub.plan_type}</p>
-                          <p className="text-[10px] text-muted-foreground">{getPlanPrice(sub.plan_type)}</p>
+                          <p className="font-medium capitalize">{sub.plan_type}</p>
+                          <p className="text-xs text-muted-foreground">{getPlanPrice(sub.plan_type)}</p>
                         </div>
                       </TableCell>
                       <TableCell>{getStatusBadge(sub)}</TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        <Badge variant="outline" className="text-xs">{sub.total_payments_received || 0}</Badge>
+                      <TableCell>
+                        <Badge variant="outline">{sub.total_payments_received || 0}</Badge>
                       </TableCell>
-                      <TableCell className="hidden lg:table-cell">
+                      <TableCell>
                         {sub.last_payment_date ? (
-                          <div className="text-xs">
+                          <div className="text-sm">
                             <p>{new Date(sub.last_payment_date).toLocaleDateString()}</p>
                             <p className="text-muted-foreground">${sub.last_payment_amount}</p>
                           </div>
                         ) : (
-                          <span className="text-muted-foreground text-xs">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {sub.end_date ? (
-                          <div className="flex items-center gap-1 text-xs">
-                            <Calendar className="w-3 h-3 text-muted-foreground" />
-                            {new Date(sub.end_date).toLocaleDateString()}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">-</span>
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
                       <TableCell>
-                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+                        {sub.end_date ? (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                            {new Date(sub.end_date).toLocaleDateString()}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -573,7 +573,7 @@ export default function SubscriptionManagement() {
 
                   <Separator className="my-4" />
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                  <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
                       <p className="text-muted-foreground">Start date</p>
                       <p className="font-medium">{new Date(selectedSubscription.start_date).toLocaleDateString()}</p>
@@ -597,7 +597,7 @@ export default function SubscriptionManagement() {
 
                   <Separator className="my-4" />
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                  <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
                       <p className="text-muted-foreground">Last payment</p>
                       {selectedSubscription.last_payment_date ? (

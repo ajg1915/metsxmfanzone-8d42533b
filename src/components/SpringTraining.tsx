@@ -45,9 +45,7 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
         .order("display_order", { ascending: true });
       if (error) throw error;
       return data;
-    },
-    staleTime: 1000 * 60 * 2, // Refresh every 2 minutes
-    refetchOnWindowFocus: true,
+    }
   });
 
   return (

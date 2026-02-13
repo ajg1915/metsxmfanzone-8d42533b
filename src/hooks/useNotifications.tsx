@@ -1,11 +1,4 @@
-/// <reference lib="webworker" />
 import { useState, useEffect } from "react";
-
-declare global {
-  interface ServiceWorkerRegistration {
-    pushManager: PushManager;
-  }
-}
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 

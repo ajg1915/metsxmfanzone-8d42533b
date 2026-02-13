@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
+// Home / Overview items
 const homeItems = [
   { title: "Dashboard", url: "/admin", icon: Home },
   { title: "Blog", url: "/admin/blog", icon: FileText },
@@ -30,6 +31,7 @@ const homeItems = [
   { title: "Fan Outlook", url: "/admin/talent-assessments", icon: Star },
 ];
 
+// Content & Media items - Blog, Stories, Videos, Podcasts, Newsletter
 const mediaItems = [
   { title: "Blog", url: "/admin/blog", icon: FileText },
   { title: "Stories", url: "/admin/stories", icon: Sparkles },
@@ -41,6 +43,7 @@ const mediaItems = [
   { title: "Email Editor", url: "/admin/email-editor", icon: Send },
 ];
 
+// Settings items (moved to prominent position)
 const settingsNavItems = [
   { title: "Admin Settings", url: "/admin/settings", icon: Settings },
   { title: "Social Media", url: "/admin/social-media", icon: Share2 },
@@ -48,6 +51,7 @@ const settingsNavItems = [
   { title: "TV Schedule", url: "/admin/tv-schedule", icon: Tv },
 ];
 
+// Live & Streaming
 const liveItems = [
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
   { title: "Push Notifications", url: "/admin/game-notifications", icon: Bell },
@@ -58,11 +62,13 @@ const liveItems = [
   { title: "Podcast Schedule", url: "/admin/podcast-schedule", icon: CalendarDays },
 ];
 
+// Events & Schedules
 const eventsItems = [
   { title: "Events", url: "/admin/events", icon: CalendarDays },
   { title: "Spring Training", url: "/admin/spring-training", icon: Trophy },
 ];
 
+// Users & Community - Users, Roles, Subscriptions, Feedback, Posts, etc.
 const usersItems = [
   { title: "Users", url: "/admin/user-management", icon: UserCog },
   { title: "User Roles", url: "/admin/roles", icon: Shield },
@@ -71,6 +77,7 @@ const usersItems = [
   { title: "Podcaster Apps", url: "/admin/podcaster-applications", icon: Mic },
 ];
 
+// Community Content - Posts, Feedback, Business Ads, Polls
 const communityItems = [
   { title: "Posts", url: "/admin/posts", icon: FileText },
   { title: "Feedback", url: "/admin/feedbacks", icon: MessageSquare },
@@ -78,6 +85,7 @@ const communityItems = [
   { title: "Polls", url: "/admin/polls", icon: BarChart3 },
 ];
 
+// Analytics & SEO
 const analyticsItems = [
   { title: "Daily Reports", url: "/admin/daily-reports", icon: ClipboardList },
   { title: "Real-Time Stats", url: "/admin/realtime-analytics", icon: TrendingUp },
@@ -93,13 +101,12 @@ export function AdminSidebar() {
   const currentPath = location.pathname;
   
   const [homeOpen, setHomeOpen] = useState(true);
-  const [mediaOpen, setMediaOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [liveOpen, setLiveOpen] = useState(false);
-  const [eventsOpen, setEventsOpen] = useState(false);
-  const [usersOpen, setUsersOpen] = useState(false);
-  const [communityOpen, setCommunityOpen] = useState(false);
-  const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const [mediaOpen, setMediaOpen] = useState(true);
+  const [liveOpen, setLiveOpen] = useState(true);
+  const [eventsOpen, setEventsOpen] = useState(true);
+  const [usersOpen, setUsersOpen] = useState(true);
+  const [communityOpen, setCommunityOpen] = useState(true);
+  const [analyticsOpen, setAnalyticsOpen] = useState(true);
 
   const isActive = (path: string) => {
     if (path === "/admin") {
@@ -108,7 +115,7 @@ export function AdminSidebar() {
     return currentPath.startsWith(path);
   };
 
-  const renderSection = (
+  const renderCollapsibleSection = (
     title: string,
     icon: React.ComponentType<{ className?: string }>,
     items: typeof homeItems,
@@ -116,48 +123,40 @@ export function AdminSidebar() {
     setIsOpen: (open: boolean) => void
   ) => {
     const Icon = icon;
-    const hasActive = items.some(item => isActive(item.url));
-    
     return (
-      <SidebarGroup className="py-0">
+      <SidebarGroup>
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <SidebarGroupLabel asChild>
-            <CollapsibleTrigger className={`flex items-center justify-between w-full rounded-md px-2 py-1 transition-colors
-              ${hasActive ? "text-primary" : "text-muted-foreground hover:text-foreground"}
-            `}>
-              <div className="flex items-center gap-1.5">
-                <Icon className="h-3.5 w-3.5 flex-shrink-0" />
-                <span className="text-[11px] font-semibold uppercase tracking-wider">{title}</span>
+            <CollapsibleTrigger className="flex items-center justify-between w-full hover:bg-muted/50 rounded-md px-2 py-1.5">
+              <div className="flex items-center gap-2">
+                <Icon className="h-4 w-4 flex-shrink-0" />
+                <span className="text-xs font-medium">{title}</span>
               </div>
               <ChevronDown 
-                className={`h-3 w-3 transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
+                className={`h-3 w-3 transition-transform flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
               />
             </CollapsibleTrigger>
           </SidebarGroupLabel>
           <CollapsibleContent>
             <SidebarGroupContent>
-              <SidebarMenu className="gap-0">
-                {items.map((item) => {
-                  const active = isActive(item.url);
-                  return (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild tooltip={item.title} className="h-7">
-                        <NavLink
-                          to={item.url}
-                          className={`flex items-center gap-1.5 pl-3 rounded-md text-[11px] transition-colors
-                            ${active
-                              ? "bg-primary/10 text-primary font-medium border-l-2 border-primary"
-                              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                            }`
-                          }
-                        >
-                          <item.icon className="h-3 w-3 flex-shrink-0" />
-                          <span className="truncate">{item.title}</span>
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
+              <SidebarMenu>
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild tooltip={item.title}>
+                      <NavLink
+                        to={item.url}
+                        className={({ isActive: active }) =>
+                          `flex items-center gap-2 pl-4 ${active || isActive(item.url)
+                            ? "bg-primary text-primary-foreground font-medium"
+                            : "hover:bg-muted/50"}`
+                        }
+                      >
+                        <item.icon className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span className="text-xs truncate">{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </CollapsibleContent>
@@ -168,15 +167,31 @@ export function AdminSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarContent className="gap-0.5 py-1.5 px-1">
-        {renderSection("Home", Home, homeItems, homeOpen, setHomeOpen)}
-        {renderSection("Settings", Settings, settingsNavItems, settingsOpen, setSettingsOpen)}
-        {renderSection("Content", Film, mediaItems, mediaOpen, setMediaOpen)}
-        {renderSection("Live", Radio, liveItems, liveOpen, setLiveOpen)}
-        {renderSection("Events", CalendarDays, eventsItems, eventsOpen, setEventsOpen)}
-        {renderSection("Users", Users, usersItems, usersOpen, setUsersOpen)}
-        {renderSection("Community", MessageSquare, communityItems, communityOpen, setCommunityOpen)}
-        {renderSection("Analytics", TrendingUp, analyticsItems, analyticsOpen, setAnalyticsOpen)}
+      <SidebarContent className="gap-1 py-2">
+        {/* Home / Overview */}
+        {renderCollapsibleSection("Home", Home, homeItems, homeOpen, setHomeOpen)}
+
+        {/* Settings (prominent position) */}
+        {renderCollapsibleSection("Settings", Settings, settingsNavItems, liveOpen, setLiveOpen)}
+
+        {/* Content & Media */}
+        {renderCollapsibleSection("Content", Film, mediaItems, mediaOpen, setMediaOpen)}
+
+        {/* Live & Streaming */}
+        {renderCollapsibleSection("Live", Radio, liveItems, eventsOpen, setEventsOpen)}
+
+        {/* Events & Schedules */}
+        {renderCollapsibleSection("Events", CalendarDays, eventsItems, eventsOpen, setEventsOpen)}
+
+        {/* Users & Accounts */}
+        {renderCollapsibleSection("Users", Users, usersItems, usersOpen, setUsersOpen)}
+
+        {/* Community Content */}
+        {renderCollapsibleSection("Community", MessageSquare, communityItems, communityOpen, setCommunityOpen)}
+
+        {/* Analytics & SEO */}
+        {renderCollapsibleSection("Analytics", TrendingUp, analyticsItems, analyticsOpen, setAnalyticsOpen)}
+
       </SidebarContent>
     </Sidebar>
   );

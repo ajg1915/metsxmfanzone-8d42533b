@@ -213,7 +213,7 @@ const PodcastLiveStreamManagement = () => {
 
   if (!stream) {
     return (
-      <div className="max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
+      <div className="container mx-auto px-4 py-8">
         <Card>
           <CardContent className="py-8">
             <p className="text-center text-muted-foreground">No stream configuration found</p>

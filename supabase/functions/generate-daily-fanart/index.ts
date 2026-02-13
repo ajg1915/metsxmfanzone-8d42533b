@@ -190,66 +190,45 @@
        console.error("Error saving to history:", historyError);
      }
  
-      // Step 6: Optionally update podcast show thumbnail
-      let updatedPodcastId: string | null = null;
-      
-      if (targetPodcastId) {
-        const { error: updateError } = await supabase
-          .from('podcast_shows')
-          .update({ thumbnail_url: generatedImageUrl })
-          .eq('id', targetPodcastId);
-
-        if (!updateError) {
-          updatedPodcastId = targetPodcastId;
-          console.log("Updated podcast thumbnail:", targetPodcastId);
-        }
-      } else if (todayShows && todayShows.length > 0) {
-        const showWithoutThumb = todayShows.find((s: any) => !s.thumbnail_url);
-        if (showWithoutThumb) {
-          const { error: updateError } = await supabase
-            .from('podcast_shows')
-            .update({ thumbnail_url: generatedImageUrl })
-            .eq('id', showWithoutThumb.id);
-
-          if (!updateError) {
-            updatedPodcastId = showWithoutThumb.id;
-            console.log("Auto-attached to podcast:", showWithoutThumb.id);
-          }
-        }
-      }
-
-      // Step 7: Update spring training games that have no preview image
-      let updatedSpringTrainingCount = 0;
-      const { data: springGames } = await supabase
-        .from('spring_training_games')
-        .select('id, opponent, preview_image_url')
-        .eq('published', true)
-        .or('preview_image_url.is.null,preview_image_url.eq.');
-
-      if (springGames && springGames.length > 0) {
-        for (const game of springGames) {
-          const { error: stError } = await supabase
-            .from('spring_training_games')
-            .update({ preview_image_url: generatedImageUrl })
-            .eq('id', game.id);
-
-          if (!stError) {
-            updatedSpringTrainingCount++;
-            console.log("Updated spring training game image:", game.opponent);
-          }
-        }
-      }
-
-      return new Response(
-        JSON.stringify({ 
-          success: true,
-          imageUrl: generatedImageUrl,
-          prompt: fanArtPrompt,
-          trendingTopics,
-          updatedPodcastId,
-          updatedSpringTrainingGames: updatedSpringTrainingCount,
-          generatedAt: new Date().toISOString()
-        }),
+     // Step 6: Optionally update podcast show thumbnail
+     let updatedPodcastId: string | null = null;
+     
+     if (targetPodcastId) {
+       // Update specific podcast
+       const { error: updateError } = await supabase
+         .from('podcast_shows')
+         .update({ thumbnail_url: generatedImageUrl })
+         .eq('id', targetPodcastId);
+ 
+       if (!updateError) {
+         updatedPodcastId = targetPodcastId;
+         console.log("Updated podcast thumbnail:", targetPodcastId);
+       }
+     } else if (todayShows && todayShows.length > 0) {
+       // Update first today's podcast that doesn't have a thumbnail
+       const showWithoutThumb = todayShows.find((s: any) => !s.thumbnail_url);
+       if (showWithoutThumb) {
+         const { error: updateError } = await supabase
+           .from('podcast_shows')
+           .update({ thumbnail_url: generatedImageUrl })
+           .eq('id', showWithoutThumb.id);
+ 
+         if (!updateError) {
+           updatedPodcastId = showWithoutThumb.id;
+           console.log("Auto-attached to podcast:", showWithoutThumb.id);
+         }
+       }
+     }
+ 
+     return new Response(
+       JSON.stringify({ 
+         success: true,
+         imageUrl: generatedImageUrl,
+         prompt: fanArtPrompt,
+         trendingTopics,
+         updatedPodcastId,
+         generatedAt: new Date().toISOString()
+       }),
        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
      );
  

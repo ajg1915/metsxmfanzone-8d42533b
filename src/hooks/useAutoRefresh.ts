@@ -2,20 +2,11 @@ import { useEffect } from 'react';
 
 export const useAutoRefresh = () => {
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        window.location.reload();
-      }
-    };
-
-    // Only add listener after a short delay so the initial page load doesn't trigger it
-    const timeout = setTimeout(() => {
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-    }, 3000);
-
-    return () => {
-      clearTimeout(timeout);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
+    // Disabled auto-refresh on service worker updates
+    // Content updates via Supabase realtime subscriptions instead
+    // Users can manually refresh if needed - no more constant page reloads
+    
+    // The service worker still caches assets for offline/performance,
+    // but won't force page reloads when updated
   }, []);
 };

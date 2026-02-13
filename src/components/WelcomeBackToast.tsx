@@ -134,11 +134,11 @@ export const WelcomeBackToast = () => {
         } else if (newContent.liveStreams.length > 0) {
           toast(
             <div className="flex items-center gap-3">
-              <div className="bg-[#ff4500]/20 p-2 rounded-full">
-                <Radio className="h-5 w-5 text-[#ff4500]" />
+              <div className="bg-[#002D72]/20 p-2 rounded-full">
+                <Radio className="h-5 w-5 text-[#002D72]" />
               </div>
               <div>
-                <p className="font-bold text-[#ff4500]">Upcoming Stream</p>
+                <p className="font-bold text-[#002D72]">Upcoming Stream</p>
                 <p className="text-sm">{aiMessage || newContent.liveStreams[0].title}</p>
               </div>
             </div>,

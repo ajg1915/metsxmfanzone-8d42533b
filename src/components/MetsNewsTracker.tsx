@@ -63,21 +63,21 @@ const MetsNewsTracker = () => {
           icon: TrendingUp,
           label: "NEW SIGNING",
           color: "bg-green-500/90 hover:bg-green-600/90",
-          iconBg: "bg-green-500"
+          iconBg: "bg-green-500",
         };
       case "traded":
         return {
           icon: Users,
           label: "TRADE NEWS",
           color: "bg-blue-500/90 hover:bg-blue-600/90",
-          iconBg: "bg-blue-500"
+          iconBg: "bg-blue-500",
         };
       case "injury":
         return {
           icon: AlertCircle,
           label: "INJURY UPDATE",
           color: "bg-red-500/90 hover:bg-red-600/90",
-          iconBg: "bg-red-500"
+          iconBg: "bg-red-500",
         };
       default:
         return { icon: Newspaper, label: "MLB NEWS", color: "bg-primary/90 hover:bg-primary", iconBg: "bg-primary" };
@@ -93,8 +93,8 @@ const MetsNewsTracker = () => {
             <p className="text-muted-foreground">Loading MLB news...</p>
           </div>
         </div>
-      </section>);
-
+      </section>
+    );
   }
 
   if (error) {
@@ -108,8 +108,8 @@ const MetsNewsTracker = () => {
             Try Again
           </Button>
         </div>
-      </section>);
-
+      </section>
+    );
   }
 
   if (newsItems.length === 0) return null;
@@ -126,8 +126,8 @@ const MetsNewsTracker = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-8 sm:mb-10 md:mb-12">
-
+          className="text-center mb-8 sm:mb-10 md:mb-12"
+        >
           <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-4 py-2 glass-card rounded-full">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
             <span className="text-xs sm:text-sm font-semibold text-primary uppercase tracking-wider">
@@ -136,54 +136,54 @@ const MetsNewsTracker = () => {
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">MLB Live Tracker</h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mb-2">
-            ​Real-Time Articles that Anthony is Linked too              
+            Real-time news, signings, trades, and updates from around the league
           </p>
 
-          {lastUpdated &&
-          <p className="text-xs text-muted-foreground mt-2">Last updated: {lastUpdated.toLocaleTimeString()}</p>
-          }
+          {lastUpdated && (
+            <p className="text-xs text-muted-foreground mt-2">Last updated: {lastUpdated.toLocaleTimeString()}</p>
+          )}
         </motion.div>
 
         {/* Featured First News Item */}
         {filteredNews.length > 0 &&
-        (() => {
-          const featuredItem = filteredNews[0];
-          const featuredConfig = getTypeConfig(featuredItem.type);
-          const FeaturedIcon = featuredConfig.icon;
+          (() => {
+            const featuredItem = filteredNews[0];
+            const featuredConfig = getTypeConfig(featuredItem.type);
+            const FeaturedIcon = featuredConfig.icon;
 
-          return (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              onClick={() => featuredItem.link && window.open(featuredItem.link, "_blank")}
-              className={`glass-card hover-lift glow-blue rounded-xl sm:rounded-2xl overflow-hidden group mb-4 sm:mb-6 ${featuredItem.link ? "cursor-pointer" : ""}`}
-              role={featuredItem.link ? "button" : undefined}
-              tabIndex={featuredItem.link ? 0 : undefined}
-              onKeyDown={(e) => e.key === "Enter" && featuredItem.link && window.open(featuredItem.link, "_blank")}>
-
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                onClick={() => featuredItem.link && window.open(featuredItem.link, "_blank")}
+                className={`glass-card hover-lift glow-blue rounded-xl sm:rounded-2xl overflow-hidden group mb-4 sm:mb-6 ${featuredItem.link ? "cursor-pointer" : ""}`}
+                role={featuredItem.link ? "button" : undefined}
+                tabIndex={featuredItem.link ? 0 : undefined}
+                onKeyDown={(e) => e.key === "Enter" && featuredItem.link && window.open(featuredItem.link, "_blank")}
+              >
                 <div className="flex flex-col md:flex-row">
                   <div className="relative w-full md:w-1/3 aspect-[16/9] md:aspect-auto">
                     <img
-                    src={featuredItem.image_url}
-                    alt={featuredItem.player}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png";
-                    }} />
-
+                      src={featuredItem.image_url}
+                      alt={featuredItem.player}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png";
+                      }}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-card/80" />
                     <div
-                    className={`absolute top-3 left-3 sm:top-4 sm:left-4 p-2 sm:p-2.5 rounded-full ${featuredConfig.iconBg} backdrop-blur-sm`}>
-
+                      className={`absolute top-3 left-3 sm:top-4 sm:left-4 p-2 sm:p-2.5 rounded-full ${featuredConfig.iconBg} backdrop-blur-sm`}
+                    >
                       <FeaturedIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
                     {/* Mobile overlay content */}
                     <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:hidden">
                       <Badge
-                      className={`mb-2 text-[10px] sm:text-xs ${featuredConfig.color} text-white backdrop-blur-sm`}>
-
+                        className={`mb-2 text-[10px] sm:text-xs ${featuredConfig.color} text-white backdrop-blur-sm`}
+                      >
                         {featuredConfig.label}
                       </Badge>
                       <h3 className="text-base sm:text-lg font-bold text-white line-clamp-2 drop-shadow-lg">
@@ -206,12 +206,12 @@ const MetsNewsTracker = () => {
                         <Clock className="w-4 h-4" />
                         {featuredItem.time_ago}
                       </div>
-                      {featuredItem.link &&
-                    <div className="flex items-center gap-1 text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                      {featuredItem.link && (
+                        <div className="flex items-center gap-1 text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
                           <span>Read full story</span>
                           <ExternalLink className="w-4 h-4" />
                         </div>
-                    }
+                      )}
                     </div>
                   </div>
                   {/* Mobile bottom bar */}
@@ -225,9 +225,9 @@ const MetsNewsTracker = () => {
                     </div>
                   </div>
                 </div>
-              </motion.div>);
-
-        })()}
+              </motion.div>
+            );
+          })()}
 
         {/* Remaining News Items - Compact Grid */}
         <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -246,8 +246,8 @@ const MetsNewsTracker = () => {
                 className={`glass-card hover-lift rounded-xl overflow-hidden group ${item.link ? "cursor-pointer" : ""}`}
                 role={item.link ? "button" : undefined}
                 tabIndex={item.link ? 0 : undefined}
-                onKeyDown={(e) => e.key === "Enter" && item.link && window.open(item.link, "_blank")}>
-
+                onKeyDown={(e) => e.key === "Enter" && item.link && window.open(item.link, "_blank")}
+              >
                 <div className="flex gap-3 p-3">
                   <div className="relative flex-shrink-0">
                     <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-primary/20 group-hover:border-primary/40 transition-colors">
@@ -257,12 +257,12 @@ const MetsNewsTracker = () => {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png";
-                        }} />
-
+                        }}
+                      />
                     </div>
                     <div
-                      className={`absolute -top-1 -right-1 p-1.5 rounded-full ${typeConfig.iconBg} backdrop-blur-sm`}>
-
+                      className={`absolute -top-1 -right-1 p-1.5 rounded-full ${typeConfig.iconBg} backdrop-blur-sm`}
+                    >
                       <IconComponent className="w-3 h-3 text-white" />
                     </div>
                   </div>
@@ -280,8 +280,8 @@ const MetsNewsTracker = () => {
                     </div>
                   </div>
                 </div>
-              </motion.div>);
-
+              </motion.div>
+            );
           })}
         </div>
 
@@ -290,16 +290,16 @@ const MetsNewsTracker = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-8 sm:mt-10 text-center">
-
+          className="mt-8 sm:mt-10 text-center"
+        >
           <Button onClick={fetchNewsItems} variant="outline" size="sm" className="gap-2 glass-card">
             <RefreshCw className="w-4 h-4" />
             Refresh News
           </Button>
         </motion.div>
       </div>
-    </section>);
-
+    </section>
+  );
 };
 
 export default MetsNewsTracker;

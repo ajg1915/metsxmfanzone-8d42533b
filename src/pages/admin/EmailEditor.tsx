@@ -555,7 +555,7 @@ export default function EmailEditor() {
   };
 
   return (
-    <div className="max-w-full px-1 sm:px-2 md:px-4 py-2 sm:py-3 md:py-6 overflow-x-hidden">
+    <div className="container mx-auto max-w-5xl px-3 sm:px-4 py-4 sm:py-6">
       <div className="mb-4 sm:mb-6">
         <h2 className="text-xl sm:text-2xl font-bold mb-1">Email Editor</h2>
         <p className="text-xs sm:text-sm text-muted-foreground">

@@ -127,10 +127,10 @@ export default function UserRoles() {
   };
 
   return (
-    <div className="w-full max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
-      <h2 className="text-base sm:text-lg font-bold mb-3">User Roles Management</h2>
+    <div className="container mx-auto max-w-7xl px-4 py-6">
+      <h2 className="text-3xl font-bold mb-6">User Roles Management</h2>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

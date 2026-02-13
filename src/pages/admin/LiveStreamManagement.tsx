@@ -264,7 +264,7 @@ export default function LiveStreamManagement() {
   };
 
   return (
-    <div className="max-w-full px-1 sm:px-2 py-2 sm:py-3 overflow-x-hidden">
+    <div className="max-w-7xl mx-auto px-2 py-3">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-lg font-bold">Live Stream Management</h1>
         <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>

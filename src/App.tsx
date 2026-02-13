@@ -22,7 +22,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Index from "./pages/Index";
 import Maintenance from "./pages/Maintenance";
 import Auth from "./pages/Auth";
-import Navigation from "./components/Navigation";
 
 // Lazy load all other pages
 const Community = lazy(() => import("./pages/Community"));
@@ -138,7 +137,6 @@ const TalentAssessmentManagement = lazy(() => import("./pages/admin/TalentAssess
 const PollManagement = lazy(() => import("./pages/admin/PollManagement"));
 const SocialMediaSettings = lazy(() => import("./pages/admin/SocialMediaSettings"));
 const WhatsNew = lazy(() => import("./pages/WhatsNew"));
-const PlayerParlays = lazy(() => import("./pages/PlayerParlays"));
 const Install = lazy(() => import("./pages/Install"));
 const MetsVsAstros = lazy(() => import("./pages/matchups/MetsVsAstros"));
 const MetsVsBraves = lazy(() => import("./pages/matchups/MetsVsBraves"));
@@ -262,10 +260,6 @@ const AppContent = () => {
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isAuthRoute = location.pathname === "/auth" || location.pathname === "/logout";
   const isMaintenancePreview = location.pathname === "/maintenance-preview";
-  const isTVRoute = location.pathname.startsWith("/tv");
-  const isWriterAuthRoute = location.pathname === "/writer-auth" || location.pathname === "/writer-register";
-  const isCheckoutRoute = location.pathname === "/helcim-checkout";
-  const showNavigation = !isAdminRoute && !isTVRoute && !isMaintenancePreview && !isCheckoutRoute && !(maintenanceEnabled && !isAdminRoute && !isAuthRoute);
 
   // Show maintenance page for non-admin routes when enabled (or preview route)
   if (isMaintenancePreview) {
@@ -278,8 +272,7 @@ const AppContent = () => {
   
   return (
     <TooltipProvider>
-     <PullToRefresh>
-        {showNavigation && <Navigation />}
+      <PullToRefresh>
         <Toaster />
         <Sonner />
         {/* LiveStreamToast removed per user request */}
@@ -340,7 +333,6 @@ const AppContent = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/whats-new" element={<WhatsNew />} />
-            <Route path="/parlays" element={<PlayerParlays />} />
             <Route path="/install" element={<Install />} />
             <Route path="/podcast" element={<Podcast />} />
             <Route path="/community-podcast" element={<CommunityPodcast />} />

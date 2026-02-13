@@ -25,22 +25,14 @@ import { format } from "date-fns";
 const STAR_PLAYERS = [
   { id: 596019, name: "Francisco Lindor" },
   { id: 665742, name: "Juan Soto" },
+  { id: 607043, name: "Brandon Nimmo" },
+  { id: 643446, name: "Jeff McNeil" },
   { id: 668901, name: "Mark Vientos" },
   { id: 682626, name: "Francisco Alvarez" },
-  { id: 673357, name: "Luis Robert Jr." },
-  { id: 543760, name: "Marcus Semien" },
-  { id: 666182, name: "Bo Bichette" },
-  { id: 669004, name: "MJ Melendez" },
-  { id: 593871, name: "Jorge Polanco" },
-  { id: 683146, name: "Brett Baty" },
-  { id: 673540, name: "Kodai Senga" },
+  { id: 516782, name: "Starling Marte" },
+  { id: 673085, name: "Kodai Senga" },
+  { id: 621242, name: "Edwin Diaz" },
   { id: 640455, name: "Sean Manaea" },
-  { id: 642547, name: "Freddy Peralta" },
-  { id: 605280, name: "Clay Holmes" },
-  { id: 642207, name: "Devin Williams" },
-  { id: 596133, name: "Luke Weaver" },
-  { id: 656849, name: "David Peterson" },
-  { id: 681035, name: "Christian Scott" },
 ];
 
 interface Prediction {

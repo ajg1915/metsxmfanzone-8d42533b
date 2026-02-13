@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import SEOHead from "@/components/SEOHead";
-
+import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import LiveGameTicker from "@/components/LiveGameTicker";
 import Footer from "@/components/Footer";
@@ -14,7 +14,6 @@ const ImmersiveBackground = lazy(() => import("@/components/ImmersiveBackground"
 const LiveNotificationBar = lazy(() => import("@/components/LiveNotificationBar"));
 const LiveNetworks = lazy(() => import("@/components/LiveNetworks"));
 const LiveStreamsSection = lazy(() => import("@/components/LiveStreamsSection"));
-const SeasonalVideoSection = lazy(() => import("@/components/SeasonalVideoSection"));
 
 const SpringTraining = lazy(() => import("@/components/SpringTraining"));
 const PlayersToWatch = lazy(() => import("@/components/PlayersToWatch"));
@@ -167,17 +166,16 @@ const Index = () => {
         pageType="home"
         breadcrumbs={[{ name: "Home", url: "/" }]}
       />
-      
+      <Navigation />
       <LiveGameTicker />
+      <Suspense fallback={null}>
+        <GameAlertsBanner />
+      </Suspense>
       <main className="pt-14 sm:pt-16 relative z-10">
         <Hero />
         
         <Suspense fallback={null}>
           <LiveNotificationBar />
-        </Suspense>
-
-        <Suspense fallback={null}>
-          <GameAlertsBanner />
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton height="h-32" />}>
@@ -190,10 +188,6 @@ const Index = () => {
 
         <Suspense fallback={<SectionSkeleton />}>
           <LiveStreamsSection />
-        </Suspense>
-
-        <Suspense fallback={<SectionSkeleton />}>
-          <SeasonalVideoSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
@@ -212,6 +206,10 @@ const Index = () => {
           <CommunityPreviewSection />
         </Suspense>
 
+        <Suspense fallback={<SectionSkeleton />}>
+          <PodcastScheduleSection />
+        </Suspense>
+
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
@@ -228,10 +226,6 @@ const Index = () => {
 
         <Suspense fallback={<SectionSkeleton />}>
           <TalentAssessmentSection />
-        </Suspense>
-
-        <Suspense fallback={<SectionSkeleton />}>
-          <PodcastScheduleSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />

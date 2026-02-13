@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit, Upload, Sparkles, Film, Download, RefreshCw, ImagePlus } from "lucide-react";
+import { Trash2, Plus, Edit, Upload, Sparkles, Film, Download, RefreshCw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -46,9 +46,6 @@ export default function VideoGalleryManagement() {
   const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
   const [generatingGif, setGeneratingGif] = useState(false);
   const [fetchingMLBHighlights, setFetchingMLBHighlights] = useState(false);
-  const [extractedFrames, setExtractedFrames] = useState<string[]>([]);
-  const [extractingFrames, setExtractingFrames] = useState(false);
-  const [generatingDescription, setGeneratingDescription] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<'file' | 'youtube' | 'link'>('file');
   const [formData, setFormData] = useState({
     title: "",
@@ -142,113 +139,6 @@ export default function VideoGalleryManagement() {
     }
   };
 
-  const extractYouTubeVideoId = (url: string): string | null => {
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
-    ];
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match) return match[1];
-    }
-    return null;
-  };
-
-  const extractFramesFromYouTube = async (url: string) => {
-    setExtractingFrames(true);
-    setExtractedFrames([]);
-    try {
-      const videoId = extractYouTubeVideoId(url);
-      if (!videoId) throw new Error('Invalid YouTube URL');
-
-      // YouTube provides these thumbnail variants for every video
-      const thumbUrls = [
-        `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-        `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,
-        `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-        `https://img.youtube.com/vi/${videoId}/0.jpg`,
-        `https://img.youtube.com/vi/${videoId}/1.jpg`,
-        `https://img.youtube.com/vi/${videoId}/2.jpg`,
-        `https://img.youtube.com/vi/${videoId}/3.jpg`,
-      ];
-
-      // Check which thumbnails actually exist (maxres may not exist for all videos)
-      const validFrames: string[] = [];
-      await Promise.all(
-        thumbUrls.map(async (thumbUrl) => {
-          try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            await new Promise<void>((resolve, reject) => {
-              img.onload = () => {
-                // YouTube returns a tiny grey placeholder (120x90) for missing thumbs
-                if (img.naturalWidth > 120) validFrames.push(thumbUrl);
-                resolve();
-              };
-              img.onerror = () => resolve(); // skip failed ones
-              img.src = thumbUrl;
-            });
-          } catch {}
-        })
-      );
-
-      // Sort to maintain original order
-      const ordered = thumbUrls.filter(u => validFrames.includes(u));
-      setExtractedFrames(ordered);
-      toast({ title: `${ordered.length} YouTube frames found`, description: "Select one as your thumbnail." });
-    } catch (error: any) {
-      toast({ title: "Failed to extract YouTube frames", description: error.message, variant: "destructive" });
-    } finally {
-      setExtractingFrames(false);
-    }
-  };
-
-  const extractFramesFromVideo = async (file: File) => {
-    setExtractingFrames(true);
-    setExtractedFrames([]);
-    try {
-      const video = document.createElement('video');
-      video.preload = 'auto';
-      video.muted = true;
-      video.src = URL.createObjectURL(file);
-
-      await new Promise<void>((resolve, reject) => {
-        video.onloadedmetadata = () => resolve();
-        video.onerror = () => reject(new Error('Failed to load video'));
-      });
-
-      const duration = video.duration;
-      const frameCount = 6;
-      const times = Array.from({ length: frameCount }, (_, i) =>
-        Math.min(duration * ((i + 1) / (frameCount + 1)), duration - 0.1)
-      );
-
-      const frames: string[] = [];
-      for (const time of times) {
-        video.currentTime = time;
-        await new Promise<void>((resolve) => {
-          video.onseeked = () => resolve();
-        });
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          frames.push(canvas.toDataURL('image/jpeg', 0.85));
-        }
-      }
-
-      URL.revokeObjectURL(video.src);
-      setExtractedFrames(frames);
-      toast({ title: `${frames.length} frames extracted`, description: "Select one as your thumbnail." });
-    } catch (error: any) {
-      console.error('Frame extraction error:', error);
-      toast({ title: "Failed to extract frames", description: error.message, variant: "destructive" });
-    } finally {
-      setExtractingFrames(false);
-    }
-  };
-
   const fetchMLBHighlights = async () => {
     setFetchingMLBHighlights(true);
     try {
@@ -293,77 +183,87 @@ export default function VideoGalleryManagement() {
       // Handle file upload method
       if (uploadMethod === 'file' && videoFile) {
         const fileExt = videoFile.name.split('.').pop();
-        const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExt}`;
-        const objectUrl = URL.createObjectURL(videoFile);
+        const fileName = `${Math.random()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('videos')
+          .upload(fileName, videoFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
-        // Build all promises to run in parallel
-        const promises: Promise<any>[] = [];
+        if (uploadError) throw uploadError;
 
-        // 1. Upload video file
-        promises.push(
-          supabase.storage
-            .from('videos')
-            .upload(fileName, videoFile, { cacheControl: '3600', upsert: false })
-        );
+        const { data: { publicUrl } } = supabase.storage
+          .from('videos')
+          .getPublicUrl(fileName);
 
-        // 2. Get duration from object URL (fast, no re-read)
-        promises.push(
-          new Promise<number>((resolve) => {
-            const vid = document.createElement('video');
-            vid.preload = 'metadata';
-            vid.onloadedmetadata = () => { resolve(Math.round(vid.duration)); };
-            vid.onerror = () => resolve(0);
-            vid.src = objectUrl;
-          })
-        );
+        videoUrl = publicUrl;
 
-        // 3. Thumbnail: use provided file, already-set URL, or auto-generate from video
-        const needsAutoThumb = !thumbnailUrl && !thumbnailFile;
+        const videoElement = document.createElement('video');
+        videoElement.preload = 'metadata';
+        videoElement.onloadedmetadata = () => {
+          duration = Math.round(videoElement.duration);
+        };
+        videoElement.src = URL.createObjectURL(videoFile);
+
         if (thumbnailFile) {
-          const thumbName = `thumb_${Date.now()}.${thumbnailFile.name.split('.').pop()}`;
-          promises.push(
-            supabase.storage.from('videos').upload(thumbName, thumbnailFile)
-              .then(({ error }) => {
-                if (error) throw error;
-                return supabase.storage.from('videos').getPublicUrl(thumbName).data.publicUrl;
-              })
-          );
-        } else if (needsAutoThumb) {
-          // Auto-generate thumbnail in parallel using the same object URL
-          promises.push(
-            new Promise<string>((resolve, reject) => {
-              const vid2 = document.createElement('video');
-              vid2.preload = 'auto';
-              vid2.muted = true;
-              vid2.onloadedmetadata = () => { vid2.currentTime = 1; };
-              vid2.onseeked = () => {
-                const c = document.createElement('canvas');
-                c.width = vid2.videoWidth;
-                c.height = vid2.videoHeight;
-                c.getContext('2d')!.drawImage(vid2, 0, 0, c.width, c.height);
-                c.toBlob(async (blob) => {
-                  if (!blob) { resolve(''); return; }
-                  const name = `thumb_auto_${Date.now()}.jpg`;
-                  const { error } = await supabase.storage.from('videos').upload(name, blob);
-                  resolve(error ? '' : supabase.storage.from('videos').getPublicUrl(name).data.publicUrl);
-                }, 'image/jpeg', 0.8);
-              };
-              vid2.onerror = () => resolve('');
-              vid2.src = objectUrl;
-            })
-          );
+          const thumbExt = thumbnailFile.name.split('.').pop();
+          const thumbName = `thumb_${Math.random()}.${thumbExt}`;
+          const { error: thumbError } = await supabase.storage
+            .from('videos')
+            .upload(thumbName, thumbnailFile);
+
+          if (thumbError) throw thumbError;
+
+          const { data: { publicUrl: thumbUrl } } = supabase.storage
+            .from('videos')
+            .getPublicUrl(thumbName);
+
+          thumbnailUrl = thumbUrl;
         } else {
-          promises.push(Promise.resolve(null)); // placeholder
+          setGeneratingThumbnail(true);
+          try {
+            const thumbDataUrl = await generateThumbnailFromVideo(videoFile);
+            const thumbBlob = await fetch(thumbDataUrl).then(r => r.blob());
+            const thumbName = `thumb_${Math.random()}.jpg`;
+            
+            const { error: thumbError } = await supabase.storage
+              .from('videos')
+              .upload(thumbName, thumbBlob);
+
+            if (thumbError) throw thumbError;
+
+            const { data: { publicUrl: thumbUrl } } = supabase.storage
+              .from('videos')
+              .getPublicUrl(thumbName);
+
+            thumbnailUrl = thumbUrl;
+          } catch (error) {
+            console.error('Error generating thumbnail:', error);
+          } finally {
+            setGeneratingThumbnail(false);
+          }
         }
+      }
 
-        const [uploadResult, dur, thumbUrl] = await Promise.all(promises);
-        URL.revokeObjectURL(objectUrl);
-
-        if (uploadResult.error) throw uploadResult.error;
-
-        videoUrl = supabase.storage.from('videos').getPublicUrl(fileName).data.publicUrl;
-        duration = dur;
-        if (thumbUrl) thumbnailUrl = thumbUrl;
+      // Auto-generate GIF preview for highlight videos
+      const isHighlight = formData.video_type === 'highlight';
+      const needsGif = isHighlight && !thumbnailGifUrl && videoUrl;
+      
+      if (needsGif) {
+        toast({
+          title: "Generating preview",
+          description: "Creating animated preview for your highlight...",
+        });
+        
+        const gifUrl = await generateGifPreview(videoUrl);
+        if (gifUrl) {
+          thumbnailGifUrl = gifUrl;
+          toast({
+            title: "Preview generated",
+            description: "Animated preview created successfully!",
+          });
+        }
       }
 
       if (editingVideo) {
@@ -473,7 +373,6 @@ export default function VideoGalleryManagement() {
     setVideoFile(null);
     setThumbnailFile(null);
     setUploadMethod('file');
-    setExtractedFrames([]);
   };
 
   if (loading) {
@@ -588,7 +487,7 @@ export default function VideoGalleryManagement() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="thumbnail-url">Thumbnail URL (or select from frames below)</Label>
+                    <Label htmlFor="thumbnail-url">Thumbnail URL</Label>
                     <Input
                       id="thumbnail-url"
                       value={formData.thumbnail_url}
@@ -596,125 +495,10 @@ export default function VideoGalleryManagement() {
                         setFormData({ ...formData, thumbnail_url: e.target.value })
                       }
                       placeholder="https://..."
+                      required
                     />
                   </div>
                 </>
-              )}
-
-              {/* Video Frame Thumbnail Selector */}
-              {(videoFile || extractedFrames.length > 0 || (uploadMethod === 'youtube' && formData.video_url)) && (
-                <div className="space-y-2 border border-dashed border-primary/30 rounded-lg p-3 bg-primary/5">
-                  <Label className="flex items-center gap-1.5 text-primary">
-                    <ImagePlus className="w-4 h-4" />
-                    Select Thumbnail from Video
-                  </Label>
-                  {/* File-based extraction */}
-                  {uploadMethod === 'file' && videoFile && extractedFrames.length === 0 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      disabled={extractingFrames}
-                      onClick={() => extractFramesFromVideo(videoFile)}
-                    >
-                      {extractingFrames ? (
-                        <>
-                          <Film className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                          Extracting Frames...
-                        </>
-                      ) : (
-                        <>
-                          <Film className="mr-1.5 h-3.5 w-3.5" />
-                          Extract Frames from Video
-                        </>
-                      )}
-                    </Button>
-                  )}
-                  {/* YouTube extraction */}
-                  {uploadMethod === 'youtube' && formData.video_url && extractedFrames.length === 0 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      disabled={extractingFrames}
-                      onClick={() => extractFramesFromYouTube(formData.video_url)}
-                    >
-                      {extractingFrames ? (
-                        <>
-                          <Film className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                          Fetching YouTube Frames...
-                        </>
-                      ) : (
-                        <>
-                          <Film className="mr-1.5 h-3.5 w-3.5" />
-                          Extract Frames from YouTube
-                        </>
-                      )}
-                    </Button>
-                  )}
-                  {extractedFrames.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2">
-                      {extractedFrames.map((frame, idx) => {
-                        const isYouTubeFrame = frame.startsWith('https://img.youtube.com');
-                        return (
-                          <button
-                            key={idx}
-                            type="button"
-                            className={`relative rounded-md overflow-hidden border-2 transition-all hover:scale-105 ${
-                              formData.thumbnail_url === frame
-                                ? 'border-primary ring-2 ring-primary/40'
-                                : 'border-transparent hover:border-primary/50'
-                            }`}
-                            onClick={async () => {
-                              if (isYouTubeFrame) {
-                                // YouTube frames are direct URLs - use as-is
-                                setFormData(prev => ({ ...prev, thumbnail_url: frame }));
-                                toast({ title: "Thumbnail selected!" });
-                              } else {
-                                // File-based frames need uploading
-                                try {
-                                  const blob = await fetch(frame).then(r => r.blob());
-                                  const thumbName = `thumb_frame_${Date.now()}_${idx}.jpg`;
-                                  const { error } = await supabase.storage.from('videos').upload(thumbName, blob);
-                                  if (error) throw error;
-                                  const { data: { publicUrl } } = supabase.storage.from('videos').getPublicUrl(thumbName);
-                                  setFormData(prev => ({ ...prev, thumbnail_url: publicUrl }));
-                                  toast({ title: "Thumbnail selected!" });
-                                } catch (err: any) {
-                                  toast({ title: "Upload failed", description: err.message, variant: "destructive" });
-                                }
-                              }
-                            }}
-                          >
-                            <img src={frame} alt={`Frame ${idx + 1}`} className="w-full aspect-video object-cover" />
-                            <span className="absolute bottom-1 right-1 bg-background/80 text-[10px] px-1 rounded">
-                              Frame {idx + 1}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                  {extractedFrames.length > 0 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="w-full text-xs"
-                      onClick={() => setExtractedFrames([])}
-                    >
-                      <RefreshCw className="mr-1 h-3 w-3" /> Re-extract Frames
-                    </Button>
-                  )}
-                  {formData.thumbnail_url && (
-                    <div className="mt-2">
-                      <p className="text-xs text-muted-foreground mb-1">Selected thumbnail:</p>
-                      <img src={formData.thumbnail_url} alt="Selected thumbnail" className="w-full h-32 object-cover rounded-md" />
-                    </div>
-                  )}
-                </div>
               )}
 
               <div className="space-y-2">
@@ -730,38 +514,7 @@ export default function VideoGalleryManagement() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="description">Description</Label>
-                  {formData.thumbnail_url && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-7 text-xs gap-1"
-                      disabled={generatingDescription}
-                      onClick={async () => {
-                        setGeneratingDescription(true);
-                        try {
-                          const { data, error } = await supabase.functions.invoke('describe-video-thumbnail', {
-                            body: { imageUrl: formData.thumbnail_url },
-                          });
-                          if (error) throw error;
-                          if (data?.description) {
-                            setFormData(prev => ({ ...prev, description: data.description }));
-                            toast({ title: "AI description generated!" });
-                          }
-                        } catch (err: any) {
-                          toast({ title: "Failed to generate description", description: err.message, variant: "destructive" });
-                        } finally {
-                          setGeneratingDescription(false);
-                        }
-                      }}
-                    >
-                      <Sparkles className="h-3 w-3" />
-                      {generatingDescription ? "Generating..." : "AI Describe"}
-                    </Button>
-                  )}
-                </div>
+                <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
                   value={formData.description}

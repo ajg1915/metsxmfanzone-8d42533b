@@ -210,7 +210,7 @@ export default function SpringTrainingManagement() {
   };
 
   return (
-    <div className="w-full max-w-full py-2 sm:py-6 overflow-x-hidden">
+    <div className="w-full max-w-full px-2 sm:px-4 py-4 sm:py-6 overflow-x-hidden">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold">Spring Training</h2>

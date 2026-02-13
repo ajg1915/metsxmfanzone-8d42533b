@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
 import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles, Tv, ChevronDown } from "lucide-react";
@@ -35,7 +34,6 @@ import {
 } from "@/components/ui/collapsible";
 
 const Navigation = () => {
-  // Navigation is always visible
   const { user, signOut } = useAuth();
   const { tier } = useSubscription();
   const navigate = useNavigate();
@@ -113,22 +111,10 @@ const Navigation = () => {
     }
   };
 
-  const [navRoot, setNavRoot] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const el = document.getElementById("nav-root");
-    if (el) {
-      // Clear any stale portal content to prevent duplicates
-      el.innerHTML = '';
-      setNavRoot(el);
-    }
-  }, []);
-
   return (
     <>
       <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
-      {navRoot ? createPortal(
-      <nav className="glass-nav w-full">
+      <nav className="fixed top-0 left-0 right-0 z-50 glass-nav">
         <div className="container mx-auto px-3 sm:px-4">
         <div className="flex items-center justify-between h-12">
           <div className="flex items-center gap-2">
@@ -189,14 +175,14 @@ const Navigation = () => {
                     onClick={() => navigate("/broadcast-schedule")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                    <Tv className="w-4 h-4" />
                     Live Games
                   </button>
                   <button
                     onClick={() => handleProtectedNavigation("/spring-training-live")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                    <CalendarDays className="w-4 h-4" />
                     Spring Training
                   </button>
                 </div>
@@ -214,14 +200,14 @@ const Navigation = () => {
                     onClick={() => handleProtectedNavigation("/community")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                    <Users className="w-4 h-4" />
                     Fan Community
                   </button>
                   <button
                     onClick={() => handleProtectedNavigation("/events")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
-                    <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                    <CalendarDays className="w-4 h-4" />
                     Events
                   </button>
                   <button
@@ -369,7 +355,7 @@ const Navigation = () => {
                         className="flex items-center gap-3 w-full text-foreground hover:text-primary hover:bg-primary/10 transition-all py-2.5 px-3 rounded-xl text-left"
                       >
                         <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                          <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                          <Users className="w-4 h-4 text-blue-500" />
                         </div>
                         <span className="font-medium text-sm">Roster</span>
                       </button>
@@ -381,7 +367,7 @@ const Navigation = () => {
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                          <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                          <Shield className="w-4 h-4 text-orange-500" />
                         </div>
                         <span className="font-medium text-sm">Pricing</span>
                       </NavLink>
@@ -394,7 +380,7 @@ const Navigation = () => {
                       <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-xl hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                            <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                            <Tv className="w-4 h-4 text-blue-500" />
                           </div>
                           <span className="font-medium text-sm">TV Schedule</span>
                         </div>
@@ -433,7 +419,7 @@ const Navigation = () => {
                       <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 rounded-xl hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                            <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                            <Users className="w-4 h-4 text-orange-500" />
                           </div>
                           <span className="font-medium text-sm">Community</span>
                         </div>
@@ -503,7 +489,7 @@ const Navigation = () => {
                           className="flex items-center gap-3 w-full text-foreground hover:text-primary hover:bg-primary/10 transition-all py-2.5 px-3 rounded-xl text-left"
                         >
                           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                            <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                            <LayoutDashboard className="w-4 h-4 text-primary" />
                           </div>
                           <span className="font-medium text-sm">Dashboard</span>
                         </button>
@@ -517,7 +503,7 @@ const Navigation = () => {
                               className="flex items-center gap-3 w-full text-foreground hover:text-primary hover:bg-primary/10 transition-all py-2.5 px-3 rounded-xl text-left"
                             >
                               <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                                <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                                <Sparkles className="w-4 h-4 text-purple-500" />
                               </div>
                               <span className="font-medium text-sm">Admin Stories</span>
                             </button>
@@ -529,7 +515,7 @@ const Navigation = () => {
                               className="flex items-center gap-3 w-full text-foreground hover:text-primary hover:bg-primary/10 transition-all py-2.5 px-3 rounded-xl text-left"
                             >
                               <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
-                                <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                                <Shield className="w-4 h-4 text-red-500" />
                               </div>
                               <span className="font-medium text-sm">Admin Portal</span>
                             </button>
@@ -542,7 +528,7 @@ const Navigation = () => {
                           className="flex items-center gap-3 w-full text-destructive hover:bg-destructive/10 transition-all py-2.5 px-3 rounded-xl text-left"
                         >
                           <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
-                            <img src={logo} alt="" className="w-4 h-4 object-contain" />
+                            <LogOut className="w-4 h-4 text-destructive" />
                           </div>
                           <span className="font-medium text-sm">Sign Out</span>
                         </button>
@@ -577,9 +563,7 @@ const Navigation = () => {
           </div>
         </div>
       </div>
-    </nav>,
-      navRoot
-      ) : null}
+    </nav>
     </>
   );
 };
