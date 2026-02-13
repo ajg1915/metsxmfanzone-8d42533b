@@ -10,8 +10,8 @@ const corsHeaders = {
 
 // Server-side plan pricing - never trust client
 const PLAN_PRICES: Record<string, number> = {
-  'premium': 9.99,
-  'annual': 99.99,
+  'premium': 12.99,
+  'annual': 129.99,
 };
 
 Deno.serve(async (req: Request) => {

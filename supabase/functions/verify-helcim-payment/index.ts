@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     const token = authHeader.replace('Bearer ', '').trim();
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
 
     // Send confirmation email
     try {
-      const amount = subscription.plan_type === 'annual' ? '99.99' : '9.99';
+      const amount = subscription.plan_type === 'annual' ? '129.99' : '12.99';
       await supabase.functions.invoke('send-confirmation-email', {
         body: {
           type: 'subscription',
@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
         body: {
           userId: user.id,
           planType: subscription.plan_type,
-          amount: subscription.plan_type === 'annual' ? '$99.99' : '$9.99',
+          amount: subscription.plan_type === 'annual' ? '$129.99' : '$12.99',
           source: 'Helcim',
         },
       });
