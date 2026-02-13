@@ -22,20 +22,33 @@ div[id^="helcim-pay-js-"] {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
   width: 100vw !important;
+  height: 100vh !important;
   height: 100dvh !important;
   max-width: none !important;
   max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
   z-index: 99999 !important;
   overflow: auto !important;
   -webkit-overflow-scrolling: touch !important;
   background: white !important;
+  border: none !important;
 }
 
 div[id^="helcim-pay-js-"] iframe {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
   width: 100% !important;
   height: 100% !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
   min-height: 100dvh !important;
   border: none !important;
   display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
