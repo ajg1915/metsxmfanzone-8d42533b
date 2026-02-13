@@ -199,8 +199,17 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
       if (data?.checkoutToken && data?.secretToken) {
         sessionStorage.setItem("helcim_checkout_token", data.checkoutToken);
         sessionStorage.setItem("helcim_secret_token", data.secretToken);
-        // Load the iframe directly instead of navigating away
-        await loadHelcimIframe(data.checkoutToken);
+        // Store plan info for the checkout page
+        sessionStorage.setItem("checkout_plan_info", JSON.stringify({
+          name: plan.name,
+          price: plan.price,
+          priceValue: plan.priceValue,
+          period: plan.period,
+          billingNote: plan.billingNote,
+          description: plan.description,
+        }));
+        onOpenChange(false);
+        navigate(`/helcim-checkout?token=${data.checkoutToken}`);
       } else {
         toast({
           title: "Error",
