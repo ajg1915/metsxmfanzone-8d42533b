@@ -27,21 +27,31 @@ const HelcimCheckout = () => {
     }
   }, [checkoutToken, navigate]);
 
+  // Lock body overflow on mount, restore on unmount
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+    };
+  }, []);
+
   useEffect(() => {
     if (!checkoutToken) {
       navigate('/pricing');
       return;
     }
 
-    // Load HelcimPay.js script
     const script = document.createElement('script');
     script.src = 'https://secure.helcim.app/helcim-pay/services/start.js';
     script.async = true;
-    
+
     script.onload = () => {
       setStatus('ready');
-      
-      // Small delay to ensure script is fully initialized
       setTimeout(() => {
         if (typeof window.appendHelcimPayIframe === 'function') {
           window.appendHelcimPayIframe(checkoutToken, true);
@@ -68,11 +78,18 @@ const HelcimCheckout = () => {
     };
   }, [checkoutToken, navigate, handleMessage]);
 
-  // Add CSS to ensure Helcim iframe is visible above everything
+  // Inject CSS to ensure Helcim iframe takes over the full viewport
   useEffect(() => {
     const style = document.createElement('style');
     style.id = 'helcim-checkout-styles';
     style.textContent = `
+      html, body {
+        overflow: hidden !important;
+        height: 100dvh !important;
+      }
+      #nav-root {
+        display: none !important;
+      }
       .helcim-pay-iframe-wrapper,
       .helcim-pay-iframe-wrapper iframe,
       div[id*="helcimPayIframe"] {
@@ -83,6 +100,7 @@ const HelcimCheckout = () => {
         width: 100vw !important;
         height: 100dvh !important;
         border: none !important;
+        background: #fff !important;
       }
     `;
     document.head.appendChild(style);
@@ -93,36 +111,14 @@ const HelcimCheckout = () => {
     };
   }, []);
 
-  return (
-    <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center p-4">
-      {status === 'loading' && (
-        <div className="flex flex-col items-center justify-center space-y-6 max-w-sm text-center">
-          <Loader2 className="w-12 h-12 text-primary animate-spin" />
-          <h2 className="text-xl font-bold text-foreground">Preparing Secure Payment</h2>
-          <p className="text-muted-foreground text-sm">
-            Loading your payment form...
-          </p>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Shield className="w-4 h-4" />
-            <span>256-bit SSL encrypted</span>
-          </div>
-        </div>
-      )}
+  // Once iframe is active, return null so no React content competes
+  if (status === 'ready') {
+    return null;
+  }
 
-      {status === 'ready' && (
-        <div className="flex flex-col items-center justify-center space-y-4 max-w-sm text-center">
-          <CreditCard className="w-10 h-10 text-primary" />
-          <h2 className="text-xl font-bold text-foreground">Complete Your Payment</h2>
-          <p className="text-muted-foreground text-sm">
-            The secure payment form should appear. If it doesn't load, try refreshing.
-          </p>
-          <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
-            Refresh Page
-          </Button>
-        </div>
-      )}
-
-      {status === 'error' && (
+  if (status === 'error') {
+    return (
+      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center p-4">
         <div className="flex flex-col items-center justify-center space-y-4 max-w-sm text-center">
           <AlertCircle className="w-10 h-10 text-destructive" />
           <h2 className="text-xl font-bold text-foreground">Payment Error</h2>
@@ -136,12 +132,25 @@ const HelcimCheckout = () => {
             </Button>
           </div>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center p-4">
+      <div className="flex flex-col items-center justify-center space-y-6 max-w-sm text-center">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+        <h2 className="text-xl font-bold text-foreground">Preparing Secure Payment</h2>
+        <p className="text-muted-foreground text-sm">Loading your payment form...</p>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Shield className="w-4 h-4" />
+          <span>256-bit SSL encrypted</span>
+        </div>
+      </div>
     </div>
   );
 };
 
-// Extend Window interface for TypeScript
 declare global {
   interface Window {
     appendHelcimPayIframe: (checkoutToken: string, allowExit?: boolean) => void;

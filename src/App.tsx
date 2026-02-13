@@ -264,7 +264,8 @@ const AppContent = () => {
   const isMaintenancePreview = location.pathname === "/maintenance-preview";
   const isTVRoute = location.pathname.startsWith("/tv");
   const isWriterAuthRoute = location.pathname === "/writer-auth" || location.pathname === "/writer-register";
-  const showNavigation = !isAdminRoute && !isTVRoute && !isMaintenancePreview && !(maintenanceEnabled && !isAdminRoute && !isAuthRoute);
+  const isCheckoutRoute = location.pathname === "/helcim-checkout";
+  const showNavigation = !isAdminRoute && !isTVRoute && !isMaintenancePreview && !isCheckoutRoute && !(maintenanceEnabled && !isAdminRoute && !isAuthRoute);
 
   // Show maintenance page for non-admin routes when enabled (or preview route)
   if (isMaintenancePreview) {
