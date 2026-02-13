@@ -3,7 +3,7 @@ import { decode } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'",
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
@@ -83,15 +83,8 @@ Deno.serve(async (req) => {
 
     if (!helcimResponse.ok) {
       const errorData = await helcimResponse.text();
-      console.error('Helcim API error:', helcimResponse.status, errorData.substring(0, 200));
+      console.error('Helcim API error:', errorData);
       throw new Error(`Helcim API error: ${helcimResponse.status}`);
-    }
-
-    const contentType = helcimResponse.headers.get('content-type');
-    if (!contentType?.includes('application/json')) {
-      const textBody = await helcimResponse.text();
-      console.error('Helcim returned non-JSON:', contentType, textBody.substring(0, 200));
-      throw new Error('Helcim returned unexpected response format');
     }
 
     const helcimData = await helcimResponse.json();

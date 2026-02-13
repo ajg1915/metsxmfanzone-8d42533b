@@ -75,22 +75,6 @@ const TestimonialsSection = () => {
 
   useEffect(() => {
     fetchTestimonials();
-
-    // Subscribe to realtime changes so new reviews appear automatically
-    const channel = supabase
-      .channel("testimonials-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "feedbacks" },
-        () => {
-          fetchTestimonials();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, []);
 
   const handleSubmitReview = async () => {

@@ -309,7 +309,7 @@ const Hero = () => {
   ];
 
   return (
-    <section className="group/hero relative min-h-[520px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[700px] overflow-hidden">
+    <section className="group/hero relative min-h-[550px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[700px] overflow-hidden">
       {/* Immersive background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div 
@@ -341,7 +341,7 @@ const Hero = () => {
                 pointerEvents: selectedIndex === index ? "auto" : "none",
               }}
             >
-              <div className="relative min-h-[520px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[700px]">
+              <div className="relative min-h-[550px] sm:min-h-[600px] md:min-h-[650px] lg:min-h-[700px]">
                 {/* Background Image with parallax effect */}
                 <div
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -362,7 +362,7 @@ const Hero = () => {
 
                 {/* Content - Left Aligned */}
                 <div
-                  className="absolute inset-0 flex flex-col justify-center px-5 sm:px-8 md:px-12 lg:px-16 xl:px-20 pt-6 pb-32"
+                  className="absolute inset-0 flex flex-col justify-center px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 pt-8 pb-28"
                   style={{
                     opacity: selectedIndex === index ? 1 : 0,
                     transform: selectedIndex === index ? "translateY(0)" : "translateY(20px)",
@@ -384,7 +384,7 @@ const Hero = () => {
                   </span>
 
                   {/* Title */}
-                  <h1 className="text-[22px] sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-foreground mb-2 sm:mb-3 max-w-2xl leading-[1.1] uppercase tracking-tight">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-foreground mb-2 sm:mb-3 max-w-2xl leading-tight uppercase tracking-tight">
                     {slide.title}
                   </h1>
 
@@ -402,7 +402,7 @@ const Hero = () => {
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs sm:text-xs md:text-sm lg:text-base text-foreground/80 mb-5 sm:mb-5 max-w-[320px] sm:max-w-md leading-relaxed">
+                  <p className="text-[11px] sm:text-xs md:text-sm lg:text-base text-foreground/80 mb-4 sm:mb-5 max-w-sm sm:max-w-md leading-relaxed">
                     {slide.description}
                   </p>
 
@@ -416,7 +416,7 @@ const Hero = () => {
                         <Button
                           onClick={() => handleProtectedNavigation("/metsxmfanzone-tv")}
                           size="default"
-                          className={`relative gap-1.5 sm:gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-5 sm:px-6 md:px-8 h-11 sm:h-10 md:h-11 text-sm sm:text-sm shadow-lg transition-all duration-300 rounded-xl ${
+                          className={`relative gap-1.5 sm:gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-4 sm:px-6 md:px-8 h-9 sm:h-10 md:h-11 text-xs sm:text-sm shadow-lg transition-all duration-300 ${
                             isLiveNow 
                               ? "shadow-[#ff4500]/50 hover:shadow-[#ff4500]/70 ring-2 ring-[#ff4500]/30" 
                               : "shadow-primary/30 hover:shadow-primary/50"
@@ -432,7 +432,7 @@ const Hero = () => {
                         onClick={() => handleSlideClick(slide.link_url)}
                         size="default"
                         variant="outline"
-                        className="gap-1.5 sm:gap-2 glass-light border-border/30 hover:border-primary/50 transition-all duration-300 h-11 sm:h-10 md:h-11 text-sm sm:text-sm px-4 sm:px-4 md:px-6 rounded-xl"
+                        className="gap-1.5 sm:gap-2 glass-light border-border/30 hover:border-primary/50 transition-all duration-300 h-9 sm:h-10 md:h-11 text-xs sm:text-sm px-3 sm:px-4 md:px-6"
                       >
                         <Info className="w-4 h-4 sm:w-5 sm:h-5" />
                         {slide.link_text}

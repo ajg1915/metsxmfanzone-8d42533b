@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
       // Find all admins with verification codes set up
       const { data: adminCodes, error: codesError } = await supabase
         .from('admin_verification_codes')
-        .select('user_id, code_hash, backup_code_hash');
+        .select('user_id, code_hash');
 
       if (codesError || !adminCodes || adminCodes.length === 0) {
         // Log failed attempt
@@ -128,14 +128,14 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Check PIN against all admins (primary and backup PINs)
+      // Check PIN against all admins
       let matchedUserId: string | null = null;
       
       for (const adminCode of adminCodes) {
         const userSalt = adminCode.user_id.substring(0, 16);
         const hashedInput = await hashPin(pin, userSalt);
         
-        if (hashedInput === adminCode.code_hash || hashedInput === adminCode.backup_code_hash) {
+        if (hashedInput === adminCode.code_hash) {
           matchedUserId = adminCode.user_id;
           break;
         }
@@ -291,26 +291,14 @@ Deno.serve(async (req) => {
       const userSalt = setupUserId.substring(0, 16);
       const hashedPin = await hashPin(setupPin, userSalt);
 
-      // Also hash the backup PIN if provided
-      const backupPin = body.backupPin;
-      let hashedBackupPin: string | null = null;
-      if (backupPin && backupPin.length >= 6) {
-        hashedBackupPin = await hashPin(backupPin, userSalt);
-      }
-
       // Upsert the PIN in admin_verification_codes
-      const upsertData: Record<string, unknown> = {
-        user_id: setupUserId,
-        code_hash: hashedPin,
-        updated_at: new Date().toISOString()
-      };
-      if (hashedBackupPin) {
-        upsertData.backup_code_hash = hashedBackupPin;
-      }
-
       const { error: upsertError } = await supabase
         .from('admin_verification_codes')
-        .upsert(upsertData, {
+        .upsert({
+          user_id: setupUserId,
+          code_hash: hashedPin,
+          updated_at: new Date().toISOString()
+        }, {
           onConflict: 'user_id'
         });
 

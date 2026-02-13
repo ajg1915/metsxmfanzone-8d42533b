@@ -7,7 +7,6 @@ import { Badge } from "./ui/badge";
 import { Loader2, Users, Sparkles, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
-import StatsFlipCardsSection from "@/components/parlays/StatsFlipCardsSection";
 
 interface TalentAssessment {
   id: string;
@@ -99,6 +98,14 @@ const TalentAssessmentSection = () => {
               </h2>
               <p className="text-muted-foreground text-sm">Anthony's weekly player grades & analysis</p>
             </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link to="/mets-roster">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Users className="h-4 w-4" />
+                Full Roster
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -253,7 +260,6 @@ const TalentAssessmentSection = () => {
             <Badge className="bg-secondary/10 text-blue-700 border-secondary/30">D - Below Avg</Badge>
           </div>
         </div>
-
       </GlassCard>
     </section>
   );

@@ -169,7 +169,7 @@ const Index = () => {
       />
       
       <LiveGameTicker />
-      <main className="pt-14 sm:pt-14 relative z-10">
+      <main className="pt-14 sm:pt-16 relative z-10">
         <Hero />
         
         <Suspense fallback={null}>

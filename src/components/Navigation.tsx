@@ -34,20 +34,23 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
-  // Show/hide nav based on hidden prop only (no scroll-based hiding)
+const Navigation = () => {
+  // Hide nav once user scrolls past threshold
   useEffect(() => {
     const navRoot = document.getElementById("nav-root");
     if (!navRoot) return;
 
-    if (hidden) {
-      navRoot.style.display = 'none';
-      return () => { navRoot.style.display = ''; };
-    }
+    const handleScroll = () => {
+      if (window.scrollY > 60) {
+        navRoot.classList.add("nav-hidden");
+      } else {
+        navRoot.classList.remove("nav-hidden");
+      }
+    };
 
-    navRoot.style.display = '';
-    navRoot.classList.remove("nav-hidden");
-  }, [hidden]);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   const { user, signOut } = useAuth();
   const { tier } = useSubscription();
   const navigate = useNavigate();
@@ -142,7 +145,7 @@ const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
       {navRoot ? createPortal(
       <nav className="glass-nav w-full">
         <div className="container mx-auto px-3 sm:px-4">
-        <div className="flex items-center justify-between h-12 sm:h-12">
+        <div className="flex items-center justify-between h-12">
           <div className="flex items-center gap-2">
             {!isHomePage && (
               <Button
@@ -317,18 +320,18 @@ const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
             {!user && (
               <Button 
                 size="sm" 
-                className="md:hidden text-[10px] h-7 px-2 rounded-lg font-medium"
+                className="md:hidden text-[10px] h-7 px-2"
                 onClick={() => navigate("/auth")}
               >
-                Login
+                Login / Register
               </Button>
             )}
 
-            {/* Mobile Menu */}
+            {/* Modern Mobile Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 transition-all">
-                  <Menu className="w-4 h-4 text-primary" />
+                <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 transition-all">
+                  <Menu className="w-5 h-5 text-primary" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[340px] bg-gradient-to-b from-background to-background/95 backdrop-blur-xl p-0 border-l border-primary/20">
@@ -587,53 +590,6 @@ const Navigation = ({ hidden = false }: { hidden?: boolean }) => {
               </SheetContent>
             </Sheet>
           </div>
-        </div>
-        
-        {/* Mobile horizontal link bar */}
-        <div className="md:hidden flex items-center gap-1 overflow-x-auto py-1.5 border-t border-border/30 scrollbar-hide">
-          <NavLink 
-            to="/" 
-            className="text-[10px] font-medium text-muted-foreground hover:text-primary whitespace-nowrap px-2 py-1 rounded-md transition-colors"
-            activeClassName="text-primary bg-primary/10"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Home
-          </NavLink>
-          <button
-            onClick={() => handleProtectedNavigation("/podcast")}
-            className="text-[10px] font-medium text-muted-foreground hover:text-primary whitespace-nowrap px-2 py-1 rounded-md transition-colors"
-          >
-            Podcast
-          </button>
-          <button
-            onClick={() => handleProtectedNavigation("/broadcast-schedule")}
-            className="text-[10px] font-medium text-muted-foreground hover:text-primary whitespace-nowrap px-2 py-1 rounded-md transition-colors"
-          >
-            TV Schedule
-          </button>
-          <button
-            onClick={() => handleProtectedNavigation("/community")}
-            className="text-[10px] font-medium text-muted-foreground hover:text-primary whitespace-nowrap px-2 py-1 rounded-md transition-colors"
-          >
-            Community
-          </button>
-          {user && (
-            <button
-              onClick={() => navigate("/mets-roster")}
-              className="text-[10px] font-medium text-muted-foreground hover:text-primary whitespace-nowrap px-2 py-1 rounded-md transition-colors"
-            >
-              Roster
-            </button>
-          )}
-          {!user && (
-            <NavLink 
-              to="/pricing" 
-              className="text-[10px] font-medium text-muted-foreground hover:text-primary whitespace-nowrap px-2 py-1 rounded-md transition-colors"
-              activeClassName="text-primary bg-primary/10"
-            >
-              Pricing
-            </NavLink>
-          )}
         </div>
       </div>
     </nav>,
