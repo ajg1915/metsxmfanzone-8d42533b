@@ -84,8 +84,11 @@ Deno.serve(async (req) => {
 
     if (!squareResponse.ok) {
       const errorData = await squareResponse.text();
-      console.error('Square API error:', errorData);
-      throw new Error(`Square API error: ${squareResponse.status}`);
+      console.error('Square API error status:', squareResponse.status);
+      console.error('Square API error body:', errorData);
+      console.error('Location ID used:', squareLocationId);
+      console.error('Location ID length:', squareLocationId.length);
+      throw new Error(`Square API error: ${squareResponse.status} - ${errorData}`);
     }
 
     const squareData = await squareResponse.json();
