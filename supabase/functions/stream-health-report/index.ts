@@ -82,6 +82,15 @@ Deno.serve(async (req) => {
         } else {
           console.log('Auto-alert sent to viewers for stream:', stream_id);
         }
+
+        // Send maintenance emails for high severity issues
+        if (severity === 'high') {
+          try {
+            await sendMaintenanceEmails(supabase, issue_type, alertMessage);
+          } catch (emailErr) {
+            console.error('Error sending maintenance emails:', emailErr);
+          }
+        }
       } else {
         console.log('Active alert already exists for stream:', stream_id);
       }
@@ -137,4 +146,66 @@ function getAlertMessage(issueType: string, severity: string): string {
     default:
       return `${severityPrefix}We're experiencing technical difficulties. Our team is aware and working on a fix. We apologize for any inconvenience.`;
   }
+}
+
+const escapeHtml = (str: string): string => {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+};
+
+async function sendMaintenanceEmails(supabase: any, issueType: string, alertMessage: string) {
+  const resendApiKey = Deno.env.get('RESEND_API_KEY');
+  if (!resendApiKey) {
+    console.log('RESEND_API_KEY not configured, skipping maintenance emails');
+    return;
+  }
+
+  // Get all members with email
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('email, full_name')
+    .not('email', 'is', null);
+
+  if (profilesError || !profiles?.length) {
+    console.error('Error fetching profiles for maintenance email:', profilesError);
+    return;
+  }
+
+  const safeMessage = escapeHtml(alertMessage);
+  const subject = `⚠️ MetsXMFanZone Stream Maintenance Notice`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #002d72; color: #ffffff; padding: 30px; border-radius: 12px;">
+      <h1 style="color: #ff5910; text-align: center;">🏟️ MetsXMFanZone</h1>
+      <h2 style="text-align: center; color: #ffffff;">Stream Maintenance Notice</h2>
+      <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <p style="font-size: 16px; line-height: 1.6;">${safeMessage}</p>
+      </div>
+      <p style="font-size: 14px; color: #cccccc; text-align: center;">Our team is working to restore service as quickly as possible. We'll notify you when the stream is back online.</p>
+      <p style="font-size: 12px; color: #999999; text-align: center; margin-top: 20px;">© MetsXMFanZone. All rights reserved.</p>
+    </div>
+  `;
+
+  let sent = 0;
+  let failed = 0;
+
+  for (const profile of profiles) {
+    if (!profile.email) continue;
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendApiKey}` },
+        body: JSON.stringify({
+          from: 'MetsXMFanZone <noreply@metsxmfanzone.com>',
+          to: [profile.email],
+          subject,
+          html: html.replace('{{name}}', escapeHtml(profile.full_name || 'Fan')),
+        }),
+      });
+      if (response.ok) sent++; else failed++;
+    } catch {
+      failed++;
+    }
+  }
+
+  console.log(`Maintenance emails sent: ${sent} successful, ${failed} failed`);
 }
