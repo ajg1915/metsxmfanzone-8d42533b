@@ -204,9 +204,11 @@ const Index = () => {
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <CommunityPreviewSection />
-        </Suspense>
+        <div id="social">
+          <Suspense fallback={<SectionSkeleton />}>
+            <CommunityPreviewSection />
+          </Suspense>
+        </div>
 
         <Suspense fallback={<SectionSkeleton />}>
           <PodcastScheduleSection />
