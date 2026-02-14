@@ -1,19 +1,30 @@
-import { MessageCircle, Share2, Youtube, BookOpen, Mic2 } from "lucide-react";
+import { MessageSquarePlus, Share2, Youtube, BookOpen, Mic2 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
+import { toast } from "sonner";
 
 const navItems = [
-  { icon: MessageCircle, label: "Chat", path: "/community" },
-  { icon: Share2, label: "Social", path: "/#social", isAnchor: true },
-  { icon: Youtube, label: "Watch Live", path: "/metsxmfanzone-tv" },
-  { icon: BookOpen, label: "Blog", path: "/blog" },
-  { icon: Mic2, label: "Podcast", path: "/podcast" },
+  { icon: MessageSquarePlus, label: "Post", path: "/community", requiresMembership: false },
+  { icon: Share2, label: "Social", path: "/#social", isAnchor: true, requiresMembership: true },
+  { icon: Youtube, label: "Watch Live", path: "/metsxmfanzone-tv", requiresMembership: true },
+  { icon: BookOpen, label: "Blog", path: "/blog", requiresMembership: true },
+  { icon: Mic2, label: "Podcast", path: "/podcast", requiresMembership: true },
 ];
 
 const SocialMediaBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+  const { isPremium } = useSubscription();
 
   const handleClick = (item: typeof navItems[0]) => {
+    if (item.requiresMembership && (!user || !isPremium)) {
+      toast.error("Members only! Please subscribe to access this feature.");
+      navigate("/plans");
+      return;
+    }
+
     if (item.isAnchor && location.pathname === "/") {
       const el = document.getElementById("social");
       if (el) {
