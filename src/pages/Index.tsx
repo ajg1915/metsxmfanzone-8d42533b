@@ -266,8 +266,10 @@ const Index = () => {
       </main>
       <Footer />
       
-      {/* Lazy load non-critical UI */}
-      {/* Removed: InstallPrompt, NotificationPrompt, OnboardingWalkthrough, FeedbackToast */}
+      {/* Onboarding walkthrough */}
+      <Suspense fallback={null}>
+        <OnboardingWalkthrough onComplete={() => setOnboardingShown(true)} />
+      </Suspense>
     </div>
   );
 };
