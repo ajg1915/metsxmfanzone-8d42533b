@@ -270,6 +270,11 @@ const Index = () => {
       <Suspense fallback={null}>
         <OnboardingWalkthrough onComplete={() => setOnboardingShown(true)} />
       </Suspense>
+      
+      {/* Install prompt */}
+      <Suspense fallback={null}>
+        <InstallPrompt />
+      </Suspense>
     </div>
   );
 };
