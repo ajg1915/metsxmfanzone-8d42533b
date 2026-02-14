@@ -1,4 +1,4 @@
-import { MessageSquarePlus } from "lucide-react";
+import { MessageSquarePlus, Share2, Tv, PenLine, BookOpen, Mic } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -53,8 +53,18 @@ const SocialMediaBar = () => {
             onClick={() => handleClick(item)}
             className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors"
           >
-            {item.label === "Post" ? (
+            {item.label === "Home" ? (
+              <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
+            ) : item.label === "Social" ? (
+              <Share2 className="h-5 w-5" />
+            ) : item.label === "Watch Live" ? (
+              <Tv className="h-5 w-5" />
+            ) : item.label === "Post" ? (
               <MessageSquarePlus className="h-5 w-5" />
+            ) : item.label === "Blog" ? (
+              <BookOpen className="h-5 w-5" />
+            ) : item.label === "Podcast" ? (
+              <Mic className="h-5 w-5" />
             ) : (
               <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
             )}
