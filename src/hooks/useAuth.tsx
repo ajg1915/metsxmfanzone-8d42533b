@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -6,13 +6,7 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const initializedRef = useRef(false);
-
   useEffect(() => {
-    // Prevent double initialization
-    if (initializedRef.current) return;
-    initializedRef.current = true;
-
     let mounted = true;
 
     // Set up auth state listener FIRST (critical for session persistence)
@@ -43,11 +37,9 @@ export const useAuth = () => {
         return;
       }
       
-      // Only set if we haven't received an auth state change yet
-      if (existingSession) {
-        setSession(existingSession);
-        setUser(existingSession.user);
-      }
+      // Set initial session state
+      setSession(existingSession);
+      setUser(existingSession?.user ?? null);
       setLoading(false);
     });
 

@@ -10,7 +10,7 @@ import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { useSessionExpiryWarning } from "@/hooks/useSessionExpiryWarning";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import { usePresenceTracking } from "@/hooks/usePresenceTracking";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
+// ExitIntentPopup removed per user request
 import { StreamExitDialog } from "@/components/StreamExitDialog";
 import { LiveStreamToast } from "@/components/LiveStreamToast";
 import SocialMediaBar from "@/components/SocialMediaBar";
@@ -276,8 +276,7 @@ const AppContent = () => {
       <PullToRefresh>
         <Toaster />
         <Sonner />
-        {/* LiveStreamToast removed per user request */}
-        <ExitIntentPopup />
+        {/* Removed: ExitIntentPopup, most toasts. Only Live/Offline kept */}
         <StreamExitDialog />
         <SocialMediaBar />
         

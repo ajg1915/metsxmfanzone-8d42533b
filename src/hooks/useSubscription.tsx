@@ -46,7 +46,7 @@ export const useSubscription = () => {
         // Check subscription status
         const { data, error } = await supabase
           .from("subscriptions")
-          .select("plan_type, status, end_date")
+          .select("plan_type, status, end_date, start_date")
           .eq("user_id", user.id)
           .eq("status", "active")
           .order("created_at", { ascending: false })
@@ -59,6 +59,19 @@ export const useSubscription = () => {
           const isActive = !endDate || endDate > new Date();
           
           if (isActive) {
+            // For free plans, enforce 30-day expiry from start_date
+            if (data.plan_type === "free") {
+              const startDate = data.start_date ? new Date(data.start_date) : null;
+              if (startDate) {
+                const thirtyDaysLater = new Date(startDate);
+                thirtyDaysLater.setDate(thirtyDaysLater.getDate() + 30);
+                if (new Date() > thirtyDaysLater) {
+                  setTier("free"); // Expired free plan - treat as no active sub
+                  setLoading(false);
+                  return;
+                }
+              }
+            }
             setTier(data.plan_type as SubscriptionTier);
           } else {
             setTier("free");
