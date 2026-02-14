@@ -74,18 +74,18 @@ export const WelcomeBackToast = () => {
         // Check for live streams first - highest priority
         const hasLiveStream = newContent.liveStreams.some(s => s.status === 'live');
         
-        // Try to get AI-generated message
+        // Try to get AI-generated message (skip if credits are depleted)
         let aiMessage: string | null = null;
         try {
           const { data, error } = await supabase.functions.invoke('generate-welcome-prompt', {
             body: { newContent }
           });
           
-          if (!error && data?.message) {
+          if (!error && data?.message && !data?.fallback) {
             aiMessage = data.message;
           }
-        } catch (e) {
-          console.log('AI prompt generation unavailable, using fallback');
+        } catch {
+          // AI unavailable, silently use fallback
         }
 
         // Show the news alert toast
