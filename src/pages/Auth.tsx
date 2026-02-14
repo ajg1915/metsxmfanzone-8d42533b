@@ -1488,12 +1488,18 @@ const Auth = () => {
             )}
             
             {/* Writer Portal Link */}
-            <div className="pt-2 border-t border-border/50">
+            <div className="pt-2 border-t border-border/50 space-y-1">
               <Link 
                 to="/writer-auth" 
                 className="text-muted-foreground hover:text-primary text-xs flex items-center justify-center gap-1"
               >
                 Are you a writer? Sign in to Writer Portal →
+              </Link>
+              <Link 
+                to="/admin-portal" 
+                className="text-muted-foreground/50 hover:text-muted-foreground text-[10px] flex items-center justify-center"
+              >
+                admin login only
               </Link>
             </div>
           </div>

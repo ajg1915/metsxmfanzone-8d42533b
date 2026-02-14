@@ -12,7 +12,6 @@ import { useAuth } from "@/hooks/useAuth";
 
 // Lazy load heavy components that are below the fold
 const ImmersiveBackground = lazy(() => import("@/components/ImmersiveBackground"));
-const LiveNotificationBar = lazy(() => import("@/components/LiveNotificationBar"));
 const LiveNetworks = lazy(() => import("@/components/LiveNetworks"));
 const LiveStreamsSection = lazy(() => import("@/components/LiveStreamsSection"));
 
@@ -34,9 +33,7 @@ const CommunityPreviewSection = lazy(() => import("@/components/CommunityPreview
 const InstallPrompt = lazy(() => import("@/components/InstallPrompt"));
 const OnboardingWalkthrough = lazy(() => import("@/components/OnboardingWalkthrough"));
 const NotificationPrompt = lazy(() => import("@/components/NotificationPrompt"));
-const WelcomeBackToast = lazy(() => import("@/components/WelcomeBackToast"));
-const FeedbackToast = lazy(() => import("@/components/FeedbackToast"));
-const GameAlertsBanner = lazy(() => import("@/components/GameAlertsBanner"));
+// Removed: WelcomeBackToast, FeedbackToast, GameAlertsBanner per user request
 
 
 // Section loading skeleton
@@ -145,10 +142,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Welcome back toast for returning users - lazy loaded */}
-      <Suspense fallback={null}>
-        <WelcomeBackToast />
-      </Suspense>
+      {/* Removed: WelcomeBackToast */}
 
       {/* Immersive animated background - lazy loaded */}
       <Suspense fallback={null}>
@@ -169,16 +163,12 @@ const Index = () => {
       />
       <Navigation />
       <LiveGameTicker />
-      <Suspense fallback={null}>
-        <GameAlertsBanner />
-      </Suspense>
+      {/* Removed: GameAlertsBanner */}
       <main className="pt-14 sm:pt-16 relative z-10">
         <Hero />
         
         
-        <Suspense fallback={null}>
-          <LiveNotificationBar />
-        </Suspense>
+        {/* Removed: LiveNotificationBar */}
 
         <Suspense fallback={<SectionSkeleton height="h-32" />}>
           <StoriesSection />
@@ -277,18 +267,7 @@ const Index = () => {
       <Footer />
       
       {/* Lazy load non-critical UI */}
-      <Suspense fallback={null}>
-        <InstallPrompt />
-      </Suspense>
-      <Suspense fallback={null}>
-        <NotificationPrompt />
-      </Suspense>
-      <Suspense fallback={null}>
-        <OnboardingWalkthrough onComplete={() => setOnboardingShown(true)} />
-      </Suspense>
-      <Suspense fallback={null}>
-        <FeedbackToast />
-      </Suspense>
+      {/* Removed: InstallPrompt, NotificationPrompt, OnboardingWalkthrough, FeedbackToast */}
     </div>
   );
 };

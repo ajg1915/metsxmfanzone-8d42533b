@@ -81,11 +81,12 @@ const Plans = () => {
       name: "Free",
       price: "$0",
       priceValue: 0,
-      period: "forever",
-      description: "Perfect for casual fans",
+      period: "30 days",
+      description: "Try it free for February & March only",
+      trialNote: "Free access expires after 30 days. Upgrade to keep watching!",
       features: ["Limited highlights access", "Community forum access", "Game schedules", "Free Spring Training Live"],
       notIncluded: ["Live streaming", "Full game replays", "Exclusive content", "Ad-free experience"],
-      cta: "Sign Up Free",
+      cta: "Start Free (30 Days)",
       popular: false,
     },
     {
@@ -158,7 +159,12 @@ const Plans = () => {
     {
       question: "Is there a refund policy?",
       answer:
-        "We offer a 7-day money-back guarantee for first-time subscribers. If you're not satisfied, contact support within 7 days for a full refund.",
+        "We offer a 7-day money-back guarantee for first-time subscribers. This trial applies only to the regular season (not Spring Training or off-season). If you're not satisfied, contact support within 7 days for a full refund.",
+    },
+    {
+      question: "How long does the Free plan last?",
+      answer:
+        "The Free plan is available for 30 days during February and March only. After that, you'll need to upgrade to a paid plan (Premium or Annual) to continue accessing content.",
     },
     {
       question: "Can I watch on multiple devices?",
@@ -228,10 +234,13 @@ const Plans = () => {
                       <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
                       <div className="mb-2">
                         <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                        <span className="text-muted-foreground ml-1">/{plan.period === "forever" ? "forever" : plan.period.replace("per ", "")}</span>
+                        <span className="text-muted-foreground ml-1">/{plan.period === "30 days" ? "30 days" : plan.period.replace("per ", "")}</span>
                       </div>
                       {plan.billingNote && (
                         <p className="text-xs text-muted-foreground">{plan.billingNote}</p>
+                      )}
+                      {(plan as any).trialNote && (
+                        <p className="text-[10px] text-primary font-medium mt-1">{(plan as any).trialNote}</p>
                       )}
                     </div>
 
