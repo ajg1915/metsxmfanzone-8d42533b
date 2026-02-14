@@ -1,4 +1,3 @@
-import { MessageSquarePlus, Share2, Youtube } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -6,8 +5,6 @@ import { toast } from "sonner";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
 type NavItem = {
-  icon?: typeof MessageSquarePlus;
-  customIcon?: string;
   label: string;
   path: string;
   isAnchor?: boolean;
@@ -15,11 +12,11 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { icon: MessageSquarePlus, label: "Post", path: "/community", requiresMembership: false },
-  { icon: Share2, label: "Social", path: "/#social", isAnchor: true, requiresMembership: true },
-  { icon: Youtube, label: "Watch Live", path: "/metsxmfanzone-tv", requiresMembership: true },
-  { customIcon: metsLogo, label: "Blog", path: "/blog", requiresMembership: true },
-  { customIcon: metsLogo, label: "Podcast", path: "/podcast", requiresMembership: true },
+  { label: "Post", path: "/community", requiresMembership: false },
+  { label: "Social", path: "/#social", isAnchor: true, requiresMembership: true },
+  { label: "Watch Live", path: "/metsxmfanzone-tv", requiresMembership: true },
+  { label: "Blog", path: "/blog", requiresMembership: true },
+  { label: "Podcast", path: "/podcast", requiresMembership: true },
 ];
 
 const SocialMediaBar = () => {
@@ -54,11 +51,7 @@ const SocialMediaBar = () => {
             onClick={() => handleClick(item)}
             className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors"
           >
-            {item.customIcon ? (
-              <img src={item.customIcon} alt={item.label} className="h-5 w-5 object-contain" />
-            ) : item.icon ? (
-              <item.icon className="h-5 w-5" />
-            ) : null}
+            <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
             <span className="text-[9px] font-medium">{item.label}</span>
           </button>
         ))}
