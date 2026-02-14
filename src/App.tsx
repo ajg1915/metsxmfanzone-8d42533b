@@ -13,6 +13,7 @@ import { usePresenceTracking } from "@/hooks/usePresenceTracking";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { StreamExitDialog } from "@/components/StreamExitDialog";
 import { LiveStreamToast } from "@/components/LiveStreamToast";
+import SocialMediaBar from "@/components/SocialMediaBar";
 
 import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
 import { useDevice } from "@/hooks/use-device";
@@ -278,6 +279,7 @@ const AppContent = () => {
         {/* LiveStreamToast removed per user request */}
         <ExitIntentPopup />
         <StreamExitDialog />
+        <SocialMediaBar />
         
         <Suspense fallback={<PageLoader />}>
           <Routes>

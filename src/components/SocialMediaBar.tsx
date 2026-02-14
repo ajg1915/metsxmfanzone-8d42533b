@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 const navItems = [
   { icon: MessageCircle, label: "Chat", path: "/community" },
   { icon: Share2, label: "Social", path: "/#social", isAnchor: true },
-  { icon: Youtube, label: "Watch Live", path: "/metsxmfanzone-live" },
+  { icon: Youtube, label: "Watch Live", path: "/metsxmfanzone-tv" },
   { icon: BookOpen, label: "Blog", path: "/blog" },
   { icon: Mic2, label: "Podcast", path: "/podcast" },
 ];
