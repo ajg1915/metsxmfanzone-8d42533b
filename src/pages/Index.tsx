@@ -6,6 +6,7 @@ import LiveGameTicker from "@/components/LiveGameTicker";
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
+import SocialMediaBar from "@/components/SocialMediaBar";
 import { useAutoLineupFetch } from "@/hooks/useAutoLineupFetch";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -173,6 +174,7 @@ const Index = () => {
       </Suspense>
       <main className="pt-14 sm:pt-16 relative z-10">
         <Hero />
+        <SocialMediaBar />
         
         <Suspense fallback={null}>
           <LiveNotificationBar />
