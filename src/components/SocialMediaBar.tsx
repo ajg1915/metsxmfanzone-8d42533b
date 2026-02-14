@@ -1,4 +1,4 @@
-import { MessageSquarePlus, Home } from "lucide-react";
+import { MessageSquarePlus } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -53,9 +53,7 @@ const SocialMediaBar = () => {
             onClick={() => handleClick(item)}
             className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors"
           >
-            {item.label === "Home" ? (
-              <Home className="h-5 w-5" />
-            ) : item.label === "Post" ? (
+            {item.label === "Post" ? (
               <MessageSquarePlus className="h-5 w-5" />
             ) : (
               <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
