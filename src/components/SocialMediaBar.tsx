@@ -7,31 +7,29 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 );
 
 const socialLinks = [
-  { icon: Facebook, href: "https://www.facebook.com/metsxmfanzoneofficial", label: "Facebook", color: "bg-blue-600" },
-  { icon: Twitter, href: "https://twitter.com/metsxmfanzone", label: "X", color: "bg-foreground" },
-  { icon: Youtube, href: "https://www.youtube.com/@metsxmfanzone", label: "YouTube", color: "bg-red-600" },
-  { icon: TikTokIcon, href: "https://www.tiktok.com/@metsxmfanzone", label: "TikTok", color: "bg-foreground" },
+  { icon: Facebook, href: "https://www.facebook.com/metsxmfanzoneofficial", label: "Facebook" },
+  { icon: Twitter, href: "https://twitter.com/metsxmfanzone", label: "X" },
+  { icon: Youtube, href: "https://www.youtube.com/@metsxmfanzone", label: "YouTube" },
+  { icon: TikTokIcon, href: "https://www.tiktok.com/@metsxmfanzone", label: "TikTok" },
 ];
 
 const SocialMediaBar = () => {
   return (
-    <div className="block md:hidden px-4 py-3">
-      <div className="flex items-center justify-center gap-3">
-        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Follow Us</span>
-        <div className="flex gap-2">
-          {socialLinks.map((s) => (
-            <a
-              key={s.label}
-              href={s.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Follow us on ${s.label}`}
-              className={`${s.color} text-white rounded-full w-8 h-8 flex items-center justify-center hover:opacity-80 transition-opacity`}
-            >
-              <s.icon className="h-4 w-4" />
-            </a>
-          ))}
-        </div>
+    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/90 backdrop-blur-md border-t border-border/40">
+      <div className="flex items-center justify-around py-2 px-4">
+        {socialLinks.map((s) => (
+          <a
+            key={s.label}
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Follow us on ${s.label}`}
+            className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors"
+          >
+            <s.icon className="h-5 w-5" />
+            <span className="text-[9px] font-medium">{s.label}</span>
+          </a>
+        ))}
       </div>
     </div>
   );
