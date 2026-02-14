@@ -38,7 +38,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "helcim">("helcim");
+  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "helcim" | "square">("helcim");
   const [showPromoCode, setShowPromoCode] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
@@ -103,6 +103,22 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
           toast({
             title: "Error",
             description: "Failed to create payment session. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } else if (paymentMethod === "square") {
+        const { data, error } = await supabase.functions.invoke("create-square-checkout", {
+          body: { planType: plan.id },
+        });
+
+        if (error) throw error;
+
+        if (data?.checkoutUrl) {
+          window.location.href = data.checkoutUrl;
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to create Square checkout. Please try again.",
             variant: "destructive",
           });
         }
@@ -278,7 +294,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
               </Label>
               <RadioGroup
                 value={paymentMethod}
-                onValueChange={(value) => setPaymentMethod(value as "paypal" | "helcim")}
+                onValueChange={(value) => setPaymentMethod(value as "paypal" | "helcim" | "square")}
                 className="space-y-2"
               >
                 <label
@@ -290,6 +306,16 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
                     <CreditCard className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm font-medium">Credit/Debit Card</span>
                     <span className="text-xs text-primary ml-auto">Primary</span>
+                  </div>
+                </label>
+                <label
+                  htmlFor="square"
+                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
+                >
+                  <RadioGroupItem value="square" id="square" />
+                  <div className="flex items-center gap-2 flex-1">
+                    <CreditCard className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Square</span>
                   </div>
                 </label>
                 <label
@@ -319,7 +345,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
           {/* Security Badge */}
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <Shield className="w-4 h-4" />
-            <span>Secure checkout powered by PayPal & Helcim</span>
+            <span>Secure checkout powered by Helcim, Square & PayPal</span>
           </div>
         </div>
       </DialogContent>
