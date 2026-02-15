@@ -147,7 +147,7 @@ const PodcastScheduleSection = () => {
     });
   };
   if (loading) {
-    return <section className="py-10 sm:py-12 md:py-16 px-4">
+    return <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-6">
         <div className="container mx-auto max-w-7xl">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-64 mx-auto" />
@@ -158,23 +158,23 @@ const PodcastScheduleSection = () => {
         </div>
       </section>;
   }
-  return <section className="py-10 sm:py-12 md:py-16 px-4 relative overflow-hidden">
+  return <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-6 relative overflow-hidden">
       <div className="container mx-auto max-w-7xl relative z-10">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-10">
+         <div className="text-center mb-8 sm:mb-10">
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl glass-card">
-              <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
+              <img src={logo} alt="MetsXMFanZone" className="w-7 h-7 sm:w-8 sm:h-8" />
             </div>
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
               Live Podcast Schedule
             </h2>
-            {isLiveNow && <Badge className="bg-red-500 text-white animate-pulse text-[10px] sm:text-xs">
-                <Radio className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
+            {isLiveNow && <Badge className="bg-red-500 text-white animate-pulse text-xs sm:text-sm">
+                <Radio className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1" />
                 LIVE NOW
               </Badge>}
           </div>
-          <p className="text-muted-foreground max-w-xl sm:max-w-2xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed px-2 text-center font-thin">
+          <p className="text-muted-foreground max-w-xl sm:max-w-2xl mx-auto text-sm sm:text-base md:text-lg leading-relaxed px-2 text-center font-thin">
             Catch us live on Mon, Tue & Fri @ 5:30 PM • Weekends @ 2:00 PM • Game day pregame shows!
           </p>
         </div>
@@ -206,10 +206,10 @@ const PodcastScheduleSection = () => {
           </div>}
 
         {/* Upcoming Shows Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {shows.map(show => <GlassCard key={show.id} variant="interactive" glow="blue" className="h-full overflow-hidden">
               {/* Thumbnail - AI Image or Gradient Fallback */}
-              <div className="relative h-24 sm:h-28 md:h-32 overflow-hidden">
+              <div className="relative h-28 sm:h-32 md:h-36 overflow-hidden">
                 {show.thumbnail_url ? <img src={show.thumbnail_url} alt={show.title} className="w-full h-full object-cover" /> : <div className={`w-full h-full bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'}`} />}
                 
                 {/* Overlay Content */}
@@ -239,17 +239,17 @@ const PodcastScheduleSection = () => {
               </div>
 
               {/* Show Info */}
-              <div className="p-2 sm:p-3">
-                <h3 className="font-bold text-foreground text-xs sm:text-sm md:text-base mb-0.5 sm:mb-1 line-clamp-1 leading-tight">
+              <div className="p-3 sm:p-4">
+                <h3 className="font-bold text-foreground text-sm sm:text-base md:text-lg mb-1 line-clamp-1 leading-tight">
                   {show.title}
                 </h3>
-                <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground line-clamp-2 leading-snug">
+                <p className="text-xs sm:text-sm md:text-base text-muted-foreground line-clamp-2 leading-snug">
                   {show.description}
                 </p>
 
-                <div className="mt-1.5 sm:mt-2 flex items-center">
-                  <Badge variant="outline" className="text-[9px] sm:text-[10px] md:text-xs border-primary/30 text-primary px-1.5 sm:px-2 py-0.5">
-                    <Tv className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5 sm:mr-1" />
+                <div className="mt-2 sm:mt-3 flex items-center">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs md:text-sm border-primary/30 text-primary px-2 sm:px-2.5 py-0.5">
+                    <Tv className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
                     MetsXMFanZone
                   </Badge>
                 </div>
@@ -259,24 +259,24 @@ const PodcastScheduleSection = () => {
 
         {/* Schedule Info & CTA */}
         <div className="mt-6 sm:mt-8 text-center">
-          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 md:gap-3 mb-3 sm:mb-4 md:mb-6 px-2">
-            <Badge variant="secondary" className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 bg-primary/10 text-primary text-[10px] sm:text-xs md:text-sm">
-              <Calendar className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 mr-0.5 sm:mr-1" />
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-4 sm:mb-6 px-2">
+            <Badge variant="secondary" className="px-3 sm:px-4 py-1.5 bg-primary/10 text-primary text-xs sm:text-sm">
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
               Mon•Tue•Fri 5:30PM
             </Badge>
-            <Badge variant="secondary" className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 bg-orange-500/10 text-orange-500 text-[10px] sm:text-xs md:text-sm">
-              <Zap className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 mr-0.5 sm:mr-1" />
+            <Badge variant="secondary" className="px-3 sm:px-4 py-1.5 bg-orange-500/10 text-orange-500 text-xs sm:text-sm">
+              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
               Weekends 2PM
             </Badge>
-            <Badge variant="secondary" className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 bg-secondary/10 text-secondary text-[10px] sm:text-xs md:text-sm">
-              <Radio className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 mr-0.5 sm:mr-1" />
+            <Badge variant="secondary" className="px-3 sm:px-4 py-1.5 bg-secondary/10 text-secondary text-xs sm:text-sm">
+              <Radio className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
               Pregame
             </Badge>
           </div>
 
-          <Button asChild size="default" className="glass-card border-primary/30 hover:border-primary/50 text-xs sm:text-sm md:text-base h-9 sm:h-10 px-3 sm:px-4 md:px-6">
+          <Button asChild size="default" className="glass-card border-primary/30 hover:border-primary/50 text-sm sm:text-base h-10 sm:h-11 px-4 sm:px-6">
             <Link to="/podcast">
-              <Radio className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+              <Radio className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               View All Shows
             </Link>
           </Button>
