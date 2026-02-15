@@ -134,7 +134,7 @@ const CommunityPreviewSection = () => {
 
   if (loading) {
     return (
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6">
+      <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-6">
         <div className="container mx-auto max-w-7xl">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-64" />
@@ -150,7 +150,7 @@ const CommunityPreviewSection = () => {
   }
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6">
+    <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-6">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
