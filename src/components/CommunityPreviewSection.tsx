@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,9 +25,26 @@ interface Post {
 
 const CommunityPreviewSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ postsCount: 0, membersCount: 0 });
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        setIsAdmin(data?.some(r => r.role === "admin") ?? false);
+      });
+  }, [user]);
+
+  const handlePostClick = () => {
+    navigate(isAdmin ? "/admin/stories" : "/community");
+  };
 
   useEffect(() => {
     fetchCommunityData();
@@ -181,7 +199,7 @@ const CommunityPreviewSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4 }}
-                onClick={() => navigate("/community")}
+                onClick={handlePostClick}
                 className="cursor-pointer group glass-card hover-lift glow-blue rounded-xl overflow-hidden"
               >
                 <div className="flex flex-col sm:flex-row">
@@ -252,7 +270,7 @@ const CommunityPreviewSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.05 }}
-                    onClick={() => navigate("/community")}
+                    onClick={handlePostClick}
                     className="cursor-pointer group glass-card hover-lift glow-blue rounded-lg overflow-hidden"
                   >
                     <div className="flex gap-3 p-2.5">
