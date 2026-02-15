@@ -155,7 +155,7 @@ const CommunityPreviewSection = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2 sm:gap-3 leading-tight">
+            <h2 className="sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2 sm:gap-3 leading-tight text-base">
               <img src={logo} alt="MetsXMFanZone" className="w-7 h-7 sm:w-8 sm:h-8" />
               MetsXMFanZone Community
             </h2>
