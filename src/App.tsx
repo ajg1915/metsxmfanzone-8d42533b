@@ -8,6 +8,7 @@ import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { useSessionExpiryWarning } from "@/hooks/useSessionExpiryWarning";
+import { AuthProvider } from "@/hooks/useAuth";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
 import { usePresenceTracking } from "@/hooks/usePresenceTracking";
 // ExitIntentPopup removed per user request
@@ -429,7 +430,9 @@ const AppContent = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
