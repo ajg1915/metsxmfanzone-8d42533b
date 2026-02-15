@@ -178,7 +178,7 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 max-w-5xl py-8 space-y-6">
 
           {/* Hero Profile Section */}
-          <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br from-[hsl(var(--mets-blue-dark))] via-card to-card p-6 sm:p-8">
+          <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br from-[hsl(var(--mets-blue-dark))] via-card to-card p-4 sm:p-8">
             {/* Background decoration */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.15),transparent_70%)] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-[radial-gradient(ellipse_at_bottom_left,hsl(var(--secondary)/0.1),transparent_70%)] pointer-events-none" />
@@ -187,7 +187,7 @@ const Dashboard = () => {
               {/* Avatar */}
               <div className="relative group">
                 <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-primary to-secondary opacity-70 blur-sm group-hover:opacity-100 transition-opacity" />
-                <Avatar className="relative h-20 w-20 sm:h-24 sm:w-24 ring-2 ring-background">
+                <Avatar className="relative h-16 w-16 sm:h-24 sm:w-24 ring-2 ring-background">
                   <AvatarImage src={avatarUrl} alt="Profile avatar" />
                   <AvatarFallback className="bg-primary/20 text-primary text-2xl font-bold">
                     {fullName ? fullName.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase()}
@@ -198,7 +198,7 @@ const Dashboard = () => {
               {/* User Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
+                  <h1 className="text-lg sm:text-2xl font-bold text-foreground truncate">
                     {fullName || "MetsXMFanZone Member"}
                   </h1>
                   {userPlan !== "free" && (
@@ -272,15 +272,15 @@ const Dashboard = () => {
             <div className="relative grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-border/30">
               <div className="text-center">
                 <p className="text-2xl sm:text-3xl font-bold text-primary">{postCount}</p>
-                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">Posts</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Posts</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl sm:text-3xl font-bold text-primary">{memberDays}</p>
-                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">Days Active</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Days Active</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl sm:text-3xl font-bold text-primary capitalize">{planLabel}</p>
-                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">Plan</p>
+                <p className="text-xl sm:text-3xl font-bold text-primary">{planLabel}</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Plan</p>
               </div>
             </div>
           </div>
