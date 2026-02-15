@@ -1,7 +1,9 @@
 import { MessageSquarePlus, Share2, Tv, PenLine, BookOpen, Mic } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
@@ -25,11 +27,29 @@ const SocialMediaBar = () => {
   const location = useLocation();
   const { user } = useAuth();
   const { isPremium } = useSubscription();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        setIsAdmin(data?.some(r => r.role === "admin") ?? false);
+      });
+  }, [user]);
 
   const handleClick = (item: typeof navItems[0]) => {
     if (item.requiresMembership && (!user || !isPremium)) {
       toast.error("Members only! Please subscribe to access this feature.");
       navigate("/plans");
+      return;
+    }
+
+    // Admin override: Post button goes to admin stories
+    if (item.label === "Post" && isAdmin) {
+      navigate("/admin/stories");
       return;
     }
 
