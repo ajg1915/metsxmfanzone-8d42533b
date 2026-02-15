@@ -1108,48 +1108,40 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 relative">
         <AuthBackground />
-        <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl">
-          <CardHeader className="space-y-1">
-            <div className="flex flex-col items-center gap-3 mb-4">
-              <img 
-                src={authLogo} 
-                alt="MetsXMFanZone" 
-                className="h-20 w-auto object-contain"
-              />
-              <span className="text-lg font-bold text-[#FF5910]">MetsXMFanZone.com</span>
+        {/* Decorative glow */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[120px]" />
+        </div>
+        <div className="w-full max-w-sm relative z-10">
+          <div className="rounded-2xl border border-muted/40 bg-card/90 backdrop-blur-xl shadow-2xl overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-secondary via-primary to-secondary" />
+            <div className="p-5 sm:p-6 space-y-4">
+              <div className="flex flex-col items-center gap-3">
+                <img src={authLogo} alt="MetsXMFanZone" className="h-16 w-auto object-contain" />
+                <span className="text-sm font-bold text-primary">MetsXMFanZone.com</span>
+              </div>
+              <div className="text-center">
+                <h1 className="text-lg font-bold text-foreground">Welcome Back!</h1>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Continue as <span className="font-medium text-foreground">{rememberedUser.email}</span>
+                </p>
+              </div>
+              <div className="bg-muted/30 border border-muted/30 rounded-xl p-3 text-center">
+                <p className="text-xs text-muted-foreground">
+                  Your device is remembered. Click below to receive a verification code.
+                </p>
+              </div>
+              <Button onClick={handleRememberedLogin} className="w-full h-10 rounded-xl text-sm font-semibold" disabled={loading}>
+                {loading ? "Sending code..." : "Send Verification Code"}
+              </Button>
+              <div className="text-center">
+                <button type="button" onClick={handleForgetDevice} className="text-xs text-muted-foreground hover:text-foreground" disabled={loading}>
+                  Not you? Sign in with a different account
+                </button>
+              </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-center">Welcome Back!</CardTitle>
-            <CardDescription className="text-center">
-              Continue as <span className="font-medium text-foreground">{rememberedUser.email}</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-muted/50 border border-border rounded-md p-4 text-center">
-              <p className="text-sm text-muted-foreground">
-                Your device is remembered. Click below to receive a verification code.
-              </p>
-            </div>
-            
-            <Button 
-              onClick={handleRememberedLogin} 
-              className="w-full" 
-              disabled={loading}
-            >
-              {loading ? "Sending code..." : "Send Verification Code"}
-            </Button>
-            
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={handleForgetDevice}
-                className="text-sm text-muted-foreground hover:text-foreground"
-                disabled={loading}
-              >
-                Not you? Sign in with a different account
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -1157,30 +1149,36 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
       <AuthBackground />
-      <Card className="w-full max-w-md bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl">
-        <CardHeader className="space-y-1">
-          <div className="flex flex-col items-center gap-3 mb-4">
-            <img 
-              src={authLogo} 
-              alt="MetsXMFanZone" 
-              className="h-20 w-auto object-contain"
-            />
-            <span className="text-lg font-bold text-[#FF5910]">MetsXMFanZone.com</span>
-          </div>
-          <CardTitle className="text-2xl font-bold text-center">
-            {isResettingPassword ? "Set New Password" : isForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Create Account"}
-          </CardTitle>
-          <CardDescription className="text-center">
-            {isResettingPassword
-              ? "Enter your new password below"
-              : isForgotPassword
-              ? "Enter your email to receive a password reset link"
-              : isLogin
-              ? "Enter your credentials to access your account"
-              : "Sign up to join MetsXMFanZone"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      {/* Decorative glow */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/3 w-[250px] h-[250px] rounded-full bg-primary/5 blur-[100px]" />
+      </div>
+      <div className="w-full max-w-sm relative z-10">
+        <div className="rounded-2xl border border-muted/40 bg-card/90 backdrop-blur-xl shadow-2xl overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-secondary via-primary to-secondary" />
+          <div className="p-5 sm:p-6">
+            <div className="space-y-4">
+              <div className="flex flex-col items-center gap-2 mb-2">
+                <img src={authLogo} alt="MetsXMFanZone" className="h-14 w-auto object-contain" />
+                <span className="text-xs font-bold text-primary">MetsXMFanZone.com</span>
+              </div>
+              <div className="text-center">
+                <h1 className="text-lg font-bold text-foreground">
+                  {isResettingPassword ? "Set New Password" : isForgotPassword ? "Reset Password" : isLogin ? "Welcome Back" : "Create Account"}
+                </h1>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {isResettingPassword
+                    ? "Enter your new password below"
+                    : isForgotPassword
+                    ? "Enter your email to receive a reset link"
+                    : isLogin
+                    ? "Enter your credentials to continue"
+                    : "Sign up to join MetsXMFanZone"}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4">
           <form onSubmit={isResettingPassword ? handleUpdatePassword : isForgotPassword ? handleForgotPassword : isLogin ? handleLogin : handleSignup} className="space-y-4">
             {!isLogin && !isForgotPassword && !isResettingPassword && (
               <>
@@ -1450,15 +1448,12 @@ const Auth = () => {
 
           </form>
 
-          <div className="mt-4 text-center text-sm space-y-2">
+          <div className="mt-4 text-center text-xs space-y-2">
             {!isResettingPassword && (
               isForgotPassword ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsForgotPassword(false);
-                    setEmail("");
-                  }}
+                  onClick={() => { setIsForgotPassword(false); setEmail(""); }}
                   className="text-primary hover:underline"
                   disabled={loading}
                 >
@@ -1469,42 +1464,31 @@ const Auth = () => {
                   type="button"
                   onClick={() => {
                     setIsLogin(!isLogin);
-                    setEmail("");
-                    setPassword("");
-                    setFullName("");
-                    setPhoneNumber("");
-                    setSmsOptIn(false);
-                    setAgreeToTerms(false);
-                    setSelectedPlan("");
+                    setEmail(""); setPassword(""); setFullName("");
+                    setPhoneNumber(""); setSmsOptIn(false);
+                    setAgreeToTerms(false); setSelectedPlan("");
                   }}
                   className="text-primary hover:underline"
                   disabled={loading}
                 >
-                  {isLogin
-                    ? "Don't have an account? Sign up"
-                    : "Already have an account? Sign in"}
+                  {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
                 </button>
               )
             )}
             
-            {/* Writer Portal Link */}
-            <div className="pt-2 border-t border-border/50 space-y-1">
-              <Link 
-                to="/writer-auth" 
-                className="text-muted-foreground hover:text-primary text-xs flex items-center justify-center gap-1"
-              >
-                Are you a writer? Sign in to Writer Portal →
+            <div className="pt-2 border-t border-muted/30 space-y-1">
+              <Link to="/writer-auth" className="text-muted-foreground hover:text-primary text-[10px] flex items-center justify-center gap-1">
+                Writer Portal →
               </Link>
-              <Link 
-                to="/admin-portal" 
-                className="text-muted-foreground/50 hover:text-muted-foreground text-[10px] flex items-center justify-center"
-              >
-                admin login only
+              <Link to="/admin-portal" className="text-muted-foreground/50 hover:text-muted-foreground text-[10px] flex items-center justify-center">
+                admin login
               </Link>
             </div>
           </div>
-        </CardContent>
-      </Card>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

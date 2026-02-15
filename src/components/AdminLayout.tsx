@@ -23,27 +23,27 @@ function AdminHeader({ navigate }: { navigate: (path: string | number) => void }
   };
 
   return (
-    <header className="h-11 border-b flex items-center justify-between px-2 sm:px-3 bg-background/95 backdrop-blur-sm sticky top-0 z-10">
+    <header className="h-11 border-b border-muted/30 flex items-center justify-between px-2 sm:px-3 bg-card/80 backdrop-blur-xl sticky top-0 z-10">
       <div className="flex items-center gap-1.5 sm:gap-2">
-        <SidebarTrigger className="h-7 w-7 flex-shrink-0" />
+        <SidebarTrigger className="h-7 w-7 flex-shrink-0 text-muted-foreground hover:text-foreground" />
         {!isOnDashboard && (
           <Button
             variant="ghost"
             size="sm"
             onClick={handleGoBack}
-            className="h-7 text-xs px-2 gap-1"
+            className="h-7 text-xs px-2 gap-1 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Back</span>
           </Button>
         )}
-        <h1 className="text-xs sm:text-sm font-semibold truncate">Admin</h1>
+        <h1 className="text-xs sm:text-sm font-semibold truncate text-foreground">Admin</h1>
       </div>
       <Button
-        variant="outline"
+        variant="ghost"
         size="sm"
         onClick={() => navigate("/")}
-        className="h-7 text-xs px-2 flex-shrink-0"
+        className="h-7 text-xs px-2 flex-shrink-0 text-muted-foreground hover:text-foreground border border-muted/30"
       >
         <Home className="w-3.5 h-3.5 sm:mr-1" />
         <span className="hidden sm:inline">Back to Site</span>
@@ -216,7 +216,7 @@ export function AdminLayout() {
 
   return (
     <SidebarProvider defaultOpen={false}>
-      <div className="min-h-screen flex w-full overflow-x-hidden">
+      <div className="min-h-screen flex w-full overflow-x-hidden bg-background">
         <AdminSidebar />
         <div className="flex-1 flex flex-col min-w-0 w-full max-w-full">
           <AdminHeader navigate={navigate} />
@@ -225,9 +225,10 @@ export function AdminLayout() {
             [&_h2]:text-sm [&_h2]:sm:text-base [&_h2]:md:text-lg
             [&_h3]:text-xs [&_h3]:sm:text-sm [&_h3]:md:text-base
             [&_.container]:px-0 [&_.container]:sm:px-2 [&_.container]:max-w-full
-            [&_.card]:text-sm [&_.card-header]:p-3 [&_.card-content]:p-3
-            [&_input]:text-sm [&_input]:h-8
-            [&_textarea]:text-sm
+            [&_.card]:text-sm [&_.card]:bg-card/80 [&_.card]:backdrop-blur-xl [&_.card]:border-muted/30
+            [&_.card-header]:p-3 [&_.card-content]:p-3
+            [&_input]:text-sm [&_input]:h-8 [&_input]:bg-muted/30 [&_input]:border-muted/40
+            [&_textarea]:text-sm [&_textarea]:bg-muted/30 [&_textarea]:border-muted/40
             [&_select]:text-sm
             [&_button]:text-xs [&_button]:sm:text-sm
             [&_label]:text-xs

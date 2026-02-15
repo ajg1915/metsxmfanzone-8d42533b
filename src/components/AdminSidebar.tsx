@@ -166,7 +166,7 @@ export function AdminSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="border-r border-muted/30">
       <SidebarContent className="gap-1 py-2">
         {/* Home / Overview */}
         {renderCollapsibleSection("Home", Home, homeItems, homeOpen, setHomeOpen)}
