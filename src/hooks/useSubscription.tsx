@@ -32,7 +32,7 @@ export const useSubscription = () => {
           .select("role")
           .eq("user_id", user.id)
           .eq("role", "admin")
-          .single();
+          .maybeSingle();
 
         if (roleData) {
           setIsAdmin(true);
@@ -51,7 +51,7 @@ export const useSubscription = () => {
           .eq("status", "active")
           .order("created_at", { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
         if (!error && data) {
           // Check if subscription is still valid

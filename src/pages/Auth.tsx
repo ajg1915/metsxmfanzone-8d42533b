@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -173,6 +174,7 @@ const detectBot = (): { isBot: boolean; reason?: string } => {
 };
 
 const Auth = () => {
+  const { user: authUser, loading: authLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const mode = searchParams.get("mode");
   const [isLogin, setIsLogin] = useState(mode === "login" || mode !== "signup");
@@ -397,15 +399,12 @@ const Auth = () => {
   }, [mode]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      // IMPORTANT: During password recovery (reset link), Supabase creates a session.
-      // We must NOT redirect away from /auth?mode=reset, otherwise the user never
-      // sees the "Set New Password" screen.
-      if (session && !show2FA && !isRememberedLogin && !isResettingPassword) {
-        navigate("/");
-      }
-    });
-  }, [navigate, show2FA, isRememberedLogin, isResettingPassword]);
+    // Only redirect if auth has finished loading and user is confirmed logged in
+    // Don't redirect during 2FA, remembered login flow, or password reset
+    if (!authLoading && authUser && !show2FA && !isRememberedLogin && !isResettingPassword && !sendingOtp) {
+      navigate("/", { replace: true });
+    }
+  }, [authUser, authLoading, navigate, show2FA, isRememberedLogin, isResettingPassword, sendingOtp]);
 
   // Resend cooldown timer
   useEffect(() => {
