@@ -63,36 +63,37 @@ export function AdminLayout() {
   const [pinOnlyAuth, setPinOnlyAuth] = useState(false);
 
   useEffect(() => {
-    // Check if already verified this session (either via PIN-only or traditional auth)
+    // Check if already verified this session
     const verified = sessionStorage.getItem("admin_verified");
     const verifiedAt = sessionStorage.getItem("admin_verified_at");
     const adminUserId = sessionStorage.getItem("admin_user_id");
     const storedFingerprint = sessionStorage.getItem("admin_device_fingerprint");
     
     if (verified === "true" && verifiedAt) {
-      // Check if verification is still valid (24 hour max)
       const verifiedTime = new Date(verifiedAt);
       const hoursSinceVerification = (Date.now() - verifiedTime.getTime()) / (1000 * 60 * 60);
       
       if (hoursSinceVerification < 24) {
-        setPinVerified(true);
-        
-        // If using PIN-only auth (no Supabase user), verify device fingerprint
+        // Only auto-trust sessionStorage for PIN-only auth (no Supabase user)
+        // For traditional auth (user exists), always require fresh PIN verification
         if (adminUserId && !user) {
           setPinOnlyAuth(true);
+          setPinVerified(true);
           // Validate device fingerprint matches
           generateDeviceFingerprint().then(currentFp => {
             if (storedFingerprint && storedFingerprint !== currentFp) {
-              // Device mismatch - clear session and require re-auth
               sessionStorage.removeItem("admin_verified");
               sessionStorage.removeItem("admin_verified_at");
               sessionStorage.removeItem("admin_user_id");
               sessionStorage.removeItem("admin_session_token");
               sessionStorage.removeItem("admin_device_fingerprint");
+              setPinVerified(false);
               navigate("/admin-portal");
             }
           });
         }
+        // If user is logged in via Supabase, do NOT auto-set pinVerified
+        // They must go through PIN verification every time
       } else {
         // Expired, clear it
         sessionStorage.removeItem("admin_verified");
