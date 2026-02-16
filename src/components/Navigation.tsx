@@ -256,7 +256,7 @@ const Navigation = () => {
                       Dashboard
                     </DropdownMenuItem>
                     {isWriter && (
-                      <DropdownMenuItem onClick={() => navigate("/writer/dashboard")}>
+                      <DropdownMenuItem onClick={() => navigate("/writer")}>
                         <PenLine className="w-4 h-4 mr-2" />
                         Writers Portal
                       </DropdownMenuItem>
@@ -456,7 +456,7 @@ const Navigation = () => {
                       </button>
                       {isWriter && (
                         <button 
-                          onClick={() => { navigate("/writer/dashboard"); setMobileMenuOpen(false); }}
+                          onClick={() => { navigate("/writer"); setMobileMenuOpen(false); }}
                           className="flex items-center gap-2.5 w-full text-foreground hover:text-primary hover:bg-primary/8 transition-all py-2 px-2.5 rounded-lg text-left text-xs"
                         >
                           <PenLine className="w-3.5 h-3.5 text-secondary" />
