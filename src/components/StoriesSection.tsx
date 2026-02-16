@@ -345,7 +345,7 @@ const StoriesSection = () => {
 
   return (
     <>
-      <div className="w-full -mt-2 sm:-mt-3">
+      <div className="w-full mt-2 sm:mt-3">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div 
             className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6"
