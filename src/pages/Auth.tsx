@@ -647,6 +647,7 @@ const Auth = () => {
     try {
       const validated = loginSchema.parse({ email, password });
       setLoading(true);
+      setSendingOtp(true); // Prevent redirect race condition before auth completes
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: validated.email,
@@ -654,6 +655,7 @@ const Auth = () => {
       });
 
       if (error) {
+        setSendingOtp(false);
         // Track failed login attempt for security alerts
         trackFailedLogin(validated.email);
         
@@ -696,6 +698,7 @@ const Auth = () => {
         // Check if email_verified is explicitly true (handles null case)
         if (profile?.email_verified !== true) {
           // Sign out the user since they haven't confirmed their email
+          setSendingOtp(false);
           await supabase.auth.signOut();
           toast({
             title: "Email Not Verified",
@@ -706,9 +709,8 @@ const Auth = () => {
           return;
         }
 
-        // Generate and send OTP for 2FA - show loading screen during send
+        // Generate and send OTP for 2FA
         setLoading(false); // Hide form loading
-        setSendingOtp(true); // Show OTP sending screen
         
         const { otp, expiry } = generateOtp();
         setGeneratedOtp(otp);
@@ -722,13 +724,14 @@ const Auth = () => {
           setShow2FA(true);
           setResendCooldown(60);
         } else {
+          // Still show 2FA - user can retry resend. Never bypass 2FA.
+          setShow2FA(true);
+          setResendCooldown(0);
           toast({
-            title: "2FA email not delivered",
-            description: "We couldn't send your 6-digit code by email. You'll be logged in without 2FA for now.",
+            title: "Verification code issue",
+            description: "We had trouble sending your code. Please tap 'Resend Code' to try again.",
             variant: "destructive",
           });
-          // If email fails, proceed without 2FA
-          await completeAuthentication(data.user.id, false);
         }
       }
     } catch (error) {
