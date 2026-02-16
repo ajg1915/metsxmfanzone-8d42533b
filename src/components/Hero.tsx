@@ -309,7 +309,7 @@ const Hero = () => {
   ];
 
   return (
-    <section className="group/hero relative min-h-[380px] sm:min-h-[420px] md:min-h-[480px] lg:min-h-[520px] overflow-hidden">
+    <section className="group/hero relative min-h-[330px] sm:min-h-[360px] md:min-h-[390px] lg:min-h-[420px] overflow-hidden">
       {/* Immersive background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div 
@@ -341,7 +341,7 @@ const Hero = () => {
                 pointerEvents: selectedIndex === index ? "auto" : "none",
               }}
             >
-              <div className="relative min-h-[380px] sm:min-h-[420px] md:min-h-[480px] lg:min-h-[520px]">
+              <div className="relative min-h-[330px] sm:min-h-[360px] md:min-h-[390px] lg:min-h-[420px]">
                 {/* Background Image with parallax effect */}
                 <div
                   className="absolute inset-0 bg-cover bg-center bg-no-repeat"
