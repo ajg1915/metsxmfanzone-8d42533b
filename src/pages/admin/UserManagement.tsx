@@ -20,7 +20,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 interface UserSubscription {
   user_id: string;
@@ -194,6 +206,33 @@ const UserManagement = () => {
     }
   };
 
+  const deleteUserAccount = async (userId: string, email: string | null) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const response = await supabase.functions.invoke("delete-user-account", {
+        body: { user_id: userId },
+      });
+
+      if (response.error) throw response.error;
+
+      toast({
+        title: "Account Deleted",
+        description: `${email || "User"} has been permanently deleted.`,
+      });
+
+      fetchUsers();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete user account",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading || authLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -217,8 +256,9 @@ const UserManagement = () => {
                   <TableHead className="text-xs hidden sm:table-cell">Plan</TableHead>
                   <TableHead className="text-xs hidden sm:table-cell">Status</TableHead>
                   <TableHead className="text-xs hidden md:table-cell">End</TableHead>
-                  <TableHead className="text-xs">Plan</TableHead>
-                </TableRow>
+                   <TableHead className="text-xs">Plan</TableHead>
+                   <TableHead className="text-xs w-10"></TableHead>
+                 </TableRow>
               </TableHeader>
               <TableBody>
                 {users.map((userRow) => (
@@ -253,6 +293,32 @@ const UserManagement = () => {
                           <SelectItem value="annual">Annual</SelectItem>
                         </SelectContent>
                       </Select>
+                    </TableCell>
+                    <TableCell>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Permanently delete <strong>{userRow.email || "this user"}</strong>? This cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteUserAccount(userRow.user_id, userRow.email)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                   </TableRow>
                 ))}
