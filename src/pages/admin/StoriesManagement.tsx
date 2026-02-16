@@ -193,11 +193,21 @@ const StoriesManagement = () => {
           .eq("id", editingStory.id);
 
         if (error) throw error;
+        
+        // Send push notification if story was just published
+        if (storyData.published && !editingStory.published) {
+          sendStoryNotification(storyData.title);
+        }
         toast({ title: "Success", description: "Story updated successfully" });
       } else {
         const { error } = await supabase.from("stories").insert(storyData);
 
         if (error) throw error;
+        
+        // Send push notification if new story is published
+        if (storyData.published) {
+          sendStoryNotification(storyData.title);
+        }
         toast({ title: "Success", description: "Story created successfully" });
       }
 
@@ -239,6 +249,22 @@ const StoriesManagement = () => {
     }
   };
 
+  const sendStoryNotification = async (title: string) => {
+    try {
+      await supabase.functions.invoke("send-push-notification", {
+        body: {
+          title: "📸 New Story on MetsXMFanZone!",
+          body: title,
+          icon: "/logo-192.png",
+          url: "/",
+          tag: "new-story",
+        },
+      });
+    } catch (error) {
+      console.debug("Push notification error:", error);
+    }
+  };
+
   const togglePublished = async (story: Story) => {
     try {
       const { error } = await supabase
@@ -247,6 +273,11 @@ const StoriesManagement = () => {
         .eq("id", story.id);
 
       if (error) throw error;
+
+      // Send notification when publishing
+      if (!story.published) {
+        sendStoryNotification(story.title);
+      }
 
       toast({
         title: "Success",
