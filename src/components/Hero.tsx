@@ -495,7 +495,7 @@ const Hero = () => {
                   if (tab.id === "community") handleProtectedNavigation("/community");
                 }}
                 className={`
-                  relative flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 md:gap-1.5 px-2 sm:px-3 md:px-4 lg:px-5 py-1.5 sm:py-2 md:py-2.5 text-[11px] sm:text-xs md:text-sm lg:text-base font-medium transition-all duration-300 rounded-lg sm:rounded-xl
+                  relative flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 md:py-2.5 text-[11px] sm:text-xs md:text-sm lg:text-base font-medium transition-all duration-300 rounded-lg sm:rounded-xl
                   ${
                     activeTab === tab.id
                       ? "text-foreground glass-strong border-primary/50 shadow-lg"
@@ -511,12 +511,7 @@ const Hero = () => {
                     <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-[#ff4500]"></span>
                   </span>
                 )}
-                {tab.isImage ? (
-                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain" />
-                ) : (
-                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
-                )}
-                <span className="hidden xs:inline sm:inline">{tab.label}</span>
+                <span>{tab.label}</span>
               </button>
             );
 
