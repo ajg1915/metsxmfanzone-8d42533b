@@ -112,7 +112,7 @@ export default function Blog() {
             </Button>
           </div>
 
-          <div className="mb-8 space-y-4">
+          <div className="mb-8">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
@@ -122,28 +122,6 @@ export default function Blog() {
                 className="pl-10"
               />
             </div>
-
-            {categories.length > 0 && (
-              <div className="flex gap-2 flex-wrap">
-                <Button
-                  variant={selectedCategory === null ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(null)}
-                >
-                  All
-                </Button>
-                {categories.map((category) => (
-                  <Button
-                    key={category}
-                    variant={selectedCategory === category ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedCategory(category)}
-                  >
-                    {category}
-                  </Button>
-                ))}
-              </div>
-            )}
           </div>
 
           {loading ? (
@@ -257,6 +235,35 @@ export default function Blog() {
                 </>
               )}
             </>
+          )}
+
+          {/* Category Tags - Bottom of page */}
+          {categories.length > 0 && (
+            <div className="mt-10 pt-6 border-t border-border">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+                <Tag className="w-4 h-4" />
+                Browse by Category
+              </h3>
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant={selectedCategory === null ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(null)}
+                >
+                  All
+                </Button>
+                {categories.map((category) => (
+                  <Button
+                    key={category}
+                    variant={selectedCategory === category ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category)}
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </main>
