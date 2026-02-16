@@ -824,14 +824,14 @@ const Auth = () => {
       // Check if user is admin
       const isAdmin = roles?.some(r => r.role === "admin");
       if (isAdmin) {
-        navigate("/admin");
+        navigate("/admin", { replace: true });
         return;
       }
       
       // Check if user is writer
       const isWriter = roles?.some(r => r.role === "writer");
       if (isWriter) {
-        navigate("/writer");
+        navigate("/writer", { replace: true });
         return;
       }
       
@@ -842,9 +842,9 @@ const Auth = () => {
       const subscription = subscriptions?.find(s => s.status === "active");
 
       if (subscription && (subscription.plan_type === "premium" || subscription.plan_type === "annual")) {
-        navigate("/");
+        navigate("/", { replace: true });
       } else {
-        navigate("/pricing");
+        navigate("/pricing", { replace: true });
       }
     }
   };
