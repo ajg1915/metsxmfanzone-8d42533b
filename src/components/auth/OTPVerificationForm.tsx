@@ -1,4 +1,4 @@
-import { ArrowLeft, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
@@ -87,15 +87,6 @@ const OTPVerificationForm = ({
                 {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
               </button>
             </p>
-            <button
-              type="button"
-              onClick={onBack}
-              className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mx-auto"
-              disabled={loading}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to login
-            </button>
           </div>
         </CardContent>
       </Card>

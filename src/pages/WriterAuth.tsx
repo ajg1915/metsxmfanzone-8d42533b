@@ -102,13 +102,17 @@ const WriterAuth = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && !show2FA && !isResettingPassword) {
-        // Check if user is a writer
-        checkWriterRole(session.user.id);
-      }
-    });
-  }, [show2FA, isResettingPassword]);
+    // Don't auto-redirect on existing session - 2FA is mandatory for every login
+    // Users must enter credentials + OTP each time
+    if (!isResettingPassword) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session && !show2FA) {
+          // Sign out existing session to force fresh login with 2FA
+          supabase.auth.signOut();
+        }
+      });
+    }
+  }, [isResettingPassword]);
 
   // Resend cooldown timer
   useEffect(() => {
@@ -255,8 +259,13 @@ const WriterAuth = () => {
             description: "Please check your email for the 6-digit code.",
           });
         } else {
-          // If email fails, still proceed for writers
-          navigate("/writer");
+          // If email fails, sign out and show error - 2FA is mandatory
+          await supabase.auth.signOut();
+          toast({
+            title: "Verification Failed",
+            description: "Could not send verification code. Please try again.",
+            variant: "destructive",
+          });
         }
       }
     } catch (error) {
@@ -351,7 +360,9 @@ const WriterAuth = () => {
     }
   };
 
-  const handleBack2FA = () => {
+  const handleBack2FA = async () => {
+    // Sign out user - 2FA is mandatory, can't go back without completing it
+    await supabase.auth.signOut();
     setShow2FA(false);
     setOtpCode("");
     setGeneratedOtp("");
@@ -669,15 +680,6 @@ const WriterAuth = () => {
                   {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
                 </button>
               </p>
-              <button
-                type="button"
-                onClick={handleBack2FA}
-                className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mx-auto"
-                disabled={loading}
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to login
-              </button>
             </div>
           </CardContent>
         </Card>
