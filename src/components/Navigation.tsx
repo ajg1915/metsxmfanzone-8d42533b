@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles, Tv, ChevronDown } from "lucide-react";
+import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles, Tv, ChevronDown, PenLine } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import podcastIcon from "@/assets/podcast-icon.png";
@@ -39,12 +39,14 @@ const Navigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isWriter, setIsWriter] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [userProfile, setUserProfile] = useState<{ full_name: string | null; avatar_url: string | null }>({ full_name: null, avatar_url: null });
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [tvScheduleOpen, setTvScheduleOpen] = useState(false);
   const [communityOpen, setCommunityOpen] = useState(false);
+
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -64,15 +66,14 @@ const Navigation = () => {
   useEffect(() => {
     const checkAdminAndProfile = async () => {
       if (user) {
-        // Check admin role
-        const { data: roleData } = await supabase
+        // Check roles
+        const { data: rolesData } = await supabase
           .from("user_roles")
           .select("role")
-          .eq("user_id", user.id)
-          .eq("role", "admin")
-          .single();
+          .eq("user_id", user.id);
 
-        setIsAdmin(!!roleData);
+        setIsAdmin(rolesData?.some(r => r.role === "admin") ?? false);
+        setIsWriter(rolesData?.some(r => r.role === "writer" || r.role === "admin") ?? false);
 
         // Fetch user profile
         const { data: profileData } = await supabase
@@ -86,6 +87,7 @@ const Navigation = () => {
         }
       } else {
         setIsAdmin(false);
+        setIsWriter(false);
         setUserProfile({ full_name: null, avatar_url: null });
       }
     };
@@ -253,6 +255,12 @@ const Navigation = () => {
                       <LayoutDashboard className="w-4 h-4 mr-2" />
                       Dashboard
                     </DropdownMenuItem>
+                    {isWriter && (
+                      <DropdownMenuItem onClick={() => navigate("/writer/dashboard")}>
+                        <PenLine className="w-4 h-4 mr-2" />
+                        Writer Dashboard
+                      </DropdownMenuItem>
+                    )}
                     {isAdmin && (
                       <DropdownMenuItem onClick={() => navigate("/admin")}>
                         <Shield className="w-4 h-4 mr-2" />
@@ -446,6 +454,15 @@ const Navigation = () => {
                         <LayoutDashboard className="w-3.5 h-3.5 text-primary" />
                         <span className="font-medium">Dashboard</span>
                       </button>
+                      {isWriter && (
+                        <button 
+                          onClick={() => { navigate("/writer/dashboard"); setMobileMenuOpen(false); }}
+                          className="flex items-center gap-2.5 w-full text-foreground hover:text-primary hover:bg-primary/8 transition-all py-2 px-2.5 rounded-lg text-left text-xs"
+                        >
+                          <PenLine className="w-3.5 h-3.5 text-secondary" />
+                          <span className="font-medium">Writer Dashboard</span>
+                        </button>
+                      )}
                       {isAdmin && (
                         <>
                           <button 
