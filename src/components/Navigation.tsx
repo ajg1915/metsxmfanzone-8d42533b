@@ -73,7 +73,7 @@ const Navigation = () => {
           .eq("user_id", user.id);
 
         setIsAdmin(rolesData?.some(r => r.role === "admin") ?? false);
-        setIsWriter(rolesData?.some(r => r.role === "writer" || r.role === "admin") ?? false);
+        setIsWriter(rolesData?.some(r => r.role === "writer") ?? false);
 
         // Fetch user profile
         const { data: profileData } = await supabase

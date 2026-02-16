@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { PenLine, FileText, Clock, CheckCircle, XCircle, Plus, LogOut, User } from "lucide-react";
+import { PenLine, FileText, Clock, CheckCircle, XCircle, Plus, LogOut, User, ArrowLeft, Home } from "lucide-react";
 
 interface BlogPost {
   id: string;
@@ -140,13 +140,26 @@ export default function WriterDashboard() {
       <header className="border-b border-border bg-card">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <PenLine className="w-6 h-6 sm:w-8 sm:h-8 text-primary flex-shrink-0" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/")}
+              className="h-8 w-8 p-0 flex-shrink-0"
+              title="Back to Site"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <PenLine className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
             <div className="min-w-0">
               <h1 className="text-base sm:text-xl font-bold truncate">Writer Portal</h1>
               <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Create and manage your articles</p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+            <Button variant="outline" size="sm" onClick={() => navigate("/")} className="hidden sm:flex gap-1.5 px-3">
+              <Home className="w-3.5 h-3.5" />
+              <span className="text-xs">Back to Site</span>
+            </Button>
             <div className="hidden sm:flex items-center gap-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={profile?.avatar_url || ""} />
