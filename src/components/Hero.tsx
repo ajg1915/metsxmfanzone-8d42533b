@@ -477,70 +477,8 @@ const Hero = () => {
         </>
       )}
 
-      {/* Bottom Navigation Tabs - Glass styled */}
+      {/* Slide Indicators */}
       <div className="absolute bottom-0 left-0 right-0 z-20">
-        <div className="flex items-center justify-center gap-0.5 sm:gap-1 md:gap-2 px-2 sm:px-4 pb-3 sm:pb-4">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isLiveTab = tab.id === "live";
-            const isOverviewTab = tab.id === "overview";
-            
-            const tabButton = (
-              <button
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  if (tab.id === "overview") setShowOverviewInfo(true);
-                  if (tab.id === "live") handleProtectedNavigation("/metsxmfanzone-tv");
-                  if (tab.id === "podcasts") handleProtectedNavigation("/podcast");
-                  if (tab.id === "community") handleProtectedNavigation("/community");
-                }}
-                className={`
-                  relative flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 md:py-2.5 text-[11px] sm:text-xs md:text-sm lg:text-base font-medium transition-all duration-300 rounded-lg sm:rounded-xl
-                  ${
-                    activeTab === tab.id
-                      ? "text-foreground glass-strong border-primary/50 shadow-lg"
-                      : "text-muted-foreground hover:text-foreground glass-light hover:border-border/50"
-                  }
-                  ${isLiveTab && isLiveNow ? "ring-1 ring-[#ff4500]/40 shadow-[#ff4500]/20" : ""}
-                `}
-              >
-                {/* Live indicator dot - left side */}
-                {isLiveTab && isLiveNow && (
-                  <span className="absolute -top-0.5 -left-0.5 sm:-top-1 sm:-left-1 flex h-2 w-2 sm:h-2.5 sm:w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff4500] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-[#ff4500]"></span>
-                  </span>
-                )}
-                <span>{tab.label}</span>
-              </button>
-            );
-
-            return (
-              <div key={tab.id} className="relative">
-                {/* Orange glow for Live Streams tab when live */}
-                {isLiveTab && isLiveNow && (
-                  <div className="absolute -inset-1 rounded-xl bg-[#ff4500]/30 blur-md animate-pulse" />
-                )}
-                {isOverviewTab ? (
-                  <Popover open={showOverviewInfo} onOpenChange={setShowOverviewInfo}>
-                    <PopoverTrigger asChild>
-                      {tabButton}
-                    </PopoverTrigger>
-                    <PopoverContent className="w-72 p-3 glass-strong border-primary/30">
-                      <p className="text-sm text-foreground">
-                        Here is a quick way to select your tabs quickly for Live Streams, Live Podcast and chat with your fellow fans daily!
-                      </p>
-                    </PopoverContent>
-                  </Popover>
-                ) : (
-                  tabButton
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Slide Indicators - Enhanced */}
         <div className="flex justify-center gap-1.5 sm:gap-2 pb-4 sm:pb-5">
           {slidesToShow.map((_, index) => (
             <button
