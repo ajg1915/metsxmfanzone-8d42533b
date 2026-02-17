@@ -47,7 +47,7 @@ const SpringTrainingGamesSection = () => {
         .select("*")
         .eq("published", true)
         .in("status", ["live", "scheduled"])
-        .contains("assigned_pages", ["spring-training-live"])
+        .contains("assigned_pages", ["spring-training-games"])
         .order("scheduled_start", { ascending: true })
         .limit(8);
       
