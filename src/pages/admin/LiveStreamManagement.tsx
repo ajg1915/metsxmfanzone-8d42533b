@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit, Radio, Upload, X, Loader2 } from "lucide-react";
+import { Trash2, Plus, Edit, Radio, Upload, X, Loader2, RotateCcw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -265,15 +265,39 @@ export default function LiveStreamManagement() {
 
   return (
     <div className="max-w-7xl mx-auto px-2 py-3">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
         <h1 className="text-lg font-bold">Live Stream Management</h1>
-        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="h-8">
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              Add Live Stream
-            </Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8"
+            onClick={async () => {
+              toast({ title: "Scraping...", description: "Fetching replay games from mlblive.net. This may take a minute." });
+              try {
+                const { data, error } = await supabase.functions.invoke('scrape-replay-games', {
+                  body: { maxPages: 3 }
+                });
+                if (error) throw error;
+                toast({
+                  title: "Scrape Complete",
+                  description: `Found ${data.total_with_embeds} games, ${data.newly_inserted} newly added.`,
+                });
+              } catch (err: any) {
+                toast({ title: "Scrape Failed", description: err.message || "Error scraping replays", variant: "destructive" });
+              }
+            }}
+          >
+            <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+            Scrape Replays
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="h-8">
+                <Plus className="w-3.5 h-3.5 mr-1.5" />
+                Add Live Stream
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingStream ? "Edit Live Stream" : "Add New Live Stream"}</DialogTitle>
@@ -467,6 +491,7 @@ export default function LiveStreamManagement() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {loading ? (
