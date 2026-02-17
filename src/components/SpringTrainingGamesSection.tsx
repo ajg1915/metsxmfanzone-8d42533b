@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Radio, Users, Play, ChevronRight, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 interface LiveStream {
   id: string;
@@ -20,6 +21,7 @@ interface LiveStream {
 
 const SpringTrainingGamesSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -61,6 +63,10 @@ const SpringTrainingGamesSection = () => {
   };
 
   const handleStreamClick = (stream: LiveStream) => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
     navigate("/spring-training-live");
   };
 
@@ -112,7 +118,15 @@ const SpringTrainingGamesSection = () => {
             </Badge>
           </div>
           <a
-            href="/spring-training-live"
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              if (!user) {
+                navigate("/auth");
+                return;
+              }
+              navigate("/spring-training-live");
+            }}
             className="flex items-center gap-1 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
             View All

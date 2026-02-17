@@ -36,6 +36,12 @@ const ReplayGames = () => {
   const [selectedStream, setSelectedStream] = useState<ReplayStream | null>(null);
 
   useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
     fetchReplayStreams();
 
     const channel = supabase.channel('replay-page-changes').on('postgres_changes', {

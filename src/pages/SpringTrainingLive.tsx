@@ -28,9 +28,15 @@ interface BlogPost {
 }
 
 const SpringTrainingLive = () => {
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    }
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     const fetchBlogPosts = async () => {
