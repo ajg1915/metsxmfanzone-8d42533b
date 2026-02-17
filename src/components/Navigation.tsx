@@ -168,7 +168,6 @@ const Navigation = () => {
               className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
               Podcast
-              {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold">PRO</span>}
             </button>
             {user && (
               <button
@@ -192,7 +191,6 @@ const Navigation = () => {
                   >
                     <Tv className="w-4 h-4" />
                     Live Games
-                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                   </button>
                   <button
                     onClick={() => handleProtectedNavigation("/spring-training-live")}
@@ -200,7 +198,6 @@ const Navigation = () => {
                   >
                     <CalendarDays className="w-4 h-4" />
                     Spring Training
-                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-green-600 text-white font-bold ml-auto">FREE</span>}
                   </button>
                   <button
                     onClick={() => handleProtectedNavigation("/mets-lineup-card")}
@@ -226,7 +223,6 @@ const Navigation = () => {
                   >
                     <Users className="w-4 h-4" />
                     Fan Community
-                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-green-600 text-white font-bold ml-auto">FREE</span>}
                   </button>
                   <button
                     onClick={() => handleProNavigation("/events")}
@@ -234,7 +230,6 @@ const Navigation = () => {
                   >
                     <CalendarDays className="w-4 h-4" />
                     Events
-                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                   </button>
                   <button
                     onClick={() => handleProNavigation("/blog")}
@@ -242,7 +237,6 @@ const Navigation = () => {
                   >
                     <img src={logo} alt="" className="w-4 h-4 object-contain" />
                     Blog
-                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                   </button>
                 </div>
               </div>
@@ -381,7 +375,6 @@ const Navigation = () => {
                   >
                     <img src={podcastIcon} alt="" className="w-3.5 h-3.5 object-contain" />
                     <span className="font-medium">Podcast</span>
-                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                   </button>
                   {user && (
                     <button
@@ -422,7 +415,6 @@ const Navigation = () => {
                       >
                         <span className="w-1 h-1 rounded-full bg-secondary" />
                         Live Games
-                        {!isPremium && user && <span className="text-[7px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                       </button>
                       <button
                         onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/spring-training-live"); }}
@@ -430,7 +422,6 @@ const Navigation = () => {
                       >
                         <span className="w-1 h-1 rounded-full bg-green-500" />
                         Spring Training
-                        {!isPremium && user && <span className="text-[7px] px-1 py-0.5 rounded bg-green-600 text-white font-bold ml-auto">FREE</span>}
                       </button>
                       <button
                         onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/mets-lineup-card"); }}
@@ -458,7 +449,6 @@ const Navigation = () => {
                       >
                         <span className="w-1 h-1 rounded-full bg-primary" />
                         Fan Community
-                        {!isPremium && user && <span className="text-[7px] px-1 py-0.5 rounded bg-green-600 text-white font-bold ml-auto">FREE</span>}
                       </button>
                       <button
                         onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); handleProNavigation("/events"); }}
@@ -466,7 +456,6 @@ const Navigation = () => {
                       >
                         <span className="w-1 h-1 rounded-full bg-yellow-500" />
                         Events
-                        {!isPremium && user && <span className="text-[7px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                       </button>
                       <button
                         onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); handleProNavigation("/blog"); }}
@@ -474,7 +463,6 @@ const Navigation = () => {
                       >
                         <span className="w-1 h-1 rounded-full bg-primary" />
                         Blog
-                        {!isPremium && user && <span className="text-[7px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                       </button>
                     </CollapsibleContent>
                   </Collapsible>
