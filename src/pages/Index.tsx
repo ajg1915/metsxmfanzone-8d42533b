@@ -15,7 +15,8 @@ const ImmersiveBackground = lazy(() => import("@/components/ImmersiveBackground"
 const FreeTrialExpiryBanner = lazy(() => import("@/components/FreeTrialExpiryBanner"));
 const LiveNetworks = lazy(() => import("@/components/LiveNetworks"));
 const LiveStreamsSection = lazy(() => import("@/components/LiveStreamsSection"));
-
+const SpringTrainingGamesSection = lazy(() => import("@/components/SpringTrainingGamesSection"));
+const ReplayGamesSection = lazy(() => import("@/components/ReplayGamesSection"));
 const SpringTraining = lazy(() => import("@/components/SpringTraining"));
 const PlayersToWatch = lazy(() => import("@/components/PlayersToWatch"));
 const TalentAssessmentSection = lazy(() => import("@/components/TalentAssessmentSection"));
@@ -184,6 +185,14 @@ const Index = () => {
 
         <Suspense fallback={<SectionSkeleton />}>
           <LiveStreamsSection />
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <SpringTrainingGamesSection />
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <ReplayGamesSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />

@@ -19,9 +19,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import LiveStreamsSection from "@/components/LiveStreamsSection";
-import SpringTrainingGamesSection from "@/components/SpringTrainingGamesSection";
-import ReplayGamesSection from "@/components/ReplayGamesSection";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -398,15 +395,6 @@ const Dashboard = () => {
               })}
             </div>
           </div>
-
-          {/* Live Streams */}
-          <LiveStreamsSection />
-
-          {/* Spring Training Live Games */}
-          <SpringTrainingGamesSection />
-
-          {/* Replay Games */}
-          <ReplayGamesSection />
 
           {/* Notifications & Security */}
           <NotificationPreferencesCard />
