@@ -1,4 +1,4 @@
-import { MessageSquarePlus, Share2, Tv, PenLine, BookOpen, Mic, Lock } from "lucide-react";
+import { MessageSquarePlus, Share2, Tv, PenLine, BookOpen, Mic } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -74,18 +74,12 @@ const SocialMediaBar = () => {
     <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/90 backdrop-blur-md border-t border-border/40">
       <div className="flex items-center justify-around py-2 px-4">
         {navItems.map((item) => {
-          const showProLock = item.requiresPremium && !isPremium && !isAdmin;
           return (
             <button
               key={item.label}
               onClick={() => handleClick(item)}
               className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors relative"
             >
-              {showProLock && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full flex items-center justify-center">
-                  <Lock className="w-1.5 h-1.5 text-white" />
-                </span>
-              )}
               {item.label === "Home" ? (
                 <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
               ) : item.label === "Social" ? (
