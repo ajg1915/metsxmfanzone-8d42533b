@@ -108,6 +108,15 @@ const LiveStreamsSection = () => {
       }
       return;
     }
+    // MetsXMFanZone streams: free users get 10-min preview (handled by StreamTimeLimit)
+    if (stream.assigned_pages?.includes('metsxmfanzone')) {
+      if (!user) {
+        navigate("/auth");
+      } else {
+        navigate(getStreamPageUrl(stream));
+      }
+      return;
+    }
     // All other streams require premium
     if (isAdmin || tier === "premium" || tier === "annual") {
       navigate(getStreamPageUrl(stream));
