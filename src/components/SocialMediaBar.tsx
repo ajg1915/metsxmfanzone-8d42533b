@@ -1,4 +1,4 @@
-import { MessageSquarePlus, Share2, Tv, PenLine, BookOpen, Mic } from "lucide-react";
+import { MessageSquarePlus, Share2, Tv, PenLine, BookOpen, Mic, Lock } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,15 +11,15 @@ type NavItem = {
   label: string;
   path: string;
   isAnchor?: boolean;
-  requiresMembership: boolean;
+  requiresPremium: boolean;
 };
 
 const navItems: NavItem[] = [
-  { label: "Home", path: "/", requiresMembership: false },
-  { label: "Watch Live", path: "/metsxmfanzone-tv", requiresMembership: true },
-  { label: "Post", path: "/community", requiresMembership: false },
-  { label: "Blog", path: "/blog", requiresMembership: true },
-  { label: "Podcast", path: "/podcast", requiresMembership: true },
+  { label: "Home", path: "/", requiresPremium: false },
+  { label: "Watch Live", path: "/metsxmfanzone-tv", requiresPremium: true },
+  { label: "Post", path: "/community", requiresPremium: false },
+  { label: "Blog", path: "/blog", requiresPremium: true },
+  { label: "Podcast", path: "/podcast", requiresPremium: true },
 ];
 
 const SocialMediaBar = () => {
@@ -41,9 +41,16 @@ const SocialMediaBar = () => {
   }, [user]);
 
   const handleClick = (item: typeof navItems[0]) => {
-    if (item.requiresMembership && (!user || !isPremium)) {
-      toast.error("Members only! Please subscribe to access this feature.");
-      navigate("/plans");
+    // Items requiring premium: redirect to pricing if not premium
+    if (item.requiresPremium && (!user || !isPremium)) {
+      toast.error("This is a PRO feature! Upgrade to access.");
+      navigate("/pricing");
+      return;
+    }
+
+    // Community requires login but NOT premium
+    if (item.label === "Post" && !user) {
+      navigate("/auth");
       return;
     }
 
@@ -66,30 +73,38 @@ const SocialMediaBar = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/90 backdrop-blur-md border-t border-border/40">
       <div className="flex items-center justify-around py-2 px-4">
-        {navItems.map((item) => (
-          <button
-            key={item.label}
-            onClick={() => handleClick(item)}
-            className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors"
-          >
-            {item.label === "Home" ? (
-              <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
-            ) : item.label === "Social" ? (
-              <Share2 className="h-5 w-5" />
-            ) : item.label === "Watch Live" ? (
-              <Tv className="h-5 w-5" />
-            ) : item.label === "Post" ? (
-              <MessageSquarePlus className="h-5 w-5" />
-            ) : item.label === "Blog" ? (
-              <BookOpen className="h-5 w-5" />
-            ) : item.label === "Podcast" ? (
-              <Mic className="h-5 w-5" />
-            ) : (
-              <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
-            )}
-            <span className="text-[9px] font-medium">{item.label}</span>
-          </button>
-        ))}
+        {navItems.map((item) => {
+          const showProLock = item.requiresPremium && !isPremium && !isAdmin;
+          return (
+            <button
+              key={item.label}
+              onClick={() => handleClick(item)}
+              className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors relative"
+            >
+              {showProLock && (
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full flex items-center justify-center">
+                  <Lock className="w-1.5 h-1.5 text-white" />
+                </span>
+              )}
+              {item.label === "Home" ? (
+                <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
+              ) : item.label === "Social" ? (
+                <Share2 className="h-5 w-5" />
+              ) : item.label === "Watch Live" ? (
+                <Tv className="h-5 w-5" />
+              ) : item.label === "Post" ? (
+                <MessageSquarePlus className="h-5 w-5" />
+              ) : item.label === "Blog" ? (
+                <BookOpen className="h-5 w-5" />
+              ) : item.label === "Podcast" ? (
+                <Mic className="h-5 w-5" />
+              ) : (
+                <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
+              )}
+              <span className="text-[9px] font-medium">{item.label}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

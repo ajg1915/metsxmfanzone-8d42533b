@@ -5,7 +5,8 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Radio, Users, Play, ChevronRight, ChevronLeft } from "lucide-react";
+import { Radio, Users, Play, ChevronRight, ChevronLeft, Lock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import PremiumBadge from "@/components/PremiumBadge";
@@ -24,6 +25,7 @@ interface LiveStream {
 
 const LiveStreamsSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { tier, isAdmin, loading: subscriptionLoading } = useSubscription();
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +76,14 @@ const LiveStreamsSection = () => {
     }
   };
 
+  const isSpringTrainingStream = (stream: LiveStream) => {
+    return stream.assigned_pages?.includes('spring-training-live');
+  };
+
+  const isProStream = (stream: LiveStream) => {
+    return !isSpringTrainingStream(stream);
+  };
+
   const getStreamPageUrl = (stream: LiveStream) => {
     const networkPages = stream.assigned_pages.filter(page => page !== 'live' && page !== 'guide');
     if (networkPages.includes('metsxmfanzone')) return '/metsxmfanzone-tv';
@@ -89,10 +99,20 @@ const LiveStreamsSection = () => {
       navigate(getStreamPageUrl(stream));
       return;
     }
+    // Spring training streams are free for all authenticated users
+    if (isSpringTrainingStream(stream)) {
+      if (!user) {
+        navigate("/auth");
+      } else {
+        navigate(getStreamPageUrl(stream));
+      }
+      return;
+    }
+    // All other streams require premium
     if (isAdmin || tier === "premium" || tier === "annual") {
       navigate(getStreamPageUrl(stream));
     } else {
-      setShowUpgradePrompt(true);
+      navigate("/pricing");
     }
   };
 
@@ -217,9 +237,15 @@ const LiveStreamsSection = () => {
 
                     {/* Status badge */}
                     <div className="absolute top-2 right-2 flex items-center gap-1.5">
-                      {/* Premium badge for non-members */}
-                      {!isAdmin && tier !== "premium" && tier !== "annual" && (
+                      {/* PRO badge only on non-spring-training streams for non-premium users */}
+                      {isProStream(stream) && !isAdmin && tier !== "premium" && tier !== "annual" && (
                         <PremiumBadge size="sm" />
+                      )}
+                      {/* FREE badge on spring training streams for non-premium users */}
+                      {isSpringTrainingStream(stream) && !isAdmin && tier !== "premium" && tier !== "annual" && (
+                        <Badge className="text-[10px] px-1.5 py-0.5 font-semibold backdrop-blur-sm bg-green-600/90 text-white">
+                          FREE
+                        </Badge>
                       )}
                       <Badge className={cn(
                         "text-[10px] sm:text-xs px-1.5 py-0.5 font-semibold backdrop-blur-sm",
