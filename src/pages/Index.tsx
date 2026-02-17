@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 // Lazy load heavy components that are below the fold
 const ImmersiveBackground = lazy(() => import("@/components/ImmersiveBackground"));
+const FreeTrialExpiryBanner = lazy(() => import("@/components/FreeTrialExpiryBanner"));
 const LiveNetworks = lazy(() => import("@/components/LiveNetworks"));
 const LiveStreamsSection = lazy(() => import("@/components/LiveStreamsSection"));
 
@@ -164,6 +165,9 @@ const Index = () => {
       <Navigation />
       <LiveGameTicker />
       {/* Removed: GameAlertsBanner */}
+      <Suspense fallback={null}>
+          <FreeTrialExpiryBanner />
+        </Suspense>
       <main className="pt-14 sm:pt-16 relative z-10">
         <Hero />
         
