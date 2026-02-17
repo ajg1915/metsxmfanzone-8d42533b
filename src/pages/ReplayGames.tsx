@@ -106,21 +106,8 @@ const ReplayGames = () => {
 
       <main className="flex-1 pt-12">
         {/* Hero Banner */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-primary/20 via-background to-background">
-          <div className="absolute inset-0 overflow-hidden">
-            <motion.div
-              className="absolute -top-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute -bottom-20 -left-20 w-80 h-80 bg-accent/10 rounded-full blur-3xl"
-              animate={{ scale: [1.2, 1, 1.2], opacity: [0.15, 0.3, 0.15] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </div>
-
-          <div className="container mx-auto px-4 py-8 sm:py-12 relative z-10">
+        <div className="relative overflow-hidden bg-background">
+          <div className="container mx-auto px-4 py-8 sm:py-12">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <motion.div
                 className="relative"
