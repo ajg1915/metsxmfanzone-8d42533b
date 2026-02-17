@@ -95,9 +95,21 @@ const Navigation = () => {
     checkAdminAndProfile();
   }, [user]);
 
+  const isPremium = isAdmin || tier === "premium" || tier === "annual";
+
   const handleProtectedNavigation = (path: string) => {
     if (!user) {
       navigate("/auth");
+    } else {
+      navigate(path);
+    }
+  };
+
+  const handleProNavigation = (path: string) => {
+    if (!user) {
+      navigate("/auth");
+    } else if (!isPremium) {
+      navigate("/pricing");
     } else {
       navigate(path);
     }
@@ -152,10 +164,11 @@ const Navigation = () => {
               Home
             </NavLink>
             <button
-              onClick={() => handleProtectedNavigation("/podcast")}
-              className="text-foreground hover:text-primary transition-colors"
+              onClick={() => handleProNavigation("/podcast")}
+              className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
               Podcast
+              {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold">PRO</span>}
             </button>
             {user && (
               <button
@@ -174,11 +187,12 @@ const Navigation = () => {
               <div className="absolute left-0 top-full pt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="bg-background border border-border rounded-lg shadow-lg min-w-[160px] py-1">
                   <button
-                    onClick={() => navigate("/broadcast-schedule")}
+                    onClick={() => handleProNavigation("/broadcast-schedule")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
                     <Tv className="w-4 h-4" />
                     Live Games
+                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                   </button>
                   <button
                     onClick={() => handleProtectedNavigation("/spring-training-live")}
@@ -186,9 +200,10 @@ const Navigation = () => {
                   >
                     <CalendarDays className="w-4 h-4" />
                     Spring Training
+                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-green-600 text-white font-bold ml-auto">FREE</span>}
                   </button>
                   <button
-                    onClick={() => navigate("/mets-lineup-card")}
+                    onClick={() => handleProtectedNavigation("/mets-lineup-card")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
                     <Users className="w-4 h-4" />
@@ -211,20 +226,23 @@ const Navigation = () => {
                   >
                     <Users className="w-4 h-4" />
                     Fan Community
+                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-green-600 text-white font-bold ml-auto">FREE</span>}
                   </button>
                   <button
-                    onClick={() => handleProtectedNavigation("/events")}
+                    onClick={() => handleProNavigation("/events")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
                     <CalendarDays className="w-4 h-4" />
                     Events
+                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                   </button>
                   <button
-                    onClick={() => handleProtectedNavigation("/blog")}
+                    onClick={() => handleProNavigation("/blog")}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                   >
                     <img src={logo} alt="" className="w-4 h-4 object-contain" />
                     Blog
+                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                   </button>
                 </div>
               </div>
@@ -358,11 +376,12 @@ const Navigation = () => {
                     <span className="font-medium">Home</span>
                   </NavLink>
                   <button
-                    onClick={() => { setMobileMenuOpen(false); handleProtectedNavigation("/podcast"); }}
+                    onClick={() => { setMobileMenuOpen(false); handleProNavigation("/podcast"); }}
                     className="flex items-center gap-2.5 w-full text-foreground hover:text-primary hover:bg-primary/8 transition-all py-2 px-2.5 rounded-lg text-left text-xs"
                   >
                     <img src={podcastIcon} alt="" className="w-3.5 h-3.5 object-contain" />
                     <span className="font-medium">Podcast</span>
+                    {!isPremium && user && <span className="text-[8px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                   </button>
                   {user && (
                     <button
@@ -398,11 +417,12 @@ const Navigation = () => {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="space-y-0.5 mt-0.5 ml-6">
                       <button
-                        onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); navigate("/broadcast-schedule"); }}
+                        onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); handleProNavigation("/broadcast-schedule"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
                         <span className="w-1 h-1 rounded-full bg-secondary" />
                         Live Games
+                        {!isPremium && user && <span className="text-[7px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                       </button>
                       <button
                         onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/spring-training-live"); }}
@@ -410,9 +430,10 @@ const Navigation = () => {
                       >
                         <span className="w-1 h-1 rounded-full bg-green-500" />
                         Spring Training
+                        {!isPremium && user && <span className="text-[7px] px-1 py-0.5 rounded bg-green-600 text-white font-bold ml-auto">FREE</span>}
                       </button>
                       <button
-                        onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); navigate("/mets-lineup-card"); }}
+                        onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/mets-lineup-card"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
                         <span className="w-1 h-1 rounded-full bg-primary" />
@@ -437,20 +458,23 @@ const Navigation = () => {
                       >
                         <span className="w-1 h-1 rounded-full bg-primary" />
                         Fan Community
+                        {!isPremium && user && <span className="text-[7px] px-1 py-0.5 rounded bg-green-600 text-white font-bold ml-auto">FREE</span>}
                       </button>
                       <button
-                        onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/events"); }}
+                        onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); handleProNavigation("/events"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
                         <span className="w-1 h-1 rounded-full bg-yellow-500" />
                         Events
+                        {!isPremium && user && <span className="text-[7px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                       </button>
                       <button
-                        onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/blog"); }}
+                        onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); handleProNavigation("/blog"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
                         <span className="w-1 h-1 rounded-full bg-primary" />
                         Blog
+                        {!isPremium && user && <span className="text-[7px] px-1 py-0.5 rounded bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold ml-auto">PRO</span>}
                       </button>
                     </CollapsibleContent>
                   </Collapsible>

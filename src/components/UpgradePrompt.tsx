@@ -18,18 +18,18 @@ export function UpgradePrompt({ open, onOpenChange }: UpgradePromptProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Upgrade Required</DialogTitle>
+          <DialogTitle>🔒 PRO Feature</DialogTitle>
           <DialogDescription>
-            Access to live streams and upcoming stream sections requires a Monthly or Annual membership. 
-            Upgrade your plan to enjoy exclusive live content and premium features.
+            This content is available exclusively to PRO members. Free members enjoy access to Spring Training streams and the Fan Community. 
+            Upgrade to PRO to unlock MetsXMFanZone live streams, podcasts, blogs, events, and all premium content.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col sm:flex-row gap-2">
           <Button variant="outline" onClick={handleClose}>
             Maybe Later
           </Button>
-          <Button onClick={() => navigate("/pricing")}>
-            View Membership
+          <Button onClick={() => navigate("/pricing")} className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600">
+            Upgrade to PRO
           </Button>
         </DialogFooter>
       </DialogContent>
