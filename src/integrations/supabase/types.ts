@@ -1371,6 +1371,42 @@ export type Database = {
         }
         Relationships: []
       }
+      replay_games: {
+        Row: {
+          created_at: string
+          description: string | null
+          embed_url: string
+          game_date: string | null
+          id: string
+          source_url: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          embed_url: string
+          game_date?: string | null
+          id?: string
+          source_url?: string | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          embed_url?: string
+          game_date?: string | null
+          id?: string
+          source_url?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       seo_settings: {
         Row: {
           canonical_url: string | null
