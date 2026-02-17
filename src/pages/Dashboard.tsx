@@ -353,7 +353,7 @@ const Dashboard = () => {
               <div className="mt-4 p-3 rounded-xl bg-primary/5 border border-primary/20">
                 <p className="text-sm text-foreground">
                   <Sparkles className="w-4 h-4 inline mr-1 text-primary" />
-                  <strong>Special Offer:</strong> Start your 7-day free trial of Premium today!
+                  <strong>Special Offer:</strong> Free Spring Training access on Signup!
                 </p>
               </div>
             )}
