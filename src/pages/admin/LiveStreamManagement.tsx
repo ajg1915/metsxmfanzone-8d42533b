@@ -402,7 +402,7 @@ export default function LiveStreamManagement() {
                 <div>
                   <Label htmlFor="assigned_pages">Assign to Pages *</Label>
                   <div className="space-y-2 mt-2">
-                    {['guide', 'live', 'metsxmfanzone', 'mlb-network', 'espn-network', 'pix11-network', 'spring-training-live'].map((page) => (
+                    {['guide', 'live', 'metsxmfanzone', 'mlb-network', 'espn-network', 'pix11-network', 'spring-training-live', 'spring-training-games', 'replay-games'].map((page) => (
                       <div key={page} className="flex items-center space-x-2">
                         <input
                           type="checkbox"
@@ -417,7 +417,7 @@ export default function LiveStreamManagement() {
                           className="rounded border-border"
                         />
                         <Label htmlFor={page} className="cursor-pointer font-normal">
-                          {page === 'guide' ? 'Guide Page' : page === 'live' ? 'Live Page' : page === 'metsxmfanzone' ? 'MetsXMFanZone TV' : page === 'mlb-network' ? 'MLB Network' : page === 'espn-network' ? 'ESPN Network' : page === 'pix11-network' ? 'PIX11 Network' : 'Spring Training Live'}
+                          {page === 'guide' ? 'Guide Page' : page === 'live' ? 'Live Page' : page === 'metsxmfanzone' ? 'MetsXMFanZone TV' : page === 'mlb-network' ? 'MLB Network' : page === 'espn-network' ? 'ESPN Network' : page === 'pix11-network' ? 'PIX11 Network' : page === 'spring-training-live' ? 'Spring Training Live' : page === 'spring-training-games' ? 'Spring Training Games' : 'Replay Games'}
                         </Label>
                       </div>
                     ))}
@@ -512,6 +512,8 @@ export default function LiveStreamManagement() {
                     if (p === 'espn-network') return 'ESPN Network';
                     if (p === 'pix11-network') return 'PIX11 Network';
                     if (p === 'spring-training-live') return 'Spring Training Live';
+                    if (p === 'spring-training-games') return 'Spring Training Games';
+                    if (p === 'replay-games') return 'Replay Games';
                     return p;
                   }).join(', ') : 'None'}</p>
                   {stream.scheduled_start && (

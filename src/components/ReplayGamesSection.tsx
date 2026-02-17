@@ -51,7 +51,7 @@ const ReplayGamesSection = () => {
         .from("live_streams")
         .select("*")
         .eq("published", true)
-        .eq("status", "ended")
+        .contains("assigned_pages", ["replay-games"])
         .order("scheduled_start", { ascending: false })
         .limit(8);
       
