@@ -54,7 +54,7 @@ const LiveStreamsSection = () => {
         .from("live_streams")
         .select("*")
         .eq("published", true)
-        .in("status", ["live", "scheduled"])
+        .eq("status", "live")
         .order("scheduled_start", { ascending: true })
         .limit(8);
       
