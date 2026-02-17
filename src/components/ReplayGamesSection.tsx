@@ -135,10 +135,10 @@ const ReplayGamesSection = () => {
             </h2>
           </div>
           <a
-            href="/mets-gamecast"
+            href="/replay-games"
             className="flex items-center gap-1 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
-            Mets Gamecast
+            View All Replays
             <ChevronRight className="w-4 h-4" />
           </a>
         </motion.div>

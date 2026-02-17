@@ -78,6 +78,7 @@ const Sitemap = lazy(() => import("./pages/Sitemap"));
 const PayPalSuccess = lazy(() => import("./pages/PayPalSuccess"));
 const HelcimCheckout = lazy(() => import("./pages/HelcimCheckout"));
 const SpringTrainingLive = lazy(() => import("./pages/SpringTrainingLive"));
+const ReplayGames = lazy(() => import("./pages/ReplayGames"));
 const Merch = lazy(() => import("./pages/Merch"));
 const Product = lazy(() => import("./pages/Product"));
 const MetsSchedule2026 = lazy(() => import("./pages/MetsSchedule2026"));
@@ -392,6 +393,7 @@ const AppContent = () => {
             <Route path="/writer/new-article" element={<WriterArticleEditor />} />
             <Route path="/writer/edit/:id" element={<WriterArticleEditor />} />
             <Route path="/spring-training-live" element={<SpringTrainingLive />} />
+            <Route path="/replay-games" element={<ReplayGames />} />
             <Route path="/merch" element={<Merch />} />
             <Route path="/product/:handle" element={<Product />} />
             <Route path="/mets-schedule-2026" element={<MetsSchedule2026 />} />
