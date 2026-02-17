@@ -445,7 +445,7 @@ const Hero = () => {
                     <div className="mt-4 sm:mt-5 md:mt-6">
                       <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-lg sm:rounded-xl glass-light glow-pulse">
                         <span className="text-[10px] sm:text-xs md:text-sm text-foreground">
-                          ⚡ Sign up for <span className="text-primary font-bold">FREE Spring Training</span> access
+                          ⚡ <span className="text-primary font-bold">FREE Spring Training</span> access on signup · Regular season just <span className="text-primary font-bold">$12.99/mo</span>
                         </span>
                       </div>
                     </div>
