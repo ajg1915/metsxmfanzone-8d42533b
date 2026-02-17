@@ -144,20 +144,6 @@ export default function MetsSchedule2026() {
             Full Season Schedule - Spring Training & Regular Season
           </p>
           
-          {!loading && games.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-3 mb-4">
-              <Badge variant="outline" className="text-sm px-3 py-1">
-                {springTrainingCount} Spring Training Games
-              </Badge>
-              <Badge variant="outline" className="text-sm px-3 py-1">
-                {regularSeasonCount} Regular Season Games
-              </Badge>
-              <Badge variant="outline" className="text-sm px-3 py-1">
-                {games.length} Total Games
-              </Badge>
-            </div>
-          )}
-          
           <Button
             variant="outline"
             size="sm"
@@ -304,7 +290,21 @@ export default function MetsSchedule2026() {
           </>
         )}
 
-        <div className="mt-8 text-center">
+        {!loading && games.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-3 mt-8 mb-4">
+            <Badge variant="outline" className="text-sm px-3 py-1">
+              {springTrainingCount} Spring Training Games
+            </Badge>
+            <Badge variant="outline" className="text-sm px-3 py-1">
+              {regularSeasonCount} Regular Season Games
+            </Badge>
+            <Badge variant="outline" className="text-sm px-3 py-1">
+              {games.length} Total Games
+            </Badge>
+          </div>
+        )}
+
+        <div className="mt-4 text-center">
           <p className="text-sm text-muted-foreground">
             * Schedule data from MLB Stats API. Subject to change.
           </p>
