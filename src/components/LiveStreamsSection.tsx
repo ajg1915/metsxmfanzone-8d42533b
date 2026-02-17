@@ -77,7 +77,11 @@ const LiveStreamsSection = () => {
   };
 
   const isSpringTrainingStream = (stream: LiveStream) => {
-    return stream.assigned_pages?.includes('spring-training-live');
+    return stream.assigned_pages?.includes('spring-training-live') && !stream.assigned_pages?.includes('metsxmfanzone');
+  };
+
+  const isMetsXMFanZoneStream = (stream: LiveStream) => {
+    return stream.assigned_pages?.includes('metsxmfanzone');
   };
 
   const isProStream = (stream: LiveStream) => {
