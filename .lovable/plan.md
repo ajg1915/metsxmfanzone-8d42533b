@@ -1,51 +1,31 @@
 
 
-# Update 2026 New York Mets Roster for Predictions
+# Fix Stream Playback on Tablet Views
 
-## What's Changing
+## Problem
+Streams other than MetsXMFanZone TV don't play on tablet views. This is caused by two issues in the `StreamPlayer` component:
 
-The hardcoded roster used for "Anthony's Player Parlays" (Predictions) and Talent Assessments contains several players who are no longer on the 2026 Mets, and is missing many current roster members.
+1. **Native HLS override breaks Safari/iPad**: The Video.js config uses `overrideNative: true` which forces its own HLS parser instead of Safari's built-in native HLS support. iPad Safari handles HLS natively and works better without this override.
 
-## Players Being Removed (Not on 2026 Mets)
+2. **Player not properly reinitializing between pages**: When navigating from one stream page to another, the Video.js player instance may not be fully disposed before a new one is created, causing the second stream to fail.
 
-- Brandon Nimmo (was already supposed to be excluded per custom knowledge)
-- Jesse Winker
-- Luisangel Acuna
-- Jose Iglesias
-- Frankie Montas
+## Solution
 
-## Players Being Added (Currently on 2026 Mets Active Roster)
+### 1. Update `src/components/StreamPlayer.tsx`
 
-- Jonah Tong (SP) -- id: 804636
-- Nolan McLean (RP) -- id: 690997
-- Vidal Brujan (IF) -- id: 660644
-- Hayden Senger (C) -- id: 663584
-- Luis Torrens (C) -- id: 620443
-- Nick Morabito (OF) -- id: 703492
-- Jared Young (OF/1B) -- id: 676724
-- Alex Carrillo (RP) -- id: 692024
-- Luis Garcia (RP) -- id: 472610
-- Joey Gerber (RP) -- id: 680702
-- Justin Hagenman (RP) -- id: 663795
-- Bryan Hudson (RP) -- id: 663542
-- Jonathan Pintaro (RP) -- id: 702752
-- Dylan Ross (RP) -- id: 697811
-- Austin Warren (RP) -- id: 681810
+- **Detect tablet/mobile Safari** and conditionally use native HLS instead of overriding it. Safari (including iPad) has excellent native HLS support, so we should let it handle HLS streams natively.
+- **Fix player disposal logic**: Ensure the player is fully disposed when the `pageName` prop changes or the component unmounts, so a fresh player is created for each stream page.
+- **Add `playsinline` attribute** directly on the `<video>` element for proper iOS/iPadOS inline playback.
+- **Improve error recovery**: Add a retry mechanism when the player encounters an error on tablet, attempting to reload the stream source.
 
-## Players Staying (Confirmed on roster)
+### Technical Details
 
-Francisco Lindor, Juan Soto, Mark Vientos, Francisco Alvarez, Marcus Semien, Bo Bichette, Luis Robert Jr., MJ Melendez, Brett Baty, Jorge Polanco, Ronny Mauricio, Tyrone Taylor, Kodai Senga, Sean Manaea, David Peterson, Clay Holmes, Freddy Peralta, Christian Scott, Tobias Myers, Devin Williams, Luke Weaver, A.J. Minter, Dedniel Nunez, Brooks Raley, Huascar Brazoban
+**Key changes to Video.js config:**
+- Check if the browser supports native HLS (`video.canPlayType('application/vnd.apple.mpegurl')`)
+- If native HLS is supported (Safari/iPad), set `overrideNative: false` and enable native tracks
+- If native HLS is NOT supported (Chrome, Firefox), keep `overrideNative: true`
+- Ensure the video element gets the `playsinline` attribute for iPad
+- Fix the cleanup effect to properly reset `playerReady` state and handle race conditions when `pageName` changes
 
-## Files Being Updated
-
-1. **`supabase/functions/generate-daily-predictions/index.ts`** -- Update the `METS_2026_ROSTER` array with the correct active roster (remove 5 players, add 15 players)
-
-2. **`supabase/functions/generate-talent-assessments/index.ts`** -- Update the fallback roster list to match the same corrected roster (remove Jose Quintana, Edwin Diaz, Jesse Winker, Jose Iglesias, Nimmo; add new players)
-
-## Technical Details
-
-- Both edge functions will be redeployed automatically after the update
-- The predictions function excludes Brandon Nimmo per existing custom knowledge rules
-- MLB player IDs are sourced directly from mlb.com/mets/roster as of today
-- After deploying, a force-regenerate of predictions will pick from the updated roster
+**Estimated change:** ~20 lines modified in `StreamPlayer.tsx`
 
