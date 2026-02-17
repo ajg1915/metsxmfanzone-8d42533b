@@ -38,114 +38,114 @@ interface LineupCard {
 
 // Historical end-of-2025 lineups (September/October)
 const historical2025Lineups = [
-  {
-    id: "hist-2025-sept-28",
-    game_date: "2025-09-28",
-    game_time: "1:10 PM",
-    opponent: "Braves",
-    location: "Citi Field",
-    lineup_data: [
-      { position: 1, name: "Francisco Lindor", fieldPosition: "SS" },
-      { position: 2, name: "Juan Soto", fieldPosition: "RF" },
-      { position: 3, name: "Mark Vientos", fieldPosition: "3B" },
-      { position: 4, name: "Pete Alonso", fieldPosition: "1B" },
-      { position: 5, name: "Brandon Nimmo", fieldPosition: "LF" },
-      { position: 6, name: "Jesse Winker", fieldPosition: "DH" },
-      { position: 7, name: "Francisco Alvarez", fieldPosition: "C" },
-      { position: 8, name: "Tyrone Taylor", fieldPosition: "CF" },
-      { position: 9, name: "Jose Iglesias", fieldPosition: "2B" },
-    ],
-    starting_pitcher: { name: "Sean Manaea", hand: "LHP", era: "3.47", strikeouts: "184" },
-    published: true,
-    notes: "Regular Season Finale 2025",
-  },
-  {
-    id: "hist-2025-sept-27",
-    game_date: "2025-09-27",
-    game_time: "7:10 PM",
-    opponent: "Braves",
-    location: "Citi Field",
-    lineup_data: [
-      { position: 1, name: "Francisco Lindor", fieldPosition: "SS" },
-      { position: 2, name: "Juan Soto", fieldPosition: "RF" },
-      { position: 3, name: "Mark Vientos", fieldPosition: "3B" },
-      { position: 4, name: "Pete Alonso", fieldPosition: "1B" },
-      { position: 5, name: "Brandon Nimmo", fieldPosition: "LF" },
-      { position: 6, name: "Francisco Alvarez", fieldPosition: "C" },
-      { position: 7, name: "Jesse Winker", fieldPosition: "DH" },
-      { position: 8, name: "Harrison Bader", fieldPosition: "CF" },
-      { position: 9, name: "Jose Iglesias", fieldPosition: "2B" },
-    ],
-    starting_pitcher: { name: "Kodai Senga", hand: "RHP", era: "2.90", strikeouts: "52" },
-    published: true,
-    notes: null,
-  },
-  {
-    id: "hist-2025-sept-26",
-    game_date: "2025-09-26",
-    game_time: "7:10 PM",
-    opponent: "Braves",
-    location: "Citi Field",
-    lineup_data: [
-      { position: 1, name: "Francisco Lindor", fieldPosition: "SS" },
-      { position: 2, name: "Juan Soto", fieldPosition: "RF" },
-      { position: 3, name: "Mark Vientos", fieldPosition: "3B" },
-      { position: 4, name: "Pete Alonso", fieldPosition: "1B" },
-      { position: 5, name: "Brandon Nimmo", fieldPosition: "LF" },
-      { position: 6, name: "Francisco Alvarez", fieldPosition: "C" },
-      { position: 7, name: "Tyrone Taylor", fieldPosition: "CF" },
-      { position: 8, name: "Jesse Winker", fieldPosition: "DH" },
-      { position: 9, name: "Luisangel Acuña", fieldPosition: "2B" },
-    ],
-    starting_pitcher: { name: "David Peterson", hand: "LHP", era: "3.08", strikeouts: "143" },
-    published: true,
-    notes: null,
-  },
-  {
-    id: "hist-2025-sept-25",
-    game_date: "2025-09-25",
-    game_time: "6:40 PM",
-    opponent: "Brewers",
-    location: "American Family Field",
-    lineup_data: [
-      { position: 1, name: "Francisco Lindor", fieldPosition: "SS" },
-      { position: 2, name: "Juan Soto", fieldPosition: "RF" },
-      { position: 3, name: "Mark Vientos", fieldPosition: "3B" },
-      { position: 4, name: "Pete Alonso", fieldPosition: "1B" },
-      { position: 5, name: "Brandon Nimmo", fieldPosition: "LF" },
-      { position: 6, name: "Francisco Alvarez", fieldPosition: "C" },
-      { position: 7, name: "Jesse Winker", fieldPosition: "DH" },
-      { position: 8, name: "Harrison Bader", fieldPosition: "CF" },
-      { position: 9, name: "Jose Iglesias", fieldPosition: "2B" },
-    ],
-    starting_pitcher: { name: "Jose Quintana", hand: "LHP", era: "3.75", strikeouts: "140" },
-    published: true,
-    notes: null,
-  },
-  {
-    id: "hist-2025-sept-24",
-    game_date: "2025-09-24",
-    game_time: "6:40 PM",
-    opponent: "Brewers",
-    location: "American Family Field",
-    lineup_data: [
-      { position: 1, name: "Francisco Lindor", fieldPosition: "SS" },
-      { position: 2, name: "Juan Soto", fieldPosition: "RF" },
-      { position: 3, name: "Mark Vientos", fieldPosition: "3B" },
-      { position: 4, name: "Pete Alonso", fieldPosition: "1B" },
-      { position: 5, name: "Brandon Nimmo", fieldPosition: "LF" },
-      { position: 6, name: "Francisco Alvarez", fieldPosition: "C" },
-      { position: 7, name: "Jesse Winker", fieldPosition: "DH" },
-      { position: 8, name: "Tyrone Taylor", fieldPosition: "CF" },
-      { position: 9, name: "Luisangel Acuña", fieldPosition: "2B" },
-    ],
-    starting_pitcher: { name: "Luis Severino", hand: "RHP", era: "3.91", strikeouts: "161" },
-    published: true,
-    notes: null,
-  },
-];
+{
+  id: "hist-2025-sept-28",
+  game_date: "2025-09-28",
+  game_time: "1:10 PM",
+  opponent: "Braves",
+  location: "Citi Field",
+  lineup_data: [
+  { position: 1, name: "Francisco Lindor", fieldPosition: "SS" },
+  { position: 2, name: "Juan Soto", fieldPosition: "RF" },
+  { position: 3, name: "Mark Vientos", fieldPosition: "3B" },
+  { position: 4, name: "Pete Alonso", fieldPosition: "1B" },
+  { position: 5, name: "Brandon Nimmo", fieldPosition: "LF" },
+  { position: 6, name: "Jesse Winker", fieldPosition: "DH" },
+  { position: 7, name: "Francisco Alvarez", fieldPosition: "C" },
+  { position: 8, name: "Tyrone Taylor", fieldPosition: "CF" },
+  { position: 9, name: "Jose Iglesias", fieldPosition: "2B" }],
 
-function LineupCardDisplay({ lineup, isUpcoming = false }: { lineup: LineupCard | typeof historical2025Lineups[0]; isUpcoming?: boolean }) {
+  starting_pitcher: { name: "Sean Manaea", hand: "LHP", era: "3.47", strikeouts: "184" },
+  published: true,
+  notes: "Regular Season Finale 2025"
+},
+{
+  id: "hist-2025-sept-27",
+  game_date: "2025-09-27",
+  game_time: "7:10 PM",
+  opponent: "Braves",
+  location: "Citi Field",
+  lineup_data: [
+  { position: 1, name: "Francisco Lindor", fieldPosition: "SS" },
+  { position: 2, name: "Juan Soto", fieldPosition: "RF" },
+  { position: 3, name: "Mark Vientos", fieldPosition: "3B" },
+  { position: 4, name: "Pete Alonso", fieldPosition: "1B" },
+  { position: 5, name: "Brandon Nimmo", fieldPosition: "LF" },
+  { position: 6, name: "Francisco Alvarez", fieldPosition: "C" },
+  { position: 7, name: "Jesse Winker", fieldPosition: "DH" },
+  { position: 8, name: "Harrison Bader", fieldPosition: "CF" },
+  { position: 9, name: "Jose Iglesias", fieldPosition: "2B" }],
+
+  starting_pitcher: { name: "Kodai Senga", hand: "RHP", era: "2.90", strikeouts: "52" },
+  published: true,
+  notes: null
+},
+{
+  id: "hist-2025-sept-26",
+  game_date: "2025-09-26",
+  game_time: "7:10 PM",
+  opponent: "Braves",
+  location: "Citi Field",
+  lineup_data: [
+  { position: 1, name: "Francisco Lindor", fieldPosition: "SS" },
+  { position: 2, name: "Juan Soto", fieldPosition: "RF" },
+  { position: 3, name: "Mark Vientos", fieldPosition: "3B" },
+  { position: 4, name: "Pete Alonso", fieldPosition: "1B" },
+  { position: 5, name: "Brandon Nimmo", fieldPosition: "LF" },
+  { position: 6, name: "Francisco Alvarez", fieldPosition: "C" },
+  { position: 7, name: "Tyrone Taylor", fieldPosition: "CF" },
+  { position: 8, name: "Jesse Winker", fieldPosition: "DH" },
+  { position: 9, name: "Luisangel Acuña", fieldPosition: "2B" }],
+
+  starting_pitcher: { name: "David Peterson", hand: "LHP", era: "3.08", strikeouts: "143" },
+  published: true,
+  notes: null
+},
+{
+  id: "hist-2025-sept-25",
+  game_date: "2025-09-25",
+  game_time: "6:40 PM",
+  opponent: "Brewers",
+  location: "American Family Field",
+  lineup_data: [
+  { position: 1, name: "Francisco Lindor", fieldPosition: "SS" },
+  { position: 2, name: "Juan Soto", fieldPosition: "RF" },
+  { position: 3, name: "Mark Vientos", fieldPosition: "3B" },
+  { position: 4, name: "Pete Alonso", fieldPosition: "1B" },
+  { position: 5, name: "Brandon Nimmo", fieldPosition: "LF" },
+  { position: 6, name: "Francisco Alvarez", fieldPosition: "C" },
+  { position: 7, name: "Jesse Winker", fieldPosition: "DH" },
+  { position: 8, name: "Harrison Bader", fieldPosition: "CF" },
+  { position: 9, name: "Jose Iglesias", fieldPosition: "2B" }],
+
+  starting_pitcher: { name: "Jose Quintana", hand: "LHP", era: "3.75", strikeouts: "140" },
+  published: true,
+  notes: null
+},
+{
+  id: "hist-2025-sept-24",
+  game_date: "2025-09-24",
+  game_time: "6:40 PM",
+  opponent: "Brewers",
+  location: "American Family Field",
+  lineup_data: [
+  { position: 1, name: "Francisco Lindor", fieldPosition: "SS" },
+  { position: 2, name: "Juan Soto", fieldPosition: "RF" },
+  { position: 3, name: "Mark Vientos", fieldPosition: "3B" },
+  { position: 4, name: "Pete Alonso", fieldPosition: "1B" },
+  { position: 5, name: "Brandon Nimmo", fieldPosition: "LF" },
+  { position: 6, name: "Francisco Alvarez", fieldPosition: "C" },
+  { position: 7, name: "Jesse Winker", fieldPosition: "DH" },
+  { position: 8, name: "Tyrone Taylor", fieldPosition: "CF" },
+  { position: 9, name: "Luisangel Acuña", fieldPosition: "2B" }],
+
+  starting_pitcher: { name: "Luis Severino", hand: "RHP", era: "3.91", strikeouts: "161" },
+  published: true,
+  notes: null
+}];
+
+
+function LineupCardDisplay({ lineup, isUpcoming = false }: {lineup: LineupCard | typeof historical2025Lineups[0];isUpcoming?: boolean;}) {
   const [expanded, setExpanded] = useState(isUpcoming);
   const gameDate = new Date(lineup.game_date + "T12:00:00");
   const dateStr = gameDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
@@ -156,20 +156,20 @@ function LineupCardDisplay({ lineup, isUpcoming = false }: { lineup: LineupCard 
     <Card className="overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left"
-      >
+        className="w-full text-left">
+
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex flex-col">
                 <CardTitle className="text-lg flex items-center gap-2">
                   Mets vs {lineup.opponent}
-                  {isUpcoming && (
-                    <Badge variant="default" className="text-xs">Upcoming</Badge>
-                  )}
-                  {lineup.notes && (
-                    <Badge variant="secondary" className="text-xs">{lineup.notes}</Badge>
-                  )}
+                  {isUpcoming &&
+                  <Badge variant="default" className="text-xs">Upcoming</Badge>
+                  }
+                  {lineup.notes &&
+                  <Badge variant="secondary" className="text-xs">{lineup.notes}</Badge>
+                  }
                 </CardTitle>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                   <Calendar className="h-3.5 w-3.5" />
@@ -183,41 +183,41 @@ function LineupCardDisplay({ lineup, isUpcoming = false }: { lineup: LineupCard 
         </CardHeader>
       </button>
 
-      {expanded && (
-        <CardContent className="pt-0 space-y-4">
-          {players && players.length > 0 ? (
-            <div className="bg-muted/30 rounded-lg p-4">
+      {expanded &&
+      <CardContent className="pt-0 space-y-4">
+          {players && players.length > 0 ?
+        <div className="bg-muted/30 rounded-lg p-4">
               <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
                 <Users className="h-4 w-4" /> Batting Order
               </h3>
               <div className="space-y-1">
-                {players.map((player) => (
-                  <div key={player.position} className="flex items-center gap-3 p-2 rounded hover:bg-muted/50 transition-colors">
+                {players.map((player) =>
+            <div key={player.position} className="flex items-center gap-3 p-2 rounded hover:bg-muted/50 transition-colors">
                     <span className="text-lg font-bold text-primary w-7 text-center">{player.position}</span>
-                    {player.imageUrl && (
-                      <img
-                        src={player.imageUrl}
-                        alt={player.name}
-                        className="w-8 h-8 rounded-full object-cover bg-muted"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                      />
-                    )}
+                    {player.imageUrl &&
+              <img
+                src={player.imageUrl}
+                alt={player.name}
+                className="w-8 h-8 rounded-full object-cover bg-muted"
+                onError={(e) => {(e.target as HTMLImageElement).style.display = "none";}} />
+
+              }
                     <div className="flex-1 flex items-center justify-between">
                       <p className="font-medium">{player.name}</p>
                       <Badge variant="outline" className="text-xs">{player.fieldPosition}</Badge>
                     </div>
                   </div>
-                ))}
+            )}
               </div>
-            </div>
-          ) : (
-            <div className="bg-muted/30 rounded-lg p-6 text-center">
+            </div> :
+
+        <div className="bg-muted/30 rounded-lg p-6 text-center">
               <p className="text-muted-foreground">Lineup TBA — typically released 1-2 hours before first pitch</p>
             </div>
-          )}
+        }
 
-          {pitcher && (
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+          {pitcher &&
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
               <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mb-2">Starting Pitcher</h3>
               <div className="flex items-center justify-between">
                 <p className="font-bold text-lg">{pitcher.name}</p>
@@ -227,11 +227,11 @@ function LineupCardDisplay({ lineup, isUpcoming = false }: { lineup: LineupCard 
                 </div>
               </div>
             </div>
-          )}
+        }
         </CardContent>
-      )}
-    </Card>
-  );
+      }
+    </Card>);
+
 }
 
 export default function MetsLineupCard() {
@@ -244,11 +244,11 @@ export default function MetsLineupCard() {
 
   const fetchUpcomingLineups = async () => {
     try {
-      const { data, error } = await supabase
-        .from("lineup_cards")
-        .select("*")
-        .order("game_date", { ascending: false })
-        .limit(30);
+      const { data, error } = await supabase.
+      from("lineup_cards").
+      select("*").
+      order("game_date", { ascending: false }).
+      limit(30);
 
       if (error) {
         console.error("Error fetching lineups:", error);
@@ -298,30 +298,30 @@ export default function MetsLineupCard() {
           <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
             Mets Lineup Cards
           </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto mb-4">
-            End-of-2025 lineups & upcoming 2026 season lineups — updated automatically from MLB data
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-4">End-of-2025 lineups & upcoming 2026 season lineups
+
           </p>
           <Button
             variant="outline"
             size="sm"
             onClick={handleRefresh}
             disabled={refreshing}
-            className="gap-2"
-          >
+            className="gap-2">
+
             <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
             {refreshing ? "Refreshing..." : "Refresh Lineup"}
           </Button>
         </div>
 
         {/* Today's Game Highlight */}
-        {todayLineup && (
-          <div className="mb-8">
+        {todayLineup &&
+        <div className="mb-8">
             <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
               🔴 Today's Lineup
             </h2>
             <LineupCardDisplay lineup={todayLineup} isUpcoming />
           </div>
-        )}
+        }
 
         <Tabs defaultValue="2026" className="w-full">
           <TabsList className="w-full grid grid-cols-2 mb-6">
@@ -330,19 +330,19 @@ export default function MetsLineupCard() {
           </TabsList>
 
           <TabsContent value="2026" className="space-y-4">
-            {loading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <Card key={i} className="animate-pulse">
+            {loading ?
+            <div className="space-y-4">
+                {[1, 2, 3].map((i) =>
+              <Card key={i} className="animate-pulse">
                     <CardHeader>
                       <div className="h-5 bg-muted rounded w-48" />
                       <div className="h-4 bg-muted rounded w-32 mt-2" />
                     </CardHeader>
                   </Card>
-                ))}
-              </div>
-            ) : upcomingLineups.length === 0 ? (
-              <Card>
+              )}
+              </div> :
+            upcomingLineups.length === 0 ?
+            <Card>
                 <CardContent className="py-12 text-center">
                   <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No 2026 Lineup Data Yet</h3>
@@ -359,31 +359,31 @@ export default function MetsLineupCard() {
                     </ul>
                   </div>
                 </CardContent>
-              </Card>
-            ) : (
-              <>
-                {futureLineups.length > 0 && (
-                  <div>
+              </Card> :
+
+            <>
+                {futureLineups.length > 0 &&
+              <div>
                     <h3 className="text-lg font-semibold mb-3 text-muted-foreground">Upcoming Games</h3>
                     <div className="space-y-3">
-                      {futureLineups.map((lineup) => (
-                        <LineupCardDisplay key={lineup.id} lineup={lineup} isUpcoming />
-                      ))}
+                      {futureLineups.map((lineup) =>
+                  <LineupCardDisplay key={lineup.id} lineup={lineup} isUpcoming />
+                  )}
                     </div>
                   </div>
-                )}
-                {pastLineups2026.length > 0 && (
-                  <div className="mt-6">
+              }
+                {pastLineups2026.length > 0 &&
+              <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-3 text-muted-foreground">Previous 2026 Games</h3>
                     <div className="space-y-3">
-                      {pastLineups2026.map((lineup) => (
-                        <LineupCardDisplay key={lineup.id} lineup={lineup} />
-                      ))}
+                      {pastLineups2026.map((lineup) =>
+                  <LineupCardDisplay key={lineup.id} lineup={lineup} />
+                  )}
                     </div>
                   </div>
-                )}
+              }
               </>
-            )}
+            }
           </TabsContent>
 
           <TabsContent value="2025" className="space-y-4">
@@ -393,9 +393,9 @@ export default function MetsLineupCard() {
               </p>
             </div>
             <div className="space-y-3">
-              {historical2025Lineups.map((lineup) => (
-                <LineupCardDisplay key={lineup.id} lineup={lineup} />
-              ))}
+              {historical2025Lineups.map((lineup) =>
+              <LineupCardDisplay key={lineup.id} lineup={lineup} />
+              )}
             </div>
           </TabsContent>
         </Tabs>
@@ -408,6 +408,6 @@ export default function MetsLineupCard() {
       </main>
 
       <Footer />
-    </div>
-  );
+    </div>);
+
 }
