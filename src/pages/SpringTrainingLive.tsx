@@ -7,7 +7,8 @@ import Footer from "@/components/Footer";
 import MetsNewsTracker from "@/components/MetsNewsTracker";
 import MetsRSSFeed from "@/components/MetsRSSFeed";
 import { StreamPlayer } from "@/components/StreamPlayer";
-import StreamTimeLimit from "@/components/StreamTimeLimit";
+// NOTE: Re-enable StreamTimeLimit after Spring Training ends (last day of March 2026)
+// import StreamTimeLimit from "@/components/StreamTimeLimit";
 import SEOHead from "@/components/SEOHead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,8 +57,8 @@ const SpringTrainingLive = () => {
     );
   }
 
+  // NOTE: Re-wrap content with <StreamTimeLimit> after Spring Training ends (last day of March 2026)
   return (
-    <StreamTimeLimit>
     <div className="min-h-screen flex flex-col bg-background">
       <SEOHead
         title="Mets 2026 Spring Training Live - Exclusive Coverage | MetsXMFanZone"
@@ -332,7 +333,6 @@ const SpringTrainingLive = () => {
 
       <Footer />
     </div>
-    </StreamTimeLimit>
   );
 };
 
