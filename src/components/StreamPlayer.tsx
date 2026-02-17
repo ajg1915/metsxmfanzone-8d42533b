@@ -64,10 +64,34 @@ export function StreamPlayer({
     };
   }, [pageName]);
 
+  // Detect if the browser supports native HLS (Safari/iPad/iOS)
+  const supportsNativeHLS = () => {
+    const video = document.createElement('video');
+    return video.canPlayType('application/vnd.apple.mpegurl') !== '';
+  };
+
+  // Dispose player helper
+  const disposePlayer = () => {
+    if (playerRef.current) {
+      playerRef.current.dispose();
+      playerRef.current = null;
+      setPlayerReady(false);
+    }
+  };
+
+  // Dispose player when pageName changes (navigating between stream pages)
+  useEffect(() => {
+    return () => {
+      disposePlayer();
+    };
+  }, [pageName]);
+
   // Initialize Video.js player when stream changes
   useEffect(() => {
     if (stream && videoRef.current && !playerRef.current) {
-      console.log('Initializing Video.js player for:', stream.stream_url);
+      const useNativeHLS = supportsNativeHLS();
+      console.log('Initializing Video.js player for:', stream.stream_url, '| Native HLS:', useNativeHLS);
+
       playerRef.current = videojs(videoRef.current, {
         controls: true,
         autoplay: true,
@@ -81,11 +105,11 @@ export function StreamPlayer({
         },
         html5: {
           vhs: {
-            overrideNative: true
+            overrideNative: !useNativeHLS
           },
-          nativeVideoTracks: false,
-          nativeAudioTracks: false,
-          nativeTextTracks: false
+          nativeVideoTracks: useNativeHLS,
+          nativeAudioTracks: useNativeHLS,
+          nativeTextTracks: useNativeHLS
         },
         sources: [{
           src: stream.stream_url,
@@ -93,7 +117,7 @@ export function StreamPlayer({
         }]
       });
 
-      // Enable landscape fullscreen plugin - auto fullscreen on rotate, auto rotate on fullscreen
+      // Enable landscape fullscreen plugin
       playerRef.current.landscapeFullscreen({
         fullscreen: {
           enterOnRotate: true,
@@ -110,19 +134,23 @@ export function StreamPlayer({
 
       playerRef.current.on('error', (e: any) => {
         console.error('Video.js error:', e);
-        const error = playerRef.current.error();
+        const error = playerRef.current?.error();
         if (error) {
           console.error('Error details:', error.message, error.code);
+          // Retry once on error (helps tablet/mobile recovery)
+          setTimeout(() => {
+            if (playerRef.current && stream) {
+              console.log('Retrying stream source...');
+              playerRef.current.src({ src: stream.stream_url, type: 'application/x-mpegURL' });
+              playerRef.current.play();
+            }
+          }, 2000);
         }
       });
     }
 
     return () => {
-      if (playerRef.current) {
-        playerRef.current.dispose();
-        playerRef.current = null;
-        setPlayerReady(false);
-      }
+      disposePlayer();
     };
   }, [stream]);
 
@@ -196,6 +224,7 @@ export function StreamPlayer({
               <video 
                 ref={videoRef} 
                 className="video-js vjs-big-play-centered vjs-theme-fantasy" 
+                playsInline
                 style={{ width: '100%', height: '100%' }} 
               />
             </div>
