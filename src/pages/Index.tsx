@@ -35,7 +35,8 @@ const CommunityPreviewSection = lazy(() => import("@/components/CommunityPreview
 const InstallPrompt = lazy(() => import("@/components/InstallPrompt"));
 const OnboardingWalkthrough = lazy(() => import("@/components/OnboardingWalkthrough"));
 const NotificationPrompt = lazy(() => import("@/components/NotificationPrompt"));
-// Removed: WelcomeBackToast, FeedbackToast, GameAlertsBanner per user request
+// Removed: WelcomeBackToast, FeedbackToast per user request
+const GameAlertsBanner = lazy(() => import("@/components/GameAlertsBanner"));
 
 
 // Section loading skeleton
@@ -165,7 +166,9 @@ const Index = () => {
       />
       <Navigation />
       <LiveGameTicker />
-      {/* Removed: GameAlertsBanner */}
+      <Suspense fallback={null}>
+        <GameAlertsBanner />
+      </Suspense>
       <Suspense fallback={null}>
           <FreeTrialExpiryBanner />
         </Suspense>
