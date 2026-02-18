@@ -219,6 +219,7 @@ const Auth = () => {
   const [biometricEmail, setBiometricEmail] = useState("");
   const [biometricError, setBiometricError] = useState<string | null>(null);
   const [biometricPendingUserId, setBiometricPendingUserId] = useState<string | null>(null);
+  const [biometricAuthToken, setBiometricAuthToken] = useState<{ token: string; verificationUrl: string } | null>(null);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -331,8 +332,12 @@ const Auth = () => {
         return;
       }
 
-      // Store user info for after 2FA
+      // Store user info and auth token for after 2FA
       setBiometricPendingUserId(userId);
+      setBiometricAuthToken({
+        token: verifyResponse.data.token,
+        verificationUrl: verifyResponse.data.verificationUrl,
+      });
       setPendingUserData({ userId, isSignup: false });
       
       // Show 2FA screen
@@ -881,24 +886,79 @@ const Auth = () => {
       setLoading(true);
       
       // For remembered users, we need to sign them in with a magic link approach
-      // Since we don't have their password, we verify OTP and trust the remembered session
       if (pendingUserData.userId === "remembered" && rememberedUser) {
-        // Get the user from their email via a workaround - request password reset token validation
-        // Actually, we need to use a different approach: 
-        // For remembered users, we'll prompt them to enter password once to verify identity
-        // Then extend their remembered session
-        
-        // For now, we'll need their password for remembered login too
-        // Let's sign in with email link or show password prompt
         toast({
           title: "Verification successful!",
           description: "Please enter your password to complete login.",
         });
         setShow2FA(false);
         setIsRememberedLogin(false);
-        // Keep the email populated
         setLoading(false);
         return;
+      }
+      
+      // For biometric logins, establish Supabase session using magic link token
+      if (biometricAuthToken) {
+        try {
+          // Try verifying with the hashed token
+          if (biometricAuthToken.token) {
+            const { error: sessionError } = await supabase.auth.verifyOtp({
+              token_hash: biometricAuthToken.token,
+              type: 'magiclink',
+            });
+            
+            if (sessionError) {
+              console.error("Session establishment failed with token_hash:", sessionError);
+              // Fallback: try using the verification URL directly
+              if (biometricAuthToken.verificationUrl) {
+                try {
+                  const url = new URL(biometricAuthToken.verificationUrl);
+                  const token = url.searchParams.get('token') || url.hash?.match(/token=([^&]+)/)?.[1];
+                  const type = url.searchParams.get('type') || 'magiclink';
+                  if (token) {
+                    const { error: fallbackError } = await supabase.auth.verifyOtp({
+                      token_hash: token,
+                      type: type as 'magiclink',
+                    });
+                    if (fallbackError) {
+                      console.error("Fallback session establishment failed:", fallbackError);
+                      // Last resort: sign in with email link
+                      const { error: signInError } = await supabase.auth.signInWithOtp({
+                        email: biometricEmail,
+                        options: { shouldCreateUser: false },
+                      });
+                      if (signInError) {
+                        toast({
+                          title: "Session Error",
+                          description: "Biometric verified but couldn't establish session. Please try password login.",
+                          variant: "destructive",
+                        });
+                        setLoading(false);
+                        setBiometricAuthToken(null);
+                        setShow2FA(false);
+                        return;
+                      }
+                      // OTP sent - user needs to check email again
+                      toast({
+                        title: "One more step",
+                        description: "Please check your email for a login link to complete sign-in.",
+                      });
+                      setLoading(false);
+                      setBiometricAuthToken(null);
+                      setShow2FA(false);
+                      return;
+                    }
+                  }
+                } catch (urlErr) {
+                  console.error("Error parsing verification URL:", urlErr);
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Error establishing biometric session:", err);
+        }
+        setBiometricAuthToken(null);
       }
       
       await completeAuthentication(pendingUserData.userId, pendingUserData.isSignup);
@@ -921,7 +981,8 @@ const Auth = () => {
     setOtpExpiry(expiry);
     setOtpCode("");
     
-    const emailSent = await sendOtpEmail(email, otp);
+    const targetEmail = biometricPendingUserId ? biometricEmail : email;
+    const emailSent = await sendOtpEmail(targetEmail, otp);
     if (emailSent) {
       setResendCooldown(60);
       toast({
@@ -946,6 +1007,7 @@ const Auth = () => {
     setGeneratedOtp("");
     setOtpExpiry(null);
     setPendingUserData(null);
+    setBiometricAuthToken(null);
   };
 
 
