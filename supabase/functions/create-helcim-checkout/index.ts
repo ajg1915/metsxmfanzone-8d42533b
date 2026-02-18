@@ -100,6 +100,7 @@ Deno.serve(async (req) => {
         amount: amount,
         currency: 'USD',
         paypal_order_id: helcimData.checkoutToken,
+        payment_method: 'helcim',
       });
 
     if (insertError) {
