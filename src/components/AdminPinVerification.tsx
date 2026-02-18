@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Lock, Key } from "lucide-react";
+import { Shield, Lock, Key, Fingerprint } from "lucide-react";
+import { startAuthentication } from "@simplewebauthn/browser";
 
 interface AdminPinVerificationProps {
   userId: string;
@@ -23,6 +24,8 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [lockoutUntil, setLockoutUntil] = useState<Date | null>(null);
+  const [hasPasskeys, setHasPasskeys] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
   const { toast } = useToast();
 
   const MAX_ATTEMPTS = 5;
@@ -30,6 +33,7 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
 
   useEffect(() => {
     checkExistingPin();
+    checkPasskeys();
   }, [userId]);
 
   useEffect(() => {
@@ -50,6 +54,57 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
     }
   }, []);
 
+  const checkPasskeys = async () => {
+    try {
+      const { data } = await supabase
+        .from("user_passkeys")
+        .select("id")
+        .eq("user_id", userId)
+        .limit(1);
+      setHasPasskeys(!!data && data.length > 0);
+    } catch {
+      setHasPasskeys(false);
+    }
+  };
+
+  const handleBiometricAuth = async () => {
+    setBiometricLoading(true);
+    try {
+      // Get login options from edge function
+      const { data: options, error: optError } = await supabase.functions.invoke('webauthn-login-options', {
+        body: { userId }
+      });
+      if (optError || options?.error) throw new Error(options?.error || "Failed to get options");
+
+      // Prompt biometric
+      const authResult = await startAuthentication({ optionsJSON: options });
+
+      // Verify with edge function
+      const { data: verifyData, error: verifyError } = await supabase.functions.invoke('webauthn-login-verify', {
+        body: { userId, credential: authResult }
+      });
+      if (verifyError || verifyData?.error) throw new Error(verifyData?.error || "Verification failed");
+
+      // Success
+      sessionStorage.removeItem("admin_attempts");
+      sessionStorage.removeItem("admin_lockout");
+      sessionStorage.setItem("admin_verified", "true");
+      sessionStorage.setItem("admin_verified_at", new Date().toISOString());
+
+      toast({ title: "Verified", description: "Biometric authentication successful" });
+      onVerified();
+    } catch (err: any) {
+      console.error("Biometric auth error:", err);
+      toast({
+        title: "Biometric Failed",
+        description: err?.message || "Please use your PIN instead.",
+        variant: "destructive",
+      });
+    } finally {
+      setBiometricLoading(false);
+    }
+  };
+
   const checkExistingPin = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -64,7 +119,6 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
 
       if (response.error) {
         console.error("Error checking PIN:", response.error);
-        // Fallback to direct check
         const { data } = await supabase
           .from("admin_verification_codes")
           .select("id")
@@ -350,12 +404,24 @@ export function AdminPinVerification({ userId, onVerified, onCancel }: AdminPinV
                 </div>
               )}
 
-              <div className="flex gap-2 pt-4">
+              {!isSetupMode && hasPasskeys && (
+                <Button
+                  variant="outline"
+                  onClick={handleBiometricAuth}
+                  disabled={biometricLoading || verifying}
+                  className="w-full flex items-center gap-2"
+                >
+                  <Fingerprint className="h-4 w-4" />
+                  {biometricLoading ? "Authenticating..." : "Use Biometrics"}
+                </Button>
+              )}
+
+              <div className="flex gap-2 pt-2">
                 <Button
                   variant="outline"
                   onClick={onCancel}
                   className="flex-1"
-                  disabled={verifying}
+                  disabled={verifying || biometricLoading}
                 >
                   Cancel
                 </Button>
