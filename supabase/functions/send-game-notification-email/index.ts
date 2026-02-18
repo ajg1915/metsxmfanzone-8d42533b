@@ -83,7 +83,7 @@ const getEmailTemplate = (
         <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 15px; height: 15px;" />
       </div>
       <h2 style="color: #FF4500; font-size: 18px; text-align: center; margin: 0 0 15px 0;">${title}</h2>
-      ${imageUrl ? `<div style="text-align: center; margin: 0 0 15px 0;"><img src="${imageUrl}" alt="Alert image" style="max-width: 100%; height: auto; border-radius: 8px;" /></div>` : ''}
+      ${imageUrl ? `<div style="text-align: center; margin: 0 0 15px 0;"><img src="${imageUrl}" alt="Alert image" width="280" style="width: 280px; max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 0 auto;" /></div>` : ''}
       <p style="color: #D1D5DB; font-size: 13px; line-height: 1.5; text-align: center; margin: 0 0 15px 0;">${message}</p>
       ${gameInfoHtml}
       <div style="text-align: center; margin-top: 20px;">
