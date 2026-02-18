@@ -161,6 +161,16 @@ export function StreamPlayer({
       setIsMuted(newMutedState);
       if (!newMutedState) {
         setShowUnmuteBanner(false);
+        // On mobile, ensure playback continues after unmuting
+        const playPromise = playerRef.current.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {
+            console.log('Play after unmute failed, retrying muted');
+            playerRef.current.muted(true);
+            setIsMuted(true);
+            playerRef.current.play();
+          });
+        }
       }
     }
   };
