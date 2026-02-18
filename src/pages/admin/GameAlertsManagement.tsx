@@ -164,28 +164,28 @@ const GameAlertsManagement = () => {
   };
 
   return (
-    <div className="space-y-3 max-w-full">
-      <div className="flex items-center gap-2">
-        <Bell className="w-5 h-5 text-primary" />
-        <h1 className="text-base sm:text-lg font-bold">Game Alerts</h1>
+    <div className="space-y-2 w-full max-w-full overflow-hidden px-1">
+      <div className="flex items-center gap-1.5">
+        <Bell className="w-4 h-4 text-primary" />
+        <h1 className="text-sm sm:text-base font-bold">Game Alerts</h1>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid gap-2 lg:grid-cols-2">
         {/* Create Alert */}
-        <Card className="border-border/30">
-          <CardHeader className="p-3 pb-2">
-            <CardTitle className="text-sm flex items-center gap-1.5">
-              <Plus className="w-4 h-4" /> Create Alert
+        <Card className="border-border/30 overflow-hidden">
+          <CardHeader className="p-2 pb-1">
+            <CardTitle className="text-xs flex items-center gap-1">
+              <Plus className="w-3 h-3" /> Create Alert
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-3 pt-0 space-y-3">
-            <div className="grid grid-cols-2 gap-1.5">
+          <CardContent className="p-2 pt-0 space-y-2">
+            <div className="grid grid-cols-2 gap-1">
               {quickTemplates.map((t, i) => (
                 <Button
                   key={i}
                   variant="outline"
                   size="sm"
-                  className="text-[10px] h-7 px-2 justify-start truncate"
+                  className="text-[9px] h-6 px-1.5 justify-start truncate"
                   onClick={() => {
                     setTitle(t.title);
                     setMessage(t.message);
@@ -194,16 +194,16 @@ const GameAlertsManagement = () => {
                     setLinkUrl(t.url);
                   }}
                 >
-                  {t.title.slice(0, 18)}...
+                  {t.title.slice(0, 15)}...
                 </Button>
               ))}
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <Label className="text-xs">Type</Label>
+            <div className="grid grid-cols-2 gap-1.5">
+              <div className="space-y-0.5">
+                <Label className="text-[10px]">Type</Label>
                 <Select value={alertType} onValueChange={setAlertType}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="game_day">Game Day</SelectItem>
                     <SelectItem value="score_update">Score Update</SelectItem>
@@ -214,10 +214,10 @@ const GameAlertsManagement = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Severity</Label>
+              <div className="space-y-0.5">
+                <Label className="text-[10px]">Severity</Label>
                 <Select value={severity} onValueChange={setSeverity}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="info">Info</SelectItem>
                     <SelectItem value="warning">Warning</SelectItem>
@@ -227,36 +227,36 @@ const GameAlertsManagement = () => {
               </div>
             </div>
 
-            <div className="space-y-1">
-              <Label className="text-xs">Title</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-8 text-xs" maxLength={80} />
+            <div className="space-y-0.5">
+              <Label className="text-[10px]">Title</Label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-7 text-[11px]" maxLength={80} />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Message</Label>
-              <Textarea value={message} onChange={(e) => setMessage(e.target.value)} className="text-xs min-h-[60px]" maxLength={300} />
+            <div className="space-y-0.5">
+              <Label className="text-[10px]">Message</Label>
+              <Textarea value={message} onChange={(e) => setMessage(e.target.value)} className="text-[11px] min-h-[50px]" maxLength={300} />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Link URL</Label>
-              <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} className="h-8 text-xs" />
+            <div className="space-y-0.5">
+              <Label className="text-[10px]">Link URL</Label>
+              <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} className="h-7 text-[11px]" />
             </div>
 
             {/* Image Upload */}
-            <div className="space-y-1">
-              <Label className="text-xs">Image (optional)</Label>
+            <div className="space-y-0.5">
+              <Label className="text-[10px]">Image (optional)</Label>
               {imagePreview ? (
                 <div className="relative inline-block">
-                  <img src={imagePreview} alt="Preview" className="h-16 rounded-md object-cover" />
+                  <img src={imagePreview} alt="Preview" className="h-12 rounded-md object-cover" />
                   <button
                     onClick={() => { setImageFile(null); setImagePreview(null); }}
                     className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-2.5 h-2.5" />
                   </button>
                 </div>
               ) : (
-                <label className="flex items-center gap-1.5 border border-dashed border-border rounded-md p-2 cursor-pointer hover:bg-muted/50 transition-colors">
-                  <ImagePlus className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Upload image</span>
+                <label className="flex items-center gap-1 border border-dashed border-border rounded-md p-1.5 cursor-pointer hover:bg-muted/50 transition-colors">
+                  <ImagePlus className="w-3 h-3 text-muted-foreground" />
+                  <span className="text-[10px] text-muted-foreground">Upload image</span>
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/gif,image/webp"
@@ -277,67 +277,67 @@ const GameAlertsManagement = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Switch checked={sendPush} onCheckedChange={setSendPush} />
-                <Label className="text-xs">Push Notification</Label>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <Switch checked={sendPush} onCheckedChange={setSendPush} className="scale-75" />
+                <Label className="text-[10px]">Push</Label>
               </div>
-              <div className="flex items-center gap-2">
-                <Switch checked={sendEmail} onCheckedChange={setSendEmail} />
-                <Label className="text-xs">Email</Label>
+              <div className="flex items-center gap-1.5">
+                <Switch checked={sendEmail} onCheckedChange={setSendEmail} className="scale-75" />
+                <Label className="text-[10px]">Email</Label>
               </div>
             </div>
 
-            <Button onClick={createAlert} disabled={sending} className="w-full h-8 text-xs">
-              <Send className="w-3 h-3 mr-1.5" />
+            <Button onClick={createAlert} disabled={sending} className="w-full h-7 text-[10px]">
+              <Send className="w-3 h-3 mr-1" />
               {sending ? "Sending..." : "Create & Send Alert"}
             </Button>
           </CardContent>
         </Card>
 
         {/* Recent Alerts */}
-        <Card className="border-border/30">
-          <CardHeader className="p-3 pb-2">
-            <CardTitle className="text-sm">Recent Alerts</CardTitle>
+        <Card className="border-border/30 overflow-hidden">
+          <CardHeader className="p-2 pb-1">
+            <CardTitle className="text-xs">Recent Alerts</CardTitle>
           </CardHeader>
-          <CardContent className="p-3 pt-0">
+          <CardContent className="p-2 pt-0">
             {loading ? (
-              <p className="text-xs text-muted-foreground">Loading...</p>
+              <p className="text-[10px] text-muted-foreground">Loading...</p>
             ) : alerts.length === 0 ? (
-              <div className="text-center py-6 text-muted-foreground">
-                <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p className="text-xs">No alerts yet</p>
+              <div className="text-center py-4 text-muted-foreground">
+                <Bell className="w-6 h-6 mx-auto mb-1 opacity-50" />
+                <p className="text-[10px]">No alerts yet</p>
               </div>
             ) : (
-              <div className="space-y-2 max-h-[400px] overflow-y-auto">
+              <div className="space-y-1.5 max-h-[350px] overflow-y-auto">
                 {alerts.map((alert) => (
                   <motion.div
                     key={alert.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="border border-border/50 rounded-md p-2 space-y-1"
+                    className="border border-border/50 rounded-md p-1.5 space-y-0.5"
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="flex items-center gap-1 min-w-0 flex-1">
                         {severityIcon(alert.severity)}
-                        <span className="text-xs font-medium truncate">{alert.title}</span>
+                        <span className="text-[10px] font-medium truncate">{alert.title}</span>
                       </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <Badge variant={alert.is_active ? "default" : "secondary"} className="text-[10px] px-1.5 py-0 cursor-pointer" onClick={() => toggleActive(alert.id, alert.is_active)}>
+                      <div className="flex items-center gap-0.5 flex-shrink-0">
+                        <Badge variant={alert.is_active ? "default" : "secondary"} className="text-[8px] px-1 py-0 cursor-pointer" onClick={() => toggleActive(alert.id, alert.is_active)}>
                           {alert.is_active ? "Active" : "Off"}
                         </Badge>
                         <button onClick={() => deleteAlert(alert.id)} className="text-destructive hover:text-destructive/80">
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-2.5 h-2.5" />
                         </button>
                       </div>
                     </div>
-                    <p className="text-[10px] text-muted-foreground line-clamp-1">{alert.message}</p>
-                    <div className="flex items-center gap-1.5">
+                    <p className="text-[9px] text-muted-foreground line-clamp-1">{alert.message}</p>
+                    <div className="flex items-center gap-1">
                       {(alert as any).image_url && (
-                        <img src={(alert as any).image_url} alt="" className="h-6 w-6 rounded object-cover" />
+                        <img src={(alert as any).image_url} alt="" className="h-5 w-5 rounded object-cover" />
                       )}
-                      {alert.push_sent && <Badge variant="outline" className="text-[9px] px-1 py-0">Push ✓</Badge>}
-                      {alert.email_sent && <Badge variant="outline" className="text-[9px] px-1 py-0">Email ✓</Badge>}
+                      {alert.push_sent && <Badge variant="outline" className="text-[8px] px-1 py-0">Push ✓</Badge>}
+                      {alert.email_sent && <Badge variant="outline" className="text-[8px] px-1 py-0">Email ✓</Badge>}
                     </div>
                   </motion.div>
                 ))}
