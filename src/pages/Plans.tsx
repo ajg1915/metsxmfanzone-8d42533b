@@ -78,15 +78,15 @@ const Plans = () => {
   const plans = [
     {
       id: "free",
-      name: "Free",
+      name: "Free (Spring Training)",
       price: "$0",
       priceValue: 0,
-      period: "30 days",
-      description: "Try it free for February & March only",
-      trialNote: "Free access expires after 30 days. Upgrade to keep watching!",
+      period: "Spring Training",
+      description: "Free access through end of Spring Training",
+      trialNote: "Free access expires March 31, 2026. Upgrade to keep watching!",
       features: ["Limited highlights access", "Community forum access", "Game schedules", "Free Spring Training Live"],
       notIncluded: ["Live streaming", "Full game replays", "Exclusive content", "Ad-free experience"],
-      cta: "Start Free (30 Days)",
+      cta: "Start Free (Spring Training)",
       popular: false,
     },
     {
@@ -234,7 +234,7 @@ const Plans = () => {
                       <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
                       <div className="mb-2">
                         <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                        <span className="text-muted-foreground ml-1">/{plan.period === "30 days" ? "30 days" : plan.period.replace("per ", "")}</span>
+                        <span className="text-muted-foreground ml-1">/{plan.period === "Spring Training" ? "Spring Training" : plan.period.replace("per ", "")}</span>
                       </div>
                       {plan.billingNote && (
                         <p className="text-xs text-muted-foreground">{plan.billingNote}</p>
