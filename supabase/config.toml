@@ -146,3 +146,6 @@ verify_jwt = false
 
 [functions.scrape-replay-games]
 verify_jwt = true
+
+[functions.payment-enforcement]
+verify_jwt = false

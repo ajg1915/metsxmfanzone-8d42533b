@@ -70,9 +70,7 @@ const eventsItems = [
 
 // Users & Community - Users, Roles, Subscriptions, Feedback, Posts, etc.
 const usersItems = [
-  { title: "Users", url: "/admin/user-management", icon: UserCog },
-  { title: "User Roles", url: "/admin/roles", icon: Shield },
-  { title: "Subscriptions", url: "/admin/subscriptions", icon: CreditCard },
+  { title: "Members", url: "/admin/user-management", icon: UserCog },
   { title: "Writer Apps", url: "/admin/writer-applications", icon: PenLine },
   { title: "Podcaster Apps", url: "/admin/podcaster-applications", icon: Mic },
 ];
