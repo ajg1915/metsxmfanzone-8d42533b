@@ -111,12 +111,13 @@ Deno.serve(async (req: Request) => {
     const { error: insertError } = await supabase
       .from('subscriptions')
       .insert({
-        user_id: user.id,
+      user_id: user.id,
         plan_type: planType,
         status: 'pending',
         paypal_order_id: orderData.id,
         amount: amount,
         currency: 'USD',
+        payment_method: 'paypal',
       });
 
     if (insertError) {

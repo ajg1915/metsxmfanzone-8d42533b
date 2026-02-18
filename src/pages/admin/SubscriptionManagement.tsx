@@ -369,6 +369,49 @@ export default function SubscriptionManagement() {
     }
   };
 
+  const handleActivatePending = async (sub: UserSubscription) => {
+    setIsProcessing(true);
+    try {
+      const endDate = new Date();
+      if (sub.plan_type === "annual") {
+        endDate.setFullYear(endDate.getFullYear() + 1);
+      } else if (sub.plan_type === "premium") {
+        endDate.setMonth(endDate.getMonth() + 1);
+      } else {
+        // Free plan - 30 days
+        endDate.setDate(endDate.getDate() + 30);
+      }
+
+      const { error } = await supabase
+        .from("subscriptions")
+        .update({
+          status: "active",
+          start_date: new Date().toISOString(),
+          end_date: endDate.toISOString(),
+        })
+        .eq("id", sub.id);
+
+      if (error) throw error;
+
+      // Log activity
+      await supabase.from("subscription_activity").insert({
+        subscription_id: sub.id,
+        user_id: sub.user_id,
+        action: "manually_activated",
+        details: { plan_type: sub.plan_type, activated_by: "admin" },
+        performed_by: user?.id,
+      });
+
+      toast({ title: "Activated!", description: `${sub.plan_type} subscription activated for ${sub.email}` });
+      fetchSubscriptions();
+    } catch (error) {
+      console.error("Error activating subscription:", error);
+      toast({ title: "Error", description: "Failed to activate subscription", variant: "destructive" });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const getStatusBadge = (sub: UserSubscription) => {
     if (sub.cancellation_status === "pending") {
       return <Badge variant="outline" className="text-warning border-warning">Pending Cancellation</Badge>;
@@ -377,6 +420,8 @@ export default function SubscriptionManagement() {
     switch (sub.status) {
       case "active":
         return <Badge className="bg-affirmative">Active</Badge>;
+      case "pending":
+        return <Badge variant="outline" className="text-yellow-500 border-yellow-500">Pending Payment</Badge>;
       case "cancelled":
         return <Badge variant="destructive">Cancelled</Badge>;
       case "suspended":
@@ -388,8 +433,8 @@ export default function SubscriptionManagement() {
 
   const getPlanPrice = (planType: string) => {
     switch (planType) {
-      case "premium": return "$4.99 / month";
-      case "annual": return "$49.99 / year";
+      case "premium": return "$12.99 / month";
+      case "annual": return "$129.99 / year";
       default: return "Free";
     }
   };
@@ -456,6 +501,19 @@ export default function SubscriptionManagement() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
+                <p className="text-sm text-muted-foreground">Pending</p>
+                <p className="text-2xl font-bold text-yellow-500">
+                  {subscriptions.filter(s => s.status === "pending").length}
+                </p>
+              </div>
+              <Clock className="w-8 h-8 text-yellow-500 opacity-50" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
                 <p className="text-sm text-muted-foreground">Premium/Annual</p>
                 <p className="text-2xl font-bold text-primary">
                   {subscriptions.filter(s => s.plan_type !== "free" && s.status === "active").length}
@@ -482,10 +540,11 @@ export default function SubscriptionManagement() {
                     <TableHead>User</TableHead>
                     <TableHead>Plan</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Payments</TableHead>
+                    <TableHead>Method</TableHead>
+                    <TableHead>Amount</TableHead>
                     <TableHead>Last Payment</TableHead>
                     <TableHead>End Date</TableHead>
-                    <TableHead></TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -509,7 +568,10 @@ export default function SubscriptionManagement() {
                       </TableCell>
                       <TableCell>{getStatusBadge(sub)}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{sub.total_payments_received || 0}</Badge>
+                        <span className="capitalize text-sm">{sub.payment_method || "—"}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm font-medium">{sub.amount ? `$${sub.amount}` : "Free"}</span>
                       </TableCell>
                       <TableCell>
                         {sub.last_payment_date ? (
@@ -518,7 +580,7 @@ export default function SubscriptionManagement() {
                             <p className="text-muted-foreground">${sub.last_payment_amount}</p>
                           </div>
                         ) : (
-                          <span className="text-muted-foreground">-</span>
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -528,11 +590,27 @@ export default function SubscriptionManagement() {
                             {new Date(sub.end_date).toLocaleDateString()}
                           </div>
                         ) : (
-                          <span className="text-muted-foreground">-</span>
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        <div className="flex items-center gap-1">
+                          {sub.status === "pending" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs text-green-600 hover:text-green-700 hover:bg-green-500/10"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleActivatePending(sub);
+                              }}
+                            >
+                              <Check className="w-3 h-3 mr-1" />
+                              Activate
+                            </Button>
+                          )}
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -72,6 +72,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
             amount: 0,
             currency: "USD",
             start_date: new Date().toISOString(),
+            payment_method: "free",
           });
 
         if (error) throw error;
