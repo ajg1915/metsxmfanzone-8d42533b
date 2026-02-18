@@ -111,10 +111,10 @@ Deno.serve(async (req) => {
 
       console.log('Square payment verified, subscription activated');
 
-      // Redirect to success page
+      // Redirect to home page after successful activation
       return new Response(null, {
         status: 302,
-        headers: { 'Location': 'https://metsxmfanzone.lovable.app/paypal-success' },
+        headers: { 'Location': 'https://metsxmfanzone.lovable.app/' },
       });
     }
 
