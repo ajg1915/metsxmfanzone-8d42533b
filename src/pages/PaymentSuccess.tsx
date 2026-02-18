@@ -49,7 +49,7 @@ const PaymentSuccess = () => {
           description: "Your subscription is now active. Welcome to the premium experience!",
         });
 
-        setTimeout(() => navigate('/dashboard'), 5000);
+        setTimeout(() => navigate('/'), 5000);
       } catch (error) {
         console.error('Payment verification error:', error);
         setStatus('error');
@@ -119,10 +119,10 @@ const PaymentSuccess = () => {
                 </div>
                 <Button 
                   size="lg" 
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/')}
                   className="w-full"
                 >
-                  Go to Dashboard
+                  Go to Home
                 </Button>
                 <p className="text-xs text-muted-foreground">
                   Redirecting automatically in 5 seconds...

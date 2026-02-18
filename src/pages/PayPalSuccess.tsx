@@ -46,7 +46,7 @@ const PayPalSuccess = () => {
             });
             sessionStorage.removeItem('helcim_checkout_token');
             sessionStorage.removeItem('helcim_secret_token');
-            setTimeout(() => navigate('/dashboard'), 2000);
+            setTimeout(() => navigate('/'), 2000);
           } else {
             setStatus('error');
             toast({
@@ -69,7 +69,7 @@ const PayPalSuccess = () => {
               title: "Payment Successful!",
               description: "Your subscription has been activated.",
             });
-            setTimeout(() => navigate('/dashboard'), 2000);
+            setTimeout(() => navigate('/'), 2000);
           } else {
             setStatus('error');
             toast({
