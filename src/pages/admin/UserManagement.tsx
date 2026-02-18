@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2, CheckCircle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +42,7 @@ interface UserSubscription {
   created_at: string;
   end_date: string | null;
   subscription_id: string | null;
+  start_date: string | null;
 }
 
 const UserManagement = () => {
@@ -107,6 +108,8 @@ const UserManagement = () => {
       const usersWithSubs: UserSubscription[] = profiles.map((profile) => {
         const userSub = subscriptions?.find(
           (sub) => sub.user_id === profile.id && sub.status === "active"
+        ) || subscriptions?.find(
+          (sub) => sub.user_id === profile.id
         );
 
         return {
@@ -116,6 +119,7 @@ const UserManagement = () => {
           status: userSub?.status || "none",
           created_at: userSub?.created_at || "",
           end_date: userSub?.end_date || null,
+          start_date: userSub?.start_date || null,
           subscription_id: userSub?.id || null,
         };
       });
@@ -233,6 +237,50 @@ const UserManagement = () => {
     }
   };
 
+  const activateSubscription = async (userId: string, subscriptionId: string, planType: string) => {
+    try {
+      const endDate = new Date();
+      if (planType === "annual") {
+        endDate.setFullYear(endDate.getFullYear() + 1);
+      } else {
+        endDate.setMonth(endDate.getMonth() + 1);
+      }
+
+      const { error } = await supabase
+        .from("subscriptions")
+        .update({
+          status: "active",
+          start_date: new Date().toISOString(),
+          end_date: endDate.toISOString(),
+        })
+        .eq("id", subscriptionId);
+
+      if (error) throw error;
+
+      // Notify admins about the new member
+      try {
+        await supabase.functions.invoke("notify-admin-new-member", {
+          body: { userId, planType, source: "Admin Manual Activation" },
+        });
+      } catch (e) {
+        // Non-blocking
+      }
+
+      toast({
+        title: "Activated!",
+        description: `Subscription activated for ${planType} plan`,
+      });
+      fetchUsers();
+    } catch (error) {
+      console.error("Error activating subscription:", error);
+      toast({
+        title: "Error",
+        description: "Failed to activate subscription",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading || authLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -294,7 +342,18 @@ const UserManagement = () => {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="flex items-center gap-1">
+                      {userRow.status === "pending" && userRow.subscription_id && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-green-500 hover:text-green-600 hover:bg-green-500/10"
+                          title="Activate subscription"
+                          onClick={() => activateSubscription(userRow.user_id, userRow.subscription_id!, userRow.plan_type)}
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                        </Button>
+                      )}
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive">
