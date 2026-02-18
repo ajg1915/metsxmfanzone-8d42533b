@@ -63,6 +63,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
     try {
       // Handle free plan - create subscription directly
       if (plan.id === "free") {
+        const springTrainingEnd = new Date("2026-03-31T23:59:59Z");
         const { error } = await supabase
           .from("subscriptions")
           .insert({
@@ -72,6 +73,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
             amount: 0,
             currency: "USD",
             start_date: new Date().toISOString(),
+            end_date: springTrainingEnd.toISOString(),
             payment_method: "free",
           });
 
