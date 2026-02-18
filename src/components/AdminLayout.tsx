@@ -79,7 +79,6 @@ export function AdminLayout() {
         if (adminUserId && !user) {
           setPinOnlyAuth(true);
           setPinVerified(true);
-          // Validate device fingerprint matches
           generateDeviceFingerprint().then(currentFp => {
             if (storedFingerprint && storedFingerprint !== currentFp) {
               sessionStorage.removeItem("admin_verified");
@@ -91,9 +90,10 @@ export function AdminLayout() {
               navigate("/admin-portal");
             }
           });
+        } else {
+          // Traditional auth user - trust session verification too
+          setPinVerified(true);
         }
-        // If user is logged in via Supabase, do NOT auto-set pinVerified
-        // They must go through PIN verification every time
       } else {
         // Expired, clear it
         sessionStorage.removeItem("admin_verified");
