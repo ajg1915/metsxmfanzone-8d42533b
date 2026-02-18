@@ -108,6 +108,9 @@ const signupSchema = z.object({
   selectedPlan: z.enum(["free", "premium", "annual"], {
     errorMap: () => ({ message: "Please select a plan" }),
   }),
+  paymentMethod: z.enum(["paypal", "card", "square"], {
+    errorMap: () => ({ message: "Please select a payment method" }),
+  }),
 });
 
 const loginSchema = z.object({
@@ -188,6 +191,7 @@ const Auth = () => {
   const [smsOptIn, setSmsOptIn] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string>("");
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   
@@ -504,6 +508,7 @@ const Auth = () => {
         smsOptIn,
         agreeToTerms: agreeToTerms as true,
         selectedPlan: selectedPlan as "free" | "premium" | "annual",
+        paymentMethod: paymentMethod as "paypal" | "card" | "square",
       });
       setLoading(true);
 
@@ -1200,6 +1205,30 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="signupEmail">Email <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="signupEmail"
+                    type="email"
+                    placeholder="fan@mets.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signupPassword">Password <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="signupPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="phoneNumber">Phone Number <span className="text-destructive">*</span></Label>
                   <Input
                     id="phoneNumber"
@@ -1246,6 +1275,22 @@ const Auth = () => {
                     You can upgrade or change your plan anytime after signup.
                   </p>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="paymentMethod">Payment Method <span className="text-destructive">*</span></Label>
+                  <Select value={paymentMethod} onValueChange={setPaymentMethod} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select payment method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="paypal">PayPal</SelectItem>
+                      <SelectItem value="card">Credit / Debit Card</SelectItem>
+                      <SelectItem value="square">Square</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Required for all accounts. Free plans won't be charged.
+                  </p>
+                </div>
                 <div className="flex items-start space-x-2">
                   <Checkbox
                     id="agreeToTerms"
@@ -1272,7 +1317,7 @@ const Auth = () => {
               </>
             )}
             
-            {!isResettingPassword && (
+            {!isResettingPassword && (isLogin || isForgotPassword) && (
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -1301,20 +1346,18 @@ const Auth = () => {
               />
             </div>
 
-            {!isForgotPassword && !isResettingPassword && (
+            {isLogin && !isForgotPassword && !isResettingPassword && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  {isLogin && (
-                    <button
-                      type="button"
-                      onClick={() => setIsForgotPassword(true)}
-                      className="text-xs text-primary hover:underline"
-                      disabled={loading}
-                    >
-                      Forgot password?
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsForgotPassword(true)}
+                    className="text-xs text-primary hover:underline"
+                    disabled={loading}
+                  >
+                    Forgot password?
+                  </button>
                 </div>
                 <Input
                   id="password"
