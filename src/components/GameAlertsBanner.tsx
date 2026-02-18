@@ -12,6 +12,7 @@ interface GameAlert {
   alert_type: string;
   severity: string;
   link_url: string | null;
+  image_url: string | null;
   created_at: string;
   expires_at: string | null;
 }
@@ -105,13 +106,18 @@ const GameAlertsBanner = () => {
                     )}
                     {alert.severity !== "urgent" && <Icon className="w-4 h-4" />}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-xs sm:text-sm font-semibold mr-1.5">
-                      {alert.title}
-                    </span>
-                    <span className="text-xs sm:text-sm opacity-90 hidden sm:inline">
-                      {alert.message}
-                    </span>
+                  <div className="min-w-0 flex-1 flex items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                      <span className="text-xs sm:text-sm font-semibold mr-1.5">
+                        {alert.title}
+                      </span>
+                      <span className="text-xs sm:text-sm opacity-90 hidden sm:inline">
+                        {alert.message}
+                      </span>
+                    </div>
+                    {alert.image_url && (
+                      <img src={alert.image_url} alt="" className="h-8 w-8 sm:h-10 sm:w-10 rounded object-cover flex-shrink-0" />
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">

@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Bell, Send, Trash2, AlertTriangle, Info, Siren, Plus } from "lucide-react";
+import { Bell, Send, Trash2, AlertTriangle, Info, Siren, Plus, ImagePlus, X, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { validateFile, generateSafeFilename } from "@/utils/fileValidation";
 
 interface GameAlert {
   id: string;
@@ -19,6 +20,7 @@ interface GameAlert {
   alert_type: string;
   severity: string;
   link_url: string | null;
+  image_url: string | null;
   is_active: boolean;
   push_sent: boolean;
   email_sent: boolean;
@@ -40,6 +42,9 @@ const GameAlertsManagement = () => {
   const [linkUrl, setLinkUrl] = useState("/");
   const [sendPush, setSendPush] = useState(true);
   const [sendEmail, setSendEmail] = useState(true);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     fetchAlerts();
@@ -64,6 +69,20 @@ const GameAlertsManagement = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
+      let uploadedImageUrl: string | null = null;
+      if (imageFile) {
+        setUploadingImage(true);
+        const safeName = generateSafeFilename(imageFile.name);
+        const filePath = `game-alerts/${safeName}`;
+        const { error: uploadError } = await supabase.storage
+          .from("content_uploads")
+          .upload(filePath, imageFile);
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage.from("content_uploads").getPublicUrl(filePath);
+        uploadedImageUrl = urlData.publicUrl;
+        setUploadingImage(false);
+      }
+
       const { data, error } = await supabase
         .from("game_alerts")
         .insert({
@@ -72,6 +91,7 @@ const GameAlertsManagement = () => {
           alert_type: alertType,
           severity,
           link_url: linkUrl || "/",
+          image_url: uploadedImageUrl,
           created_by: user?.id,
         })
         .select()
@@ -109,6 +129,8 @@ const GameAlertsManagement = () => {
       toast({ title: "Alert Created!", description: `${sendPush ? "Push sent. " : ""}${sendEmail ? "Emails sent." : ""}` });
       setTitle("");
       setMessage("");
+      setImageFile(null);
+      setImagePreview(null);
       fetchAlerts();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -217,6 +239,43 @@ const GameAlertsManagement = () => {
               <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} className="h-8 text-xs" />
             </div>
 
+            {/* Image Upload */}
+            <div className="space-y-1">
+              <Label className="text-xs">Image (optional)</Label>
+              {imagePreview ? (
+                <div className="relative inline-block">
+                  <img src={imagePreview} alt="Preview" className="h-16 rounded-md object-cover" />
+                  <button
+                    onClick={() => { setImageFile(null); setImagePreview(null); }}
+                    className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center gap-1.5 border border-dashed border-border rounded-md p-2 cursor-pointer hover:bg-muted/50 transition-colors">
+                  <ImagePlus className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Upload image</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const result = await validateFile(file, 'image', 5);
+                      if (!result.valid) {
+                        toast({ title: "Invalid file", description: result.error, variant: "destructive" });
+                        return;
+                      }
+                      setImageFile(file);
+                      setImagePreview(URL.createObjectURL(file));
+                    }}
+                  />
+                </label>
+              )}
+            </div>
+
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Switch checked={sendPush} onCheckedChange={setSendPush} />
@@ -272,7 +331,10 @@ const GameAlertsManagement = () => {
                       </div>
                     </div>
                     <p className="text-[10px] text-muted-foreground line-clamp-1">{alert.message}</p>
-                    <div className="flex gap-1.5">
+                    <div className="flex items-center gap-1.5">
+                      {(alert as any).image_url && (
+                        <img src={(alert as any).image_url} alt="" className="h-6 w-6 rounded object-cover" />
+                      )}
                       {alert.push_sent && <Badge variant="outline" className="text-[9px] px-1 py-0">Push ✓</Badge>}
                       {alert.email_sent && <Badge variant="outline" className="text-[9px] px-1 py-0">Email ✓</Badge>}
                     </div>

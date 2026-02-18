@@ -623,6 +623,7 @@ export type Database = {
           email_sent: boolean
           expires_at: string | null
           id: string
+          image_url: string | null
           is_active: boolean
           link_url: string | null
           message: string
@@ -637,6 +638,7 @@ export type Database = {
           email_sent?: boolean
           expires_at?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean
           link_url?: string | null
           message: string
@@ -651,6 +653,7 @@ export type Database = {
           email_sent?: boolean
           expires_at?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean
           link_url?: string | null
           message?: string
