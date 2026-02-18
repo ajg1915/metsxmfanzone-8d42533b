@@ -1521,14 +1521,6 @@ const Auth = () => {
               )
             )}
             
-            <div className="pt-2 border-t border-muted/30 space-y-1">
-              <Link to="/writer-auth" className="text-muted-foreground hover:text-primary text-[10px] flex items-center justify-center gap-1">
-                Writer Portal →
-              </Link>
-              <Link to="/admin-portal" className="text-muted-foreground/50 hover:text-muted-foreground text-[10px] flex items-center justify-center">
-                admin login
-              </Link>
-            </div>
           </div>
             </div>
           </div>
