@@ -121,6 +121,7 @@ const GameAlertsManagement = () => {
             message,
             notificationType: alertType === "game_day" ? "game_alert" : "general",
             url: linkUrl,
+            imageUrl: data.image_url || undefined,
           },
         });
         await supabase.from("game_alerts").update({ email_sent: true }).eq("id", data.id);

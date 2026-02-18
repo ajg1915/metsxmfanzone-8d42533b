@@ -17,6 +17,7 @@ interface GameNotificationRequest {
   notificationType: 'game_alert' | 'score_update' | 'lineup' | 'news' | 'live_stream' | 'event' | 'general';
   targetUsers?: string[];
   url?: string;
+  imageUrl?: string;
 }
 
 const sendEmail = async (apiKey: string, to: string, subject: string, html: string) => {
@@ -47,7 +48,8 @@ const getEmailTemplate = (
   message: string, 
   gameInfo?: GameNotificationRequest['gameInfo'],
   notificationType?: string,
-  url?: string
+  url?: string,
+  imageUrl?: string
 ) => {
   const baseUrl = Deno.env.get('SITE_URL') || 'https://metsxmfanzone.com';
   const actionUrl = url ? `${baseUrl}${url}` : baseUrl;
@@ -81,6 +83,7 @@ const getEmailTemplate = (
         <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 15px; height: 15px;" />
       </div>
       <h2 style="color: #FF4500; font-size: 18px; text-align: center; margin: 0 0 15px 0;">${title}</h2>
+      ${imageUrl ? `<div style="text-align: center; margin: 0 0 15px 0;"><img src="${imageUrl}" alt="Alert image" style="max-width: 100%; height: auto; border-radius: 8px;" /></div>` : ''}
       <p style="color: #D1D5DB; font-size: 13px; line-height: 1.5; text-align: center; margin: 0 0 15px 0;">${message}</p>
       ${gameInfoHtml}
       <div style="text-align: center; margin-top: 20px;">
@@ -129,7 +132,7 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { title, message, gameInfo, notificationType = 'general', targetUsers, url }: GameNotificationRequest = await req.json();
+    const { title, message, gameInfo, notificationType = 'general', targetUsers, url, imageUrl }: GameNotificationRequest = await req.json();
 
     if (!title || !message) {
       return new Response(
@@ -166,7 +169,7 @@ Deno.serve(async (req) => {
     }
 
     console.log(`Sending email notifications to ${users.length} users`);
-    const emailHtml = getEmailTemplate(title, message, gameInfo, notificationType, url);
+    const emailHtml = getEmailTemplate(title, message, gameInfo, notificationType, url, imageUrl);
 
     const emailPromises = users.map(async (user) => {
       if (!user.email) return { success: false, userId: user.id, error: 'No email' };
