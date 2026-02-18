@@ -526,6 +526,7 @@ const Auth = () => {
             full_name: validated.fullName,
             phone_number: validated.phoneNumber || null,
             sms_notifications_enabled: validated.smsOptIn || false,
+            preferred_payment_method: validated.paymentMethod,
           },
         },
       });
@@ -587,8 +588,9 @@ const Auth = () => {
           console.error("Error sending confirmation email:", err);
         }
 
-        // Store selected plan in localStorage for after confirmation
+        // Store selected plan and payment method in localStorage for after confirmation
         localStorage.setItem("pending_signup_plan", validated.selectedPlan);
+        localStorage.setItem("pending_signup_payment_method", validated.paymentMethod);
         
         // Navigate to confirmation page
         toast({

@@ -164,9 +164,50 @@ export default function ConfirmAccount() {
 
   // Check if there's a pending plan selection
   const hasPendingPlan = localStorage.getItem("pending_signup_plan");
+  const pendingPaymentMethod = localStorage.getItem("pending_signup_payment_method");
+
+  // Create free subscription after successful verification
+  useEffect(() => {
+    if (verificationState === "success" && hasPendingPlan === "free") {
+      const createFreeSubscription = async () => {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+
+          // Check if subscription already exists
+          const { data: existing } = await supabase
+            .from("subscriptions")
+            .select("id")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          if (existing) return;
+
+          const paymentMethod = pendingPaymentMethod || user.user_metadata?.preferred_payment_method || "free";
+
+          await supabase.from("subscriptions").insert({
+            user_id: user.id,
+            plan_type: "free",
+            status: "active",
+            amount: 0,
+            payment_method: paymentMethod,
+          });
+
+          // Clean up localStorage
+          localStorage.removeItem("pending_signup_plan");
+          localStorage.removeItem("pending_signup_payment_method");
+        } catch (err) {
+          console.error("Error creating free subscription:", err);
+        }
+      };
+      createFreeSubscription();
+    }
+  }, [verificationState]);
   
   const handleContinueAfterConfirmation = () => {
     if (hasPendingPlan) {
+      localStorage.removeItem("pending_signup_plan");
+      localStorage.removeItem("pending_signup_payment_method");
       navigate("/pricing?required=true");
     } else {
       navigate("/auth?mode=login");
