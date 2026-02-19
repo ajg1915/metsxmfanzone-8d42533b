@@ -221,21 +221,31 @@ export function AdminLayout() {
         <AdminSidebar />
         <div className="flex-1 flex flex-col min-w-0 w-full max-w-full">
           <AdminHeader navigate={navigate} />
-          <main className="flex-1 overflow-x-hidden overflow-y-auto p-2 sm:p-3 md:p-4 max-w-full
-            [&_h1]:text-base [&_h1]:sm:text-lg [&_h1]:md:text-xl
-            [&_h2]:text-sm [&_h2]:sm:text-base [&_h2]:md:text-lg
-            [&_h3]:text-xs [&_h3]:sm:text-sm [&_h3]:md:text-base
-            [&_.container]:px-0 [&_.container]:sm:px-2 [&_.container]:max-w-full
-            [&_.card]:text-sm [&_.card]:bg-card/80 [&_.card]:backdrop-blur-xl [&_.card]:border-muted/30
-            [&_.card-header]:p-3 [&_.card-content]:p-3
-            [&_input]:text-sm [&_input]:h-8 [&_input]:bg-muted/30 [&_input]:border-muted/40
-            [&_textarea]:text-sm [&_textarea]:bg-muted/30 [&_textarea]:border-muted/40
-            [&_select]:text-sm
-            [&_button]:text-xs [&_button]:sm:text-sm
-            [&_label]:text-xs
-            [&_.badge]:text-xs
-            [&_table]:text-xs [&_table]:sm:text-sm
-            [&_th]:p-2 [&_td]:p-2
+          <main className="flex-1 overflow-x-hidden overflow-y-auto p-1.5 sm:p-2 md:p-3 max-w-full
+            [&_h1]:text-sm [&_h1]:sm:text-base [&_h1]:md:text-lg [&_h1]:font-bold
+            [&_h2]:text-xs [&_h2]:sm:text-sm [&_h2]:md:text-base [&_h2]:font-semibold
+            [&_h3]:text-[11px] [&_h3]:sm:text-xs [&_h3]:md:text-sm
+            [&_.container]:px-0 [&_.container]:sm:px-1 [&_.container]:max-w-full
+            [&_.card]:text-xs [&_.card]:bg-card/80 [&_.card]:backdrop-blur-xl [&_.card]:border-muted/30
+            [&_.card-header]:p-2 [&_.card-header]:sm:p-2.5 [&_.card-content]:p-2 [&_.card-content]:sm:p-2.5
+            [&_.card-title]:text-[11px] [&_.card-title]:sm:text-xs
+            [&_.card-description]:text-[10px] [&_.card-description]:sm:text-[11px]
+            [&_input]:text-[11px] [&_input]:sm:text-xs [&_input]:h-7 [&_input]:bg-muted/30 [&_input]:border-muted/40
+            [&_textarea]:text-[11px] [&_textarea]:sm:text-xs [&_textarea]:bg-muted/30 [&_textarea]:border-muted/40
+            [&_select]:text-[11px] [&_select]:sm:text-xs
+            [&_button]:text-[10px] [&_button]:sm:text-xs
+            [&_label]:text-[10px] [&_label]:sm:text-xs
+            [&_.badge]:text-[9px] [&_.badge]:sm:text-[10px] [&_.badge]:px-1.5 [&_.badge]:py-0
+            [&_table]:text-[10px] [&_table]:sm:text-xs
+            [&_th]:p-1.5 [&_th]:sm:p-2 [&_th]:text-[10px] [&_th]:sm:text-xs
+            [&_td]:p-1.5 [&_td]:sm:p-2
+            [&_p]:text-[11px] [&_p]:sm:text-xs
+            [&_.space-y-4]:space-y-2 [&_.space-y-6]:space-y-3 [&_.space-y-8]:space-y-4
+            [&_.gap-4]:gap-2 [&_.gap-6]:gap-3 [&_.gap-8]:gap-4
+            [&_.mb-4]:mb-2 [&_.mb-6]:mb-3 [&_.mb-8]:mb-4
+            [&_.mt-4]:mt-2 [&_.mt-6]:mt-3 [&_.mt-8]:mt-4
+            [&_.py-6]:py-3 [&_.py-8]:py-4
+            [&_.px-4]:px-2 [&_.px-6]:px-3
           ">
             <Outlet />
           </main>
