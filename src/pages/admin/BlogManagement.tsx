@@ -71,10 +71,15 @@ export default function BlogManagement() {
   const [checkingAI, setCheckingAI] = useState<string | null>(null);
   const [aiCheckResult, setAiCheckResult] = useState<{
     postId: string;
-    isAIGenerated: boolean;
     isPlagiarized: boolean;
-    confidence: number;
-    reasons: string[];
+    originalityScore: number;
+    brandVoiceScore: number;
+    overallScore: number;
+    summary: string;
+    plagiarismFlags: string[];
+    grammarIssues: any[];
+    strengths: string[];
+    improvements: string[];
   } | null>(null);
   const [showRevokeDialog, setShowRevokeDialog] = useState(false);
   const [revokeTarget, setRevokeTarget] = useState<BlogPost | null>(null);
@@ -180,20 +185,25 @@ export default function BlogManagement() {
 
       if (error) throw error;
 
-      if (data.isAIGenerated || data.isPlagiarized) {
+      if (data.isPlagiarized || data.originalityScore < 50) {
         setAiCheckResult({
           postId: post.id,
-          isAIGenerated: data.isAIGenerated,
           isPlagiarized: data.isPlagiarized,
-          confidence: data.confidence,
-          reasons: data.reasons || []
+          originalityScore: data.originalityScore,
+          brandVoiceScore: data.brandVoiceScore,
+          overallScore: data.overallScore,
+          summary: data.summary,
+          plagiarismFlags: data.plagiarismFlags || [],
+          grammarIssues: data.grammarIssues || [],
+          strengths: data.strengths || [],
+          improvements: data.improvements || [],
         });
         setRevokeTarget(post);
         setShowRevokeDialog(true);
       } else {
         toast({
           title: "Content Verified ✓",
-          description: `Article appears to be original content (${data.confidence}% confidence)`,
+          description: `Originality: ${data.originalityScore}% · Brand Voice: ${data.brandVoiceScore}% · Overall: ${data.overallScore}%`,
         });
       }
     } catch (error: any) {
@@ -239,14 +249,14 @@ export default function BlogManagement() {
 
       if (writerEmail) {
         const reasons: string[] = [];
-        if (aiCheckResult.isAIGenerated) {
-          reasons.push("Content was detected as AI-generated (ChatGPT, Claude, or similar AI tools)");
-        }
         if (aiCheckResult.isPlagiarized) {
           reasons.push("Content appears to be plagiarized or copied from other sources");
         }
-        if (aiCheckResult.reasons.length > 0) {
-          reasons.push(...aiCheckResult.reasons);
+        if (aiCheckResult.originalityScore < 50) {
+          reasons.push(`Low originality score: ${aiCheckResult.originalityScore}%`);
+        }
+        if (aiCheckResult.plagiarismFlags.length > 0) {
+          reasons.push(...aiCheckResult.plagiarismFlags);
         }
 
         await supabase.functions.invoke('send-writer-revoked-email', {
@@ -894,22 +904,22 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
                     )}
                   </div>
                   <div className="flex gap-2 flex-wrap">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-yellow-500 border-yellow-500/50" 
+                      onClick={() => handleCheckAI(post)}
+                      disabled={checkingAI === post.id}
+                    >
+                      {checkingAI === post.id ? (
+                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                      ) : (
+                        <ShieldAlert className="w-4 h-4 mr-1" />
+                      )}
+                      AI Check
+                    </Button>
                     {post.approval_status === "pending" && (
                       <>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-yellow-500 border-yellow-500/50" 
-                          onClick={() => handleCheckAI(post)}
-                          disabled={checkingAI === post.id}
-                        >
-                          {checkingAI === post.id ? (
-                            <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                          ) : (
-                            <ShieldAlert className="w-4 h-4 mr-1" />
-                          )}
-                          AI Check
-                        </Button>
                         <Button variant="outline" size="sm" className="text-green-500 border-green-500/50" onClick={() => handleApprove(post)}>
                           <CheckCircle className="w-4 h-4 mr-1" /> Approve
                         </Button>
@@ -953,21 +963,21 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
                 <p>This article has been flagged for the following issues:</p>
                 
                 <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 space-y-2">
-                  {aiCheckResult?.isAIGenerated && (
-                    <p className="text-red-400 font-medium">• AI-Generated Content Detected</p>
-                  )}
                   {aiCheckResult?.isPlagiarized && (
                     <p className="text-red-400 font-medium">• Plagiarized Content Detected</p>
                   )}
+                  {aiCheckResult?.originalityScore !== undefined && aiCheckResult.originalityScore < 50 && (
+                    <p className="text-red-400 font-medium">• Low Originality Score: {aiCheckResult.originalityScore}%</p>
+                  )}
                   <p className="text-sm text-muted-foreground">
-                    Confidence: {aiCheckResult?.confidence}%
+                    Originality: {aiCheckResult?.originalityScore}% · Brand Voice: {aiCheckResult?.brandVoiceScore}% · Overall: {aiCheckResult?.overallScore}%
                   </p>
-                  {aiCheckResult?.reasons && aiCheckResult.reasons.length > 0 && (
+                  {aiCheckResult?.plagiarismFlags && aiCheckResult.plagiarismFlags.length > 0 && (
                     <div className="mt-2">
-                      <p className="text-sm font-medium">Reasons:</p>
+                      <p className="text-sm font-medium">Flagged Content:</p>
                       <ul className="text-sm text-muted-foreground list-disc pl-4 mt-1">
-                        {aiCheckResult.reasons.slice(0, 5).map((reason, i) => (
-                          <li key={i}>{reason}</li>
+                        {aiCheckResult.plagiarismFlags.slice(0, 5).map((flag, i) => (
+                          <li key={i}>{flag}</li>
                         ))}
                       </ul>
                     </div>
