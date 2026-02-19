@@ -1,4 +1,4 @@
-import { MessageSquarePlus, Share2, Tv, PenLine, BookOpen, Mic, Lock } from "lucide-react";
+import { MessageSquarePlus, Share2, Tv, PenLine, BookOpen, Mic, Lock, HelpCircle } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,6 +20,7 @@ const navItems: NavItem[] = [
   { label: "Post", path: "/community", requiresPremium: false },
   { label: "Blog", path: "/blog", requiresPremium: true },
   { label: "Podcast", path: "/podcast", requiresPremium: true },
+  { label: "Help", path: "/help-center", requiresPremium: false },
 ];
 
 const SocialMediaBar = () => {
@@ -98,6 +99,8 @@ const SocialMediaBar = () => {
                 <BookOpen className="h-5 w-5" />
               ) : item.label === "Podcast" ? (
                 <Mic className="h-5 w-5" />
+              ) : item.label === "Help" ? (
+                <HelpCircle className="h-5 w-5" />
               ) : (
                 <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
               )}
