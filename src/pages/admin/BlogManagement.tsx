@@ -695,30 +695,33 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-2 py-3">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-bold">Blog Management</h2>
+    <div className="space-y-2 w-full max-w-full overflow-hidden px-1">
+      <div className="flex justify-between items-center gap-1.5">
+        <div className="flex items-center gap-1.5">
+          <FileText className="w-4 h-4 text-primary" />
+          <h1 className="text-sm sm:text-base font-bold">Blog Management</h1>
+        </div>
         <Dialog open={isDialogOpen} onOpenChange={(open) => {
           setIsDialogOpen(open);
           if (!open) resetForm();
         }}>
           <DialogTrigger asChild>
-            <Button size="sm" className="h-8">
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
+            <Button size="sm" className="h-7 text-[10px] px-2">
+              <Plus className="w-3 h-3 mr-1" />
               New Post
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-full sm:max-w-3xl max-h-[90vh] overflow-y-auto mx-3 sm:mx-0">
-            <DialogHeader className="pb-2">
-              <DialogTitle className="text-base sm:text-lg">{editingPost ? "Edit Post" : "Create New Post"}</DialogTitle>
-              <DialogDescription className="text-xs sm:text-sm">
+          <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[85vh] overflow-y-auto p-3 sm:p-4">
+            <DialogHeader className="pb-1">
+              <DialogTitle className="text-sm sm:text-base">{editingPost ? "Edit Post" : "Create New Post"}</DialogTitle>
+              <DialogDescription className="text-[10px] sm:text-xs">
                 {editingPost ? "Update your blog post" : "Create a new blog post"}
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-2">
               {draftRestored && !editingPost && (
-                <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
-                  <span className="text-foreground">✨ Your previous draft was restored automatically.</span>
+                <div className="flex items-center justify-between rounded-md border border-primary/30 bg-primary/5 px-2 py-1.5 text-[10px]">
+                  <span className="text-foreground">✨ Draft restored.</span>
                   <Button
                     type="button"
                     variant="ghost"
@@ -733,291 +736,150 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
                   </Button>
                 </div>
               )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="sm:col-span-2">
-                  <Label htmlFor="title" className="text-sm">Title</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    required
-                    className="text-sm"
-                  />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                <div className="sm:col-span-2 space-y-0.5">
+                  <Label htmlFor="title" className="text-[10px]">Title</Label>
+                  <Input id="title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required className="h-7 text-[11px]" />
                 </div>
                 
-                <div>
-                  <Label htmlFor="slug" className="text-sm">Slug (URL)</Label>
-                  <Input
-                    id="slug"
-                    value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    placeholder="Auto-generated"
-                    className="text-sm"
-                  />
+                <div className="space-y-0.5">
+                  <Label htmlFor="slug" className="text-[10px]">Slug (URL)</Label>
+                  <Input id="slug" value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="Auto-generated" className="h-7 text-[11px]" />
                 </div>
 
-                <div>
-                  <Label htmlFor="category" className="text-sm">Category</Label>
-                  <Input
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    required
-                    className="text-sm"
-                  />
+                <div className="space-y-0.5">
+                  <Label htmlFor="category" className="text-[10px]">Category</Label>
+                  <Input id="category" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} required className="h-7 text-[11px]" />
                 </div>
 
-                <div className="sm:col-span-2">
-                  <Label htmlFor="tags" className="text-sm">Tags (comma separated)</Label>
-                  <Input
-                    id="tags"
-                    value={formData.tags}
-                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                    placeholder="sports, baseball, news"
-                    className="text-sm"
-                  />
+                <div className="sm:col-span-2 space-y-0.5">
+                  <Label htmlFor="tags" className="text-[10px]">Tags (comma separated)</Label>
+                  <Input id="tags" value={formData.tags} onChange={(e) => setFormData({ ...formData, tags: e.target.value })} placeholder="sports, baseball, news" className="h-7 text-[11px]" />
                 </div>
 
-                <div className="sm:col-span-2">
+                <div className="sm:col-span-2 space-y-0.5">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="excerpt" className="text-sm">Excerpt</Label>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleGenerateExcerpt}
-                      disabled={generatingExcerpt || (!formData.title && !formData.content)}
-                      className="h-6 text-xs"
-                    >
-                      {generatingExcerpt ? (
-                        <>
-                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="h-3 w-3 mr-1" />
-                          Auto-Generate
-                        </>
-                      )}
+                    <Label htmlFor="excerpt" className="text-[10px]">Excerpt</Label>
+                    <Button type="button" variant="ghost" size="sm" onClick={handleGenerateExcerpt} disabled={generatingExcerpt || (!formData.title && !formData.content)} className="h-5 text-[9px] px-1">
+                      {generatingExcerpt ? <><Loader2 className="h-2.5 w-2.5 mr-0.5 animate-spin" />Gen...</> : <><Sparkles className="h-2.5 w-2.5 mr-0.5" />Auto</>}
                     </Button>
                   </div>
-                  <Textarea
-                    id="excerpt"
-                    value={formData.excerpt}
-                    onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                    rows={2}
-                    className="text-sm mt-1"
-                    placeholder="Brief summary of the article..."
-                  />
+                  <Textarea id="excerpt" value={formData.excerpt} onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })} rows={2} className="text-[11px] min-h-[40px]" placeholder="Brief summary..." />
                 </div>
 
-                <div className="sm:col-span-2">
-                  <Label htmlFor="featured_image" className="text-sm">Featured Image URL</Label>
-                  <Input
-                    id="featured_image"
-                    value={formData.featured_image_url}
-                    onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
-                    placeholder="https://..."
-                    className="mt-1 text-sm"
-                  />
-                  
-                  <div className="mt-2">
-                    <Label htmlFor="image_upload" className="text-xs text-muted-foreground">Or Upload</Label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Input
-                        id="image_upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        disabled={uploadingImage}
-                        className="cursor-pointer text-xs"
-                      />
-                      {uploadingImage && (
-                        <Upload className="w-3 h-3 animate-pulse" />
-                      )}
+                <div className="sm:col-span-2 space-y-0.5">
+                  <Label htmlFor="featured_image" className="text-[10px]">Featured Image URL</Label>
+                  <Input id="featured_image" value={formData.featured_image_url} onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })} placeholder="https://..." className="h-7 text-[11px]" />
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <Input id="image_upload" type="file" accept="image/*" onChange={handleImageUpload} disabled={uploadingImage} className="cursor-pointer text-[10px] h-7" />
+                    {uploadingImage && <Upload className="w-2.5 h-2.5 animate-pulse" />}
                   </div>
                 </div>
 
-                <div className="sm:col-span-2">
-                  <Label htmlFor="audio_url" className="text-sm">Article Audio (Listen Version)</Label>
-                  <Input
-                    id="audio_url"
-                    value={formData.audio_url}
-                    onChange={(e) => setFormData({ ...formData, audio_url: e.target.value })}
-                    placeholder="https://... or upload below"
-                    className="mt-1 text-sm"
-                  />
-                  
-                  <div className="mt-2">
-                    <Label htmlFor="audio_upload" className="text-xs text-muted-foreground">Or Upload Audio (MP3, WAV)</Label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Input
-                        id="audio_upload"
-                        type="file"
-                        accept="audio/*"
-                        onChange={handleAudioUpload}
-                        disabled={uploadingAudio}
-                        className="cursor-pointer text-xs"
-                      />
-                      {uploadingAudio && (
-                        <Music className="w-3 h-3 animate-pulse" />
-                      )}
-                    </div>
+                <div className="sm:col-span-2 space-y-0.5">
+                  <Label htmlFor="audio_url" className="text-[10px]">Audio (Listen Version)</Label>
+                  <Input id="audio_url" value={formData.audio_url} onChange={(e) => setFormData({ ...formData, audio_url: e.target.value })} placeholder="https://... or upload" className="h-7 text-[11px]" />
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <Input id="audio_upload" type="file" accept="audio/*" onChange={handleAudioUpload} disabled={uploadingAudio} className="cursor-pointer text-[10px] h-7" />
+                    {uploadingAudio && <Music className="w-2.5 h-2.5 animate-pulse" />}
                   </div>
-                  
                   {formData.audio_url && (
-                    <div className="mt-2">
-                      <audio controls className="w-full h-8">
-                        <source src={formData.audio_url} type="audio/mpeg" />
-                      </audio>
-                    </div>
+                    <audio controls className="w-full h-7 mt-0.5"><source src={formData.audio_url} type="audio/mpeg" /></audio>
                   )}
                 </div>
-                </div>
 
-                <div className="sm:col-span-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <Label htmlFor="content" className="text-sm">Content</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleGenerateContent}
-                      disabled={generatingContent || !formData.title}
-                      className="h-7 text-xs"
-                    >
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      {generatingContent ? "Generating..." : "Generate AI"}
+                <div className="sm:col-span-2 space-y-0.5">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="content" className="text-[10px]">Content</Label>
+                    <Button type="button" variant="outline" size="sm" onClick={handleGenerateContent} disabled={generatingContent || !formData.title} className="h-5 text-[9px] px-1">
+                      <Sparkles className="w-2.5 h-2.5 mr-0.5" />
+                      {generatingContent ? "Gen..." : "AI Generate"}
                     </Button>
                   </div>
-                  <Textarea
-                    id="content"
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={8}
-                    required
-                    className="text-sm font-mono"
-                  />
+                  <Textarea id="content" value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })} rows={6} required className="text-[11px] font-mono min-h-[80px]" />
                 </div>
 
-                <div className="sm:col-span-2 flex items-center space-x-2 pt-2">
-                  <Switch
-                    id="published"
-                    checked={formData.published}
-                    onCheckedChange={(checked) => setFormData({ ...formData, published: checked })}
-                  />
-                  <Label htmlFor="published" className="text-sm">Published</Label>
+                <div className="sm:col-span-2 flex items-center space-x-1.5 pt-1">
+                  <Switch id="published" checked={formData.published} onCheckedChange={(checked) => setFormData({ ...formData, published: checked })} className="scale-75" />
+                  <Label htmlFor="published" className="text-[10px]">Published</Label>
                 </div>
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="w-full sm:w-auto">
-                  Cancel
-                </Button>
-                <Button type="submit" className="w-full sm:w-auto">
-                  {editingPost ? "Update" : "Create"} Post
-                </Button>
+              <div className="flex justify-end gap-1.5 pt-1">
+                <Button type="button" variant="outline" size="sm" onClick={() => setIsDialogOpen(false)} className="h-7 text-[10px]">Cancel</Button>
+                <Button type="submit" size="sm" className="h-7 text-[10px]">{editingPost ? "Update" : "Create"} Post</Button>
               </div>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid gap-3">
+      <div className="space-y-1.5">
         {posts.length === 0 ? (
-          <Card>
-            <CardContent className="py-6 text-center text-sm text-muted-foreground">
+          <Card className="border-border/30">
+            <CardContent className="py-4 text-center text-[10px] text-muted-foreground">
               No blog posts yet. Create your first post!
             </CardContent>
           </Card>
         ) : (
           posts.map((post) => (
-            <Card key={post.id} className={post.approval_status === "pending" ? "border-yellow-500/50" : ""}>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <CardTitle className="flex items-center gap-2 flex-wrap">
-                      <FileText className="w-5 h-5" />
-                      {post.title}
+            <Card key={post.id} className={`border-border/30 ${post.approval_status === "pending" ? "border-yellow-500/50" : ""}`}>
+              <CardContent className="p-2 space-y-1">
+                <div className="flex items-start justify-between gap-1">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <FileText className="w-3 h-3 flex-shrink-0 text-primary" />
+                      <span className="text-[11px] font-medium truncate">{post.title}</span>
                       {post.approval_status === "pending" && (
-                        <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> Pending
+                        <span className="text-[8px] bg-yellow-500/20 text-yellow-400 px-1 py-0 rounded flex items-center gap-0.5">
+                          <Clock className="w-2 h-2" /> Pending
                         </span>
                       )}
                       {post.approval_status === "approved" && post.published && (
-                        <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">
-                          Published
-                        </span>
+                        <span className="text-[8px] bg-green-500 text-white px-1 py-0 rounded">Published</span>
                       )}
                       {post.approval_status === "approved" && !post.published && (
-                        <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">
-                          Approved
-                        </span>
+                        <span className="text-[8px] bg-blue-500/20 text-blue-400 px-1 py-0 rounded">Approved</span>
                       )}
                       {post.approval_status === "rejected" && (
-                        <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">
-                          Rejected
-                        </span>
+                        <span className="text-[8px] bg-red-500/20 text-red-400 px-1 py-0 rounded">Rejected</span>
                       )}
-                    </CardTitle>
-                    <CardDescription>
+                    </div>
+                    <p className="text-[9px] text-muted-foreground mt-0.5">
                       {post.category} • {new Date(post.created_at).toLocaleDateString()}
-                      {post.profiles && (
-                        <span className="ml-2">• By: {post.profiles.full_name || post.profiles.email}</span>
-                      )}
-                    </CardDescription>
-                    {post.tags.length > 0 && (
-                      <div className="flex gap-1 mt-2">
-                        {post.tags.map((tag) => (
-                          <span key={tag} className="text-xs bg-muted px-2 py-1 rounded">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                      {post.profiles && <span> • {post.profiles.full_name || post.profiles.email}</span>}
+                    </p>
                   </div>
-                  <div className="flex gap-2 flex-wrap">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="text-yellow-500 border-yellow-500/50" 
-                      onClick={() => handleCheckAI(post)}
-                      disabled={checkingAI === post.id}
-                    >
-                      {checkingAI === post.id ? (
-                        <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                      ) : (
-                        <ShieldAlert className="w-4 h-4 mr-1" />
-                      )}
-                      AI Check
+                  <div className="flex items-center gap-0.5 flex-shrink-0 flex-wrap">
+                    <Button variant="outline" size="sm" className="h-6 px-1 text-[8px] text-yellow-500 border-yellow-500/50" onClick={() => handleCheckAI(post)} disabled={checkingAI === post.id}>
+                      {checkingAI === post.id ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <ShieldAlert className="w-2.5 h-2.5" />}
                     </Button>
                     {post.approval_status === "pending" && (
                       <>
-                        <Button variant="outline" size="sm" className="text-green-500 border-green-500/50" onClick={() => handleApprove(post)}>
-                          <CheckCircle className="w-4 h-4 mr-1" /> Approve
+                        <Button variant="outline" size="sm" className="h-6 px-1 text-green-500 border-green-500/50" onClick={() => handleApprove(post)}>
+                          <CheckCircle className="w-2.5 h-2.5" />
                         </Button>
-                        <Button variant="outline" size="sm" className="text-red-500 border-red-500/50" onClick={() => handleReject(post)}>
-                          <XCircle className="w-4 h-4 mr-1" /> Reject
+                        <Button variant="outline" size="sm" className="h-6 px-1 text-red-500 border-red-500/50" onClick={() => handleReject(post)}>
+                          <XCircle className="w-2.5 h-2.5" />
                         </Button>
                       </>
                     )}
-                    <Button variant="outline" size="sm" onClick={() => handleCopyForSharing(post)} title="Copy for sharing">
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleEdit(post)}>
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDelete(post.id)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <Button variant="outline" size="sm" className="h-6 px-1" onClick={() => handleCopyForSharing(post)}><Copy className="w-2.5 h-2.5" /></Button>
+                    <Button variant="outline" size="sm" className="h-6 px-1" onClick={() => handleEdit(post)}><Edit className="w-2.5 h-2.5" /></Button>
+                    <Button variant="destructive" size="sm" className="h-6 px-1" onClick={() => handleDelete(post.id)}><Trash2 className="w-2.5 h-2.5" /></Button>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground line-clamp-2">
-                  {post.excerpt || post.content.substring(0, 150)}...
+                <p className="text-[9px] text-muted-foreground line-clamp-1">
+                  {post.excerpt || post.content.substring(0, 100)}...
                 </p>
+                {post.tags.length > 0 && (
+                  <div className="flex gap-0.5 flex-wrap">
+                    {post.tags.slice(0, 4).map((tag) => (
+                      <span key={tag} className="text-[8px] bg-muted px-1 py-0 rounded">{tag}</span>
+                    ))}
+                    {post.tags.length > 4 && <span className="text-[8px] text-muted-foreground">+{post.tags.length - 4}</span>}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))
@@ -1026,7 +888,7 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
 
       {/* AI Detection Revocation Dialog */}
       <AlertDialog open={showRevokeDialog} onOpenChange={setShowRevokeDialog}>
-        <AlertDialogContent className="max-w-lg">
+        <AlertDialogContent className="max-w-[95vw] sm:max-w-sm p-3">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-500 flex items-center gap-2">
               <ShieldAlert className="w-5 h-5" />
