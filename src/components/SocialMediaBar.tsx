@@ -1,4 +1,4 @@
-import { MessageSquarePlus, Share2, Tv, PenLine, BookOpen, Mic, Lock, HelpCircle } from "lucide-react";
+import { MessageSquarePlus, Share2, Tv, PenLine, BookOpen, Mic, Lock, Bell } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -6,6 +6,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
+import NotificationsPanel from "@/components/NotificationsPanel";
 
 type NavItem = {
   label: string;
@@ -20,7 +21,7 @@ const navItems: NavItem[] = [
   { label: "Post", path: "/community", requiresPremium: false },
   { label: "Blog", path: "/blog", requiresPremium: true },
   { label: "Podcast", path: "/podcast", requiresPremium: true },
-  { label: "Help", path: "/help-center", requiresPremium: false },
+  { label: "Alerts", path: "#notifications", requiresPremium: false },
 ];
 
 const SocialMediaBar = () => {
@@ -76,12 +77,9 @@ const SocialMediaBar = () => {
       <div className="flex items-center justify-around py-2 px-4">
         {navItems.map((item) => {
           const showProLock = item.requiresPremium && !isPremium && !isAdmin;
-          return (
-            <button
-              key={item.label}
-              onClick={() => handleClick(item)}
-              className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors relative"
-            >
+          
+          const buttonInner = (
+            <>
               {showProLock && (
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full flex items-center justify-center">
                   <Lock className="w-1.5 h-1.5 text-white" />
@@ -89,8 +87,6 @@ const SocialMediaBar = () => {
               )}
               {item.label === "Home" ? (
                 <img src={metsLogo} alt={item.label} className="h-12 w-12 object-contain" />
-              ) : item.label === "Social" ? (
-                <Share2 className="h-7 w-7" />
               ) : item.label === "Watch Live" ? (
                 <Tv className="h-7 w-7" />
               ) : item.label === "Post" ? (
@@ -99,12 +95,32 @@ const SocialMediaBar = () => {
                 <BookOpen className="h-7 w-7" />
               ) : item.label === "Podcast" ? (
                 <Mic className="h-7 w-7" />
-              ) : item.label === "Help" ? (
-                <HelpCircle className="h-7 w-7" />
+              ) : item.label === "Alerts" ? (
+                <Bell className="h-7 w-7" />
               ) : (
                 <img src={metsLogo} alt={item.label} className="h-7 w-7 object-contain" />
               )}
               <span className={`text-[10px] font-medium ${item.label === "Watch Live" ? "animate-pulse drop-shadow-[0_0_4px_rgba(255,69,0,0.7)]" : ""}`} style={item.label === "Watch Live" ? { color: "#ff4500" } : undefined}>{item.label}</span>
+            </>
+          );
+
+          if (item.label === "Alerts") {
+            return (
+              <NotificationsPanel key={item.label}>
+                <button className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors relative">
+                  {buttonInner}
+                </button>
+              </NotificationsPanel>
+            );
+          }
+
+          return (
+            <button
+              key={item.label}
+              onClick={() => handleClick(item)}
+              className="flex flex-col items-center gap-0.5 text-muted-foreground hover:text-primary transition-colors relative"
+            >
+              {buttonInner}
             </button>
           );
         })}
