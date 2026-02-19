@@ -79,6 +79,20 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
 
         if (error) throw error;
 
+        // Notify admins about free plan signup
+        try {
+          await supabase.functions.invoke("notify-admin-new-member", {
+            body: {
+              userId: user.id,
+              planType: "free",
+              amount: "$0.00",
+              source: "Free Plan",
+            },
+          });
+        } catch (notifyError) {
+          console.error("Error notifying admins:", notifyError);
+        }
+
         toast({
           title: "Welcome!",
           description: "Your free plan has been activated",
