@@ -104,7 +104,7 @@ const SocialMediaBar = () => {
               ) : (
                 <img src={metsLogo} alt={item.label} className="h-7 w-7 object-contain" />
               )}
-              <span className={`text-[10px] font-medium ${item.label === "Watch Live" ? "animate-pulse text-orange-400 drop-shadow-[0_0_4px_rgba(251,146,60,0.7)]" : ""}`}>{item.label}</span>
+              <span className={`text-[10px] font-medium ${item.label === "Watch Live" ? "animate-pulse drop-shadow-[0_0_4px_rgba(255,69,0,0.7)]" : ""}`} style={item.label === "Watch Live" ? { color: "#ff4500" } : undefined}>{item.label}</span>
             </button>
           );
         })}
