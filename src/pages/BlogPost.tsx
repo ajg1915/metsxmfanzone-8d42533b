@@ -382,7 +382,7 @@ export default function BlogPost() {
             <header className="mb-6 sm:mb-8">
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">{post.title}</h1>
               
-              <div className="flex flex-wrap items-center gap-3 text-muted-foreground mb-4">
+              <div className="flex flex-wrap items-center gap-3 text-muted-foreground mb-2">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   {new Date(post.published_at).toLocaleDateString('en-US', {
@@ -394,8 +394,11 @@ export default function BlogPost() {
                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
                   {post.category}
                 </span>
-                
-                
+              </div>
+              <p className="text-xs text-muted-foreground mb-4">
+                By <span className="font-semibold text-foreground">MetsXMFanZone</span> · <span className="text-primary">Orange & Blue Media</span>
+              </p>
+              <div className="flex items-center gap-3 mb-4">
                 {/* Free Browser TTS Controls */}
                 {!post.audio_url && availableVoices.length > 0 && (
                   <div className="flex items-center gap-2">

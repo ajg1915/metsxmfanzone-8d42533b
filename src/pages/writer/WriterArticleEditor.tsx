@@ -10,7 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Send, Loader2, ImagePlus } from "lucide-react";
+import { ArrowLeft, Save, Send, Loader2, ImagePlus, ShieldCheck, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 const CATEGORIES = [
   "News",
@@ -57,6 +58,8 @@ export default function WriterArticleEditor() {
   const [tags, setTags] = useState("");
   const [featuredImageUrl, setFeaturedImageUrl] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [checkResult, setCheckResult] = useState<any>(null);
   const initialized = useRef(false);
 
   // Save draft to localStorage
@@ -319,6 +322,32 @@ export default function WriterArticleEditor() {
     }
   };
 
+  const handleCheckArticle = async () => {
+    if (!content.trim() || content.trim().length < 50) {
+      toast({ title: "Too short", description: "Write at least 50 characters before checking.", variant: "destructive" });
+      return;
+    }
+    if (!title.trim()) {
+      toast({ title: "Title needed", description: "Add a title before checking your article.", variant: "destructive" });
+      return;
+    }
+    setChecking(true);
+    setCheckResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("check-ai-content", {
+        body: { title: title.trim(), content: content.trim() },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setCheckResult(data);
+      toast({ title: "Article Checked ✅", description: `Originality Score: ${data.originalityScore || 0}%` });
+    } catch (err: any) {
+      toast({ title: "Check Failed", description: err.message || "Could not check article.", variant: "destructive" });
+    } finally {
+      setChecking(false);
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -343,7 +372,15 @@ export default function WriterArticleEditor() {
               Back to Dashboard
             </Link>
           </Button>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              variant="secondary"
+              onClick={handleCheckArticle}
+              disabled={checking || saving}
+            >
+              {checking ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
+              Check Article
+            </Button>
             <Button 
               variant="outline" 
               onClick={() => handleSave(false)}
@@ -508,6 +545,99 @@ export default function WriterArticleEditor() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Article Check Results */}
+        {checkResult && (
+          <Card className="border-primary/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-primary" />
+                Article Review Results
+              </CardTitle>
+              <CardDescription>{checkResult.summary}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Score bars */}
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span>Originality</span>
+                    <span className="font-semibold">{checkResult.originalityScore}%</span>
+                  </div>
+                  <Progress value={checkResult.originalityScore} className="h-2" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span>Brand Voice</span>
+                    <span className="font-semibold">{checkResult.brandVoiceScore}%</span>
+                  </div>
+                  <Progress value={checkResult.brandVoiceScore} className="h-2" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span>Overall</span>
+                    <span className="font-semibold">{checkResult.overallScore}%</span>
+                  </div>
+                  <Progress value={checkResult.overallScore} className="h-2" />
+                </div>
+              </div>
+
+              {/* Plagiarism flag */}
+              {checkResult.isPlagiarized && (
+                <div className="rounded-lg bg-destructive/10 border border-destructive/30 p-3 text-sm">
+                    <p className="font-semibold flex items-center gap-1 text-destructive mb-1">
+                    <XCircle className="w-4 h-4" /> Possible Plagiarism Detected
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                    {checkResult.plagiarismFlags?.map((flag: string, i: number) => (
+                      <li key={i}>{flag}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Grammar Issues */}
+              {checkResult.grammarIssues?.length > 0 && (
+                <div className="rounded-lg bg-accent/50 border border-border p-3 text-sm">
+                  <p className="font-semibold flex items-center gap-1 mb-2">
+                    <AlertTriangle className="w-4 h-4 text-destructive" /> Grammar & Spelling ({checkResult.grammarIssues.length})
+                  </p>
+                  <ul className="space-y-2">
+                    {checkResult.grammarIssues.slice(0, 5).map((issue: any, i: number) => (
+                      <li key={i} className="text-muted-foreground">
+                        <span className="line-through text-destructive/70">{issue.text}</span>
+                        {" → "}
+                        <span className="text-primary">{issue.suggestion}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Strengths */}
+              {checkResult.strengths?.length > 0 && (
+                <div className="rounded-lg bg-primary/5 border border-primary/20 p-3 text-sm">
+                  <p className="font-semibold flex items-center gap-1 mb-1">
+                    <CheckCircle2 className="w-4 h-4 text-primary" /> Strengths
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                    {checkResult.strengths.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {/* Improvements */}
+              {checkResult.improvements?.length > 0 && (
+                <div className="text-sm">
+                  <p className="font-semibold mb-1">💡 Suggestions</p>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                    {checkResult.improvements.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </main>
     </div>
   );
