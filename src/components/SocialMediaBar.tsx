@@ -87,7 +87,7 @@ const SocialMediaBar = () => {
                 </span>
               )}
               {item.label === "Home" ? (
-                <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
+                <img src={metsLogo} alt={item.label} className="h-7 w-7 object-contain" />
               ) : item.label === "Social" ? (
                 <Share2 className="h-5 w-5" />
               ) : item.label === "Watch Live" ? (
