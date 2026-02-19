@@ -2,21 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
-
-interface CheckAIContentRequest {
-  content: string;
-  title: string;
-}
-
-interface AICheckResult {
-  isAIGenerated: boolean;
-  isPlagiarized: boolean;
-  confidence: number;
-  reasons: string[];
-  citations: string[];
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -24,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { content, title }: CheckAIContentRequest = await req.json();
+    const { content, title } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
@@ -33,42 +20,34 @@ serve(async (req) => {
 
     if (!content || content.length < 50) {
       return new Response(
-        JSON.stringify({ error: "Content too short to analyze" }),
+        JSON.stringify({ error: "Content too short to analyze (need at least 50 characters)" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`Checking AI content for article: ${title}`);
+    console.log(`Checking article: ${title}`);
 
-    const systemPrompt = `You are an expert content authenticity analyzer. Your job is to detect:
-1. AI-generated content (written by ChatGPT, Claude, Gemini, or other AI models)
-2. Plagiarized content (copied from other sources without attribution)
-3. Missing citations or unsourced quotes
+    const systemPrompt = `You are a professional editorial content reviewer for MetsXMFanZone, a Mets fan media company under Orange & Blue Media. Your job is to review articles for:
 
-Analyze the provided article content and determine:
-- Whether it appears to be AI-generated based on writing patterns, structure, and style
-- Whether it contains plagiarized or unoriginal content
-- Whether any quotes or data need citations that are missing
+1. ORIGINALITY - Is the writing authentic and original? Does it sound like it was written by a real Mets fan with their own voice, not copied from ESPN, MLB.com, SNY, or other outlets?
+2. PLAGIARISM - Does the content appear to copy phrases, paragraphs, or structures from well-known sports media? Flag any sentences that sound like they were lifted from another source.
+3. GRAMMAR & SPELLING - Check for typos, grammar mistakes, awkward phrasing, and readability issues.
+4. BRAND VOICE - Does the article fit MetsXMFanZone / Orange & Blue Media's tone? It should feel passionate, fan-driven, and authentic — not robotic or generic.
 
 You MUST respond with a JSON object using this exact format:
 {
-  "isAIGenerated": boolean,
+  "originalityScore": number (0-100, where 100 is completely original),
   "isPlagiarized": boolean,
-  "confidence": number (0-100),
-  "reasons": ["reason1", "reason2"],
-  "citations": ["any quotes or claims that need sourcing"]
+  "plagiarismFlags": ["specific sentences or phrases that seem copied"],
+  "grammarIssues": [{"text": "the problematic text", "suggestion": "how to fix it", "type": "grammar|spelling|style"}],
+  "brandVoiceScore": number (0-100, how well it fits MetsXMFanZone tone),
+  "overallScore": number (0-100, combined quality score),
+  "summary": "A brief 2-3 sentence summary of the review",
+  "strengths": ["what the article does well"],
+  "improvements": ["specific suggestions to improve the article"]
 }
 
-Look for these AI indicators:
-- Overly perfect grammar and structure
-- Generic phrases like "In conclusion", "It's important to note"
-- Lack of personal voice or unique perspective
-- Repetitive sentence structures
-- Over-explanation of simple concepts
-- Hedging language like "may", "might", "could potentially"
-- Lists that feel artificially constructed
-- Lack of specific examples or personal experiences
-- Generic sports analysis without unique insights`;
+Be encouraging but honest. This is a fan media platform — we want authentic fan voices, not polished corporate copy. Prioritize originality and passion over perfection.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -80,9 +59,9 @@ Look for these AI indicators:
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          { 
-            role: "user", 
-            content: `Analyze this article titled "${title}":\n\n${content.substring(0, 8000)}` 
+          {
+            role: "user",
+            content: `Review this article titled "${title}":\n\n${content.substring(0, 10000)}`
           }
         ],
       }),
@@ -91,7 +70,7 @@ Look for these AI indicators:
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -113,12 +92,8 @@ Look for these AI indicators:
       throw new Error("No response from AI");
     }
 
-    console.log("AI response:", aiResponse);
-
-    // Parse the JSON response
-    let result: AICheckResult;
+    let result;
     try {
-      // Extract JSON from the response (it might be wrapped in markdown code blocks)
       const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         result = JSON.parse(jsonMatch[0]);
@@ -127,23 +102,23 @@ Look for these AI indicators:
       }
     } catch (parseError) {
       console.error("Failed to parse AI response:", parseError);
-      // Default to safe values if parsing fails
       result = {
-        isAIGenerated: false,
+        originalityScore: 0,
         isPlagiarized: false,
-        confidence: 0,
-        reasons: ["Unable to analyze content"],
-        citations: []
+        plagiarismFlags: [],
+        grammarIssues: [],
+        brandVoiceScore: 0,
+        overallScore: 0,
+        summary: "Unable to analyze content at this time. Please try again.",
+        strengths: [],
+        improvements: [],
       };
     }
-
-    console.log("AI check result:", result);
 
     return new Response(
       JSON.stringify(result),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-
   } catch (error: any) {
     console.error("Error in check-ai-content:", error);
     return new Response(
