@@ -88,23 +88,23 @@ const SocialMediaBar = () => {
                 </span>
               )}
               {item.label === "Home" ? (
-                <img src={metsLogo} alt={item.label} className="h-9 w-9 object-contain" />
+                <img src={metsLogo} alt={item.label} className="h-10 w-10 object-contain" />
               ) : item.label === "Social" ? (
-                <Share2 className="h-5 w-5" />
+                <Share2 className="h-7 w-7" />
               ) : item.label === "Watch Live" ? (
-                <Tv className="h-5 w-5" />
+                <Tv className="h-7 w-7" />
               ) : item.label === "Post" ? (
-                <MessageSquarePlus className="h-5 w-5" />
+                <MessageSquarePlus className="h-7 w-7" />
               ) : item.label === "Blog" ? (
-                <BookOpen className="h-5 w-5" />
+                <BookOpen className="h-7 w-7" />
               ) : item.label === "Podcast" ? (
-                <Mic className="h-5 w-5" />
+                <Mic className="h-7 w-7" />
               ) : item.label === "Help" ? (
-                <HelpCircle className="h-5 w-5" />
+                <HelpCircle className="h-7 w-7" />
               ) : (
-                <img src={metsLogo} alt={item.label} className="h-5 w-5 object-contain" />
+                <img src={metsLogo} alt={item.label} className="h-7 w-7 object-contain" />
               )}
-              <span className="text-[9px] font-medium">{item.label}</span>
+              <span className="text-[10px] font-medium">{item.label}</span>
             </button>
           );
         })}
