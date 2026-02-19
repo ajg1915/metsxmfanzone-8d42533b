@@ -19,7 +19,7 @@ const Footer = () => {
       transition={{ duration: 0.6 }}
       className="relative glass-nav border-t border-primary/30 bg-card/80 backdrop-blur-md"
     >
-      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-5 max-w-7xl">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-5 pb-20 md:pb-5 max-w-7xl">
         <div>
           <div className="flex flex-col items-center gap-1.5 mb-2">
             <h3 className="font-bold text-primary text-sm sm:text-base">MetsXMFanZone.com</h3>
