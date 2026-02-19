@@ -1607,7 +1607,11 @@ const Auth = () => {
                 </button>
               )
             )}
-            
+            {isLogin && !isForgotPassword && !isResettingPassword && (
+              <Link to="/admin" className="block mt-2 text-[10px] text-muted-foreground/60 hover:text-primary transition-colors">
+                Admin Login
+              </Link>
+            )}
           </div>
             </div>
           </div>
