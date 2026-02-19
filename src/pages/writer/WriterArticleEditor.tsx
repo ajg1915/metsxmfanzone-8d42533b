@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,6 +23,19 @@ const CATEGORIES = [
   "History",
 ];
 
+const DRAFT_KEY = "writer-article-draft";
+
+interface DraftData {
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  tags: string;
+  featuredImageUrl: string;
+  savedAt: number;
+}
+
 export default function WriterArticleEditor() {
   const { id } = useParams();
   const isEditing = !!id;
@@ -33,6 +46,7 @@ export default function WriterArticleEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isWriter, setIsWriter] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   
   // Form state
   const [title, setTitle] = useState("");
@@ -43,6 +57,44 @@ export default function WriterArticleEditor() {
   const [tags, setTags] = useState("");
   const [featuredImageUrl, setFeaturedImageUrl] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
+  const initialized = useRef(false);
+
+  // Save draft to localStorage
+  const saveDraft = useCallback(() => {
+    if (isEditing || !initialized.current) return;
+    if (!title && !content) return;
+    const draft: DraftData = {
+      title, slug, excerpt, content, category, tags, featuredImageUrl, savedAt: Date.now(),
+    };
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch {}
+  }, [title, slug, excerpt, content, category, tags, featuredImageUrl, isEditing]);
+
+  // Auto-save every 5 seconds
+  useEffect(() => {
+    if (isEditing) return;
+    const interval = setInterval(saveDraft, 5000);
+    return () => clearInterval(interval);
+  }, [saveDraft, isEditing]);
+
+  // Save on beforeunload / visibilitychange
+  useEffect(() => {
+    if (isEditing) return;
+    const handleBeforeUnload = () => saveDraft();
+    const handleVisibilityChange = () => { if (document.visibilityState === 'hidden') saveDraft(); };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [saveDraft, isEditing]);
+
+  // Clear draft after successful save
+  const clearDraft = useCallback(() => {
+    try { localStorage.removeItem(DRAFT_KEY); } catch {}
+  }, []);
 
   useEffect(() => {
     const checkWriterAccess = async () => {
@@ -53,7 +105,6 @@ export default function WriterArticleEditor() {
         return;
       }
 
-      // Check if user is a writer
       const { data: roles } = await supabase
         .from("user_roles")
         .select("role")
@@ -73,7 +124,6 @@ export default function WriterArticleEditor() {
 
       setIsWriter(true);
 
-      // If editing, fetch the article
       if (isEditing) {
         const { data: article, error } = await supabase
           .from("blog_posts")
@@ -99,8 +149,28 @@ export default function WriterArticleEditor() {
         setCategory(article.category);
         setTags(article.tags?.join(", ") || "");
         setFeaturedImageUrl(article.featured_image_url || "");
+      } else {
+        // Restore draft for new articles
+        try {
+          const saved = localStorage.getItem(DRAFT_KEY);
+          if (saved) {
+            const draft: DraftData = JSON.parse(saved);
+            // Only restore if less than 7 days old
+            if (Date.now() - draft.savedAt < 7 * 24 * 60 * 60 * 1000) {
+              setTitle(draft.title || "");
+              setSlug(draft.slug || "");
+              setExcerpt(draft.excerpt || "");
+              setContent(draft.content || "");
+              setCategory(draft.category || "");
+              setTags(draft.tags || "");
+              setFeaturedImageUrl(draft.featuredImageUrl || "");
+              setDraftRestored(true);
+            }
+          }
+        } catch {}
       }
 
+      initialized.current = true;
       setLoading(false);
     };
 
@@ -230,6 +300,7 @@ export default function WriterArticleEditor() {
 
         if (error) throw error;
 
+        clearDraft();
         toast({
           title: "Article created",
           description: "Your article has been submitted for admin review.",
@@ -293,13 +364,31 @@ export default function WriterArticleEditor() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+        {draftRestored && (
+          <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
+            <span className="text-foreground">✨ Your previous draft was restored automatically.</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => {
+                clearDraft();
+                setTitle(""); setSlug(""); setExcerpt(""); setContent("");
+                setCategory(""); setTags(""); setFeaturedImageUrl("");
+                setDraftRestored(false);
+              }}
+            >
+              Discard Draft
+            </Button>
+          </div>
+        )}
         <Card>
           <CardHeader>
             <CardTitle>{isEditing ? "Edit Article" : "New Article"}</CardTitle>
             <CardDescription>
               {isEditing 
                 ? "Update your article. Changes will be reviewed by an admin before publishing."
-                : "Write your article. It will be reviewed by an admin before publishing."}
+                : "Write your article. It will be reviewed by an admin before publishing. Your work is auto-saved locally."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
