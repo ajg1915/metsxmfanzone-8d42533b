@@ -86,30 +86,29 @@ const StoriesSection = () => {
       
       if (error) throw error;
 
-      const storiesWithUrls = await Promise.all(
-        (data || []).map(async (story) => {
-          const fileName = story.media_url.split('/stories/')[1] || story.media_url;
-          const { data: urlData } = await supabase.storage
+      // Stories bucket is public — use getPublicUrl instead of signed URLs (no network requests!)
+      const storiesWithUrls = (data || []).map((story) => {
+        const fileName = story.media_url.split('/stories/')[1] || story.media_url;
+        const { data: urlData } = supabase.storage
+          .from('stories')
+          .getPublicUrl(fileName);
+
+        let thumbnailUrl = story.thumbnail_url;
+        if (thumbnailUrl) {
+          const thumbFileName = thumbnailUrl.split('/stories/')[1] || thumbnailUrl;
+          const { data: thumbData } = supabase.storage
             .from('stories')
-            .createSignedUrl(fileName, 3600);
+            .getPublicUrl(thumbFileName);
+          thumbnailUrl = thumbData?.publicUrl || thumbnailUrl;
+        }
 
-          let thumbnailUrl = story.thumbnail_url;
-          if (thumbnailUrl) {
-            const thumbFileName = thumbnailUrl.split('/stories/')[1] || thumbnailUrl;
-            const { data: thumbData } = await supabase.storage
-              .from('stories')
-              .createSignedUrl(thumbFileName, 3600);
-            thumbnailUrl = thumbData?.signedUrl || thumbnailUrl;
-          }
-
-          return {
-            ...story,
-            media_type: story.media_type as 'image' | 'video',
-            media_url: urlData?.signedUrl || story.media_url,
-            thumbnail_url: thumbnailUrl
-          };
-        })
-      );
+        return {
+          ...story,
+          media_type: story.media_type as 'image' | 'video',
+          media_url: urlData?.publicUrl || story.media_url,
+          thumbnail_url: thumbnailUrl
+        };
+      });
       setStories(storiesWithUrls);
     } catch (error) {
       console.error("Error fetching stories:", error);
