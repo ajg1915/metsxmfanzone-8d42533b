@@ -106,6 +106,9 @@ export function AdminLayout() {
   }, [navigate, user]);
 
   useEffect(() => {
+    // Don't run admin check until auth has finished loading
+    if (loading) return;
+
     const checkAdmin = async () => {
       // Check for PIN-only authentication first
       const adminUserId = sessionStorage.getItem("admin_user_id");
@@ -113,48 +116,55 @@ export function AdminLayout() {
       
       if (adminUserId && pinVerifiedSession && !user) {
         // PIN-only auth - verify the user is still an admin in database
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", adminUserId)
-          .eq("role", "admin")
-          .single();
+        try {
+          const { data: roleData } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", adminUserId)
+            .eq("role", "admin")
+            .maybeSingle();
 
-        if (!roleData) {
-          toast({
-            title: "Access Denied",
-            description: "Admin privileges have been revoked",
-            variant: "destructive",
-          });
-          sessionStorage.removeItem("admin_verified");
-          sessionStorage.removeItem("admin_user_id");
+          if (!roleData) {
+            toast({
+              title: "Access Denied",
+              description: "Admin privileges have been revoked",
+              variant: "destructive",
+            });
+            sessionStorage.removeItem("admin_verified");
+            sessionStorage.removeItem("admin_user_id");
+            navigate("/admin-portal");
+            return;
+          }
+
+          setIsAdmin(true);
+          setPinOnlyAuth(true);
+          setPinVerified(true);
+        } catch (err) {
+          console.error("Error checking admin role:", err);
           navigate("/admin-portal");
           return;
         }
-
-        setIsAdmin(true);
-        setPinOnlyAuth(true);
-        setPinVerified(true);
         setChecking(false);
         return;
       }
 
       // Traditional auth flow
-      if (!loading && !user) {
+      if (!user) {
         // No user and no PIN auth - redirect to portal
         navigate("/admin-portal");
         return;
       }
 
-      if (user) {
-        const { data, error } = await supabase
+      // User exists - check admin role
+      try {
+        const { data } = await supabase
           .from("user_roles")
           .select("role")
           .eq("user_id", user.id)
           .eq("role", "admin")
-          .single();
+          .maybeSingle();
 
-        if (error || !data) {
+        if (!data) {
           toast({
             title: "Access Denied",
             description: "You don't have admin privileges",
@@ -170,6 +180,10 @@ export function AdminLayout() {
         if (!pinVerified) {
           setNeedsPinVerification(true);
         }
+      } catch (err) {
+        console.error("Error checking admin role:", err);
+        navigate("/");
+        return;
       }
       setChecking(false);
     };
