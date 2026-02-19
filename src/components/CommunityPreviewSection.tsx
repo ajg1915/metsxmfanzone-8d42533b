@@ -86,26 +86,30 @@ const CommunityPreviewSection = () => {
       from("profiles").
       select("*", { count: "exact", head: true });
 
-      // Generate signed URLs for images
-      const postsWithSignedUrls = await Promise.all(
-        (postsData || []).map(async (post) => {
-          let imageUrl = post.image_url;
-          if (post.image_url) {
-            const fileName = post.image_url.split('/community_images/')[1] || post.image_url;
-            if (fileName) {
-              const { data: signedUrlData } = await supabase.storage.
-              from('community_images').
-              createSignedUrl(fileName, 3600);
-              imageUrl = signedUrlData?.signedUrl || post.image_url;
+      // Generate signed URLs for images - batch only posts that have images
+      const postsNeedingUrls = (postsData || []).filter(p => p.image_url);
+      const signedUrlMap: Record<string, string> = {};
+      
+      if (postsNeedingUrls.length > 0) {
+        const signPromises = postsNeedingUrls.map(async (post) => {
+          const fileName = post.image_url!.split('/community_images/')[1] || post.image_url!;
+          if (fileName) {
+            const { data: signedUrlData } = await supabase.storage
+              .from('community_images')
+              .createSignedUrl(fileName, 3600);
+            if (signedUrlData?.signedUrl) {
+              signedUrlMap[post.id] = signedUrlData.signedUrl;
             }
           }
-          return {
-            ...post,
-            image_url: imageUrl,
-            isAdmin: adminUserIds.has(post.user_id)
-          };
-        })
-      );
+        });
+        await Promise.all(signPromises);
+      }
+
+      const postsWithSignedUrls = (postsData || []).map((post) => ({
+        ...post,
+        image_url: signedUrlMap[post.id] || post.image_url,
+        isAdmin: adminUserIds.has(post.user_id)
+      }));
 
       setPosts(postsWithSignedUrls);
       setStats({
