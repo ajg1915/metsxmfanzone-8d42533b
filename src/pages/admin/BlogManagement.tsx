@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -53,7 +53,12 @@ export default function BlogManagement() {
   const [loading, setLoading] = useState(true);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const [draftRestored, setDraftRestored] = useState(false);
+  const formInitialized = useRef(false);
+
+  const ADMIN_DRAFT_KEY = "admin-blog-draft";
+
+  const defaultFormData = {
     title: "",
     slug: "",
     content: "",
@@ -63,7 +68,9 @@ export default function BlogManagement() {
     category: "General",
     tags: "",
     published: false,
-  });
+  };
+
+  const [formData, setFormData] = useState(defaultFormData);
   const [generatingContent, setGeneratingContent] = useState(false);
   const [generatingExcerpt, setGeneratingExcerpt] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -83,6 +90,63 @@ export default function BlogManagement() {
   } | null>(null);
   const [showRevokeDialog, setShowRevokeDialog] = useState(false);
   const [revokeTarget, setRevokeTarget] = useState<BlogPost | null>(null);
+
+  // Auto-save draft to localStorage
+  const saveDraft = useCallback(() => {
+    if (editingPost || !formInitialized.current) return;
+    if (!formData.title && !formData.content) return;
+    try {
+      localStorage.setItem(ADMIN_DRAFT_KEY, JSON.stringify({ ...formData, savedAt: Date.now() }));
+    } catch {}
+  }, [formData, editingPost]);
+
+  useEffect(() => {
+    if (editingPost) return;
+    const interval = setInterval(saveDraft, 5000);
+    return () => clearInterval(interval);
+  }, [saveDraft, editingPost]);
+
+  useEffect(() => {
+    if (editingPost) return;
+    const handleBeforeUnload = () => saveDraft();
+    const handleVisibility = () => { if (document.visibilityState === 'hidden') saveDraft(); };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [saveDraft, editingPost]);
+
+  const clearDraft = useCallback(() => {
+    try { localStorage.removeItem(ADMIN_DRAFT_KEY); } catch {}
+  }, []);
+
+  // Restore draft on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(ADMIN_DRAFT_KEY);
+      if (saved) {
+        const draft = JSON.parse(saved);
+        if (Date.now() - draft.savedAt < 7 * 24 * 60 * 60 * 1000) {
+          setFormData({
+            title: draft.title || "",
+            slug: draft.slug || "",
+            content: draft.content || "",
+            excerpt: draft.excerpt || "",
+            featured_image_url: draft.featured_image_url || "",
+            audio_url: draft.audio_url || "",
+            category: draft.category || "General",
+            tags: draft.tags || "",
+            published: draft.published || false,
+          });
+          setDraftRestored(true);
+          setIsDialogOpen(true);
+        }
+      }
+    } catch {}
+    formInitialized.current = true;
+  }, []);
 
   useEffect(() => {
     fetchPosts();
@@ -360,6 +424,7 @@ export default function BlogManagement() {
         });
       }
 
+      clearDraft();
       setIsDialogOpen(false);
       resetForm();
       fetchPosts();
@@ -594,17 +659,9 @@ export default function BlogManagement() {
 
   const resetForm = () => {
     setEditingPost(null);
-    setFormData({
-      title: "",
-      slug: "",
-      content: "",
-      excerpt: "",
-      featured_image_url: "",
-      audio_url: "",
-      category: "General",
-      tags: "",
-      published: false,
-    });
+    setFormData(defaultFormData);
+    setDraftRestored(false);
+    clearDraft();
   };
 
   const handleCopyForSharing = async (post: BlogPost) => {
@@ -659,6 +716,23 @@ ${post.tags.length > 0 ? `Tags: ${post.tags.join(", ")}` : ""}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-3">
+              {draftRestored && !editingPost && (
+                <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
+                  <span className="text-foreground">✨ Your previous draft was restored automatically.</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7"
+                    onClick={() => {
+                      resetForm();
+                      setIsDialogOpen(true);
+                    }}
+                  >
+                    Discard Draft
+                  </Button>
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
                   <Label htmlFor="title" className="text-sm">Title</Label>
