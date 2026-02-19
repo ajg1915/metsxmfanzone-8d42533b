@@ -88,7 +88,7 @@ const SocialMediaBar = () => {
                 </span>
               )}
               {item.label === "Home" ? (
-                <img src={metsLogo} alt={item.label} className="h-10 w-10 object-contain" />
+                <img src={metsLogo} alt={item.label} className="h-12 w-12 object-contain" />
               ) : item.label === "Social" ? (
                 <Share2 className="h-7 w-7" />
               ) : item.label === "Watch Live" ? (
@@ -104,7 +104,7 @@ const SocialMediaBar = () => {
               ) : (
                 <img src={metsLogo} alt={item.label} className="h-7 w-7 object-contain" />
               )}
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <span className={`text-[10px] font-medium ${item.label === "Watch Live" ? "animate-pulse text-orange-400 drop-shadow-[0_0_4px_rgba(251,146,60,0.7)]" : ""}`}>{item.label}</span>
             </button>
           );
         })}
