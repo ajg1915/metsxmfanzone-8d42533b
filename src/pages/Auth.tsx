@@ -1482,8 +1482,31 @@ const Auth = () => {
               </>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Loading..." : isResettingPassword ? "Update Password" : isForgotPassword ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={
+                loading || 
+                (!isLogin && !isForgotPassword && !isResettingPassword && (
+                  !fullName.trim() || !email.trim() || !password || !phoneNumber.trim() || !selectedPlan || !paymentMethod || !agreeToTerms
+                ))
+              }
+            >
+              {loading 
+                ? "Loading..." 
+                : isResettingPassword 
+                ? "Update Password" 
+                : isForgotPassword 
+                ? "Send Reset Link" 
+                : isLogin 
+                ? "Sign In" 
+                : !selectedPlan 
+                ? "Select a Membership to Continue"
+                : !paymentMethod
+                ? "Select a Payment Method"
+                : !agreeToTerms
+                ? "Agree to Terms to Continue"
+                : "Create Account"}
             </Button>
 
             {/* Biometric Login Option */}
