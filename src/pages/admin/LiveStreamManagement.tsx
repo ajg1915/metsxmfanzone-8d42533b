@@ -79,6 +79,22 @@ export default function LiveStreamManagement() {
     }
   };
 
+  const sendLiveNotification = async (title: string, streamId: string) => {
+    try {
+      await supabase.functions.invoke("send-push-notification", {
+        body: {
+          title: "🔴 LIVE NOW on MetsXMFanZone!",
+          body: title,
+          url: "/metsxmfanzone-tv",
+          icon: "/logo-192.png",
+          tag: `live-stream-${streamId}`,
+        },
+      });
+    } catch (err) {
+      console.error("Push notification failed:", err);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -91,6 +107,9 @@ export default function LiveStreamManagement() {
       };
 
       if (editingStream) {
+        const wasLive = editingStream.status === 'live';
+        const nowLive = formData.status === 'live';
+
         const { error } = await supabase
           .from("live_streams")
           .update(streamData)
@@ -98,20 +117,32 @@ export default function LiveStreamManagement() {
 
         if (error) throw error;
 
+        // Fire push if stream just went live
+        if (!wasLive && nowLive) {
+          await sendLiveNotification(formData.title, editingStream.id);
+        }
+
         toast({
           title: "Success",
-          description: "Live stream updated successfully",
+          description: `Live stream updated successfully${!wasLive && nowLive ? " — Push notification sent to all subscribers!" : ""}`,
         });
       } else {
-        const { error } = await supabase
+        const { data: inserted, error } = await supabase
           .from("live_streams")
-          .insert([streamData]);
+          .insert([streamData])
+          .select()
+          .single();
 
         if (error) throw error;
 
+        // Fire push if created as live immediately
+        if (formData.status === 'live' && inserted) {
+          await sendLiveNotification(formData.title, inserted.id);
+        }
+
         toast({
           title: "Success",
-          description: "Live stream created successfully",
+          description: `Live stream created successfully${formData.status === 'live' ? " — Push notification sent to all subscribers!" : ""}`,
         });
       }
 

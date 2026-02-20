@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Bell, Send, Trash2, AlertTriangle, Info, Siren, Plus, ImagePlus, X, Loader2 } from "lucide-react";
+import { Bell, Send, Trash2, AlertTriangle, Info, Siren, Plus, ImagePlus, X, Loader2, Smartphone } from "lucide-react";
 import { motion } from "framer-motion";
 import { validateFile, generateSafeFilename } from "@/utils/fileValidation";
 
@@ -280,7 +280,8 @@ const GameAlertsManagement = () => {
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5">
                 <Switch checked={sendPush} onCheckedChange={setSendPush} className="scale-75" />
-                <Label className="text-[10px]">Push</Label>
+                <Smartphone className="w-3 h-3 text-muted-foreground" />
+                <Label className="text-[10px]">Push to Phones</Label>
               </div>
               <div className="flex items-center gap-1.5">
                 <Switch checked={sendEmail} onCheckedChange={setSendEmail} className="scale-75" />
@@ -336,8 +337,8 @@ const GameAlertsManagement = () => {
                       {(alert as any).image_url && (
                         <img src={(alert as any).image_url} alt="" className="h-5 w-5 rounded object-cover" />
                       )}
-                      {alert.push_sent && <Badge variant="outline" className="text-[8px] px-1 py-0">Push ✓</Badge>}
-                      {alert.email_sent && <Badge variant="outline" className="text-[8px] px-1 py-0">Email ✓</Badge>}
+                      {alert.push_sent && <Badge variant="outline" className="text-[8px] px-1 py-0">📱 Push ✓</Badge>}
+                      {alert.email_sent && <Badge variant="outline" className="text-[8px] px-1 py-0">✉️ Email ✓</Badge>}
                     </div>
                   </motion.div>
                 ))}
