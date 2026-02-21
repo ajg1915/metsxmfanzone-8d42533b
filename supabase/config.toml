@@ -152,3 +152,6 @@ verify_jwt = false
 
 [functions.ai-user-management]
 verify_jwt = false
+
+[functions.fetch-live-game]
+verify_jwt = false

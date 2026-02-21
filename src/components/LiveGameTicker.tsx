@@ -20,9 +20,15 @@ const LiveGameTicker = () => {
   useEffect(() => {
     const fetchLiveGame = async () => {
       try {
+        console.log('Fetching live game data...');
         const { data, error } = await supabase.functions.invoke('fetch-live-game');
 
-        if (error) throw error;
+        if (error) {
+          console.error('Live game fetch error:', error);
+          throw error;
+        }
+
+        console.log('Live game data:', JSON.stringify(data));
 
         if (data?.game) {
           setGameData(data.game);
