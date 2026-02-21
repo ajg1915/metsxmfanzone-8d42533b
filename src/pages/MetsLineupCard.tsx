@@ -147,7 +147,7 @@ const historical2025Lineups = [
 
 function LineupCardDisplay({ lineup, isUpcoming = false }: {lineup: LineupCard | typeof historical2025Lineups[0];isUpcoming?: boolean;}) {
   const [expanded, setExpanded] = useState(isUpcoming);
-  const gameDate = new Date(lineup.game_date + "T12:00:00");
+  const gameDate = new Date(lineup.game_date.includes("T") ? lineup.game_date : lineup.game_date + "T12:00:00");
   const dateStr = gameDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
   const players = lineup.lineup_data as LineupPlayer[] | null;
   const pitcher = lineup.starting_pitcher as StartingPitcher | null;
