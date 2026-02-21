@@ -25,62 +25,107 @@ serve(async (req) => {
     const day = parts.find(p => p.type === 'day')!.value;
     const todayET = `${year}-${month}-${day}`;
 
-    const url = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=${METS_TEAM_ID}&date=${todayET}&hydrate=linescore,team`;
-    const response = await fetch(url);
+    // Step 1: Get today's schedule to find the gamePk
+    const scheduleUrl = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=${METS_TEAM_ID}&date=${todayET}`;
+    const scheduleRes = await fetch(scheduleUrl, {
+      headers: { 'Cache-Control': 'no-cache, no-store' },
+    });
 
-    if (!response.ok) {
+    if (!scheduleRes.ok) {
       return new Response(JSON.stringify({ game: null }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const data = await response.json();
+    const scheduleData = await scheduleRes.json();
 
-    if (!data.dates || data.dates.length === 0 || data.dates[0].games.length === 0) {
+    if (!scheduleData.dates || scheduleData.dates.length === 0 || scheduleData.dates[0].games.length === 0) {
       return new Response(JSON.stringify({ game: null }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const game = data.dates[0].games[0];
-    const linescore = game.linescore;
-    const isLive = game.status.abstractGameState === 'Live';
-    const isFinal = game.status.abstractGameState === 'Final';
-    const isPreview = game.status.abstractGameState === 'Preview';
+    const scheduledGame = scheduleData.dates[0].games[0];
+    const gamePk = scheduledGame.gamePk;
+    const abstractState = scheduledGame.status?.abstractGameState;
 
-    let gameResult = null;
-
-    if (isLive || isFinal) {
-      gameResult = {
-        homeTeam: game.teams.home.team.name,
-        awayTeam: game.teams.away.team.name,
-        homeScore: linescore?.teams?.home?.runs || 0,
-        awayScore: linescore?.teams?.away?.runs || 0,
-        inning: linescore?.currentInning?.toString() || '',
-        inningState: linescore?.inningState || '',
-        isLive,
-        gameStatus: isFinal ? 'Final' : `${linescore?.inningState} ${linescore?.currentInning}`,
-      };
-    } else if (isPreview) {
-      const gameTime = new Date(game.gameDate).toLocaleTimeString('en-US', {
+    // For Preview (not started) games, return the scheduled time
+    if (abstractState === 'Preview') {
+      const gameTime = new Date(scheduledGame.gameDate).toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
         timeZone: 'America/New_York',
         timeZoneName: 'short',
       });
-      gameResult = {
-        homeTeam: game.teams.home.team.name,
-        awayTeam: game.teams.away.team.name,
-        homeScore: 0,
-        awayScore: 0,
-        inning: '',
-        inningState: '',
-        isLive: false,
-        gameStatus: gameTime,
-      };
+      return new Response(JSON.stringify({
+        game: {
+          homeTeam: scheduledGame.teams.home.team.name,
+          awayTeam: scheduledGame.teams.away.team.name,
+          homeScore: 0,
+          awayScore: 0,
+          inning: '',
+          inningState: '',
+          isLive: false,
+          gameStatus: gameTime,
+        }
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    return new Response(JSON.stringify({ game: gameResult }), {
+    // Step 2: For Live or Final games, use the live feed for the most real-time data
+    const liveFeedUrl = `https://statsapi.mlb.com/api/v1.1/game/${gamePk}/feed/live`;
+    const liveRes = await fetch(liveFeedUrl, {
+      headers: { 'Cache-Control': 'no-cache, no-store' },
+    });
+
+    if (!liveRes.ok) {
+      return new Response(JSON.stringify({ game: null }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const liveData = await liveRes.json();
+    const gameData = liveData.gameData;
+    const linescore = liveData.liveData?.linescore;
+    const status = gameData?.status;
+
+    const isLive = status?.abstractGameState === 'Live';
+    const isFinal = status?.abstractGameState === 'Final';
+
+    if (!isLive && !isFinal) {
+      return new Response(JSON.stringify({ game: null }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const homeTeam = gameData.teams.home.name;
+    const awayTeam = gameData.teams.away.name;
+    const homeScore = linescore?.teams?.home?.runs ?? 0;
+    const awayScore = linescore?.teams?.away?.runs ?? 0;
+    const currentInning = linescore?.currentInning ?? '';
+    const inningState = linescore?.inningState ?? '';
+    const outs = linescore?.outs ?? 0;
+
+    let gameStatus = '';
+    if (isFinal) {
+      gameStatus = currentInning > 9 ? `Final (${currentInning})` : 'Final';
+    } else {
+      gameStatus = `${inningState} ${currentInning} · ${outs} out${outs !== 1 ? 's' : ''}`;
+    }
+
+    return new Response(JSON.stringify({
+      game: {
+        homeTeam,
+        awayTeam,
+        homeScore,
+        awayScore,
+        inning: currentInning.toString(),
+        inningState,
+        isLive,
+        gameStatus,
+      }
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
