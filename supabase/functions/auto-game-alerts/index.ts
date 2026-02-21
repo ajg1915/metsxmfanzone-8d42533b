@@ -8,6 +8,66 @@ const corsHeaders = {
 
 const METS_TEAM_ID = 121;
 
+const sendNotifications = async (
+  supabaseUrl: string,
+  serviceKey: string,
+  supabase: any,
+  title: string,
+  message: string,
+  opponent: string,
+  todayET: string,
+  timeStr: string,
+  venue: string,
+  linkUrl: string,
+) => {
+  // Send email notification
+  try {
+    const emailPayload = {
+      title,
+      message,
+      notificationType: 'game_alert',
+      gameInfo: { opponent, date: todayET, time: timeStr, location: venue },
+      url: linkUrl,
+    };
+
+    const emailRes = await fetch(`${supabaseUrl}/functions/v1/send-game-notification-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceKey}` },
+      body: JSON.stringify(emailPayload),
+    });
+    const emailResult = await emailRes.json();
+    console.log(`Email sent for "${title}":`, { successful: emailResult.successful, total: emailResult.total });
+
+    await supabase
+      .from("game_alerts")
+      .update({ email_sent: true })
+      .eq("title", title)
+      .gte("created_at", `${todayET}T00:00:00Z`);
+  } catch (err) {
+    console.error(`Email failed for "${title}":`, err instanceof Error ? err.message : err);
+  }
+
+  // Send push notification
+  try {
+    const pushPayload = { title, body: message, url: linkUrl };
+    const pushRes = await fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceKey}` },
+      body: JSON.stringify(pushPayload),
+    });
+    const pushResult = await pushRes.json();
+    console.log(`Push sent for "${title}":`, { sent: pushResult.sent });
+
+    await supabase
+      .from("game_alerts")
+      .update({ push_sent: true })
+      .eq("title", title)
+      .gte("created_at", `${todayET}T00:00:00Z`);
+  } catch (err) {
+    console.error(`Push failed for "${title}":`, err instanceof Error ? err.message : err);
+  }
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -70,19 +130,49 @@ serve(async (req) => {
         timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', hour12: true,
       });
 
+      // For time-based triggers, check if game is within the right window
+      const nowMs = now.getTime();
+      const gameMs = gameDate.getTime();
+      const minsUntilGame = (gameMs - nowMs) / 60000;
+
+      if (triggerType === "pregame_20min" && (minsUntilGame < 10 || minsUntilGame > 30)) {
+        console.log(`Game ${game.gamePk} is ${Math.round(minsUntilGame)} mins away, skipping 20min alert.`);
+        continue;
+      }
+      if (triggerType === "pregame_5min" && (minsUntilGame < 0 || minsUntilGame > 10)) {
+        console.log(`Game ${game.gamePk} is ${Math.round(minsUntilGame)} mins away, skipping 5min alert.`);
+        continue;
+      }
+      if (triggerType === "pregame" && (minsUntilGame < 90 || minsUntilGame > 150)) {
+        continue;
+      }
+
       // Build alert content
       let title: string;
       let message: string;
+      let severity = "info";
 
       if (triggerType === "morning") {
         title = `⚾ Game Day! Mets ${homeAway} ${opponent}`;
         message = `${typeLabel}: Mets ${homeAway} ${opponent} today at ${timeStr} ET at ${venue}. Let's go Mets! 🟠🔵`;
-      } else {
+      } else if (triggerType === "pregame") {
         title = `🔔 Almost Game Time! Mets ${homeAway} ${opponent}`;
         message = `First pitch in ~2 hours! Mets ${homeAway} ${opponent} at ${timeStr} ET at ${venue}. Get ready! ⚾`;
+        severity = "warning";
+      } else if (triggerType === "pregame_20min") {
+        title = `🔥 20 Minutes to First Pitch! Mets ${homeAway} ${opponent}`;
+        message = `Almost time! Mets ${homeAway} ${opponent} at ${timeStr} ET at ${venue}. Tune in now! ⚾🔥`;
+        severity = "warning";
+      } else if (triggerType === "pregame_5min") {
+        title = `🚨 5 Minutes to First Pitch! Mets ${homeAway} ${opponent}`;
+        message = `IT'S GAME TIME! Mets ${homeAway} ${opponent} starting NOW at ${venue}! Let's GO Mets! 🟠🔵⚾`;
+        severity = "critical";
+      } else {
+        title = `⚾ Mets ${homeAway} ${opponent}`;
+        message = `${typeLabel}: Mets ${homeAway} ${opponent} at ${timeStr} ET at ${venue}.`;
       }
 
-      // Dedup: check if same title already created today
+      // Dedup
       const { data: existing } = await supabase
         .from("game_alerts")
         .select("id")
@@ -104,7 +194,7 @@ serve(async (req) => {
           title,
           message,
           alert_type: alertTypeDb,
-          severity: triggerType === "pregame" ? "warning" : "info",
+          severity,
           link_url: linkUrl,
           is_active: true,
           push_sent: false,
@@ -119,42 +209,8 @@ serve(async (req) => {
       console.log(`Created ${triggerType} alert: ${title}`);
       alertsCreated++;
 
-      // Auto-send email notification
-      try {
-        const emailPayload = {
-          title,
-          message,
-          notificationType: 'game_alert' as const,
-          gameInfo: {
-            opponent,
-            date: todayET,
-            time: timeStr,
-            location: venue,
-          },
-          url: linkUrl,
-        };
-
-        const emailRes = await fetch(`${supabaseUrl}/functions/v1/send-game-notification-email`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${serviceKey}`,
-          },
-          body: JSON.stringify(emailPayload),
-        });
-
-        const emailResult = await emailRes.json();
-        console.log(`Email sent for alert "${title}":`, { successful: emailResult.successful, total: emailResult.total });
-
-        // Mark alert as email_sent
-        await supabase
-          .from("game_alerts")
-          .update({ email_sent: true })
-          .eq("title", title)
-          .gte("created_at", `${todayET}T00:00:00Z`);
-      } catch (emailErr) {
-        console.error(`Failed to send email for alert "${title}":`, emailErr instanceof Error ? emailErr.message : emailErr);
-      }
+      // Send email + push notifications
+      await sendNotifications(supabaseUrl, serviceKey, supabase, title, message, opponent, todayET, timeStr, venue, linkUrl);
     }
 
     // Deactivate old auto-alerts from previous days
