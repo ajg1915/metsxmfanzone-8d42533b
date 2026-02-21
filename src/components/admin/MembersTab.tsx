@@ -24,6 +24,9 @@ interface MemberRow {
   roles: string[];
   created_at: string;
   joined_date: string;
+  payment_method: string | null;
+  amount: number | null;
+  last_payment_date: string | null;
 }
 
 export default function MembersTab() {
@@ -50,7 +53,7 @@ export default function MembersTab() {
 
       const { data: subscriptions } = await supabase
         .from("subscriptions")
-        .select("user_id, plan_type, status, end_date")
+        .select("user_id, plan_type, status, end_date, payment_method, amount, last_payment_date")
         .order("created_at", { ascending: false });
 
       const { data: roles } = await supabase
@@ -79,6 +82,9 @@ export default function MembersTab() {
           roles: roleMap.get(profile.id) || [],
           created_at: profile.created_at || "",
           joined_date: profile.created_at || "",
+          payment_method: activeSub?.payment_method || null,
+          amount: activeSub?.amount || null,
+          last_payment_date: activeSub?.last_payment_date || null,
         };
       });
 
@@ -284,6 +290,9 @@ export default function MembersTab() {
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Plan</TableHead>
+                  <TableHead>Payment Method</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Last Payment</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Roles</TableHead>
                   <TableHead>Joined</TableHead>
@@ -312,6 +321,17 @@ export default function MembersTab() {
                       <Badge variant={m.plan_type === "free" ? "outline" : "secondary"} className="text-xs capitalize">
                         {m.plan_type}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs capitalize">{m.payment_method || "—"}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs font-medium">{m.amount ? `$${m.amount}` : "Free"}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs text-muted-foreground">
+                        {m.last_payment_date ? new Date(m.last_payment_date).toLocaleDateString() : "—"}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <Badge className={`text-xs ${getStatusColor(m.status)}`}>
