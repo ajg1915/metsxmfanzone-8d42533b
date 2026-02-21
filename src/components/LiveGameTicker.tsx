@@ -44,8 +44,9 @@ const LiveGameTicker = () => {
     };
 
     fetchLiveGame();
-    // Refresh every 30 seconds for live updates
-    const interval = setInterval(fetchLiveGame, 15000);
+    // Poll every 10 seconds for near real-time updates
+    const interval = setInterval(fetchLiveGame, 10000);
+    return () => clearInterval(interval);
     return () => clearInterval(interval);
   }, []);
 
