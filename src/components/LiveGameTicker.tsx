@@ -45,7 +45,7 @@ const LiveGameTicker = () => {
 
     fetchLiveGame();
     // Refresh every 30 seconds for live updates
-    const interval = setInterval(fetchLiveGame, 30000);
+    const interval = setInterval(fetchLiveGame, 15000);
     return () => clearInterval(interval);
   }, []);
 
