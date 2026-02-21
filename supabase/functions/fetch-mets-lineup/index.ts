@@ -207,6 +207,24 @@ Deno.serve(async (req) => {
     }
 
     console.log("Lineup card saved successfully");
+
+    // Auto-generate daily predictions whenever a lineup card is posted
+    try {
+      console.log("Triggering daily predictions generation...");
+      const predictionsUrl = `${supabaseUrl}/functions/v1/generate-daily-predictions`;
+      const predResponse = await fetch(predictionsUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${supabaseKey}`,
+        },
+        body: JSON.stringify({ triggeredBy: "lineup-card" }),
+      });
+      const predResult = await predResponse.text();
+      console.log("Predictions generation result:", predResponse.status, predResult);
+    } catch (predError) {
+      console.error("Failed to trigger predictions (non-blocking):", predError);
+    }
     
     return new Response(
       JSON.stringify({
