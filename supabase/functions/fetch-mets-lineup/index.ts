@@ -178,7 +178,7 @@ Deno.serve(async (req) => {
       game_time: gameTimeStr,
       opponent: opponent.replace("New York ", "").replace("Los Angeles ", "").replace("San Francisco ", "").replace("San Diego ", ""),
       location: location,
-      lineup_data: lineupData.length > 0 ? lineupData : null,
+      lineup_data: lineupData.length > 0 ? lineupData : [],
       starting_pitcher: startingPitcher,
       published: lineupData.length > 0,
       notes: lineupData.length === 0 ? "Lineup will be updated when released (typically 1-2 hours before first pitch)" : null,
