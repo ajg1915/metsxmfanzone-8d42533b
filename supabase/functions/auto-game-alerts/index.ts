@@ -19,14 +19,16 @@ const sendNotifications = async (
   timeStr: string,
   venue: string,
   linkUrl: string,
+  notificationType: string = 'game_alert',
+  extraGameInfo: Record<string, any> = {},
 ) => {
   // Send email notification
   try {
     const emailPayload = {
       title,
       message,
-      notificationType: 'game_alert',
-      gameInfo: { opponent, date: todayET, time: timeStr, location: venue },
+      notificationType,
+      gameInfo: { opponent, date: todayET, time: timeStr, location: venue, ...extraGameInfo },
       url: linkUrl,
     };
 
@@ -130,6 +132,94 @@ serve(async (req) => {
         timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', hour12: true,
       });
 
+      // Handle final score trigger
+      if (triggerType === "final_score") {
+        const abstractState = game.status?.abstractGameState;
+        if (abstractState !== 'Final') {
+          console.log(`Game ${game.gamePk} not Final yet (${abstractState}), skipping final_score.`);
+          continue;
+        }
+
+        // Fetch live feed for final score details
+        const liveFeedUrl = `https://statsapi.mlb.com/api/v1.1/game/${game.gamePk}/feed/live`;
+        const liveRes = await fetch(liveFeedUrl);
+        if (!liveRes.ok) {
+          const errText = await liveRes.text();
+          console.error("Live feed error:", errText);
+          continue;
+        }
+
+        const liveData = await liveRes.json();
+        const linescore = liveData.liveData?.linescore;
+        const homeScore = linescore?.teams?.home?.runs ?? 0;
+        const awayScore = linescore?.teams?.away?.runs ?? 0;
+        const homeTeamName = liveData.gameData?.teams?.home?.name || game.teams.home.team.name;
+        const awayTeamName = liveData.gameData?.teams?.away?.name || game.teams.away.team.name;
+        const metsScore = isHome ? homeScore : awayScore;
+        const opponentScore = isHome ? awayScore : homeScore;
+        const metsWon = metsScore > opponentScore;
+
+        const resultText = metsWon
+          ? `Mets WIN ${metsScore}-${opponentScore}! 🎉`
+          : `Mets lose ${metsScore}-${opponentScore}`;
+
+        const title = metsWon
+          ? `🏆 Mets Win! Final: ${metsScore}-${opponentScore} ${homeAway} ${opponent}`
+          : `📊 Final Score: Mets ${metsScore}, ${opponent} ${opponentScore}`;
+
+        const message = metsWon
+          ? `What a game! The Mets defeat the ${opponent} ${metsScore}-${opponentScore} at ${venue}. ${typeLabel}. Let's Go Mets! 🟠🔵`
+          : `The Mets fall to the ${opponent} ${opponentScore}-${metsScore} at ${venue}. ${typeLabel}. We'll get 'em next time! ⚾`;
+
+        // Dedup
+        const { data: existing } = await supabase
+          .from("game_alerts")
+          .select("id")
+          .eq("title", title)
+          .gte("created_at", `${todayET}T00:00:00Z`)
+          .limit(1);
+
+        if (existing && existing.length > 0) {
+          console.log(`Final score alert already exists for game ${game.gamePk}, skipping.`);
+          continue;
+        }
+
+        const linkUrl = '/mets-scores';
+
+        const { error: insertError } = await supabase
+          .from("game_alerts")
+          .insert({
+            title,
+            message,
+            alert_type: 'final_score',
+            severity: metsWon ? 'info' : 'warning',
+            link_url: linkUrl,
+            is_active: true,
+            push_sent: false,
+            email_sent: false,
+          });
+
+        if (insertError) {
+          console.error("Failed to insert final score alert:", insertError);
+          continue;
+        }
+
+        console.log(`Created final_score alert: ${title}`);
+        alertsCreated++;
+
+        await sendNotifications(
+          supabaseUrl, serviceKey, supabase, title, message, opponent, todayET, timeStr, venue, linkUrl, 'final_score',
+          {
+            homeScore,
+            awayScore,
+            homeTeam: homeTeamName,
+            awayTeam: awayTeamName,
+            result: resultText,
+          }
+        );
+        continue;
+      }
+
       // For time-based triggers, check if game is within the right window
       const nowMs = now.getTime();
       const gameMs = gameDate.getTime();
@@ -217,7 +307,7 @@ serve(async (req) => {
     await supabase
       .from("game_alerts")
       .update({ is_active: false })
-      .in("alert_type", ["game_day", "spring_training"])
+      .in("alert_type", ["game_day", "spring_training", "final_score"])
       .lt("created_at", `${todayET}T00:00:00Z`);
 
     return new Response(
