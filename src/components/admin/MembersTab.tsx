@@ -5,22 +5,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Trash2, Users, UserCheck, UserX } from "lucide-react";
+import { Loader2, Trash2, Users, UserCheck, UserX, Lock, Unlock, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
+import { maskEmail, maskSensitiveField } from "@/utils/secureDataVault";
 
 interface MemberRow {
   user_id: string;
   email: string | null;
   full_name: string | null;
+  phone_number: string | null;
   plan_type: string;
   status: string;
   end_date: string | null;
   roles: string[];
   created_at: string;
+  joined_date: string;
 }
 
 export default function MembersTab() {
@@ -28,6 +31,9 @@ export default function MembersTab() {
   const { toast } = useToast();
   const [members, setMembers] = useState<MemberRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [decrypted, setDecrypted] = useState(false);
+  const [decrypting, setDecrypting] = useState(false);
+  const [decryptedData, setDecryptedData] = useState<Map<string, { email: string; full_name: string; phone_number: string }>>(new Map());
 
   useEffect(() => {
     fetchMembers();
@@ -38,7 +44,7 @@ export default function MembersTab() {
       setLoading(true);
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, email, full_name, created_at")
+        .select("id, email, full_name, phone_number, created_at")
         .order("created_at", { ascending: false });
       if (profilesError) throw profilesError;
 
@@ -66,11 +72,13 @@ export default function MembersTab() {
           user_id: profile.id,
           email: profile.email,
           full_name: profile.full_name,
+          phone_number: profile.phone_number || null,
           plan_type: activeSub?.plan_type || "free",
           status: activeSub?.status || "none",
           end_date: activeSub?.end_date || null,
           roles: roleMap.get(profile.id) || [],
           created_at: profile.created_at || "",
+          joined_date: profile.created_at || "",
         };
       });
 
@@ -83,13 +91,73 @@ export default function MembersTab() {
     }
   };
 
+  const handleDecryptToggle = async () => {
+    if (decrypted) {
+      setDecrypted(false);
+      setDecryptedData(new Map());
+      return;
+    }
+
+    setDecrypting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("secure-data-vault", {
+        body: {
+          action: "fetch-decrypted",
+          dataType: "profiles",
+          data: { limit: 500, offset: 0 },
+        },
+      });
+
+      if (error) throw error;
+
+      const map = new Map<string, { email: string; full_name: string; phone_number: string }>();
+      (data?.records || []).forEach((r: any) => {
+        map.set(r.id, {
+          email: r.email || "",
+          full_name: r.full_name || "",
+          phone_number: r.phone_number || "",
+        });
+      });
+
+      setDecryptedData(map);
+      setDecrypted(true);
+      toast({ title: "🔓 Data Decrypted", description: "Sensitive member data is now visible. Be careful." });
+    } catch (error: any) {
+      console.error("Decryption failed:", error);
+      toast({ title: "Decryption Failed", description: "Admin access required to decrypt data.", variant: "destructive" });
+    } finally {
+      setDecrypting(false);
+    }
+  };
+
+  const getDisplayEmail = (m: MemberRow) => {
+    if (decrypted && decryptedData.has(m.user_id)) {
+      return decryptedData.get(m.user_id)!.email;
+    }
+    return maskEmail(m.email);
+  };
+
+  const getDisplayName = (m: MemberRow) => {
+    if (decrypted && decryptedData.has(m.user_id)) {
+      return decryptedData.get(m.user_id)!.full_name || "—";
+    }
+    return m.full_name ? maskSensitiveField(m.full_name) : "—";
+  };
+
+  const getDisplayPhone = (m: MemberRow) => {
+    if (decrypted && decryptedData.has(m.user_id)) {
+      return decryptedData.get(m.user_id)!.phone_number || "—";
+    }
+    return m.phone_number ? maskSensitiveField(m.phone_number) : "—";
+  };
+
   const deleteUserAccount = async (userId: string, email: string | null) => {
     try {
       const response = await supabase.functions.invoke("delete-user-account", {
         body: { user_id: userId },
       });
       if (response.error) throw response.error;
-      toast({ title: "Deleted", description: `${email || "User"} permanently deleted.` });
+      toast({ title: "Deleted", description: `User permanently deleted.` });
       fetchMembers();
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -157,21 +225,68 @@ export default function MembersTab() {
         </Card>
       </div>
 
+      {/* Encryption Banner */}
+      <Card className={`border ${decrypted ? "border-warning/50 bg-warning/5" : "border-affirmative/50 bg-affirmative/5"}`}>
+        <CardContent className="py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {decrypted ? (
+              <Unlock className="w-5 h-5 text-warning" />
+            ) : (
+              <Lock className="w-5 h-5 text-affirmative" />
+            )}
+            <div>
+              <p className="text-sm font-medium">
+                {decrypted ? "🔓 Data Decrypted — Sensitive info visible" : "🔒 Data Encrypted — Member PII is protected"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {decrypted
+                  ? "Names, emails, and phone numbers are shown in plaintext. Click lock to re-encrypt."
+                  : "Names, emails, and phone numbers are masked. Only admins with the encryption key can decrypt."}
+              </p>
+            </div>
+          </div>
+          <Button
+            variant={decrypted ? "destructive" : "outline"}
+            size="sm"
+            onClick={handleDecryptToggle}
+            disabled={decrypting}
+            className="gap-2"
+          >
+            {decrypting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : decrypted ? (
+              <EyeOff className="w-4 h-4" />
+            ) : (
+              <Eye className="w-4 h-4" />
+            )}
+            {decrypting ? "Decrypting..." : decrypted ? "Re-Encrypt" : "Decrypt Data"}
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Members Table */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">All Members</CardTitle>
+        <CardHeader className="pb-3 flex-row items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-primary" />
+            Member Directory
+          </CardTitle>
+          <Badge variant="outline" className="text-xs">
+            {decrypted ? "🔓 Decrypted" : "🔒 Encrypted"}
+          </Badge>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table className="text-sm">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Member</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
                   <TableHead>Plan</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Roles</TableHead>
-                  <TableHead>Expires</TableHead>
+                  <TableHead>Joined</TableHead>
                   <TableHead className="w-10"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -179,10 +294,19 @@ export default function MembersTab() {
                 {members.map((m) => (
                   <TableRow key={m.user_id}>
                     <TableCell>
-                      <div>
-                        <p className="font-medium truncate max-w-[200px]">{m.full_name || "—"}</p>
-                        <p className="text-xs text-muted-foreground truncate max-w-[200px]">{m.email || "No email"}</p>
-                      </div>
+                      <p className={`font-medium truncate max-w-[160px] ${!decrypted ? "font-mono text-xs" : ""}`}>
+                        {getDisplayName(m)}
+                      </p>
+                    </TableCell>
+                    <TableCell>
+                      <p className={`truncate max-w-[200px] ${!decrypted ? "font-mono text-xs text-muted-foreground" : "text-xs text-muted-foreground"}`}>
+                        {getDisplayEmail(m)}
+                      </p>
+                    </TableCell>
+                    <TableCell>
+                      <p className={`text-xs ${!decrypted ? "font-mono text-muted-foreground" : "text-muted-foreground"}`}>
+                        {getDisplayPhone(m)}
+                      </p>
                     </TableCell>
                     <TableCell>
                       <Badge variant={m.plan_type === "free" ? "outline" : "secondary"} className="text-xs capitalize">
@@ -201,8 +325,8 @@ export default function MembersTab() {
                         )) : <span className="text-xs text-muted-foreground">member</span>}
                       </div>
                     </TableCell>
-                    <TableCell className="text-xs">
-                      {m.end_date ? new Date(m.end_date).toLocaleDateString() : "—"}
+                    <TableCell className="text-xs text-muted-foreground">
+                      {m.joined_date ? new Date(m.joined_date).toLocaleDateString() : "—"}
                     </TableCell>
                     <TableCell>
                       {m.user_id !== user?.id && (
@@ -216,7 +340,7 @@ export default function MembersTab() {
                             <AlertDialogHeader>
                               <AlertDialogTitle>Delete Account</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Permanently delete <strong>{m.email || "this user"}</strong>? This cannot be undone.
+                                Permanently delete this user? This cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>

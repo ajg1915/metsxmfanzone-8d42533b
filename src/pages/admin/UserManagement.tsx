@@ -15,6 +15,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import SubscriptionsTab from "@/components/admin/SubscriptionsTab";
 import RolesTab from "@/components/admin/RolesTab";
+import MembersTab from "@/components/admin/MembersTab";
+import { maskEmail, maskSensitiveField } from "@/utils/secureDataVault";
 
 interface MemberRow {
   user_id: string;
@@ -275,12 +277,15 @@ const UserManagement = () => {
 
       {/* Tabs: Overview / Subscriptions (overrides) / Roles */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3 max-w-lg">
+        <TabsList className="grid w-full grid-cols-4 max-w-2xl">
           <TabsTrigger value="ai-overview" className="gap-2 text-xs">
-            <Users className="w-3.5 h-3.5" />Members
+            <Users className="w-3.5 h-3.5" />Overview
+          </TabsTrigger>
+          <TabsTrigger value="members" className="gap-2 text-xs">
+            <Shield className="w-3.5 h-3.5" />Members
           </TabsTrigger>
           <TabsTrigger value="overrides" className="gap-2 text-xs">
-            <CreditCard className="w-3.5 h-3.5" />Overrides
+            <CreditCard className="w-3.5 h-3.5" />Transactions
           </TabsTrigger>
           <TabsTrigger value="roles" className="gap-2 text-xs">
             <Shield className="w-3.5 h-3.5" />Roles
@@ -325,10 +330,12 @@ const UserManagement = () => {
             </Card>
           </div>
 
-          {/* Members List */}
+          {/* Quick Members List - Always masked in overview */}
           <Card className="mt-4">
             <CardHeader className="py-3 px-4 flex-row items-center justify-between">
-              <CardTitle className="text-sm">All Members</CardTitle>
+              <CardTitle className="text-sm flex items-center gap-2">
+                🔒 Members (Encrypted View)
+              </CardTitle>
               <Button variant="ghost" size="sm" onClick={fetchMembers} className="h-7">
                 <RefreshCw className="w-3 h-3 mr-1" /> Refresh
               </Button>
@@ -344,12 +351,16 @@ const UserManagement = () => {
                     <div key={m.user_id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-sm truncate">{m.full_name || "—"}</p>
+                          <p className="font-medium text-sm truncate font-mono">
+                            {maskSensitiveField(m.full_name)}
+                          </p>
                           {m.roles.map(r => (
                             <Badge key={r} variant="outline" className="text-[10px] capitalize px-1.5 py-0">{r}</Badge>
                           ))}
                         </div>
-                        <p className="text-xs text-muted-foreground truncate">{m.email || "No email"}</p>
+                        <p className="text-xs text-muted-foreground truncate font-mono">
+                          {maskEmail(m.email)}
+                        </p>
                       </div>
                       <div className="flex items-center gap-2 ml-2">
                         <Badge className={`text-[10px] ${getStatusColor(m.status)}`}>
@@ -358,23 +369,20 @@ const UserManagement = () => {
                         <Badge variant="outline" className="text-[10px] capitalize">
                           {m.plan_type}
                         </Badge>
-                        {m.payment_method && m.payment_method !== "free" && (
-                          <span className="text-[10px] text-muted-foreground capitalize hidden sm:inline">
-                            {m.payment_method}
-                          </span>
-                        )}
-                        {m.end_date && (
-                          <span className="text-[10px] text-muted-foreground hidden md:inline">
-                            exp {new Date(m.end_date).toLocaleDateString()}
-                          </span>
-                        )}
                       </div>
                     </div>
                   ))}
+                  <p className="text-xs text-muted-foreground text-center pt-2">
+                    Go to the <button onClick={() => setActiveTab("members")} className="text-primary underline">Members tab</button> to decrypt and view full data
+                  </p>
                 </div>
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="members">
+          <MembersTab />
         </TabsContent>
 
         <TabsContent value="overrides">
