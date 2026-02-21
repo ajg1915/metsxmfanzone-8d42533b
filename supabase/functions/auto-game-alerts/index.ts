@@ -118,6 +118,43 @@ serve(async (req) => {
 
       console.log(`Created ${triggerType} alert: ${title}`);
       alertsCreated++;
+
+      // Auto-send email notification
+      try {
+        const emailPayload = {
+          title,
+          message,
+          notificationType: 'game_alert' as const,
+          gameInfo: {
+            opponent,
+            date: todayET,
+            time: timeStr,
+            location: venue,
+          },
+          url: linkUrl,
+        };
+
+        const emailRes = await fetch(`${supabaseUrl}/functions/v1/send-game-notification-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${serviceKey}`,
+          },
+          body: JSON.stringify(emailPayload),
+        });
+
+        const emailResult = await emailRes.json();
+        console.log(`Email sent for alert "${title}":`, { successful: emailResult.successful, total: emailResult.total });
+
+        // Mark alert as email_sent
+        await supabase
+          .from("game_alerts")
+          .update({ email_sent: true })
+          .eq("title", title)
+          .gte("created_at", `${todayET}T00:00:00Z`);
+      } catch (emailErr) {
+        console.error(`Failed to send email for alert "${title}":`, emailErr instanceof Error ? emailErr.message : emailErr);
+      }
     }
 
     // Deactivate old auto-alerts from previous days
