@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Activity, Circle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface GameData {
   homeTeam: string;
@@ -19,56 +20,12 @@ const LiveGameTicker = () => {
   useEffect(() => {
     const fetchLiveGame = async () => {
       try {
-        // Get today's date in YYYY-MM-DD format
-        const today = new Date().toISOString().split('T')[0];
-        
-        // Fetch Mets schedule for today (team ID 121)
-        const response = await fetch(
-          `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=121&date=${today}&hydrate=linescore,team`
-        );
-        
-        if (!response.ok) throw new Error('Failed to fetch game data');
-        
-        const data = await response.json();
-        
-        if (data.dates && data.dates.length > 0 && data.dates[0].games.length > 0) {
-          const game = data.dates[0].games[0];
-          const linescore = game.linescore;
-          
-          const isLive = game.status.abstractGameState === 'Live';
-          const isFinal = game.status.abstractGameState === 'Final';
-          const isPreview = game.status.abstractGameState === 'Preview';
-          
-          if (isLive || isFinal) {
-            setGameData({
-              homeTeam: game.teams.home.team.name,
-              awayTeam: game.teams.away.team.name,
-              homeScore: linescore?.teams?.home?.runs || 0,
-              awayScore: linescore?.teams?.away?.runs || 0,
-              inning: linescore?.currentInning?.toString() || '',
-              inningState: linescore?.inningState || '',
-              isLive,
-              gameStatus: isFinal ? 'Final' : `${linescore?.inningState} ${linescore?.currentInning}`
-            });
-          } else if (isPreview) {
-            const gameTime = new Date(game.gameDate).toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              timeZoneName: 'short'
-            });
-            setGameData({
-              homeTeam: game.teams.home.team.name,
-              awayTeam: game.teams.away.team.name,
-              homeScore: 0,
-              awayScore: 0,
-              inning: '',
-              inningState: '',
-              isLive: false,
-              gameStatus: gameTime
-            });
-          } else {
-            setGameData(null);
-          }
+        const { data, error } = await supabase.functions.invoke('fetch-live-game');
+
+        if (error) throw error;
+
+        if (data?.game) {
+          setGameData(data.game);
         } else {
           setGameData(null);
         }
