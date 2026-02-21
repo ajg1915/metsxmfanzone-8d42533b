@@ -178,6 +178,8 @@ const Index = () => {
           <StoriesSection />
         </Suspense>
 
+        <LiveGameTicker />
+
         <Suspense fallback={<SectionSkeleton />}>
           <LiveNetworks />
         </Suspense>
@@ -185,8 +187,6 @@ const Index = () => {
         <Suspense fallback={<SectionSkeleton />}>
           <LiveStreamsSection />
         </Suspense>
-
-        <LiveGameTicker />
 
         <Suspense fallback={<SectionSkeleton />}>
           <SpringTrainingGamesSection />
