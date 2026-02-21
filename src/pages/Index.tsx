@@ -174,11 +174,11 @@ const Index = () => {
         
         {/* Removed: LiveNotificationBar */}
 
+        <LiveGameTicker />
+
         <Suspense fallback={<SectionSkeleton height="h-32" />}>
           <StoriesSection />
         </Suspense>
-
-        <LiveGameTicker />
 
         <Suspense fallback={<SectionSkeleton />}>
           <LiveNetworks />
