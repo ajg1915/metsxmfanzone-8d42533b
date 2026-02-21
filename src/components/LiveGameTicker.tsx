@@ -94,7 +94,7 @@ const LiveGameTicker = () => {
   const opponent = isMetsHome ? gameData.awayTeam : gameData.homeTeam;
 
   return (
-    <div className="bg-gradient-to-r from-primary/90 via-primary to-primary/90 text-primary-foreground py-2 px-4 overflow-hidden">
+    <div className="bg-gradient-to-r from-primary/90 via-primary to-primary/90 text-primary-foreground py-2 px-4 overflow-hidden my-3 sm:my-4 mx-4 sm:mx-6 lg:mx-8 rounded-xl">
       <div className="max-w-7xl mx-auto flex items-center justify-center gap-4 text-sm md:text-base">
         {gameData.isLive && (
           <div className="flex items-center gap-1.5 animate-pulse">
