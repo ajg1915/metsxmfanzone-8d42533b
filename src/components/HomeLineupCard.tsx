@@ -106,12 +106,13 @@ export default function HomeLineupCard({
   } = useQuery({
     queryKey: ["today-lineup-card"],
     queryFn: async () => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      // Use UTC midnight to match DB timestamps stored in UTC
+      const now = new Date();
+      const todayUTC = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
       const {
         data,
         error
-      } = await supabase.from("lineup_cards").select("*").eq("published", true).gte("game_date", today.toISOString()).order("game_date", {
+      } = await supabase.from("lineup_cards").select("*").eq("published", true).gte("game_date", todayUTC.toISOString()).order("game_date", {
         ascending: true
       }).limit(1).maybeSingle();
       if (error) throw error;
