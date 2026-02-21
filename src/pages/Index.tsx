@@ -164,7 +164,6 @@ const Index = () => {
         breadcrumbs={[{ name: "Home", url: "/" }]}
       />
       <Navigation />
-      <LiveGameTicker />
       {/* Removed: GameAlertsBanner per user request - alerts only via email */}
       <Suspense fallback={null}>
           <FreeTrialExpiryBanner />
@@ -186,6 +185,8 @@ const Index = () => {
         <Suspense fallback={<SectionSkeleton />}>
           <LiveStreamsSection />
         </Suspense>
+
+        <LiveGameTicker />
 
         <Suspense fallback={<SectionSkeleton />}>
           <SpringTrainingGamesSection />
