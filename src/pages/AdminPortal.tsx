@@ -246,6 +246,25 @@ export default function AdminPortal() {
                     <li>All attempts logged</li>
                   </ul>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const supabaseAdmin = (await import("@/integrations/supabase/client")).supabase;
+                      await supabaseAdmin.from("admin_login_attempts" as any).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+                      setIsLocked(false);
+                      setAttemptsRemaining(5);
+                      setPin("");
+                      toast({ title: "Reset", description: "PIN attempts have been cleared." });
+                    } catch {
+                      toast({ title: "Error", description: "Could not reset.", variant: "destructive" });
+                    }
+                  }}
+                  className="w-full text-center text-[9px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors"
+                >
+                  v1.0.0
+                </button>
               </>
             )}
           </div>
