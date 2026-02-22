@@ -45,7 +45,7 @@ export default function GamecastBanner() {
   const hasGame = !!game;
 
   return (
-    <div className="px-3 sm:px-4 md:px-6 mt-3 sm:mt-4 mb-6 sm:mb-8">
+    <div className="px-3 sm:px-4 md:px-6 mt-6 sm:mt-8 mb-6 sm:mb-8">
       <Link to="/mets-gamecast" className="block group">
         <Card className={`overflow-hidden border-2 transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-lg ${
           isLive
