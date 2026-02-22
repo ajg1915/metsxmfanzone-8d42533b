@@ -55,7 +55,7 @@ export default function GamecastBanner() {
           <CardContent className="p-0">
             <div className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4">
               {/* Icon */}
-              <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-primary/15 overflow-hidden">
+              <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center overflow-hidden">
                 <img src={metsLogo} alt="MetsXMFanZone" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
               </div>
 
