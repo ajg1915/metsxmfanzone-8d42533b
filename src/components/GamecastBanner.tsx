@@ -88,7 +88,7 @@ export default function GamecastBanner() {
                       {(isLive || isFinal) && <span className="font-black text-sm sm:text-base">{game.teams.home.score ?? 0}</span>}
                     </div>
                     {isLive && game.linescore?.currentInningOrdinal && (
-                      <span className="text-red-400 text-[10px] font-semibold ml-auto hidden sm:inline">
+                      <span className="text-red-400 text-[10px] font-semibold ml-auto">
                         {game.linescore.inningState} {game.linescore.currentInningOrdinal}
                       </span>
                     )}
