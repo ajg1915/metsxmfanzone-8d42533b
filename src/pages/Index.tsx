@@ -28,6 +28,7 @@ const PodcastScheduleSection = lazy(() => import("@/components/PodcastScheduleSe
 const JoinPodcastSection = lazy(() => import("@/components/JoinPodcastSection"));
 const HotStoveGuide = lazy(() => import("@/components/HotStoveGuide"));
 const StoriesSection = lazy(() => import("@/components/StoriesSection"));
+const GamecastBanner = lazy(() => import("@/components/GamecastBanner"));
 const FAQSection = lazy(() => import("@/components/FAQSection"));
 const TestimonialsSection = lazy(() => import("@/components/TestimonialsSection"));
 const AppInstallSection = lazy(() => import("@/components/AppInstallSection"));
@@ -175,6 +176,10 @@ const Index = () => {
         {/* Removed: LiveNotificationBar */}
 
         <LiveGameTicker />
+
+        <Suspense fallback={<SectionSkeleton height="h-16" />}>
+          <GamecastBanner />
+        </Suspense>
 
         <Suspense fallback={<SectionSkeleton height="h-32" />}>
           <StoriesSection />
