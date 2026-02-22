@@ -210,7 +210,24 @@ Deno.serve(async (req) => {
 
     // Auto-generate daily predictions whenever a lineup card is posted
     try {
-      console.log("Triggering daily predictions generation...");
+      console.log("Triggering daily predictions generation with lineup data...");
+      
+      // Extract player IDs from lineup to force predictions for lineup players
+      const lineupPlayerIds = lineupData
+        .map((p: any) => {
+          // Extract player ID from headshot URL if available
+          const match = p.imageUrl?.match(/\/people\/(\d+)\//);
+          return match ? parseInt(match[1]) : null;
+        })
+        .filter((id: number | null) => id !== null);
+      
+      // Include starting pitcher ID if available
+      if (probablePitcher?.id) {
+        lineupPlayerIds.push(probablePitcher.id);
+      }
+      
+      console.log("Lineup player IDs for predictions:", lineupPlayerIds);
+      
       const predictionsUrl = `${supabaseUrl}/functions/v1/generate-daily-predictions`;
       const predResponse = await fetch(predictionsUrl, {
         method: "POST",
@@ -218,7 +235,14 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${supabaseKey}`,
         },
-        body: JSON.stringify({ triggeredBy: "lineup-card" }),
+        body: JSON.stringify({ 
+          triggeredBy: "lineup-card",
+          forceRegenerate: true,
+          lineupPlayerIds,
+          opponent: lineupCardData.opponent,
+          gameTime: gameTimeStr,
+          location: location
+        }),
       });
       const predResult = await predResponse.text();
       console.log("Predictions generation result:", predResponse.status, predResult);
