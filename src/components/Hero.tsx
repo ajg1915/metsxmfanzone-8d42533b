@@ -1,10 +1,7 @@
 import heroImage from "@/assets/hero-mets.png";
 import logo from "@/assets/metsxmfanzone-logo.png";
-import liveStreamIcon from "@/assets/live-streaming-icon.png";
-import podcastIcon from "@/assets/podcast-icon.png";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
-
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,12 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { Play, Info, ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { toast } from "sonner";
+
 interface HeroSlide {
   id: string;
   title: string;
@@ -30,305 +22,81 @@ interface HeroSlide {
 }
 
 const Hero = () => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    dragFree: false,
-    watchDrag: false, // Disable drag for fade effect
-    duration: 0, // Instant snap for fade transition
-  });
-
-  // Auto-advance slides every 10 seconds
-  useEffect(() => {
-    if (!emblaApi) return;
-    
-    const autoplay = setInterval(() => {
-      emblaApi.scrollNext();
-    }, 10000);
-    
-    return () => clearInterval(autoplay);
-  }, [emblaApi]);
-
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false, watchDrag: false, duration: 0 });
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState("overview");
   const { user } = useAuth();
-  const { isPremium, loading: subscriptionLoading } = useSubscription();
+  const { isPremium } = useSubscription();
   const [memberSlides, setMemberSlides] = useState<HeroSlide[]>([]);
+  const [publicSlides, setPublicSlides] = useState<HeroSlide[]>([]);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [isLiveNow, setIsLiveNow] = useState(false);
   const navigate = useNavigate();
 
-  // Check if any live stream is currently active
+  // Auto-advance
   useEffect(() => {
-    const checkLiveStreams = async () => {
-      const { data } = await supabase
-        .from('live_streams')
-        .select('id')
-        .eq('status', 'live')
-        .eq('published', true)
-        .limit(1);
-      
-      setIsLiveNow(data && data.length > 0);
-    };
-
-    checkLiveStreams();
-
-    // Subscribe to live stream changes
-    const channel = supabase
-      .channel('hero-live-indicator')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'live_streams',
-        },
-        () => {
-          checkLiveStreams();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const onSelect = useCallback(() => {
     if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
+    const t = setInterval(() => emblaApi.scrollNext(), 10000);
+    return () => clearInterval(t);
   }, [emblaApi]);
 
+  // Live check
   useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on("select", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
+    const check = async () => {
+      const { data } = await supabase.from('live_streams').select('id').eq('status', 'live').eq('published', true).limit(1);
+      setIsLiveNow(data && data.length > 0);
     };
-  }, [emblaApi, onSelect]);
-
-  // Fetch member slides from database
-  useEffect(() => {
-    const fetchMemberSlides = async () => {
-      const { data, error } = await supabase
-        .from("hero_slides")
-        .select("*")
-        .eq("is_for_members", true)
-        .eq("published", true)
-        .order("display_order", { ascending: true });
-
-      if (!error && data && data.length > 0) {
-        setMemberSlides(data);
-      }
-    };
-
-    if (user) {
-      fetchMemberSlides();
-    }
-  }, [user]);
-
-  const [publicSlides, setPublicSlides] = useState<HeroSlide[]>([]);
-
-  // Fetch public slides from database
-  useEffect(() => {
-    const fetchPublicSlides = async () => {
-      const { data, error } = await supabase
-        .from("hero_slides")
-        .select("*")
-        .eq("is_for_members", false)
-        .eq("published", true)
-        .order("display_order", { ascending: true });
-
-      if (!error && data) {
-        setPublicSlides(data);
-      }
-    };
-
-    fetchPublicSlides();
+    check();
+    const ch = supabase.channel('hero-live').on('postgres_changes', { event: '*', schema: 'public', table: 'live_streams' }, () => check()).subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, []);
 
-  const defaultPublicSlides = [
-    {
-      title: "METSXMFANZONE.TV",
-      subtitle: "LIVE HOME FOR METS FANS",
-      description:
-        "Connect with thousands of passionate Mets fans. Share your thoughts, predictions, and game reactions in the all new Live Home for Mets Fans.",
-      image: heroImage,
-      link_url: null,
-      link_text: null,
-      show_watch_live: true,
-      badges: ["SNY", "2025", "Live"],
-    },
-    {
-      title: "Live Game Coverage",
-      subtitle: "STREAMING NOW",
-      description:
-        "Watch exclusive live streams, game highlights, and expert analysis. Never miss a moment of Mets action.",
-      image: heroImage,
-      link_url: "/metsxmfanzone-tv",
-      link_text: "Watch Now",
-      show_watch_live: false,
-      badges: ["SNY", "HD", "4K"],
-    },
-    {
-      title: "MetsXMFanZone Live Podcast",
-      subtitle: "Join Like a Super Fan",
-      description: "Access exclusive podcasts, behind-the-scenes content, and premium features with your membership.",
-      image: heroImage,
-      link_url: "/podcast",
-      link_text: "Subscribe",
-      show_watch_live: false,
-      badges: ["MetsXMFanZoneTV", "Podcast"],
-    },
+  const onSelect = useCallback(() => { if (emblaApi) setSelectedIndex(emblaApi.selectedScrollSnap()); }, [emblaApi]);
+  useEffect(() => { if (!emblaApi) return; onSelect(); emblaApi.on("select", onSelect); return () => { emblaApi.off("select", onSelect); }; }, [emblaApi, onSelect]);
+
+  // Fetch slides
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase.from("hero_slides").select("*").eq("is_for_members", true).eq("published", true).order("display_order");
+      if (data?.length) setMemberSlides(data);
+    };
+    if (user) fetch();
+  }, [user]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase.from("hero_slides").select("*").eq("is_for_members", false).eq("published", true).order("display_order");
+      if (data) setPublicSlides(data);
+    };
+    fetch();
+  }, []);
+
+  const defaultSlides = [
+    { title: "METSXMFANZONE.TV", description: "Connect with thousands of passionate Mets fans. Watch live streams, highlights, podcasts and more.", image: heroImage, link_url: null, link_text: null, show_watch_live: true, tag: "STREAMING" },
+    { title: "Live Game Coverage", description: "Watch exclusive live streams, game highlights, and expert analysis. Never miss a moment.", image: heroImage, link_url: "/metsxmfanzone-tv", link_text: "Watch Now", show_watch_live: false, tag: "LIVE" },
+    { title: "MetsXMFanZone Podcast", description: "Join Anthony and the Mets Universe on the daily MetsXMFanZone podcast.", image: heroImage, link_url: "/podcast", link_text: "Listen", show_watch_live: false, tag: "PODCAST" },
   ];
 
-  const defaultMemberSlides = [
-    {
-      title: "Welcome Back!",
-      subtitle: "The Ultimate Destination Where the Fans Go!",
-      description: "Your Go to Stop For Live exclusive content, and community discussions. Dive into today's action!",
-      image: heroImage,
-      link_url: null,
-      link_text: null,
-      show_watch_live: true,
-      badges: ["MetsXMFanZoneTV", "LIVE"],
-    },
-    {
-      title: "Live Now",
-      subtitle: "MetsXMFanZone.TV Streams",
-      description: "Check out our live streams, game highlights, and real-time updates. Stay connected to every play!",
-      image: heroImage,
-      link_url: "/live",
-      link_text: "Watch",
-      show_watch_live: true,
-      badges: ["LIVE", "HD"],
-    },
-    {
-      title: "Join Mets Fans Discusing Mets News Daily",
-      description: "Join Anthony and The Mets Universe on his daily Show The MetsXMFanZone podcast",
-      image: heroImage,
-      link_url: "/pricing",
-      link_text: "Membership",
-      show_watch_live: false,
-      badges: ["Podcasts", "UNLIMITED"],
-    },
-  ];
+  const mapDbSlides = (slides: HeroSlide[], tag: string) => slides.map(s => ({
+    title: s.title, description: s.description, image: s.image_url || heroImage,
+    link_url: s.link_url, link_text: s.link_text, show_watch_live: s.show_watch_live ?? true, tag,
+  }));
 
-  // Use database slides if available, otherwise use defaults
   const slidesToShow = user
-    ? memberSlides.length > 0
-      ? memberSlides.map((s) => ({
-          title: s.title,
-          subtitle: "MEMBER CONTENT",
-          description: s.description,
-          image: s.image_url || heroImage,
-          link_url: s.link_url,
-          link_text: s.link_text,
-          show_watch_live: s.show_watch_live ?? true,
-          badges: ["MEtsXMFanTV", "Watch Live"],
-        }))
-      : defaultMemberSlides
-    : publicSlides.length > 0
-      ? publicSlides.map((s) => ({
-          title: s.title,
-          subtitle: "PUBLIC CONTENT",
-          description: s.description,
-          image: s.image_url || heroImage,
-          link_url: s.link_url,
-          link_text: s.link_text,
-          show_watch_live: s.show_watch_live ?? true,
-          badges: ["LIVE", "2025", "HD"],
-        }))
-      : defaultPublicSlides;
+    ? (memberSlides.length > 0 ? mapDbSlides(memberSlides, "MEMBER") : defaultSlides)
+    : (publicSlides.length > 0 ? mapDbSlides(publicSlides, "FEATURED") : defaultSlides);
 
-  // Check if a URL requires premium access
-  const requiresPremium = (url: string) => {
-    const premiumRoutes = ['/live', '/metsxmfanzone-tv', '/mlb-network', '/espn-network', '/pix11-network', '/spring-training-live'];
-    return premiumRoutes.some(route => url.toLowerCase().includes(route.toLowerCase().replace('/', '')));
+  const premiumRoutes = ['/live', '/metsxmfanzone-tv', '/mlb-network', '/espn-network', '/pix11-network', '/spring-training-live'];
+  const requiresPremium = (url: string) => premiumRoutes.some(r => url.toLowerCase().includes(r.toLowerCase().replace('/', '')));
+
+  const handleNav = (url: string) => {
+    if (!user) { navigate("/auth"); return; }
+    if (!isPremium && requiresPremium(url)) { setShowUpgradePrompt(true); return; }
+    url.startsWith("http") ? window.open(url, "_blank") : navigate(url);
   };
-
-  const handleProtectedNavigation = (linkUrl: string) => {
-    // If not logged in, redirect to auth
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-    // If logged in but not premium, show upgrade prompt
-    if (!isPremium && requiresPremium(linkUrl)) {
-      setShowUpgradePrompt(true);
-      return;
-    }
-    // Otherwise, navigate
-    if (linkUrl.startsWith("http")) {
-      window.open(linkUrl, "_blank");
-    } else {
-      navigate(linkUrl);
-    }
-  };
-
-  const handleSlideClick = (linkUrl: string | null) => {
-    if (linkUrl) {
-      handleProtectedNavigation(linkUrl);
-    }
-  };
-
-  // Custom icon components for tabs
-  const LogoIcon = ({ className }: { className?: string }) => <img src={logo} alt="" className={className} />;
-
-  const LiveStreamIcon = ({ className }: { className?: string }) => (
-    <img src={liveStreamIcon} alt="" className={className} />
-  );
-
-  const PodcastIcon = ({ className }: { className?: string }) => <img src={podcastIcon} alt="" className={className} />;
-
-  const SocialIcon = ({ className }: { className?: string }) => (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-      <path d="M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-      <path d="M18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-      <path d="m8.59 13.51 6.83 3.98" />
-      <path d="m15.41 6.51-6.82 3.98" />
-    </svg>
-  );
-
-  const [showOverviewInfo, setShowOverviewInfo] = useState(false);
-
-  const tabs = [
-    { id: "overview", label: "Overview", icon: LogoIcon, isImage: true },
-    { id: "live", label: "Live Streams", icon: LiveStreamIcon, isImage: true },
-    { id: "podcasts", label: "Podcast", icon: PodcastIcon, isImage: true },
-    { id: "community", label: "Community", icon: LogoIcon, isImage: true },
-  ];
 
   return (
-    <section className="group/hero relative min-h-[358px] sm:min-h-[390px] md:min-h-[423px] lg:min-h-[455px] overflow-hidden">
-      {/* Immersive background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div 
-          className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full opacity-30"
-          style={{
-            background: "radial-gradient(circle, hsl(220 80% 40% / 0.5), transparent 70%)",
-            filter: "blur(100px)",
-          }}
-        />
-        <div 
-          className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 rounded-full opacity-20"
-          style={{
-            background: "radial-gradient(circle, hsl(24 100% 50% / 0.4), transparent 70%)",
-            filter: "blur(100px)",
-          }}
-        />
-      </div>
-      
-      <div ref={emblaRef} className="overflow-hidden h-full absolute inset-0">
+    <section className="group/hero relative h-[55vw] min-h-[280px] max-h-[480px] sm:max-h-[520px] overflow-hidden bg-black">
+      <div ref={emblaRef} className="overflow-hidden absolute inset-0">
         <div className="flex h-full">
           {slidesToShow.map((slide, index) => (
             <div
@@ -337,161 +105,112 @@ const Hero = () => {
               style={{
                 opacity: selectedIndex === index ? 1 : 0,
                 zIndex: selectedIndex === index ? 10 : 0,
-                transition: "opacity 0.5s ease-out",
+                transition: "opacity 0.8s ease-in-out",
                 pointerEvents: selectedIndex === index ? "auto" : "none",
               }}
             >
-              <div className="relative min-h-[358px] sm:min-h-[390px] md:min-h-[423px] lg:min-h-[455px]">
-                {/* Background Image with parallax effect */}
-                <div
-                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                  style={{
-                    backgroundImage: `url(${slide.image})`,
-                    transform: selectedIndex === index ? "scale(1)" : "scale(1.05)",
-                    transition: "transform 0.6s ease-out",
-                  }}
-                />
+              {/* Full-bleed background image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style={{
+                  backgroundImage: `url(${slide.image})`,
+                  transform: selectedIndex === index ? "scale(1)" : "scale(1.08)",
+                  transition: "transform 8s ease-out",
+                }}
+              />
 
-                {/* Enhanced gradient overlays for glass depth */}
-                <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/40" />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background via-background/80 to-transparent" />
-                
-                {/* Glass panel for content */}
-                <div className="absolute inset-y-0 left-0 w-full lg:w-3/4 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
+              {/* Netflix-style gradient: bottom fade + left vignette */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent" />
 
-                {/* Content - Left Aligned */}
-                <div
-                  className="absolute inset-0 flex flex-col justify-center px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 pt-8 pb-28"
-                  style={{
-                    opacity: selectedIndex === index ? 1 : 0,
-                    transform: selectedIndex === index ? "translateY(0)" : "translateY(20px)",
-                    transition: "opacity 0.4s ease-out 0.1s, transform 0.4s ease-out 0.1s",
-                  }}
-                >
-                  {/* Logo */}
-                  <div className="mb-3 sm:mb-4">
-                    <img
-                      src={logo}
-                      alt="MetsXMFanZone"
-                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 object-contain"
-                    />
-                  </div>
-
-                  {/* Subtitle */}
-                  <span className="text-primary font-bold text-[10px] sm:text-xs md:text-sm tracking-widest mb-1.5 sm:mb-2">
-                    {slide.subtitle}
+              {/* Content overlay — bottom-left like Netflix */}
+              <div
+                className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 lg:p-12 pb-12 sm:pb-14 md:pb-16"
+                style={{
+                  opacity: selectedIndex === index ? 1 : 0,
+                  transform: selectedIndex === index ? "translateY(0)" : "translateY(16px)",
+                  transition: "opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s",
+                }}
+              >
+                {/* Logo + tag */}
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                  <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+                  <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.2em] text-primary/90 uppercase">
+                    {slide.tag}
                   </span>
+                </div>
 
-                  {/* Title */}
-                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-foreground mb-2 sm:mb-3 max-w-2xl leading-tight uppercase tracking-tight">
-                    {slide.title}
-                  </h1>
+                {/* Title */}
+                <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-white mb-1.5 sm:mb-2 max-w-xl leading-[1.1] uppercase tracking-tight drop-shadow-lg">
+                  {slide.title}
+                </h1>
 
-                  {/* Badges */}
-                  <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 mb-3 sm:mb-4 flex-wrap">
-                    <span className="text-primary font-semibold text-xs sm:text-sm">98% Match</span>
-                    {slide.badges?.map((badge, i) => (
-                      <span
-                        key={i}
-                        className="px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] md:text-xs font-bold border border-border/50 rounded text-muted-foreground"
-                      >
-                        {badge}
-                      </span>
-                    ))}
-                  </div>
+                {/* Description */}
+                <p className="text-[11px] sm:text-xs md:text-sm text-white/75 mb-3 sm:mb-4 max-w-md leading-relaxed line-clamp-2 sm:line-clamp-3">
+                  {slide.description}
+                </p>
 
-                  {/* Description */}
-                  <p className="text-[11px] sm:text-xs md:text-sm lg:text-base text-foreground/80 mb-4 sm:mb-5 max-w-sm sm:max-w-md leading-relaxed">
-                    {slide.description}
-                  </p>
-
-                  {/* Action Buttons - Glass styled */}
-                  <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                    {slide.show_watch_live && (
-                      <div className="relative">
-                        {isLiveNow && (
-                          <div className="absolute -inset-1.5 sm:-inset-2 rounded-lg sm:rounded-xl bg-[#ff4500]/40 blur-lg sm:blur-xl animate-pulse" />
-                        )}
-                        <Button
-                          onClick={() => handleProtectedNavigation("/metsxmfanzone-tv")}
-                          size="default"
-                          className={`relative gap-1.5 sm:gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-4 sm:px-6 md:px-8 h-9 sm:h-10 md:h-11 text-xs sm:text-sm shadow-lg transition-all duration-300 ${
-                            isLiveNow 
-                              ? "shadow-[#ff4500]/50 hover:shadow-[#ff4500]/70 ring-2 ring-[#ff4500]/30" 
-                              : "shadow-primary/30 hover:shadow-primary/50"
-                          }`}
-                        >
-                          <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
-                          Watch Live
-                        </Button>
-                      </div>
-                    )}
-                    {slide.link_url && slide.link_text && (
+                {/* Action buttons */}
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                  {slide.show_watch_live && (
+                    <div className="relative">
+                      {isLiveNow && <div className="absolute -inset-1 rounded-lg bg-red-500/40 blur-lg animate-pulse" />}
                       <Button
-                        onClick={() => handleSlideClick(slide.link_url)}
-                        size="default"
-                        variant="outline"
-                        className="gap-1.5 sm:gap-2 glass-light border-border/30 hover:border-primary/50 transition-all duration-300 h-9 sm:h-10 md:h-11 text-xs sm:text-sm px-3 sm:px-4 md:px-6"
+                        onClick={() => handleNav("/metsxmfanzone-tv")}
+                        className={`relative gap-1.5 bg-white text-black hover:bg-white/90 font-bold px-4 sm:px-6 h-8 sm:h-9 md:h-10 text-xs sm:text-sm rounded-sm ${isLiveNow ? "ring-2 ring-red-500/50" : ""}`}
                       >
-                        <Info className="w-4 h-4 sm:w-5 sm:h-5" />
-                        {slide.link_text}
+                        <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
+                        {isLiveNow ? "Watch Live" : "Watch"}
                       </Button>
-                    )}
-                  </div>
-
-                  {/* Free Trial Banner for non-users - Glass styled */}
-                  {!user && (
-                    <div className="mt-4 sm:mt-5 md:mt-6">
-                      <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-lg sm:rounded-xl glass-light glow-pulse">
-                        <span className="text-[10px] sm:text-xs md:text-sm text-foreground">
-                          ⚡ <span className="text-primary font-bold">FREE Spring Training</span> access on signup · Regular season just <span className="text-primary font-bold">$12.99/mo</span>
-                        </span>
-                      </div>
                     </div>
                   )}
+                  {slide.link_url && slide.link_text && (
+                    <Button
+                      onClick={() => handleNav(slide.link_url!)}
+                      variant="outline"
+                      className="gap-1.5 bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/40 h-8 sm:h-9 md:h-10 text-xs sm:text-sm px-3 sm:px-5 rounded-sm"
+                    >
+                      <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      {slide.link_text}
+                    </Button>
+                  )}
                 </div>
+
+                {/* Signup banner */}
+                {!user && (
+                  <div className="mt-3 sm:mt-4">
+                    <button onClick={() => navigate("/auth")} className="text-[10px] sm:text-xs text-white/60 hover:text-white/80 transition-colors">
+                      ⚡ <span className="text-primary font-semibold">FREE Spring Training</span> access · Regular season <span className="text-primary font-semibold">$12.99/mo</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Arrow Navigation - Show on hover only, positioned outside content area */}
+      {/* Nav arrows */}
       {slidesToShow.length > 1 && (
         <>
-          <button
-            onClick={() => emblaApi?.scrollPrev()}
-            className="absolute left-2 sm:left-3 top-1/3 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full glass-light flex items-center justify-center text-foreground/70 hover:text-primary hover:border-primary/50 transition-all duration-300 opacity-0 group-hover/hero:opacity-100"
-            aria-label="Previous slide"
-          >
+          <button onClick={() => emblaApi?.scrollPrev()} className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white transition-all opacity-0 group-hover/hero:opacity-100" aria-label="Previous">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <button
-            onClick={() => emblaApi?.scrollNext()}
-            className="absolute right-2 sm:right-3 top-1/3 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full glass-light flex items-center justify-center text-foreground/70 hover:text-primary hover:border-primary/50 transition-all duration-300 opacity-0 group-hover/hero:opacity-100"
-            aria-label="Next slide"
-          >
+          <button onClick={() => emblaApi?.scrollNext()} className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white transition-all opacity-0 group-hover/hero:opacity-100" aria-label="Next">
             <ChevronRight className="w-4 h-4" />
           </button>
         </>
       )}
 
-      {/* Slide Indicators */}
-      <div className="absolute bottom-0 left-0 right-0 z-20">
-        <div className="flex justify-center gap-1.5 sm:gap-2 pb-4 sm:pb-5">
-          {slidesToShow.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => emblaApi?.scrollTo(index)}
-              className={`h-1 sm:h-1.5 rounded-full transition-all duration-300 ${
-                selectedIndex === index 
-                  ? "w-6 sm:w-8 bg-primary shadow-lg shadow-primary/50" 
-                  : "w-1.5 sm:w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
-              }`}
-            />
-          ))}
-        </div>
+      {/* Slide indicators */}
+      <div className="absolute bottom-2 sm:bottom-3 left-0 right-0 z-20 flex justify-center gap-1 sm:gap-1.5">
+        {slidesToShow.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => emblaApi?.scrollTo(i)}
+            className={`h-[3px] rounded-full transition-all duration-500 ${selectedIndex === i ? "w-5 sm:w-7 bg-white" : "w-1.5 sm:w-2 bg-white/30 hover:bg-white/50"}`}
+          />
+        ))}
       </div>
 
       <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
