@@ -8,6 +8,7 @@ import GamecastTicker from "@/components/gamecast/GamecastTicker";
 import GamecastScoreboard from "@/components/gamecast/GamecastScoreboard";
 import GamecastLineScore from "@/components/gamecast/GamecastLineScore";
 import GamecastBoxScore from "@/components/gamecast/GamecastBoxScore";
+import GamecastLineup from "@/components/gamecast/GamecastLineup";
 import GamecastPlays, { type PlayEvent } from "@/components/gamecast/GamecastPlays";
 
 interface GameData {
@@ -167,10 +168,14 @@ const MetsGamecast = () => {
             <Tabs defaultValue="plays" className="w-full">
               <TabsList className="w-full mb-3">
                 <TabsTrigger value="plays" className="flex-1 text-xs">PLAYS</TabsTrigger>
+                <TabsTrigger value="lineup" className="flex-1 text-xs">LINEUP</TabsTrigger>
                 <TabsTrigger value="box" className="flex-1 text-xs">BOX SCORE</TabsTrigger>
               </TabsList>
               <TabsContent value="plays">
                 <GamecastPlays plays={plays} />
+              </TabsContent>
+              <TabsContent value="lineup">
+                {gameData && <GamecastLineup gameData={gameData} boxScore={boxScore} />}
               </TabsContent>
               <TabsContent value="box">
                 {gameData && <GamecastBoxScore gameData={gameData} boxScore={boxScore} />}
