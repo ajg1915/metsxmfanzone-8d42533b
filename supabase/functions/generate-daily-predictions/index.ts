@@ -78,12 +78,19 @@ serve(async (req) => {
     let forceStarPlayers: number[] = [];
     let forceRegenerate = false;
     let triggerType = "manual";
+    let lineupPlayerIds: number[] = [];
+    let gameContext = "";
     
     try {
       const body = await req.json();
       if (body.forceStarPlayers && Array.isArray(body.forceStarPlayers)) forceStarPlayers = body.forceStarPlayers;
       if (body.forceRegenerate === true) forceRegenerate = true;
       if (body.triggerType) triggerType = body.triggerType;
+      if (body.triggeredBy) triggerType = body.triggeredBy;
+      if (body.lineupPlayerIds && Array.isArray(body.lineupPlayerIds)) lineupPlayerIds = body.lineupPlayerIds;
+      if (body.opponent) gameContext += `Today's game: Mets vs ${body.opponent}. `;
+      if (body.gameTime) gameContext += `Game time: ${body.gameTime}. `;
+      if (body.location) gameContext += `Location: ${body.location}. `;
     } catch { /* defaults */ }
 
     const today = new Date().toISOString().split('T')[0];
@@ -112,13 +119,28 @@ serve(async (req) => {
     console.log(`Fetched ${metsPlayers.length} players from Mets roster`);
 
     let selectedPlayers: Array<{ name: string; id: number; position: string }> = [];
+    
+    // Priority 1: Force star players (admin override)
     if (forceStarPlayers.length > 0) {
       selectedPlayers = [...metsPlayers.filter(p => forceStarPlayers.includes(p.id))];
     }
+    
+    // Priority 2: Lineup card players (when triggered by lineup fetch)
+    if (lineupPlayerIds.length > 0 && selectedPlayers.length < 6) {
+      const lineupPlayers = metsPlayers.filter(
+        p => lineupPlayerIds.includes(p.id) && !selectedPlayers.some(sp => sp.id === p.id)
+      );
+      // Shuffle lineup players and pick up to remaining slots
+      const shuffledLineup = [...lineupPlayers].sort(() => 0.5 - Math.random());
+      const slotsAvailable = 6 - selectedPlayers.length;
+      selectedPlayers = [...selectedPlayers, ...shuffledLineup.slice(0, slotsAvailable)];
+      console.log(`Selected ${Math.min(shuffledLineup.length, slotsAvailable)} players from today's lineup card`);
+    }
+    
+    // Priority 3: Fill remaining slots with roster mix
     const remainingSlots = 6 - selectedPlayers.length;
     if (remainingSlots > 0) {
       const available = metsPlayers.filter(p => !selectedPlayers.some(sp => sp.id === p.id));
-      // Prioritize everyday starters: pick at least 3 hitters and 2 pitchers
       const hitters = available.filter(p => !["SP","CL","RP"].includes(p.position));
       const pitchers = available.filter(p => ["SP","CL","RP"].includes(p.position));
       const shuffledHitters = [...hitters].sort(() => 0.5 - Math.random());
@@ -130,7 +152,6 @@ serve(async (req) => {
         ...shuffledHitters.slice(0, hittersNeeded),
         ...shuffledPitchers.slice(0, pitchersNeeded),
       ];
-      // Fill any remaining slots
       const stillNeeded = 6 - selectedPlayers.length;
       if (stillNeeded > 0) {
         const remaining = available.filter(p => !selectedPlayers.some(sp => sp.id === p.id));
@@ -139,8 +160,10 @@ serve(async (req) => {
     }
 
     let contextNote = "";
-    if (triggerType === "morning") contextNote = "It's early morning. Focus on trending players.";
-    else if (triggerType === "pregame") contextNote = "Pre-game time! Give your hottest takes.";
+    if (triggerType === "lineup-card") contextNote = `Lineup card just dropped! These players are confirmed in today's lineup. ${gameContext}Give your sharpest takes based on the matchup.`;
+    else if (triggerType === "morning") contextNote = `It's early morning. ${gameContext}Focus on trending players.`;
+    else if (triggerType === "pregame") contextNote = `Pre-game time! ${gameContext}Give your hottest takes.`;
+    else if (gameContext) contextNote = gameContext;
 
     const playerList = selectedPlayers.map(p => `${p.name} (${p.position})`).join(", ");
 
