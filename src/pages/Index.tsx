@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
-import LiveGameTicker from "@/components/LiveGameTicker";
+
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { setupNotificationListeners } from "@/utils/notificationTriggers";
@@ -175,7 +175,7 @@ const Index = () => {
         
         {/* Removed: LiveNotificationBar */}
 
-        <LiveGameTicker />
+        
 
         <Suspense fallback={<SectionSkeleton height="h-16" />}>
           <GamecastBanner />
