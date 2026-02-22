@@ -168,7 +168,7 @@ const Index = () => {
       <Suspense fallback={null}>
           <FreeTrialExpiryBanner />
         </Suspense>
-      <main className="pt-14 sm:pt-16 relative z-10">
+      <main className="relative z-10">
         <Hero />
         
         
