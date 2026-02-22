@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
 interface LiveGame {
   gamePk: number;
@@ -54,10 +55,8 @@ export default function GamecastBanner() {
           <CardContent className="p-0">
             <div className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4">
               {/* Icon */}
-              <div className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${
-                isLive ? 'bg-red-500/20' : 'bg-primary/15'
-              }`}>
-                <Activity className={`w-5 h-5 sm:w-6 sm:h-6 ${isLive ? 'text-red-400 animate-pulse' : 'text-primary'}`} />
+              <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-primary/15 overflow-hidden">
+                <img src={metsLogo} alt="MetsXMFanZone" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
               </div>
 
               {/* Game info */}
