@@ -95,7 +95,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="group/hero relative h-[55vw] min-h-[280px] max-h-[480px] sm:max-h-[520px] overflow-hidden bg-black">
+    <section className="group/hero relative h-[60vw] min-h-[320px] max-h-[540px] sm:max-h-[580px] overflow-hidden bg-black">
       <div ref={emblaRef} className="overflow-hidden absolute inset-0">
         <div className="flex h-full">
           {slidesToShow.map((slide, index) => (
