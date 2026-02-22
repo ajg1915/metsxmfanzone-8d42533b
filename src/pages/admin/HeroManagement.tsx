@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Plus, Trash2, Save, GripVertical, ChevronDown, ChevronUp, Eye, EyeOff, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Save, GripVertical, ChevronDown, ChevronUp, Eye, EyeOff, Sparkles, Image as ImageIcon, Upload, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   DndContext,
@@ -59,24 +59,60 @@ interface SuggestedSlide {
   source: string;
 }
 
+// Image uploader component
+const ImageUploader = ({ imageUrl, onImageChange, slideId }: { imageUrl: string | null; onImageChange: (url: string) => void; slideId: string }) => {
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Max 5MB"); return; }
+
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `hero-slides/${slideId}-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("content_uploads").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data: urlData } = supabase.storage.from("content_uploads").getPublicUrl(path);
+      onImageChange(urlData.publicUrl);
+      toast.success("Image uploaded");
+    } catch { toast.error("Upload failed"); }
+    finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ""; }
+  };
+
+  return (
+    <div className="space-y-1">
+      <Label className="text-[10px]">Image</Label>
+      {imageUrl ? (
+        <div className="relative group">
+          <img src={imageUrl} alt="" className="w-full h-20 rounded object-cover border border-border" />
+          <button onClick={() => fileInputRef.current?.click()} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded text-[10px] text-white gap-1">
+            <Upload className="w-3 h-3" /> Replace
+          </button>
+        </div>
+      ) : (
+        <button onClick={() => fileInputRef.current?.click()} className="w-full h-20 rounded border-2 border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center gap-1 transition-colors">
+          {uploading ? <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /> : (
+            <>
+              <Upload className="w-4 h-4 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground">Upload image</span>
+            </>
+          )}
+        </button>
+      )}
+      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
+    </div>
+  );
+};
+
 // Compact sortable slide row
 const SortableSlideRow = ({
-  slide,
-  index,
-  blogPosts,
-  saving,
-  expanded,
-  onToggle,
-  onUpdate,
-  onLinkBlog,
-  onSave,
-  onDelete,
+  slide, index, blogPosts, saving, expanded, onToggle, onUpdate, onLinkBlog, onSave, onDelete,
 }: {
-  slide: HeroSlide;
-  index: number;
-  blogPosts: BlogPost[];
-  saving: boolean;
-  expanded: boolean;
+  slide: HeroSlide; index: number; blogPosts: BlogPost[]; saving: boolean; expanded: boolean;
   onToggle: () => void;
   onUpdate: (id: string, field: keyof HeroSlide, value: string | boolean | number | null) => void;
   onLinkBlog: (slideId: string, blogId: string | null) => void;
@@ -88,13 +124,10 @@ const SortableSlideRow = ({
 
   return (
     <Card ref={setNodeRef} style={style} className={`border-border overflow-hidden ${isDragging ? 'ring-2 ring-primary' : ''}`}>
-      {/* Compact header row */}
       <div className="flex items-center gap-1.5 px-2 py-1.5 cursor-pointer" onClick={onToggle}>
         <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded" onClick={e => e.stopPropagation()}>
           <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
         </div>
-        
-        {/* Thumbnail */}
         {slide.image_url ? (
           <img src={slide.image_url} alt="" className="w-10 h-6 rounded object-cover flex-shrink-0" />
         ) : (
@@ -102,27 +135,20 @@ const SortableSlideRow = ({
             <ImageIcon className="w-3 h-3 text-muted-foreground" />
           </div>
         )}
-
         <div className="flex-1 min-w-0">
           <p className="text-xs font-medium truncate">{slide.title || "Untitled"}</p>
         </div>
-
         <div className="flex items-center gap-1 flex-shrink-0">
           <Badge variant={slide.is_for_members ? "default" : "secondary"} className="text-[9px] px-1 py-0 h-4">
             {slide.is_for_members ? "Members" : "Public"}
           </Badge>
-          <button
-            onClick={e => { e.stopPropagation(); onUpdate(slide.id, "published", !slide.published); }}
-            className="p-0.5"
-            title={slide.published ? "Published" : "Draft"}
-          >
+          <button onClick={e => { e.stopPropagation(); onUpdate(slide.id, "published", !slide.published); }} className="p-0.5" title={slide.published ? "Published" : "Draft"}>
             {slide.published ? <Eye className="w-3.5 h-3.5 text-green-500" /> : <EyeOff className="w-3.5 h-3.5 text-muted-foreground" />}
           </button>
           {expanded ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
         </div>
       </div>
 
-      {/* Expanded edit panel */}
       {expanded && (
         <CardContent className="px-2 pb-2 pt-0 space-y-2 border-t border-border/50">
           <div className="grid grid-cols-2 gap-1.5 pt-1.5">
@@ -130,10 +156,7 @@ const SortableSlideRow = ({
               <Label className="text-[10px]">Title</Label>
               <Input value={slide.title} onChange={e => onUpdate(slide.id, "title", e.target.value)} className="h-7 text-xs" />
             </div>
-            <div>
-              <Label className="text-[10px]">Image URL</Label>
-              <Input value={slide.image_url || ""} onChange={e => onUpdate(slide.id, "image_url", e.target.value)} className="h-7 text-xs" placeholder="https://..." />
-            </div>
+            <ImageUploader imageUrl={slide.image_url} onImageChange={url => onUpdate(slide.id, "image_url", url)} slideId={slide.id} />
           </div>
 
           <div>
