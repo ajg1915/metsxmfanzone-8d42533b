@@ -60,8 +60,8 @@ export function ClapprPlayer({ source, pageTitle, pageDescription }: ClapprPlaye
         parentId: `#${domId}`,
         width: "100%",
         height: "100%",
-        autoPlay: false,
-        mute: false,
+        autoPlay: true,
+        mute: true,
         playback: {
           playInline: true,
           controls: true,
