@@ -70,9 +70,16 @@ export function StreamPlayer({
     return video.canPlayType('application/vnd.apple.mpegurl') !== '';
   };
 
-  // Dispose player helper
+  // Dispose player helper — skips if casting via AirPlay
   const disposePlayer = () => {
     if (playerRef.current) {
+      const videoEl = playerRef.current.el()?.querySelector('video');
+      const isRemotePlaying = videoEl?.remote?.state === 'connected' || 
+        (videoEl as any)?.webkitCurrentPlaybackTargetIsWireless;
+      if (isRemotePlaying) {
+        console.log('[StreamPlayer] Skipping dispose — AirPlay/casting active');
+        return;
+      }
       playerRef.current.dispose();
       playerRef.current = null;
       setPlayerReady(false);
@@ -188,7 +195,15 @@ export function StreamPlayer({
         .maybeSingle();
 
       if (error) throw error;
-      setStream(data as LiveStream | null);
+      
+      // Only update state if the stream actually changed — prevents player disposal during AirPlay
+      const newStream = data as LiveStream | null;
+      setStream(prev => {
+        if (prev?.id === newStream?.id && prev?.stream_url === newStream?.stream_url) {
+          return prev; // No change, keep same reference
+        }
+        return newStream;
+      });
     } catch (error) {
       console.error("Error fetching stream:", error);
     } finally {
@@ -235,6 +250,8 @@ export function StreamPlayer({
                 ref={videoRef} 
                 className="video-js vjs-big-play-centered vjs-theme-fantasy" 
                 playsInline
+                // @ts-ignore - AirPlay attribute
+                x-webkit-airplay="allow"
                 style={{ width: '100%', height: '100%' }} 
               />
             </div>
