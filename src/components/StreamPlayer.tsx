@@ -105,11 +105,28 @@ export function StreamPlayer({
         },
         html5: {
           vhs: {
-            overrideNative: !useNativeHLS
+            overrideNative: !useNativeHLS,
+            // Low-latency HLS tuning
+            fastQualityChange: true,
+            handlePartialData: true,
+            maxPlaylistRetries: 10,
+            smoothQualityChange: true,
+            allowSeeksWithinUnsafeLiveWindow: true,
+            experimentalLLHLS: true,
+            useNetworkInformationApi: true,
+            // Buffer tuning — keep buffers small for live
+            ...(useNativeHLS ? {} : {
+              bandwidth: 5000000, // Start with 5Mbps estimate
+              enableLowInitialPlaylist: false,
+            }),
           },
           nativeVideoTracks: useNativeHLS,
           nativeAudioTracks: useNativeHLS,
           nativeTextTracks: useNativeHLS
+        },
+        liveTracker: {
+          trackingThreshold: 0.5,  // How far behind live edge before seeking
+          liveTolerance: 15,       // Seconds behind live edge allowed
         },
         sources: [{
           src: stream.stream_url,
@@ -130,6 +147,19 @@ export function StreamPlayer({
       playerRef.current.ready(() => {
         console.log('Video.js player is ready');
         setPlayerReady(true);
+
+        // Auto-seek to live edge periodically to prevent drift/lag
+        const liveEdgeInterval = setInterval(() => {
+          const p = playerRef.current;
+          if (!p || p.paused() || !p.liveTracker?.isLive?.()) return;
+          const behindLive = p.liveTracker.liveCurrentTime() - p.currentTime();
+          if (behindLive > 30) {
+            console.log(`[StreamPlayer] ${Math.round(behindLive)}s behind live, seeking to edge`);
+            p.liveTracker.seekToLiveEdge();
+          }
+        }, 10000);
+
+        playerRef.current.on('dispose', () => clearInterval(liveEdgeInterval));
       });
 
       playerRef.current.on('error', (e: any) => {
@@ -137,7 +167,6 @@ export function StreamPlayer({
         const error = playerRef.current?.error();
         if (error) {
           console.error('Error details:', error.message, error.code);
-          // Retry once on error (helps tablet/mobile recovery)
           setTimeout(() => {
             if (playerRef.current && stream) {
               console.log('Retrying stream source...');
