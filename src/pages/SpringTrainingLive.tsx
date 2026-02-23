@@ -6,7 +6,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import MetsNewsTracker from "@/components/MetsNewsTracker";
 import MetsRSSFeed from "@/components/MetsRSSFeed";
-import { ClapprPlayer } from "@/components/ClapprPlayer";
+import { StreamPlayer } from "@/components/StreamPlayer";
 // NOTE: Re-enable StreamTimeLimit after Spring Training ends (last day of March 2026)
 // import StreamTimeLimit from "@/components/StreamTimeLimit";
 import SEOHead from "@/components/SEOHead";
@@ -225,8 +225,8 @@ const SpringTrainingLive = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <ClapprPlayer
-                source="https://video1.getstreamhosting.com:1936/resyweugpd/resyweugpd/playlist.m3u8"
+              <StreamPlayer
+                pageName="spring-training-live"
                 pageTitle="Spring Training Live Stream"
                 pageDescription="Live coverage from Clover Park"
               />
