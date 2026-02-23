@@ -1,26 +1,59 @@
 import { useEffect, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
+/**
+ * Real-time auto-refresh hook.
+ * Subscribes to key Supabase tables via Realtime and triggers a hard refresh
+ * ONLY when actual data changes occur — no more blind tab-switch reloads.
+ */
 export const useAutoRefresh = () => {
-  const initialized = useRef(false);
+  const lastRefresh = useRef(Date.now());
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    // Wait 3 seconds after mount before arming the listener so the initial
-    // page load / tab-switch that opened the site doesn't trigger a reload.
-    const initTimer = setTimeout(() => {
-      initialized.current = true;
-    }, 3000);
+    // Minimum 10 seconds between refreshes to prevent rapid reloads
+    const MIN_REFRESH_INTERVAL = 10_000;
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && initialized.current) {
-        window.location.reload();
+    const triggerRefresh = () => {
+      const now = Date.now();
+      if (now - lastRefresh.current < MIN_REFRESH_INTERVAL) {
+        return; // Too soon since last refresh
       }
+
+      // Debounce: wait 2 seconds for batch changes before reloading
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+
+      debounceTimer.current = setTimeout(() => {
+        console.log('[AutoRefresh] New data detected — refreshing');
+        lastRefresh.current = Date.now();
+        window.location.reload();
+      }, 2000);
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // Subscribe to tables that matter for the public-facing site
+    const channel = supabase
+      .channel('auto-refresh-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'hero_slides' }, triggerRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'stories' }, triggerRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'live_streams' }, triggerRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'live_notifications' }, triggerRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'stream_alerts' }, triggerRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'blog_posts' }, triggerRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'game_alerts' }, triggerRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'podcast_shows' }, triggerRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'mets_news_tracker' }, triggerRefresh)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'podcast_live_stream' }, triggerRefresh)
+      .subscribe((status) => {
+        console.log('[AutoRefresh] Realtime status:', status);
+      });
 
     return () => {
-      clearTimeout(initTimer);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+      supabase.removeChannel(channel);
     };
   }, []);
 };
