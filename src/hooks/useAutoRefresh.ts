@@ -1,5 +1,15 @@
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+
+const STREAMING_PATHS = [
+  '/espn-network',
+  '/pix11-network',
+  '/mlb-network',
+  '/metsxmfanzone-tv',
+  '/spring-training-live',
+  '/tv/',
+];
 
 /**
  * Real-time auto-refresh hook.
@@ -9,12 +19,22 @@ import { supabase } from '@/integrations/supabase/client';
 export const useAutoRefresh = () => {
   const lastRefresh = useRef(Date.now());
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const location = useLocation();
+
+  const isStreamingPage = () => {
+    return STREAMING_PATHS.some(path => location.pathname.startsWith(path));
+  };
 
   useEffect(() => {
     // Minimum 10 seconds between refreshes to prevent rapid reloads
     const MIN_REFRESH_INTERVAL = 10_000;
 
     const triggerRefresh = () => {
+      if (isStreamingPage()) {
+        console.log('[AutoRefresh] Skipping refresh — user is on a streaming page');
+        return;
+      }
+
       const now = Date.now();
       if (now - lastRefresh.current < MIN_REFRESH_INTERVAL) {
         return; // Too soon since last refresh
