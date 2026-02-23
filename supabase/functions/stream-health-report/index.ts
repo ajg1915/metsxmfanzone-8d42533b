@@ -83,13 +83,35 @@ Deno.serve(async (req) => {
           console.log('Auto-alert sent to viewers for stream:', stream_id);
         }
 
-        // Send maintenance emails for high severity issues
-        if (severity === 'high') {
-          try {
-            await sendMaintenanceEmails(supabase, issue_type, alertMessage);
-          } catch (emailErr) {
-            console.error('Error sending maintenance emails:', emailErr);
-          }
+        // Send push notifications to ALL users (admins + regular users)
+        try {
+          const pushUrl = `${supabaseUrl}/functions/v1/send-push-notification`;
+          const pushResponse = await fetch(pushUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseKey}`,
+              'X-System-Call': 'true',
+            },
+            body: JSON.stringify({
+              title: `⚠️ Stream Issue: ${issue_type.charAt(0).toUpperCase() + issue_type.slice(1)}`,
+              body: alertMessage,
+              icon: '/logo-192.png',
+              url: '/',
+              tag: `stream-alert-${stream_id}`,
+            }),
+          });
+          const pushResult = await pushResponse.json();
+          console.log('Push notifications sent:', pushResult);
+        } catch (pushErr) {
+          console.error('Error sending push notifications:', pushErr);
+        }
+
+        // Send maintenance emails for medium and high severity issues
+        try {
+          await sendMaintenanceEmails(supabase, issue_type, alertMessage);
+        } catch (emailErr) {
+          console.error('Error sending maintenance emails:', emailErr);
         }
       } else {
         console.log('Active alert already exists for stream:', stream_id);
