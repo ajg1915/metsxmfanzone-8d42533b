@@ -9,7 +9,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit, Radio, Upload, X, Loader2, RotateCcw } from "lucide-react";
+import { Trash2, Plus, Edit, Radio, Upload, X, Loader2, RotateCcw, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +49,60 @@ interface LiveStream {
   viewers_count: number;
   published: boolean;
   created_at: string;
+  display_order: number;
+}
+
+function SortableStreamCard({ stream, onEdit, onDelete, getStatusBadge }: {
+  stream: LiveStream;
+  onEdit: (s: LiveStream) => void;
+  onDelete: (id: string) => void;
+  getStatusBadge: (status: string) => string;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stream.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  const pageLabels: Record<string, string> = { guide: 'Guide Page', live: 'Live Page', metsxmfanzone: 'MetsXMFanZone TV', 'mlb-network': 'MLB Network', 'espn-network': 'ESPN Network', 'pix11-network': 'PIX11 Network', 'spring-training-live': 'Spring Training Live', 'spring-training-games': 'Spring Training Games', 'replay-games': 'Replay Games' };
+
+  return (
+    <Card ref={setNodeRef} style={style} className="relative">
+      <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 cursor-grab active:cursor-grabbing p-1 rounded bg-background/80 backdrop-blur-sm">
+        <GripVertical className="w-4 h-4 text-muted-foreground" />
+      </div>
+      <CardHeader className="pb-3 pl-10">
+        {stream.thumbnail_url && (
+          <div className="aspect-video overflow-hidden rounded-md mb-2 bg-muted">
+            <img src={stream.thumbnail_url} alt={stream.title} className="w-full h-full object-cover" />
+          </div>
+        )}
+        <div className="flex items-center gap-1.5 mb-2">
+          <Badge className={getStatusBadge(stream.status)}>
+            {stream.status === 'live' && <Radio className="w-3 h-3 mr-1" />}
+            {stream.status.toUpperCase()}
+          </Badge>
+          {!stream.published && <Badge variant="outline">Draft</Badge>}
+        </div>
+        <CardTitle className="line-clamp-2 text-base">{stream.title}</CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="space-y-1.5 text-xs text-muted-foreground mb-3">
+          <p>Assigned to: {stream.assigned_pages?.length > 0 ? stream.assigned_pages.map(p => pageLabels[p] || p).join(', ') : 'None'}</p>
+          {stream.scheduled_start && <p>Starts: {new Date(stream.scheduled_start).toLocaleString()}</p>}
+          <p>Viewers: {stream.viewers_count}</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => onEdit(stream)} className="flex-1 h-7 text-xs">
+            <Edit className="w-3 h-3 mr-1" /> Edit
+          </Button>
+          <Button variant="destructive" size="sm" onClick={() => onDelete(stream.id)} className="h-7 text-xs">
+            <Trash2 className="w-3 h-3" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function LiveStreamManagement() {
@@ -63,6 +134,7 @@ export default function LiveStreamManagement() {
       const { data, error } = await supabase
         .from("live_streams")
         .select("*")
+        .order("display_order", { ascending: true })
         .order("scheduled_start", { ascending: false });
 
       if (error) throw error;
@@ -282,6 +354,27 @@ export default function LiveStreamManagement() {
     setIsDialogOpen(open);
     if (!open) {
       resetForm();
+    }
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = streams.findIndex(s => s.id === active.id);
+    const newIndex = streams.findIndex(s => s.id === over.id);
+    const reordered = arrayMove(streams, oldIndex, newIndex);
+    setStreams(reordered);
+
+    // Persist new order
+    const updates = reordered.map((s, i) => ({ id: s.id, display_order: i }));
+    for (const u of updates) {
+      await supabase.from("live_streams").update({ display_order: u.display_order }).eq("id", u.id);
     }
   };
 
@@ -534,72 +627,21 @@ export default function LiveStreamManagement() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {streams.map((stream) => (
-            <Card key={stream.id}>
-              <CardHeader className="pb-3">
-                {stream.thumbnail_url && (
-                  <div className="aspect-video overflow-hidden rounded-md mb-2 bg-muted">
-                    <img
-                      src={stream.thumbnail_url}
-                      alt={stream.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Badge className={getStatusBadge(stream.status)}>
-                    {stream.status === 'live' && <Radio className="w-3 h-3 mr-1" />}
-                    {stream.status.toUpperCase()}
-                  </Badge>
-                  {!stream.published && (
-                    <Badge variant="outline">Draft</Badge>
-                  )}
-                </div>
-                <CardTitle className="line-clamp-2 text-base">{stream.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-1.5 text-xs text-muted-foreground mb-3">
-                  <p>Assigned to: {stream.assigned_pages?.length > 0 ? stream.assigned_pages.map(p => {
-                    if (p === 'guide') return 'Guide Page';
-                    if (p === 'live') return 'Live Page';
-                    if (p === 'metsxmfanzone') return 'MetsXMFanZone TV';
-                    if (p === 'mlb-network') return 'MLB Network';
-                    if (p === 'espn-network') return 'ESPN Network';
-                    if (p === 'pix11-network') return 'PIX11 Network';
-                    if (p === 'spring-training-live') return 'Spring Training Live';
-                    if (p === 'spring-training-games') return 'Spring Training Games';
-                    if (p === 'replay-games') return 'Replay Games';
-                    return p;
-                  }).join(', ') : 'None'}</p>
-                  {stream.scheduled_start && (
-                    <p>Starts: {new Date(stream.scheduled_start).toLocaleString()}</p>
-                  )}
-                  <p>Viewers: {stream.viewers_count}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(stream)}
-                    className="flex-1 h-7 text-xs"
-                  >
-                    <Edit className="w-3 h-3 mr-1" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(stream.id)}
-                    className="h-7 text-xs"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={streams.map(s => s.id)} strategy={rectSortingStrategy}>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {streams.map((stream) => (
+                <SortableStreamCard
+                  key={stream.id}
+                  stream={stream}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  getStatusBadge={getStatusBadge}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   );

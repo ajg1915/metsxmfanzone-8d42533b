@@ -842,6 +842,7 @@ export type Database = {
           assigned_pages: string[] | null
           created_at: string
           description: string | null
+          display_order: number | null
           id: string
           published: boolean
           scheduled_end: string | null
@@ -859,6 +860,7 @@ export type Database = {
           assigned_pages?: string[] | null
           created_at?: string
           description?: string | null
+          display_order?: number | null
           id?: string
           published?: boolean
           scheduled_end?: string | null
@@ -876,6 +878,7 @@ export type Database = {
           assigned_pages?: string[] | null
           created_at?: string
           description?: string | null
+          display_order?: number | null
           id?: string
           published?: boolean
           scheduled_end?: string | null
