@@ -79,6 +79,7 @@ serve(async (req) => {
     let forceRegenerate = false;
     let triggerType = "manual";
     let lineupPlayerIds: number[] = [];
+    let lineupPlayers: Array<{ name: string; id: number; position: string }> = [];
     let gameContext = "";
     
     try {
@@ -88,6 +89,7 @@ serve(async (req) => {
       if (body.triggerType) triggerType = body.triggerType;
       if (body.triggeredBy) triggerType = body.triggeredBy;
       if (body.lineupPlayerIds && Array.isArray(body.lineupPlayerIds)) lineupPlayerIds = body.lineupPlayerIds;
+      if (body.lineupPlayers && Array.isArray(body.lineupPlayers)) lineupPlayers = body.lineupPlayers;
       if (body.opponent) gameContext += `Today's game: Mets vs ${body.opponent}. `;
       if (body.gameTime) gameContext += `Game time: ${body.gameTime}. `;
       if (body.location) gameContext += `Location: ${body.location}. `;
@@ -118,32 +120,43 @@ serve(async (req) => {
     const metsPlayers = await fetchMetsRoster();
     console.log(`Fetched ${metsPlayers.length} players from Mets roster`);
 
+    // When lineup players are provided directly, use them as the primary source
+    // This ensures players NOT in the hardcoded roster (e.g. spring training call-ups) are included
+    const availableLineupPlayers: Array<{ name: string; id: number; position: string }> = 
+      lineupPlayers.length > 0 
+        ? lineupPlayers 
+        : lineupPlayerIds.length > 0 
+          ? metsPlayers.filter(p => lineupPlayerIds.includes(p.id))
+          : [];
+
     let selectedPlayers: Array<{ name: string; id: number; position: string }> = [];
     
     // Priority 1: Force star players (admin override)
     if (forceStarPlayers.length > 0) {
-      selectedPlayers = [...metsPlayers.filter(p => forceStarPlayers.includes(p.id))];
+      const allKnownPlayers = [...availableLineupPlayers, ...metsPlayers];
+      selectedPlayers = [...allKnownPlayers.filter(p => forceStarPlayers.includes(p.id))];
+      // Deduplicate by id
+      selectedPlayers = selectedPlayers.filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i);
     }
     
-    // Priority 2: Lineup card players (when triggered by lineup fetch)
-    if (lineupPlayerIds.length > 0 && selectedPlayers.length < 6) {
-      const lineupPlayers = metsPlayers.filter(
-        p => lineupPlayerIds.includes(p.id) && !selectedPlayers.some(sp => sp.id === p.id)
+    // Priority 2: Lineup players (when triggered by lineup fetch)
+    if (availableLineupPlayers.length > 0 && selectedPlayers.length < 6) {
+      const lineupNotSelected = availableLineupPlayers.filter(
+        p => !selectedPlayers.some(sp => sp.id === p.id)
       );
-      // Shuffle lineup players and pick up to remaining slots
-      const shuffledLineup = [...lineupPlayers].sort(() => 0.5 - Math.random());
+      const shuffledLineup = [...lineupNotSelected].sort(() => 0.5 - Math.random());
       const slotsAvailable = 6 - selectedPlayers.length;
       selectedPlayers = [...selectedPlayers, ...shuffledLineup.slice(0, slotsAvailable)];
-      console.log(`Selected ${Math.min(shuffledLineup.length, slotsAvailable)} players from today's lineup card`);
+      console.log(`Selected ${Math.min(shuffledLineup.length, slotsAvailable)} players from today's lineup`);
     }
     
-    // Priority 3: Fill remaining slots — but ONLY from lineup players if triggered by lineup-card
+    // Priority 3: Fill remaining slots
     const remainingSlots = 6 - selectedPlayers.length;
     if (remainingSlots > 0) {
-      if (lineupPlayerIds.length > 0) {
+      if (availableLineupPlayers.length > 0) {
         // Only use players from today's actual lineup — never random roster players
-        const lineupOnly = metsPlayers.filter(
-          p => lineupPlayerIds.includes(p.id) && !selectedPlayers.some(sp => sp.id === p.id)
+        const lineupOnly = availableLineupPlayers.filter(
+          p => !selectedPlayers.some(sp => sp.id === p.id)
         );
         const shuffled = [...lineupOnly].sort(() => 0.5 - Math.random());
         selectedPlayers = [...selectedPlayers, ...shuffled.slice(0, remainingSlots)];

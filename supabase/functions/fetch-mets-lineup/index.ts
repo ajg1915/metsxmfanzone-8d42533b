@@ -212,18 +212,31 @@ Deno.serve(async (req) => {
     try {
       console.log("Triggering daily predictions generation with lineup data...");
       
-      // Extract player IDs from lineup to force predictions for lineup players
-      const lineupPlayerIds = lineupData
-        .map((p: any) => {
-          // Extract player ID from headshot URL if available
-          const match = p.imageUrl?.match(/\/people\/(\d+)\//);
-          return match ? parseInt(match[1]) : null;
-        })
-        .filter((id: number | null) => id !== null);
+      // Extract player IDs and names from lineup for predictions
+      const lineupPlayerIds: number[] = [];
+      const lineupPlayers: Array<{ name: string; id: number; position: string }> = [];
       
-      // Include starting pitcher ID if available
+      lineupData.forEach((p: any) => {
+        const match = p.imageUrl?.match(/\/people\/(\d+)\//);
+        if (match) {
+          const playerId = parseInt(match[1]);
+          lineupPlayerIds.push(playerId);
+          lineupPlayers.push({ 
+            name: p.name, 
+            id: playerId, 
+            position: p.fieldPosition || "DH" 
+          });
+        }
+      });
+      
+      // Include starting pitcher if available
       if (probablePitcher?.id) {
         lineupPlayerIds.push(probablePitcher.id);
+        lineupPlayers.push({
+          name: probablePitcher.name || "Starting Pitcher",
+          id: probablePitcher.id,
+          position: "SP"
+        });
       }
       
       console.log("Lineup player IDs for predictions:", lineupPlayerIds);
@@ -239,6 +252,7 @@ Deno.serve(async (req) => {
           triggeredBy: "lineup-card",
           forceRegenerate: true,
           lineupPlayerIds,
+          lineupPlayers,
           opponent: lineupCardData.opponent,
           gameTime: gameTimeStr,
           location: location
