@@ -23,7 +23,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 // Home / Overview items
 const homeItems = [
   { title: "Dashboard", url: "/admin", icon: Home },
-  { title: "Blog", url: "/admin/blog", icon: FileText },
   { title: "Hero Slides", url: "/admin/hero", icon: Layers },
   { title: "Backgrounds", url: "/admin/backgrounds", icon: Wallpaper },
   { title: "Tutorials", url: "/admin/tutorials", icon: BookOpen },
@@ -36,9 +35,7 @@ const mediaItems = [
   { title: "Media Library", url: "/admin/media-library", icon: FolderOpen },
   { title: "Blog", url: "/admin/blog", icon: FileText },
   { title: "Stories", url: "/admin/stories", icon: Sparkles },
-  { title: "AI Images", url: "/admin/ai-images", icon: Image },
-  { title: "Videos", url: "/admin/video-gallery-management", icon: Video },
-  { title: "Video Creator", url: "/admin/video-creator", icon: Film },
+  { title: "Highlights", url: "/admin/video-gallery-management", icon: Video },
   { title: "Podcasts", url: "/admin/podcasts", icon: Mic },
   { title: "Newsletter", url: "/admin/newsletter", icon: Mail },
   { title: "Email Editor", url: "/admin/email-editor", icon: Send },
@@ -48,8 +45,6 @@ const mediaItems = [
 const settingsNavItems = [
   { title: "Admin Settings", url: "/admin/settings", icon: Settings },
   { title: "Social Media", url: "/admin/social-media", icon: Share2 },
-  { title: "News Tracker", url: "/admin/news-tracker", icon: Newspaper },
-  { title: "TV Schedule", url: "/admin/tv-schedule", icon: Tv },
 ];
 
 // Live & Streaming
@@ -58,7 +53,6 @@ const liveItems = [
   { title: "Push Notifications", url: "/admin/game-notifications", icon: Bell },
   { title: "Game Alerts", url: "/admin/game-alerts", icon: Megaphone },
   { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
-  { title: "Replays", url: "/admin/stream-replays", icon: PlaySquare },
   { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
   { title: "Podcast Schedule", url: "/admin/podcast-schedule", icon: CalendarDays },
 ];
@@ -90,7 +84,6 @@ const analyticsItems = [
   { title: "Real-Time Stats", url: "/admin/realtime-analytics", icon: TrendingUp },
   { title: "Activity Logs", url: "/admin/activity", icon: Activity },
   { title: "SEO Settings", url: "/admin/seo", icon: Globe },
-  { title: "QR Codes", url: "/admin/qr-generator", icon: QrCode },
 ];
 
 
