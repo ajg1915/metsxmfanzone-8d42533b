@@ -185,13 +185,29 @@ export default function ConfirmAccount() {
 
           const paymentMethod = pendingPaymentMethod || user.user_metadata?.preferred_payment_method || "free";
 
-          await supabase.from("subscriptions").insert({
+          const { error: subError } = await supabase.from("subscriptions").insert({
             user_id: user.id,
             plan_type: "free",
             status: "active",
             amount: 0,
             payment_method: paymentMethod,
           });
+
+          // Notify admins about new signup
+          if (!subError) {
+            try {
+              await supabase.functions.invoke("notify-admin-new-member", {
+                body: {
+                  userId: user.id,
+                  planType: "free",
+                  amount: "$0.00",
+                  source: `Free Plan (${paymentMethod})`,
+                },
+              });
+            } catch (notifyErr) {
+              console.error("Admin notification failed:", notifyErr);
+            }
+          }
 
           // Clean up localStorage
           localStorage.removeItem("pending_signup_plan");
