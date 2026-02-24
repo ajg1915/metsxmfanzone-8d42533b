@@ -16,6 +16,7 @@ const FreeTrialExpiryBanner = lazy(() => import("@/components/FreeTrialExpiryBan
 const LiveNetworks = lazy(() => import("@/components/LiveNetworks"));
 const LiveStreamsSection = lazy(() => import("@/components/LiveStreamsSection"));
 const SpringTrainingGamesSection = lazy(() => import("@/components/SpringTrainingGamesSection"));
+const GameHighlightsSection = lazy(() => import("@/components/GameHighlightsSection"));
 const ReplayGamesSection = lazy(() => import("@/components/ReplayGamesSection"));
 const SpringTraining = lazy(() => import("@/components/SpringTraining"));
 const PlayersToWatch = lazy(() => import("@/components/PlayersToWatch"));
@@ -195,6 +196,10 @@ const Index = () => {
 
         <Suspense fallback={<SectionSkeleton />}>
           <SpringTrainingGamesSection />
+        </Suspense>
+
+        <Suspense fallback={<SectionSkeleton />}>
+          <GameHighlightsSection />
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton />}>
