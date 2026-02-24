@@ -195,41 +195,78 @@ Respond with ONLY a valid JSON array (no markdown, no extra text):
   }
 ]`;
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${lovableApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: "You are Anthony, a Mets baseball analyst. Respond only with valid JSON. Be realistic with stat predictions." },
-          { role: "user", content: prompt }
-        ],
-      }),
-    });
+    // Retry up to 2 times if AI returns malformed JSON
+    let predictions: any[] | null = null;
+    let lastError = "";
+    
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${lovableApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            max_tokens: 4000,
+            messages: [
+              { role: "system", content: "You are Anthony, a Mets baseball analyst. Respond ONLY with a raw JSON array (no markdown, no code fences, no explanation). Be realistic with stat predictions." },
+              { role: "user", content: prompt }
+            ],
+          }),
+        });
 
-    if (!aiResponse.ok) {
-      if (aiResponse.status === 429) throw new Error("Rate limit exceeded. Please try again later.");
-      if (aiResponse.status === 402) throw new Error("AI credits depleted. Please add credits.");
-      throw new Error(`AI API error: ${aiResponse.status}`);
+        if (!aiResponse.ok) {
+          if (aiResponse.status === 429) throw new Error("Rate limit exceeded. Please try again later.");
+          if (aiResponse.status === 402) throw new Error("AI credits depleted. Please add credits.");
+          throw new Error(`AI API error: ${aiResponse.status}`);
+        }
+
+        const aiData = await aiResponse.json();
+        const aiContent = aiData.choices?.[0]?.message?.content;
+        if (!aiContent) throw new Error("No content in AI response");
+
+        let cleanContent = aiContent.trim();
+        // Strip markdown code fences
+        if (cleanContent.startsWith("```json")) cleanContent = cleanContent.slice(7);
+        else if (cleanContent.startsWith("```")) cleanContent = cleanContent.slice(3);
+        if (cleanContent.endsWith("```")) cleanContent = cleanContent.slice(0, -3);
+        cleanContent = cleanContent.trim();
+        
+        // Try to extract valid JSON array even if response was truncated
+        if (!cleanContent.endsWith("]")) {
+          console.warn("AI response appears truncated, attempting to fix...");
+          // Find the last complete object by finding last "},"  or "}"
+          const lastCompleteObj = cleanContent.lastIndexOf("}");
+          if (lastCompleteObj > 0) {
+            cleanContent = cleanContent.substring(0, lastCompleteObj + 1);
+            // Remove trailing comma if present
+            if (cleanContent.trimEnd().endsWith(",")) {
+              cleanContent = cleanContent.trimEnd().slice(0, -1);
+            }
+            cleanContent += "]";
+          }
+        }
+        
+        predictions = JSON.parse(cleanContent);
+        if (Array.isArray(predictions) && predictions.length > 0) {
+          console.log(`AI returned ${predictions.length} predictions on attempt ${attempt + 1}`);
+          break; // Success
+        }
+        lastError = "AI returned empty predictions array";
+      } catch (e) {
+        lastError = e instanceof Error ? e.message : String(e);
+        console.error(`Attempt ${attempt + 1} failed:`, lastError);
+        if (attempt === 0) {
+          console.log("Retrying prediction generation...");
+          await new Promise(r => setTimeout(r, 2000));
+        }
+      }
     }
-
-    const aiData = await aiResponse.json();
-    const aiContent = aiData.choices?.[0]?.message?.content;
-    if (!aiContent) throw new Error("No content in AI response");
-
-    let predictions;
-    try {
-      let cleanContent = aiContent.trim();
-      if (cleanContent.startsWith("```json")) cleanContent = cleanContent.slice(7);
-      else if (cleanContent.startsWith("```")) cleanContent = cleanContent.slice(3);
-      if (cleanContent.endsWith("```")) cleanContent = cleanContent.slice(0, -3);
-      predictions = JSON.parse(cleanContent.trim());
-    } catch {
-      console.error("Failed to parse AI response:", aiContent);
-      throw new Error("Failed to parse AI predictions");
+    
+    if (!predictions || predictions.length === 0) {
+      throw new Error(`Failed to generate predictions after 2 attempts: ${lastError}`);
     }
 
     // Cleanup old predictions
