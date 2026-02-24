@@ -14,7 +14,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Verify authentication
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(
@@ -37,17 +36,18 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { orderId } = await req.json();
+    const { orderId, subscriptionId } = await req.json();
+    const paypalSubId = subscriptionId || orderId;
 
-    if (!orderId) {
+    if (!paypalSubId) {
       return new Response(
-        JSON.stringify({ error: 'Order ID is required' }),
+        JSON.stringify({ error: 'Subscription ID is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID');
-    const PAYPAL_SECRET = Deno.env.get('PAYPAL_SECRET');
+    const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID')!;
+    const PAYPAL_SECRET = Deno.env.get('PAYPAL_SECRET')!;
     const PAYPAL_API = 'https://api-m.sandbox.paypal.com';
 
     // Get PayPal access token
@@ -59,40 +59,56 @@ Deno.serve(async (req) => {
       },
       body: 'grant_type=client_credentials',
     });
-
     const authData = await authResponse.json();
 
-    // Capture the payment
-    const captureResponse = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderId}/capture`, {
-      method: 'POST',
+    // Get subscription details from PayPal
+    const subResponse = await fetch(`${PAYPAL_API}/v1/billing/subscriptions/${paypalSubId}`, {
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${authData.access_token}`,
+        'Content-Type': 'application/json',
       },
     });
 
-    const captureData = await captureResponse.json();
-    console.log('PayPal capture response:', { status: captureData.status || '[UNKNOWN]', id: '[REDACTED]' });
+    const subData = await subResponse.json();
+    console.log('PayPal subscription status:', { status: subData.status || '[UNKNOWN]', id: '[REDACTED]' });
 
-    if (!captureResponse.ok || captureData.status !== 'COMPLETED') {
-      throw new Error('Payment capture failed');
+    // Check if subscription is active or approved
+    const isActive = subData.status === 'ACTIVE' || subData.status === 'APPROVED';
+    
+    if (!isActive) {
+      return new Response(
+        JSON.stringify({ error: 'Subscription is not active', status: subData.status }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Fetch subscription with only needed fields - never expose payment IDs
+    // Find our subscription record
     const { data: subscription } = await supabase
       .from('subscriptions')
-      .select('id, user_id, plan_type, status, amount, currency, start_date, end_date')
-      .eq('paypal_order_id', orderId)
+      .select('id, user_id, plan_type, status, amount, currency')
+      .eq('paypal_subscription_id', paypalSubId)
       .single();
 
     if (!subscription) {
-      throw new Error('Subscription not found');
+      // Also try matching by paypal_order_id for backward compatibility
+      const { data: legacySub } = await supabase
+        .from('subscriptions')
+        .select('id, user_id, plan_type, status, amount, currency')
+        .eq('paypal_order_id', paypalSubId)
+        .single();
+      
+      if (!legacySub) {
+        throw new Error('Subscription not found');
+      }
+      
+      // Handle legacy order - continue with capture flow
+      return await handleLegacyOrder(supabase, legacySub, paypalSubId, user, authData.access_token, PAYPAL_API);
     }
 
     // Verify the authenticated user owns this subscription
     if (subscription.user_id !== user.id) {
       return new Response(
-        JSON.stringify({ error: 'Unauthorized: You do not own this subscription' }),
+        JSON.stringify({ error: 'Unauthorized' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -106,6 +122,7 @@ Deno.serve(async (req) => {
       endDate.setMonth(endDate.getMonth() + 1);
     }
 
+    // Activate the subscription
     const { error: updateError } = await supabase
       .from('subscriptions')
       .update({
@@ -113,51 +130,48 @@ Deno.serve(async (req) => {
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
       })
-      .eq('paypal_order_id', orderId);
+      .eq('id', subscription.id);
 
     if (updateError) {
       console.error('Error updating subscription:', updateError);
       throw updateError;
     }
 
-    // Get user profile for email
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('email, full_name')
-      .eq('id', user.id)
-      .single();
-
     // Send confirmation email
     try {
-      const amount = subscription.plan_type === 'annual' ? '129.99' : '12.99';
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('email, full_name')
+        .eq('id', user.id)
+        .single();
+
       await supabase.functions.invoke('send-confirmation-email', {
         body: {
           type: 'subscription',
           email: profile?.email || user.email,
           name: profile?.full_name,
           planType: subscription.plan_type,
-          amount: amount,
+          amount: subscription.amount?.toString() || (subscription.plan_type === 'annual' ? '129.99' : '12.99'),
         },
       });
     } catch (emailError) {
       console.error('Error sending confirmation email:', emailError);
     }
 
-    // Notify admins about new member signup
+    // Notify admins
     try {
       await supabase.functions.invoke('notify-admin-new-member', {
         body: {
           userId: user.id,
           planType: subscription.plan_type,
           amount: subscription.plan_type === 'annual' ? '$129.99' : '$12.99',
-          source: 'PayPal',
+          source: 'PayPal Subscription',
         },
       });
     } catch (notifyError) {
       console.error('Error notifying admins:', notifyError);
     }
 
-    // Return only safe subscription data - never expose payment IDs
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -179,3 +193,58 @@ Deno.serve(async (req) => {
     );
   }
 });
+
+// Handle legacy one-time orders for backward compatibility
+async function handleLegacyOrder(supabase: any, subscription: any, orderId: string, user: any, accessToken: string, apiUrl: string) {
+  if (subscription.user_id !== user.id) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  // Capture the payment
+  const captureResponse = await fetch(`${apiUrl}/v2/checkout/orders/${orderId}/capture`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
+
+  const captureData = await captureResponse.json();
+  if (!captureResponse.ok || captureData.status !== 'COMPLETED') {
+    throw new Error('Payment capture failed');
+  }
+
+  const startDate = new Date();
+  const endDate = new Date(startDate);
+  if (subscription.plan_type === 'annual') {
+    endDate.setFullYear(endDate.getFullYear() + 1);
+  } else {
+    endDate.setMonth(endDate.getMonth() + 1);
+  }
+
+  await supabase
+    .from('subscriptions')
+    .update({
+      status: 'active',
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+    })
+    .eq('id', subscription.id);
+
+  return new Response(
+    JSON.stringify({ 
+      success: true, 
+      subscription: {
+        id: subscription.id,
+        plan_type: subscription.plan_type,
+        status: 'active',
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+      }
+    }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}

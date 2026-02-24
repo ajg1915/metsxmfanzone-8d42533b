@@ -8,11 +8,108 @@ const corsHeaders = {
   'X-Frame-Options': 'DENY',
 };
 
-// Server-side plan pricing - never trust client
-const PLAN_PRICES: Record<string, number> = {
-  'premium': 12.99,
-  'annual': 129.99,
+// Server-side plan config - never trust client
+const PLAN_CONFIG: Record<string, { price: number; interval: string; intervalCount: number; name: string }> = {
+  'premium': { price: 12.99, interval: 'MONTH', intervalCount: 1, name: 'Premium Monthly' },
+  'annual': { price: 129.99, interval: 'YEAR', intervalCount: 1, name: 'Annual' },
 };
+
+async function getPayPalAccessToken(api: string, clientId: string, secret: string) {
+  const res = await fetch(`${api}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${btoa(`${clientId}:${secret}`)}`,
+    },
+    body: 'grant_type=client_credentials',
+  });
+  const data = await res.json();
+  return data.access_token;
+}
+
+async function findOrCreateProduct(api: string, token: string) {
+  // Try to find existing product
+  const listRes = await fetch(`${api}/v1/catalogs/products?page_size=20`, {
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+  });
+  const listData = await listRes.json();
+  
+  const existing = listData.products?.find((p: any) => p.name === 'MetsXMFanZone Subscription');
+  if (existing) return existing.id;
+
+  // Create product
+  const createRes = await fetch(`${api}/v1/catalogs/products`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'PayPal-Request-Id': `metsxm-product-${Date.now()}`,
+    },
+    body: JSON.stringify({
+      name: 'MetsXMFanZone Subscription',
+      description: 'MetsXMFanZone streaming and content subscription',
+      type: 'SERVICE',
+      category: 'ENTERTAINMENT_AND_MEDIA',
+    }),
+  });
+  const product = await createRes.json();
+  console.log('Created PayPal product:', product.id);
+  return product.id;
+}
+
+async function findOrCreatePlan(api: string, token: string, productId: string, planType: string) {
+  const config = PLAN_CONFIG[planType];
+  const planName = `MetsXMFanZone ${config.name}`;
+
+  // List existing plans for the product
+  const listRes = await fetch(`${api}/v1/billing/plans?product_id=${productId}&page_size=20`, {
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+  });
+  const listData = await listRes.json();
+  
+  const existing = listData.plans?.find((p: any) => p.name === planName && p.status === 'ACTIVE');
+  if (existing) return existing.id;
+
+  // Create billing plan
+  const createRes = await fetch(`${api}/v1/billing/plans`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'PayPal-Request-Id': `metsxm-plan-${planType}-${Date.now()}`,
+    },
+    body: JSON.stringify({
+      product_id: productId,
+      name: planName,
+      description: `MetsXMFanZone ${config.name} recurring subscription`,
+      status: 'ACTIVE',
+      billing_cycles: [
+        {
+          frequency: {
+            interval_unit: config.interval,
+            interval_count: config.intervalCount,
+          },
+          tenure_type: 'REGULAR',
+          sequence: 1,
+          total_cycles: 0, // infinite
+          pricing_scheme: {
+            fixed_price: {
+              value: config.price.toString(),
+              currency_code: 'USD',
+            },
+          },
+        },
+      ],
+      payment_preferences: {
+        auto_bill_outstanding: true,
+        payment_failure_threshold: 3,
+      },
+    }),
+  });
+  const plan = await createRes.json();
+  console.log('Created PayPal billing plan:', plan.id);
+  return plan.id;
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -44,97 +141,82 @@ Deno.serve(async (req: Request) => {
 
     const { planType } = await req.json();
 
-    if (!planType) {
-      return new Response(
-        JSON.stringify({ error: 'Plan type is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Validate plan type and get server-side price
-    const amount = PLAN_PRICES[planType];
-    if (!amount) {
+    if (!planType || !PLAN_CONFIG[planType]) {
       return new Response(
         JSON.stringify({ error: 'Invalid plan type' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID');
-    const PAYPAL_SECRET = Deno.env.get('PAYPAL_SECRET');
-    const PAYPAL_API = 'https://api-m.sandbox.paypal.com'; // Use sandbox for testing
+    const config = PLAN_CONFIG[planType];
+    const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID')!;
+    const PAYPAL_SECRET = Deno.env.get('PAYPAL_SECRET')!;
+    const PAYPAL_API = 'https://api-m.sandbox.paypal.com';
 
-    // Get PayPal access token
-    const authResponse = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
+    // Get access token
+    const accessToken = await getPayPalAccessToken(PAYPAL_API, PAYPAL_CLIENT_ID, PAYPAL_SECRET);
+    console.log('PayPal auth: [REDACTED]');
+
+    // Get or create product and billing plan
+    const productId = await findOrCreateProduct(PAYPAL_API, accessToken);
+    const billingPlanId = await findOrCreatePlan(PAYPAL_API, accessToken, productId, planType);
+
+    // Create a PayPal subscription
+    const subscriptionRes = await fetch(`${PAYPAL_API}/v1/billing/subscriptions`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`)}`,
-      },
-      body: 'grant_type=client_credentials',
-    });
-
-    const authData = await authResponse.json();
-    console.log('PayPal auth response: [REDACTED]');
-
-    // Create PayPal order
-    const orderResponse = await fetch(`${PAYPAL_API}/v2/checkout/orders`, {
-      method: 'POST',
-      headers: {
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authData.access_token}`,
+        'PayPal-Request-Id': `metsxm-sub-${user.id}-${planType}-${Date.now()}`,
       },
       body: JSON.stringify({
-        intent: 'CAPTURE',
-        purchase_units: [{
-          amount: {
-            currency_code: 'USD',
-            value: amount.toString(),
-          },
-          description: `MetsXMFanZone ${planType} subscription`,
-        }],
+        plan_id: billingPlanId,
         application_context: {
+          brand_name: 'MetsXMFanZone',
+          locale: 'en-US',
+          shipping_preference: 'NO_SHIPPING',
+          user_action: 'SUBSCRIBE_NOW',
           return_url: 'https://metsxmfanzone.com/payment-success',
           cancel_url: 'https://metsxmfanzone.com/plans',
         },
       }),
     });
 
-    const orderData = await orderResponse.json();
-    console.log('PayPal order response:', { status: orderData.status || '[UNKNOWN]', id: '[REDACTED]' });
+    const subscriptionData = await subscriptionRes.json();
+    console.log('PayPal subscription response:', { status: subscriptionData.status || '[UNKNOWN]', id: '[REDACTED]' });
 
-    if (!orderResponse.ok) {
-      throw new Error(`PayPal error: ${JSON.stringify(orderData)}`);
+    if (!subscriptionRes.ok) {
+      console.error('PayPal subscription error:', JSON.stringify(subscriptionData));
+      throw new Error('Failed to create PayPal subscription');
     }
 
-    // Create pending subscription record
+    // Create pending subscription record in our DB
     const { error: insertError } = await supabase
       .from('subscriptions')
       .insert({
-      user_id: user.id,
+        user_id: user.id,
         plan_type: planType,
         status: 'pending',
-        paypal_order_id: orderData.id,
-        amount: amount,
+        paypal_subscription_id: subscriptionData.id,
+        amount: config.price,
         currency: 'USD',
         payment_method: 'paypal',
       });
 
     if (insertError) {
-      console.error('Error creating subscription:', insertError);
+      console.error('Error creating subscription record:', insertError);
       throw insertError;
     }
 
-    // Only return the approval URL - orderId stays server-side in the subscription record
-    const approvalUrl = orderData.links.find((l: any) => l.rel === 'approve')?.href;
-    console.log('Payment order created successfully');
-    
+    const approvalUrl = subscriptionData.links?.find((l: any) => l.rel === 'approve')?.href;
+    console.log('Recurring subscription created successfully');
+
     return new Response(
       JSON.stringify({ approvalUrl }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error creating PayPal order:', error);
+    console.error('Error creating PayPal subscription:', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error occurred' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
