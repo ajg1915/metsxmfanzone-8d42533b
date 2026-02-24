@@ -43,25 +43,24 @@ const getGradeBadgeColor = (grade: string | null): string => {
   return "bg-secondary/5 text-blue-800 border-secondary/20"; // Poor
 };
 
-// Get week start (Sunday) for consistent weekly queries
-const getWeekStartDate = (date: Date = new Date()): string => {
+// Get month start (1st of current month) for consistent monthly queries
+const getMonthStartDate = (date: Date = new Date()): string => {
   const d = new Date(date);
-  const day = d.getDay(); // 0 = Sunday
-  d.setDate(d.getDate() - day);
+  d.setDate(1);
   return d.toISOString().split("T")[0];
 };
 
 const TalentAssessmentSection = () => {
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
-  const weekStart = getWeekStartDate();
+  const monthStart = getMonthStartDate();
 
   const { data: assessments, isLoading } = useQuery({
-    queryKey: ["talent-assessments", weekStart],
+    queryKey: ["talent-assessments", monthStart],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("daily_talent_assessments")
         .select("*")
-        .eq("assessment_date", weekStart)
+        .eq("assessment_date", monthStart)
         .order("created_at", { ascending: true });
 
       if (error) throw error;
@@ -96,7 +95,7 @@ const TalentAssessmentSection = () => {
               <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-orange-400 to-primary bg-clip-text text-transparent">
                 Mets Fan Outlook
               </h2>
-              <p className="text-muted-foreground text-sm">Anthony's weekly player grades & analysis</p>
+              <p className="text-muted-foreground text-sm">Anthony's monthly player grades & analysis</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
