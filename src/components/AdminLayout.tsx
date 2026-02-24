@@ -1,42 +1,20 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Outlet, useLocation } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Home, ArrowLeft } from "lucide-react";
+import { Home } from "lucide-react";
 import { AdminPinVerification } from "@/components/AdminPinVerification";
 import { generateDeviceFingerprint } from "@/utils/deviceFingerprint";
 
 function AdminHeader({ navigate }: { navigate: (path: string | number) => void }) {
-  const location = useLocation();
-  const isOnDashboard = location.pathname === "/admin" || location.pathname === "/admin/";
-
-  const handleGoBack = () => {
-    if (window.history.length > 2) {
-      navigate(-1 as unknown as string);
-    } else {
-      navigate("/admin");
-    }
-  };
-
   return (
     <header className="h-11 border-b border-muted/30 flex items-center justify-between px-2 sm:px-3 bg-card/80 backdrop-blur-xl sticky top-0 z-10">
       <div className="flex items-center gap-1.5 sm:gap-2">
         <SidebarTrigger className="h-7 w-7 flex-shrink-0 text-muted-foreground hover:text-foreground" />
-        {!isOnDashboard && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleGoBack}
-            className="h-7 text-xs px-2 gap-1 text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Back</span>
-          </Button>
-        )}
         <h1 className="text-xs sm:text-sm font-semibold truncate text-foreground">Admin</h1>
       </div>
       <Button
