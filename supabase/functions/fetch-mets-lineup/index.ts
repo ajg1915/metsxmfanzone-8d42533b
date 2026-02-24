@@ -208,58 +208,72 @@ Deno.serve(async (req) => {
 
     console.log("Lineup card saved successfully");
 
-    // Auto-generate daily predictions whenever a lineup card is posted
+    // Auto-generate daily predictions only once per day, after lineup is available
     try {
-      console.log("Triggering daily predictions generation with lineup data...");
-      
-      // Extract player IDs and names from lineup for predictions
-      const lineupPlayerIds: number[] = [];
-      const lineupPlayers: Array<{ name: string; id: number; position: string }> = [];
-      
-      lineupData.forEach((p: any) => {
-        const match = p.imageUrl?.match(/\/people\/(\d+)\//);
-        if (match) {
-          const playerId = parseInt(match[1]);
-          lineupPlayerIds.push(playerId);
-          lineupPlayers.push({ 
-            name: p.name, 
-            id: playerId, 
-            position: p.fieldPosition || "DH" 
+      if (lineupData.length === 0) {
+        console.log("Skipping predictions generation: lineup not posted yet");
+      } else {
+        const { count: predictionsCount, error: predictionsCountError } = await supabase
+          .from("daily_player_predictions")
+          .select("id", { count: "exact", head: true })
+          .eq("prediction_date", dateStr);
+
+        if (predictionsCountError) {
+          console.error("Could not check existing daily predictions:", predictionsCountError);
+        } else if ((predictionsCount ?? 0) > 0) {
+          console.log("Skipping predictions generation: already generated for today");
+        } else {
+          console.log("Triggering daily predictions generation with lineup data...");
+
+          // Extract player IDs and names from lineup for predictions
+          const lineupPlayerIds: number[] = [];
+          const lineupPlayers: Array<{ name: string; id: number; position: string }> = [];
+
+          lineupData.forEach((p: any) => {
+            const match = p.imageUrl?.match(/\/people\/(\d+)\//);
+            if (match) {
+              const playerId = parseInt(match[1]);
+              lineupPlayerIds.push(playerId);
+              lineupPlayers.push({
+                name: p.name,
+                id: playerId,
+                position: p.fieldPosition || "DH"
+              });
+            }
           });
+
+          // Include starting pitcher if available
+          if (probablePitcher?.id) {
+            lineupPlayerIds.push(probablePitcher.id);
+            lineupPlayers.push({
+              name: probablePitcher.name || "Starting Pitcher",
+              id: probablePitcher.id,
+              position: "SP"
+            });
+          }
+
+          console.log("Lineup player IDs for predictions:", lineupPlayerIds);
+
+          const predictionsUrl = `${supabaseUrl}/functions/v1/generate-daily-predictions`;
+          const predResponse = await fetch(predictionsUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${supabaseKey}`,
+            },
+            body: JSON.stringify({
+              triggeredBy: "lineup-card",
+              lineupPlayerIds,
+              lineupPlayers,
+              opponent: lineupCardData.opponent,
+              gameTime: gameTimeStr,
+              location: location
+            }),
+          });
+          const predResult = await predResponse.text();
+          console.log("Predictions generation result:", predResponse.status, predResult);
         }
-      });
-      
-      // Include starting pitcher if available
-      if (probablePitcher?.id) {
-        lineupPlayerIds.push(probablePitcher.id);
-        lineupPlayers.push({
-          name: probablePitcher.name || "Starting Pitcher",
-          id: probablePitcher.id,
-          position: "SP"
-        });
       }
-      
-      console.log("Lineup player IDs for predictions:", lineupPlayerIds);
-      
-      const predictionsUrl = `${supabaseUrl}/functions/v1/generate-daily-predictions`;
-      const predResponse = await fetch(predictionsUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${supabaseKey}`,
-        },
-        body: JSON.stringify({ 
-          triggeredBy: "lineup-card",
-          forceRegenerate: true,
-          lineupPlayerIds,
-          lineupPlayers,
-          opponent: lineupCardData.opponent,
-          gameTime: gameTimeStr,
-          location: location
-        }),
-      });
-      const predResult = await predResponse.text();
-      console.log("Predictions generation result:", predResponse.status, predResult);
     } catch (predError) {
       console.error("Failed to trigger predictions (non-blocking):", predError);
     }
