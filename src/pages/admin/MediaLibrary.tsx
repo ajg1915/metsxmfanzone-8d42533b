@@ -92,8 +92,11 @@ export default function MediaLibrary() {
 
         const { error: uploadError } = await supabase.storage
           .from("media_library")
-          .upload(storagePath, file);
-        if (uploadError) throw uploadError;
+          .upload(storagePath, file, { upsert: false });
+        if (uploadError) {
+          console.error("Storage upload error:", uploadError);
+          throw uploadError;
+        }
 
         const { data: urlData } = supabase.storage
           .from("media_library")
