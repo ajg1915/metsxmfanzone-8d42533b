@@ -7,11 +7,10 @@ const corsHeaders = {
 
 const METS_TEAM_ID = 121;
 
-// Get the start of the current week (Sunday)
-const getWeekStartDate = (date: Date = new Date()): string => {
+// Get the start of the current month (1st)
+const getMonthStartDate = (date: Date = new Date()): string => {
   const d = new Date(date);
-  const day = d.getDay(); // 0 = Sunday
-  d.setDate(d.getDate() - day);
+  d.setDate(1);
   return d.toISOString().split("T")[0];
 };
 
@@ -89,19 +88,19 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    // Use week start date instead of daily
-    const weekStart = getWeekStartDate();
+    // Use month start date instead of weekly
+    const monthStart = getMonthStartDate();
     
-    // Check if we already have assessments for this week
+    // Check if we already have assessments for this month
     const { data: existingAssessments } = await supabase
       .from("daily_talent_assessments")
       .select("id")
-      .eq("assessment_date", weekStart)
+      .eq("assessment_date", monthStart)
       .limit(1);
     
     if (existingAssessments && existingAssessments.length > 0 && !forceRegenerate) {
       return new Response(
-        JSON.stringify({ message: "Assessments already exist for this week", weekStart, skipped: true }),
+        JSON.stringify({ message: "Assessments already exist for this month", monthStart, skipped: true }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -111,7 +110,7 @@ Deno.serve(async (req) => {
       await supabase
         .from("daily_talent_assessments")
         .delete()
-        .eq("assessment_date", weekStart);
+        .eq("assessment_date", monthStart);
     }
     
     // Fetch roster and select 6 random players
@@ -125,7 +124,7 @@ Deno.serve(async (req) => {
       position: p.position?.abbreviation || "UTIL"
     }));
     
-    const prompt = `You are Anthony, a passionate New York Mets fan and baseball analyst for MetsXMFanZone. Generate weekly talent assessments for the 2026 Mets season for these 6 players:
+    const prompt = `You are Anthony, a passionate New York Mets fan and baseball analyst for MetsXMFanZone. Generate monthly talent assessments for the 2026 Mets season for these 6 players:
 
 ${playerList.map((p, i) => `${i + 1}. ${p.name} (${p.position})`).join("\n")}
 
@@ -133,7 +132,7 @@ For each player, provide:
 1. An overall letter grade (A+, A, A-, B+, B, B-, C+, C, C-, D, F)
 2. Tool grades for position players: hitting, fielding, power, speed
 3. Tool grades for pitchers: pitching, arm (velocity/stuff)
-4. A short, opinionated take (2-3 sentences) on their weekly outlook - be bold, passionate, and fan-focused
+4. A short, opinionated take (2-3 sentences) on their monthly outlook - be bold, passionate, and fan-focused
 
 Use the tool to return the structured data. Be realistic but hopeful as a Mets fan would be. Mix in some hot takes!`;
 
@@ -154,7 +153,7 @@ Use the tool to return the structured data. Be realistic but hopeful as a Mets f
             type: "function",
             function: {
               name: "submit_talent_assessments",
-              description: "Submit weekly talent assessments for 6 Mets players",
+              description: "Submit monthly talent assessments for 6 Mets players",
               parameters: {
                 type: "object",
                 properties: {
@@ -219,7 +218,7 @@ Use the tool to return the structured data. Be realistic but hopeful as a Mets f
         arm_grade: assessment.arm_grade || null,
         pitching_grade: assessment.pitching_grade || null,
         opinion: assessment.opinion,
-        assessment_date: weekStart, // Use week start date
+        assessment_date: monthStart, // Use month start date
       };
     });
 
@@ -244,8 +243,8 @@ Use the tool to return the structured data. Be realistic but hopeful as a Mets f
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Weekly talent assessments generated successfully",
-        weekStart,
+        message: "Monthly talent assessments generated successfully",
+        monthStart,
         count: assessmentsToInsert.length 
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
