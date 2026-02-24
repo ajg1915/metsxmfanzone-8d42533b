@@ -151,7 +151,7 @@ Deno.serve(async (req: Request) => {
     const config = PLAN_CONFIG[planType];
     const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID')!;
     const PAYPAL_SECRET = Deno.env.get('PAYPAL_SECRET')!;
-    const PAYPAL_API = 'https://api-m.sandbox.paypal.com';
+    const PAYPAL_API = Deno.env.get('PAYPAL_BASE_URL') || 'https://api-m.paypal.com';
 
     // Get access token
     const accessToken = await getPayPalAccessToken(PAYPAL_API, PAYPAL_CLIENT_ID, PAYPAL_SECRET);
