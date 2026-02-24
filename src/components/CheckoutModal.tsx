@@ -7,10 +7,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
-import { Tag, X, CreditCard, Shield, ArrowLeft } from "lucide-react";
+import { Tag, X, Shield, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import metsLogo from "@/assets/metsxmfanzone-logo.png";
 import { useToast } from "@/hooks/use-toast";
@@ -38,7 +36,6 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "helcim" | "square">("helcim");
   const [showPromoCode, setShowPromoCode] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
@@ -79,7 +76,6 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
 
         if (error) throw error;
 
-        // Notify admins about free plan signup
         try {
           await supabase.functions.invoke("notify-admin-new-member", {
             body: {
@@ -102,62 +98,26 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
         return;
       }
 
+      // PayPal checkout for paid plans
       toast({
         title: "Processing...",
-        description: "Creating your payment session",
+        description: "Redirecting to PayPal",
       });
 
-      if (paymentMethod === "paypal") {
-        const { data, error } = await supabase.functions.invoke("create-paypal-order", {
-          body: { planType: plan.id, promoCode: appliedPromo },
-        });
+      const { data, error } = await supabase.functions.invoke("create-paypal-order", {
+        body: { planType: plan.id, promoCode: appliedPromo },
+      });
 
-        if (error) throw error;
+      if (error) throw error;
 
-        if (data?.approvalUrl) {
-          window.location.href = data.approvalUrl;
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to create payment session. Please try again.",
-            variant: "destructive",
-          });
-        }
-      } else if (paymentMethod === "square") {
-        const { data, error } = await supabase.functions.invoke("create-square-checkout", {
-          body: { planType: plan.id },
-        });
-
-        if (error) throw error;
-
-        if (data?.checkoutUrl) {
-          window.location.href = data.checkoutUrl;
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to create Square checkout. Please try again.",
-            variant: "destructive",
-          });
-        }
+      if (data?.approvalUrl) {
+        window.location.href = data.approvalUrl;
       } else {
-        const { data, error } = await supabase.functions.invoke("create-helcim-checkout", {
-          body: { planType: plan.id, promoCode: appliedPromo },
+        toast({
+          title: "Error",
+          description: "Failed to create payment session. Please try again.",
+          variant: "destructive",
         });
-
-        if (error) throw error;
-
-        if (data?.checkoutToken && data?.secretToken) {
-          sessionStorage.setItem("helcim_checkout_token", data.checkoutToken);
-          sessionStorage.setItem("helcim_secret_token", data.secretToken);
-          onOpenChange(false);
-          navigate(`/helcim-checkout?token=${data.checkoutToken}`);
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to get payment tokens. Please try again.",
-            variant: "destructive",
-          });
-        }
       }
     } catch (error) {
       console.error("Error creating payment:", error);
@@ -303,52 +263,6 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
 
           <Separator />
 
-          {/* Payment Method - Only show for paid plans */}
-          {plan.priceValue > 0 && (
-            <div>
-              <Label className="text-sm font-medium text-foreground mb-3 block">
-                Payment Method
-              </Label>
-              <RadioGroup
-                value={paymentMethod}
-                onValueChange={(value) => setPaymentMethod(value as "paypal" | "helcim" | "square")}
-                className="space-y-2"
-              >
-                <label
-                  htmlFor="helcim"
-                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
-                >
-                  <RadioGroupItem value="helcim" id="helcim" />
-                  <div className="flex items-center gap-2 flex-1">
-                    <CreditCard className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Credit/Debit Card</span>
-                    <span className="text-xs text-primary ml-auto">Primary</span>
-                  </div>
-                </label>
-                <label
-                  htmlFor="square"
-                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
-                >
-                  <RadioGroupItem value="square" id="square" />
-                  <div className="flex items-center gap-2 flex-1">
-                    <CreditCard className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Square</span>
-                  </div>
-                </label>
-                <label
-                  htmlFor="paypal"
-                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 cursor-pointer transition-colors"
-                >
-                  <RadioGroupItem value="paypal" id="paypal" />
-                  <div className="flex items-center gap-2 flex-1">
-                    <span className="text-sm font-medium">PayPal</span>
-                    <span className="text-xs text-muted-foreground ml-auto">Backup</span>
-                  </div>
-                </label>
-              </RadioGroup>
-            </div>
-          )}
-
           {/* Subscribe Button */}
           <Button
             className="w-full h-12 text-base font-semibold"
@@ -356,13 +270,17 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
             onClick={handleSubscribe}
             disabled={isProcessing}
           >
-            {isProcessing ? "Processing..." : plan.priceValue === 0 ? "Activate Free Plan" : `Pay ${plan.price}`}
+            {isProcessing
+              ? "Processing..."
+              : plan.priceValue === 0
+              ? "Activate Free Plan"
+              : `Pay with PayPal — ${plan.price}`}
           </Button>
 
           {/* Security Badge */}
           <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
             <Shield className="w-4 h-4" />
-            <span>Secure checkout powered by Helcim, Square & PayPal</span>
+            <span>Secure checkout powered by PayPal</span>
           </div>
         </div>
       </DialogContent>
