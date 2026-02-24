@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -48,6 +48,7 @@ export default function MediaLibrary() {
   const [folder, setFolder] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { data: media, isLoading } = useQuery({
     queryKey: ["media-library", folder],
@@ -148,19 +149,30 @@ export default function MediaLibrary() {
             Upload, browse, and manage your media files
           </p>
         </div>
-        <label className="cursor-pointer">
-          <Button disabled={uploading} className="gap-2">
+        <>
+          <Button
+            type="button"
+            disabled={uploading}
+            className="gap-2"
+            onClick={() => {
+              if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+                fileInputRef.current.click();
+              }
+            }}
+          >
             <Upload className="h-4 w-4" />
             {uploading ? "Uploading..." : "Upload Files"}
           </Button>
           <input
+            ref={fileInputRef}
             type="file"
             multiple
             accept="image/*,video/*,audio/*,.pdf,.svg"
             className="hidden"
             onChange={handleUpload}
           />
-        </label>
+        </>
       </div>
 
       {/* Filters */}
