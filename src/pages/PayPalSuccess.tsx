@@ -15,9 +15,9 @@ const PayPalSuccess = () => {
 
   useEffect(() => {
     const verifyPayment = async () => {
-      const orderId = searchParams.get('token');
+      const subscriptionId = searchParams.get('subscription_id') || searchParams.get('token');
       
-      if (!orderId) {
+      if (!subscriptionId) {
         setStatus('error');
         toast({
           title: "Error",
@@ -30,7 +30,7 @@ const PayPalSuccess = () => {
 
       try {
         const { data, error } = await supabase.functions.invoke('verify-paypal-payment', {
-          body: { orderId },
+          body: { subscriptionId },
         });
 
         if (error) throw error;
