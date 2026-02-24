@@ -1,9 +1,9 @@
 import { 
-  Home, FileText, Shield, Video, Radio, Bell, Mic, CreditCard, TrendingUp, 
-  MessageSquare, ChevronDown, Film, Users, Calendar, Image, Mail, PlaySquare, 
-  Megaphone, QrCode, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, 
-  Activity, PenLine, Eye, HeartPulse, Globe, Settings, Layers, Sparkles, 
-  Tv, Newspaper, ClipboardList, Star, BarChart3, Share2, FolderOpen
+  Home, FileText, Video, Radio, Bell, Mic, TrendingUp, 
+  MessageSquare, ChevronDown, Users, Mail, 
+  Megaphone, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, 
+  Activity, PenLine, HeartPulse, Globe, Settings, Layers, Sparkles, 
+  ClipboardList, Star, BarChart3, Share2, FolderOpen
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -167,7 +167,7 @@ export function AdminSidebar() {
         {renderCollapsibleSection("Settings", Settings, settingsNavItems, liveOpen, setLiveOpen)}
 
         {/* Content & Media */}
-        {renderCollapsibleSection("Content", Film, mediaItems, mediaOpen, setMediaOpen)}
+        {renderCollapsibleSection("Content", FolderOpen, mediaItems, mediaOpen, setMediaOpen)}
 
         {/* Live & Streaming */}
         {renderCollapsibleSection("Live", Radio, liveItems, eventsOpen, setEventsOpen)}

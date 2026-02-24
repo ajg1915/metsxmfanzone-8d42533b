@@ -43,17 +43,17 @@ const VideoGalleryManagement = lazy(() => import("./pages/admin/VideoGalleryMana
 const PodcastManagement = lazy(() => import("./pages/admin/PodcastManagement"));
 const PodcastLiveStreamManagement = lazy(() => import("./pages/admin/PodcastLiveStreamManagement"));
 const PodcastScheduleManagement = lazy(() => import("./pages/admin/PodcastScheduleManagement"));
-const QRCodeGenerator = lazy(() => import("./pages/admin/QRCodeGenerator"));
+
 const LiveStreamManagement = lazy(() => import("./pages/admin/LiveStreamManagement"));
 const LiveNotificationManagement = lazy(() => import("./pages/admin/LiveNotificationManagement"));
 const SubscriptionManagement = lazy(() => import("./pages/admin/SubscriptionManagement"));
 const StoriesManagement = lazy(() => import("./pages/admin/StoriesManagement"));
 const TutorialManagement = lazy(() => import("./pages/admin/TutorialManagement"));
 const FeedbackManagement = lazy(() => import("./pages/admin/FeedbackManagement"));
-const TVScheduleManagement = lazy(() => import("./pages/admin/TVScheduleManagement"));
+
 const NewsletterGenerator = lazy(() => import("./pages/admin/NewsletterGenerator"));
 const EmailEditor = lazy(() => import("./pages/admin/EmailEditor"));
-const StreamReplayEditor = lazy(() => import("./pages/admin/StreamReplayEditor"));
+
 const BusinessAdsManagement = lazy(() => import("./pages/admin/BusinessAdsManagement"));
 const MetsXMFanZone = lazy(() => import("./pages/MetsXMFanZone"));
 const MLBNetwork = lazy(() => import("./pages/MLBNetwork"));
@@ -103,7 +103,7 @@ const RealtimeAnalytics = lazy(() => import("./pages/admin/RealtimeAnalytics"));
 const StreamHealthDashboard = lazy(() => import("./pages/admin/StreamHealthDashboard"));
 const SEOManagement = lazy(() => import("./pages/admin/SEOManagement"));
 const HeroManagement = lazy(() => import("./pages/admin/HeroManagement"));
-const NewsTrackerManagement = lazy(() => import("./pages/admin/NewsTrackerManagement"));
+
 const GameNotifications = lazy(() => import("./pages/admin/GameNotifications"));
 const GameAlertsManagement = lazy(() => import("./pages/admin/GameAlertsManagement"));
 const WriterRegister = lazy(() => import("./pages/WriterRegister"));
@@ -132,8 +132,6 @@ const WriterArticleEditor = lazy(() => import("./pages/writer/WriterArticleEdito
 const AdminPortal = lazy(() => import("./pages/AdminPortal"));
 const PodcasterApplication = lazy(() => import("./pages/PodcasterApplication"));
 const PodcasterApplicationsManagement = lazy(() => import("./pages/admin/PodcasterApplicationsManagement"));
-const VideoCreatorStudio = lazy(() => import("./pages/admin/VideoCreatorStudio"));
-const AIImageGenerator = lazy(() => import("./pages/admin/AIImageGenerator"));
 const DailyReports = lazy(() => import("./pages/admin/DailyReports"));
 const PredictionsManagement = lazy(() => import("./pages/admin/PredictionsManagement"));
 const TalentAssessmentManagement = lazy(() => import("./pages/admin/TalentAssessmentManagement"));
@@ -350,15 +348,12 @@ const AppContent = () => {
               <Route path="blog" element={<BlogManagement />} />
               <Route path="video-gallery-management" element={<VideoGalleryManagement />} />
               <Route path="podcasts" element={<PodcastManagement />} />
-              <Route path="qr-generator" element={<QRCodeGenerator />} />
               <Route path="live-streams" element={<LiveStreamManagement />} />
               <Route path="podcast-live-stream" element={<PodcastLiveStreamManagement />} />
               <Route path="podcast-schedule" element={<PodcastScheduleManagement />} />
-              <Route path="stream-replays" element={<StreamReplayEditor />} />
               <Route path="live-notifications" element={<LiveNotificationManagement />} />
               <Route path="stories" element={<StoriesManagement />} />
               <Route path="tutorial" element={<TutorialManagement />} />
-              <Route path="tv-schedule" element={<TVScheduleManagement />} />
               <Route path="newsletter" element={<NewsletterGenerator />} />
               <Route path="email-editor" element={<EmailEditor />} />
               <Route path="feedbacks" element={<FeedbackManagement />} />
@@ -375,12 +370,10 @@ const AppContent = () => {
               <Route path="realtime-analytics" element={<RealtimeAnalytics />} />
               <Route path="stream-health" element={<StreamHealthDashboard />} />
               <Route path="seo" element={<SEOManagement />} />
-              <Route path="news-tracker" element={<NewsTrackerManagement />} />
               <Route path="game-notifications" element={<GameNotifications />} />
               <Route path="game-alerts" element={<GameAlertsManagement />} />
               <Route path="podcaster-applications" element={<PodcasterApplicationsManagement />} />
-              <Route path="video-creator" element={<VideoCreatorStudio />} />
-              <Route path="ai-images" element={<AIImageGenerator />} />
+              <Route path="daily-reports" element={<DailyReports />} />
               <Route path="daily-reports" element={<DailyReports />} />
               <Route path="predictions" element={<PredictionsManagement />} />
               <Route path="talent-assessments" element={<TalentAssessmentManagement />} />
