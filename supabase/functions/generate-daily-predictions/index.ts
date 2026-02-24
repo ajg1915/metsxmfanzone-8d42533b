@@ -137,25 +137,36 @@ serve(async (req) => {
       console.log(`Selected ${Math.min(shuffledLineup.length, slotsAvailable)} players from today's lineup card`);
     }
     
-    // Priority 3: Fill remaining slots with roster mix
+    // Priority 3: Fill remaining slots — but ONLY from lineup players if triggered by lineup-card
     const remainingSlots = 6 - selectedPlayers.length;
     if (remainingSlots > 0) {
-      const available = metsPlayers.filter(p => !selectedPlayers.some(sp => sp.id === p.id));
-      const hitters = available.filter(p => !["SP","CL","RP"].includes(p.position));
-      const pitchers = available.filter(p => ["SP","CL","RP"].includes(p.position));
-      const shuffledHitters = [...hitters].sort(() => 0.5 - Math.random());
-      const shuffledPitchers = [...pitchers].sort(() => 0.5 - Math.random());
-      const hittersNeeded = Math.min(Math.max(remainingSlots - 2, 3), remainingSlots, shuffledHitters.length);
-      const pitchersNeeded = Math.min(remainingSlots - hittersNeeded, shuffledPitchers.length);
-      selectedPlayers = [
-        ...selectedPlayers,
-        ...shuffledHitters.slice(0, hittersNeeded),
-        ...shuffledPitchers.slice(0, pitchersNeeded),
-      ];
-      const stillNeeded = 6 - selectedPlayers.length;
-      if (stillNeeded > 0) {
-        const remaining = available.filter(p => !selectedPlayers.some(sp => sp.id === p.id));
-        selectedPlayers = [...selectedPlayers, ...remaining.sort(() => 0.5 - Math.random()).slice(0, stillNeeded)];
+      if (lineupPlayerIds.length > 0) {
+        // Only use players from today's actual lineup — never random roster players
+        const lineupOnly = metsPlayers.filter(
+          p => lineupPlayerIds.includes(p.id) && !selectedPlayers.some(sp => sp.id === p.id)
+        );
+        const shuffled = [...lineupOnly].sort(() => 0.5 - Math.random());
+        selectedPlayers = [...selectedPlayers, ...shuffled.slice(0, remainingSlots)];
+        console.log(`Filled ${Math.min(shuffled.length, remainingSlots)} remaining slots from lineup players only`);
+      } else {
+        // Manual/scheduled trigger — fill with roster mix
+        const available = metsPlayers.filter(p => !selectedPlayers.some(sp => sp.id === p.id));
+        const hitters = available.filter(p => !["SP","CL","RP"].includes(p.position));
+        const pitchers = available.filter(p => ["SP","CL","RP"].includes(p.position));
+        const shuffledHitters = [...hitters].sort(() => 0.5 - Math.random());
+        const shuffledPitchers = [...pitchers].sort(() => 0.5 - Math.random());
+        const hittersNeeded = Math.min(Math.max(remainingSlots - 2, 3), remainingSlots, shuffledHitters.length);
+        const pitchersNeeded = Math.min(remainingSlots - hittersNeeded, shuffledPitchers.length);
+        selectedPlayers = [
+          ...selectedPlayers,
+          ...shuffledHitters.slice(0, hittersNeeded),
+          ...shuffledPitchers.slice(0, pitchersNeeded),
+        ];
+        const stillNeeded = 6 - selectedPlayers.length;
+        if (stillNeeded > 0) {
+          const remaining = available.filter(p => !selectedPlayers.some(sp => sp.id === p.id));
+          selectedPlayers = [...selectedPlayers, ...remaining.sort(() => 0.5 - Math.random()).slice(0, stillNeeded)];
+        }
       }
     }
 
