@@ -25,7 +25,6 @@ const homeItems = [
   { title: "Dashboard", url: "/admin", icon: Home },
   { title: "Blog", url: "/admin/blog", icon: FileText },
   { title: "Hero Slides", url: "/admin/hero", icon: Layers },
-  { title: "AI Hero Slides", url: "/admin/ai-hero-slides", icon: Sparkles },
   { title: "Backgrounds", url: "/admin/backgrounds", icon: Wallpaper },
   { title: "Tutorials", url: "/admin/tutorials", icon: BookOpen },
   { title: "Predictions", url: "/admin/predictions", icon: Sparkles },
