@@ -54,20 +54,31 @@ export default function AdminPortal() {
       });
 
       if (error) {
-        const message = String((error as any)?.message || "");
-        const jsonStart = message.indexOf("{");
-        const jsonEnd = message.lastIndexOf("}");
-        if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-          try {
-            const payload = JSON.parse(message.slice(jsonStart, jsonEnd + 1));
-            if (payload?.locked) {
-              setIsLocked(true);
-              setLockoutMinutes(payload.remainingMinutes ?? 30);
-              await trackSuspiciousActivity('unknown', 'admin_lockout', `Device locked after multiple failed PIN attempts`);
-              toast({ title: "Account Locked", description: payload.message || "Too many failed attempts.", variant: "destructive" });
-              return;
-            }
-          } catch { /* ignore */ }
+        // Read the actual response body from the FunctionsHttpError
+        let errorBody: any = null;
+        try {
+          if ((error as any).context instanceof Response) {
+            errorBody = await (error as any).context.json();
+          }
+        } catch { /* ignore parse errors */ }
+
+        if (errorBody) {
+          if (errorBody.locked) {
+            setIsLocked(true);
+            setLockoutMinutes(errorBody.remainingMinutes ?? 30);
+            await trackSuspiciousActivity('unknown', 'admin_lockout', `Device locked after multiple failed PIN attempts`);
+            toast({ title: "Account Locked", description: errorBody.message || "Too many failed attempts.", variant: "destructive" });
+            setPin("");
+            return;
+          }
+          if (errorBody.error === 'Invalid PIN' || errorBody.attemptsRemaining !== undefined) {
+            const remaining = errorBody.attemptsRemaining ?? attemptsRemaining - 1;
+            setAttemptsRemaining(remaining);
+            await trackFailedLogin('admin-portal', deviceFingerprint.substring(0, 16));
+            toast({ title: "Invalid PIN", description: `${remaining} attempts remaining`, variant: "destructive" });
+            setPin("");
+            return;
+          }
         }
         throw error;
       }
