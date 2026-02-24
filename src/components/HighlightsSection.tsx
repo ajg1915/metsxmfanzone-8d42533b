@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { Play, Film, ChevronRight, ChevronLeft, RefreshCw } from "lucide-react";
+import { Play, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import metsLogo from "@/assets/metsxmfanzone-logo.png";
 
 
 interface Video {
@@ -122,35 +122,23 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
             className="flex items-center justify-between mb-4"
           >
             <div className="flex items-center gap-2">
-              <Film className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              <img src={metsLogo} alt="MetsXM FanZone" className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
               <div>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+                <h2 className="text-sm sm:text-base md:text-lg font-bold text-foreground">
                   Mets Video Highlights
                 </h2>
-                <p className="text-[10px] sm:text-xs text-muted-foreground">
-                  Powered by MLB Stats API
+                <p className="text-[9px] sm:text-[10px] text-muted-foreground">
+                  Uploaded by Orange &amp; Blue Media
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={fetchMLBHighlights}
-                disabled={refreshing}
-                className="gap-1 text-xs"
-              >
-                <RefreshCw className={cn("w-3 h-3", refreshing && "animate-spin")} />
-                {refreshing ? "Fetching..." : "Refresh"}
-              </Button>
-              <a
-                href="/video-gallery"
-                className="flex items-center gap-1 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-              >
-                View All
-                <ChevronRight className="w-4 h-4" />
-              </a>
-            </div>
+            <a
+              href="/video-gallery"
+              className="flex items-center gap-1 text-[10px] sm:text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              View All
+              <ChevronRight className="w-3 h-3" />
+            </a>
           </motion.div>
         </div>
 
@@ -216,7 +204,7 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
                       </>
                     ) : (
                       <div className="w-full h-full bg-muted flex items-center justify-center">
-                        <Film className="w-8 h-8 text-muted-foreground" />
+                        <img src={metsLogo} alt="MetsXM" className="w-8 h-8 object-contain opacity-50" />
                       </div>
                     )}
                     
