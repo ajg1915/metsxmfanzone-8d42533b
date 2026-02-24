@@ -665,12 +665,15 @@ export type Database = {
       }
       hero_slides: {
         Row: {
+          ai_source_id: string | null
+          ai_source_type: string | null
           blog_post_id: string | null
           created_at: string
           description: string
           display_order: number | null
           id: string
           image_url: string | null
+          is_ai_generated: boolean | null
           is_for_members: boolean | null
           link_text: string | null
           link_url: string | null
@@ -680,12 +683,15 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_source_id?: string | null
+          ai_source_type?: string | null
           blog_post_id?: string | null
           created_at?: string
           description: string
           display_order?: number | null
           id?: string
           image_url?: string | null
+          is_ai_generated?: boolean | null
           is_for_members?: boolean | null
           link_text?: string | null
           link_url?: string | null
@@ -695,12 +701,15 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_source_id?: string | null
+          ai_source_type?: string | null
           blog_post_id?: string | null
           created_at?: string
           description?: string
           display_order?: number | null
           id?: string
           image_url?: string | null
+          is_ai_generated?: boolean | null
           is_for_members?: boolean | null
           link_text?: string | null
           link_url?: string | null

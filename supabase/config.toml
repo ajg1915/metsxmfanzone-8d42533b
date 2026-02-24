@@ -155,3 +155,6 @@ verify_jwt = false
 
 [functions.fetch-live-game]
 verify_jwt = false
+
+[functions.generate-ai-hero-slides]
+verify_jwt = true
