@@ -49,7 +49,7 @@ const PodcastScheduleSection = () => {
       generateFallbackShows();
     } else if (data && data.length > 0) {
       setShows(data);
-      setIsLiveNow(data.some(show => show.is_live));
+      setIsLiveNow(data.some((show) => show.is_live));
     } else {
       // No shows in database, try to generate weekly shows automatically
       try {
@@ -152,7 +152,7 @@ const PodcastScheduleSection = () => {
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-64 mx-auto" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-muted rounded-xl" />)}
+              {[1, 2, 3, 4].map((i) => <div key={i} className="h-48 bg-muted rounded-xl" />)}
             </div>
           </div>
         </div>
@@ -174,7 +174,7 @@ const PodcastScheduleSection = () => {
                 LIVE NOW
               </Badge>}
           </div>
-          <p className="text-muted-foreground max-w-xl sm:max-w-2xl mx-auto text-sm sm:text-base md:text-lg leading-relaxed px-2 text-center font-thin">
+          <p className="text-muted-foreground max-w-xl sm:max-w-2xl mx-auto text-sm sm:text-base leading-relaxed px-2 text-center font-thin md:text-xs">
             Catch us live on Mon, Tue & Fri @ 5:30 PM • Weekends @ 2:00 PM • Game day pregame shows!
           </p>
         </div>
@@ -207,7 +207,7 @@ const PodcastScheduleSection = () => {
 
         {/* Upcoming Shows Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {shows.map(show => <GlassCard key={show.id} variant="interactive" glow="blue" className="h-full overflow-hidden">
+          {shows.map((show) => <GlassCard key={show.id} variant="interactive" glow="blue" className="h-full overflow-hidden">
               {/* Thumbnail - AI Image or Gradient Fallback */}
               <div className="relative h-28 sm:h-32 md:h-36 overflow-hidden">
                 {show.thumbnail_url ? <img src={show.thumbnail_url} alt={show.title} className="w-full h-full object-cover" /> : <div className={`w-full h-full bg-gradient-to-br ${show.thumbnail_gradient || 'from-primary to-orange-500'}`} />}
