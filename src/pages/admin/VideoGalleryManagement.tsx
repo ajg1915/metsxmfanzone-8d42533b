@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import VideoFramePicker from "@/components/admin/VideoFramePicker";
 
 interface Video {
   id: string;
@@ -42,6 +43,7 @@ export default function VideoGalleryManagement() {
   const [uploading, setUploading] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [selectedFrameBlob, setSelectedFrameBlob] = useState<Blob | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
   const [generatingGif, setGeneratingGif] = useState(false);
@@ -206,30 +208,12 @@ export default function VideoGalleryManagement() {
         };
         videoElement.src = URL.createObjectURL(videoFile);
 
-        if (thumbnailFile) {
-          const thumbExt = thumbnailFile.name.split('.').pop();
-          const thumbName = `thumb_${Math.random()}.${thumbExt}`;
-          const { error: thumbError } = await supabase.storage
-            .from('videos')
-            .upload(thumbName, thumbnailFile);
-
-          if (thumbError) throw thumbError;
-
-          const { data: { publicUrl: thumbUrl } } = supabase.storage
-            .from('videos')
-            .getPublicUrl(thumbName);
-
-          thumbnailUrl = thumbUrl;
-        } else {
-          setGeneratingThumbnail(true);
-          try {
-            const thumbDataUrl = await generateThumbnailFromVideo(videoFile);
-            const thumbBlob = await fetch(thumbDataUrl).then(r => r.blob());
-            const thumbName = `thumb_${Math.random()}.jpg`;
-            
+          if (thumbnailFile) {
+            const thumbExt = thumbnailFile.name.split('.').pop();
+            const thumbName = `thumb_${Math.random()}.${thumbExt}`;
             const { error: thumbError } = await supabase.storage
               .from('videos')
-              .upload(thumbName, thumbBlob);
+              .upload(thumbName, thumbnailFile);
 
             if (thumbError) throw thumbError;
 
@@ -238,13 +222,45 @@ export default function VideoGalleryManagement() {
               .getPublicUrl(thumbName);
 
             thumbnailUrl = thumbUrl;
-          } catch (error) {
-            console.error('Error generating thumbnail:', error);
-          } finally {
-            setGeneratingThumbnail(false);
+          } else if (selectedFrameBlob) {
+            // Use the frame picked by the admin
+            const thumbName = `thumb_${Math.random()}.jpg`;
+            const { error: thumbError } = await supabase.storage
+              .from('videos')
+              .upload(thumbName, selectedFrameBlob);
+
+            if (thumbError) throw thumbError;
+
+            const { data: { publicUrl: thumbUrl } } = supabase.storage
+              .from('videos')
+              .getPublicUrl(thumbName);
+
+            thumbnailUrl = thumbUrl;
+          } else {
+            setGeneratingThumbnail(true);
+            try {
+              const thumbDataUrl = await generateThumbnailFromVideo(videoFile);
+              const thumbBlob = await fetch(thumbDataUrl).then(r => r.blob());
+              const thumbName = `thumb_${Math.random()}.jpg`;
+              
+              const { error: thumbError } = await supabase.storage
+                .from('videos')
+                .upload(thumbName, thumbBlob);
+
+              if (thumbError) throw thumbError;
+
+              const { data: { publicUrl: thumbUrl } } = supabase.storage
+                .from('videos')
+                .getPublicUrl(thumbName);
+
+              thumbnailUrl = thumbUrl;
+            } catch (error) {
+              console.error('Error generating thumbnail:', error);
+            } finally {
+              setGeneratingThumbnail(false);
+            }
           }
         }
-      }
 
       // Auto-generate GIF preview for highlight videos
       const isHighlight = formData.video_type === 'highlight';
@@ -372,6 +388,7 @@ export default function VideoGalleryManagement() {
     setEditingVideo(null);
     setVideoFile(null);
     setThumbnailFile(null);
+    setSelectedFrameBlob(null);
     setUploadMethod('file');
   };
 
@@ -451,21 +468,38 @@ export default function VideoGalleryManagement() {
                       id="video-file"
                       type="file"
                       accept="video/*"
-                      onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        setVideoFile(file);
+                        setSelectedFrameBlob(null);
+                      }}
                       required={!editingVideo}
                     />
                   </div>
 
+                  {videoFile && (
+                    <VideoFramePicker
+                      videoFile={videoFile}
+                      onFrameSelect={(blob) => {
+                        setSelectedFrameBlob(blob);
+                        setThumbnailFile(null);
+                      }}
+                    />
+                  )}
+
                   <div className="space-y-2">
-                    <Label htmlFor="thumbnail-file">Thumbnail (Optional)</Label>
+                    <Label htmlFor="thumbnail-file">Or upload custom thumbnail</Label>
                     <Input
                       id="thumbnail-file"
                       type="file"
                       accept="image/*"
-                      onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
+                      onChange={(e) => {
+                        setThumbnailFile(e.target.files?.[0] || null);
+                        if (e.target.files?.[0]) setSelectedFrameBlob(null);
+                      }}
                     />
                     <p className="text-xs text-muted-foreground">
-                      If not provided, a thumbnail will be auto-generated from the video
+                      Pick a frame above, upload a custom image, or one will be auto-generated
                     </p>
                   </div>
                 </>
