@@ -37,16 +37,28 @@ const PlayersToWatch = () => {
   const { data: predictions, isLoading, refetch } = useQuery({
     queryKey: ["daily-player-predictions"],
     queryFn: async () => {
+      // First try today's predictions
       const today = new Date().toISOString().split('T')[0];
-      const { data, error } = await supabase
+      const { data: todayData, error: todayError } = await supabase
         .from("daily_player_predictions")
         .select("*")
         .eq("prediction_date", today)
         .order("created_at", { ascending: true })
         .limit(6);
-      if (error) throw error;
-      return data as PlayerPrediction[];
+      if (todayError) throw todayError;
+      if (todayData && todayData.length > 0) return todayData as PlayerPrediction[];
+
+      // Fallback: show the most recent predictions (from any date)
+      const { data: recentData, error: recentError } = await supabase
+        .from("daily_player_predictions")
+        .select("*")
+        .order("prediction_date", { ascending: false })
+        .order("created_at", { ascending: true })
+        .limit(6);
+      if (recentError) throw recentError;
+      return (recentData ?? []) as PlayerPrediction[];
     },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes to avoid refetching on every navigation
   });
 
   const generatePredictions = async () => {
