@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, Trash2, Save, GripVertical, ChevronDown, ChevronUp, Eye, EyeOff, Sparkles, Image as ImageIcon, Upload, Loader2 } from "lucide-react";
+import { Plus, Trash2, Save, GripVertical, ChevronDown, ChevronUp, Eye, EyeOff, Sparkles, Image as ImageIcon, Upload, Loader2, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   DndContext,
@@ -216,6 +217,173 @@ const SortableSlideRow = ({
   );
 };
 
+interface AISlide {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string | null;
+  link_url: string | null;
+  link_text: string | null;
+  published: boolean;
+  is_for_members: boolean;
+  is_ai_generated: boolean;
+  show_watch_live: boolean;
+  display_order: number;
+  created_at: string;
+}
+
+const AIHeroSlidesTab = () => {
+  const [aiSlides, setAiSlides] = useState<AISlide[]>([]);
+  const [aiLoading, setAiLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [slideCount, setSlideCount] = useState(3);
+
+  const fetchAiSlides = async () => {
+    const { data } = await supabase
+      .from("hero_slides")
+      .select("*")
+      .eq("is_ai_generated", true)
+      .order("created_at", { ascending: false });
+    setAiSlides((data as any) || []);
+    setAiLoading(false);
+  };
+
+  useEffect(() => { fetchAiSlides(); }, []);
+
+  const generateSlides = async () => {
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-ai-hero-slides", {
+        body: { count: slideCount },
+      });
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error);
+      } else {
+        toast.success(`${data.slides_generated} AI hero slides created and published.`);
+        fetchAiSlides();
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to generate slides");
+    }
+    setGenerating(false);
+  };
+
+  const togglePublish = async (id: string, current: boolean) => {
+    await supabase.from("hero_slides").update({ published: !current }).eq("id", id);
+    setAiSlides(prev => prev.map(s => s.id === id ? { ...s, published: !current } : s));
+  };
+
+  const deleteAiSlide = async (id: string) => {
+    await supabase.from("hero_slides").delete().eq("id", id);
+    setAiSlides(prev => prev.filter(s => s.id !== id));
+    toast.success("AI slide removed");
+  };
+
+  const deleteAllAI = async () => {
+    if (!confirm("Delete all AI-generated slides?")) return;
+    await supabase.from("hero_slides").delete().eq("is_ai_generated", true);
+    setAiSlides([]);
+    toast.success("All AI slides removed");
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <p className="text-xs text-muted-foreground">Auto-generate branded Mets hero slides from your content</p>
+        <div className="flex items-center gap-1.5">
+          <select
+            value={slideCount}
+            onChange={e => setSlideCount(Number(e.target.value))}
+            className="h-7 rounded border border-border bg-muted/30 text-xs px-2"
+          >
+            {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} slide{n > 1 ? "s" : ""}</option>)}
+          </select>
+          <Button onClick={generateSlides} disabled={generating} size="sm" className="h-7 text-[10px] gap-1">
+            {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            {generating ? "Generating..." : "Generate"}
+          </Button>
+        </div>
+      </div>
+
+      {generating && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="p-3 flex items-center gap-3">
+            <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            <div>
+              <p className="font-medium text-xs">Generating AI Hero Slides...</p>
+              <p className="text-[10px] text-muted-foreground">Analyzing content & generating images. This may take 30-60 seconds.</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {aiSlides.length > 0 && (
+        <div className="flex justify-between items-center">
+          <p className="text-[10px] text-muted-foreground">{aiSlides.length} AI slide{aiSlides.length !== 1 ? "s" : ""}</p>
+          <div className="flex gap-1.5">
+            <Button variant="ghost" size="sm" onClick={fetchAiSlides} className="h-6 text-[10px] gap-1">
+              <RefreshCw className="w-3 h-3" /> Refresh
+            </Button>
+            <Button variant="destructive" size="sm" onClick={deleteAllAI} className="h-6 text-[10px] gap-1">
+              <Trash2 className="w-3 h-3" /> Clear All
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {aiLoading ? (
+        <p className="text-muted-foreground text-center py-6 text-xs">Loading...</p>
+      ) : aiSlides.length === 0 ? (
+        <Card>
+          <CardContent className="p-6 text-center">
+            <Sparkles className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+            <p className="text-xs font-medium">No AI slides yet</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Click "Generate" to create branded hero slides from your Mets content</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-2 sm:grid-cols-2">
+          {aiSlides.map(slide => (
+            <Card key={slide.id} className="overflow-hidden">
+              {slide.image_url && (
+                <div className="aspect-video bg-muted relative overflow-hidden">
+                  <img src={slide.image_url} alt={slide.title} className="w-full h-full object-cover" />
+                  <div className="absolute top-1 right-1 flex gap-1">
+                    <Badge variant={slide.published ? "default" : "secondary"} className="text-[9px]">
+                      {slide.published ? "Live" : "Draft"}
+                    </Badge>
+                    <Badge variant="outline" className="text-[9px] bg-background/80">
+                      {slide.is_for_members ? "Members" : "Public"}
+                    </Badge>
+                  </div>
+                </div>
+              )}
+              <CardHeader className="p-2">
+                <CardTitle className="text-xs line-clamp-1">{slide.title}</CardTitle>
+                <CardDescription className="text-[10px] line-clamp-2">{slide.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="p-2 pt-0 flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  {slide.link_text && <Badge variant="outline" className="text-[9px]">{slide.link_text}</Badge>}
+                </div>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => togglePublish(slide.id, slide.published)} className="h-6 w-6 p-0">
+                    {slide.published ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => deleteAiSlide(slide.id)} className="h-6 w-6 p-0 text-destructive">
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const HeroManagement = () => {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
@@ -252,69 +420,29 @@ const HeroManagement = () => {
   const fetchSuggestions = async () => {
     const suggested: SuggestedSlide[] = [];
 
-    // Recent blog posts
     const { data: blogs } = await supabase.from("blog_posts").select("title, slug, featured_image_url, excerpt").eq("published", true).order("published_at", { ascending: false }).limit(3);
     blogs?.forEach(b => {
-      suggested.push({
-        title: b.title,
-        description: b.excerpt || "Read the latest from MetsXMFanZone",
-        image_url: b.featured_image_url,
-        link_url: `/blog/${b.slug}`,
-        link_text: "Read Article",
-        source: "Blog",
-      });
+      suggested.push({ title: b.title, description: b.excerpt || "Read the latest from MetsXMFanZone", image_url: b.featured_image_url, link_url: `/blog/${b.slug}`, link_text: "Read Article", source: "Blog" });
     });
 
-    // Live streams
     const { data: streams } = await supabase.from("live_streams").select("title, description, thumbnail_url").eq("status", "live").eq("published", true).limit(2);
     streams?.forEach(s => {
-      suggested.push({
-        title: s.title,
-        description: s.description || "Watch live on MetsXMFanZone TV",
-        image_url: s.thumbnail_url,
-        link_url: "/metsxmfanzone-tv",
-        link_text: "Watch Live",
-        source: "Live Stream",
-      });
+      suggested.push({ title: s.title, description: s.description || "Watch live on MetsXMFanZone TV", image_url: s.thumbnail_url, link_url: "/metsxmfanzone-tv", link_text: "Watch Live", source: "Live Stream" });
     });
 
-    // Podcast shows
     const { data: podcasts } = await supabase.from("podcast_shows").select("title, description, thumbnail_url, show_date").eq("published", true).order("show_date", { ascending: false }).limit(2);
     podcasts?.forEach(p => {
-      suggested.push({
-        title: p.title,
-        description: p.description || "Listen to the latest MetsXMFanZone podcast",
-        image_url: p.thumbnail_url,
-        link_url: "/podcast",
-        link_text: "Listen Now",
-        source: "Podcast",
-      });
+      suggested.push({ title: p.title, description: p.description || "Listen to the latest MetsXMFanZone podcast", image_url: p.thumbnail_url, link_url: "/podcast", link_text: "Listen Now", source: "Podcast" });
     });
 
-    // Spring training games
     const { data: games } = await supabase.from("spring_training_games").select("opponent, game_date, preview_image_url, location").eq("published", true).order("game_date", { ascending: true }).limit(2);
     games?.forEach(g => {
-      suggested.push({
-        title: `Mets vs ${g.opponent}`,
-        description: `Spring Training ${g.location ? `at ${g.location}` : ""} - ${new Date(g.game_date).toLocaleDateString()}`,
-        image_url: g.preview_image_url,
-        link_url: "/spring-training-live",
-        link_text: "View Game",
-        source: "Spring Training",
-      });
+      suggested.push({ title: `Mets vs ${g.opponent}`, description: `Spring Training ${g.location ? `at ${g.location}` : ""} - ${new Date(g.game_date).toLocaleDateString()}`, image_url: g.preview_image_url, link_url: "/spring-training-live", link_text: "View Game", source: "Spring Training" });
     });
 
-    // Events
     const { data: events } = await supabase.from("events").select("title, description, image_url, event_date").eq("published", true).order("event_date", { ascending: true }).limit(2);
     events?.forEach(e => {
-      suggested.push({
-        title: e.title,
-        description: e.description || `Event on ${new Date(e.event_date).toLocaleDateString()}`,
-        image_url: e.image_url,
-        link_url: "/events",
-        link_text: "View Event",
-        source: "Event",
-      });
+      suggested.push({ title: e.title, description: e.description || `Event on ${new Date(e.event_date).toLocaleDateString()}`, image_url: e.image_url, link_url: "/events", link_text: "View Event", source: "Event" });
     });
 
     setSuggestions(suggested);
@@ -406,84 +534,100 @@ const HeroManagement = () => {
 
   return (
     <div className="space-y-3 max-w-full">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-bold">Hero Slides</h2>
-        <div className="flex gap-1.5">
-          <Button size="sm" variant="outline" onClick={fetchSuggestions} className="h-7 text-[10px] gap-1">
-            <Sparkles className="w-3 h-3" /> Suggestions
-          </Button>
-          <Button size="sm" onClick={() => addSlide()} className="h-7 text-[10px] gap-1">
-            <Plus className="w-3 h-3" /> Add
-          </Button>
-        </div>
-      </div>
+      <h2 className="text-sm font-bold">Hero Slides</h2>
 
-      {/* Suggestion slides panel */}
-      {showSuggestions && suggestions.length > 0 && (
-        <Card className="border-primary/30 bg-primary/5">
-          <CardContent className="p-2 space-y-1.5">
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] font-semibold text-primary">Suggested slides from your site data</p>
-              <Button size="sm" variant="ghost" onClick={() => setShowSuggestions(false)} className="h-5 text-[9px] px-1.5">Close</Button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-              {suggestions.map((s, i) => (
-                <div key={i} className="flex items-center gap-1.5 p-1.5 rounded bg-background border border-border/50 hover:border-primary/40 transition-colors">
-                  {s.image_url ? (
-                    <img src={s.image_url} alt="" className="w-8 h-5 rounded object-cover flex-shrink-0" />
-                  ) : (
-                    <div className="w-8 h-5 rounded bg-muted flex-shrink-0" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-medium truncate">{s.title}</p>
-                    <p className="text-[9px] text-muted-foreground truncate">{s.source}</p>
-                  </div>
-                  <Button size="sm" variant="ghost" onClick={() => addFromSuggestion(s)} className="h-5 text-[9px] px-1.5 text-primary">
-                    <Plus className="w-2.5 h-2.5 mr-0.5" /> Add
-                  </Button>
+      <Tabs defaultValue="slides" className="w-full">
+        <TabsList className="h-8">
+          <TabsTrigger value="slides" className="text-[10px] h-6 gap-1">
+            <ImageIcon className="w-3 h-3" /> Slides & Suggestions
+          </TabsTrigger>
+          <TabsTrigger value="ai" className="text-[10px] h-6 gap-1">
+            <Sparkles className="w-3 h-3" /> AI Generated
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="slides" className="space-y-3 mt-3">
+          {/* Header actions */}
+          <div className="flex items-center justify-end gap-1.5">
+            <Button size="sm" variant="outline" onClick={fetchSuggestions} className="h-7 text-[10px] gap-1">
+              <Sparkles className="w-3 h-3" /> Suggestions
+            </Button>
+            <Button size="sm" onClick={() => addSlide()} className="h-7 text-[10px] gap-1">
+              <Plus className="w-3 h-3" /> Add
+            </Button>
+          </div>
+
+          {/* Suggestion slides panel */}
+          {showSuggestions && suggestions.length > 0 && (
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="p-2 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-semibold text-primary">Suggested slides from your site data</p>
+                  <Button size="sm" variant="ghost" onClick={() => setShowSuggestions(false)} className="h-5 text-[9px] px-1.5">Close</Button>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  {suggestions.map((s, i) => (
+                    <div key={i} className="flex items-center gap-1.5 p-1.5 rounded bg-background border border-border/50 hover:border-primary/40 transition-colors">
+                      {s.image_url ? (
+                        <img src={s.image_url} alt="" className="w-8 h-5 rounded object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-8 h-5 rounded bg-muted flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-medium truncate">{s.title}</p>
+                        <p className="text-[9px] text-muted-foreground truncate">{s.source}</p>
+                      </div>
+                      <Button size="sm" variant="ghost" onClick={() => addFromSuggestion(s)} className="h-5 text-[9px] px-1.5 text-primary">
+                        <Plus className="w-2.5 h-2.5 mr-0.5" /> Add
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-      {/* Filter tabs */}
-      <div className="flex gap-1">
-        {(["all", "public", "members"] as const).map(f => (
-          <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)} className="h-6 text-[10px] px-2 capitalize">
-            {f} ({f === "all" ? slides.length : slides.filter(s => f === "members" ? s.is_for_members : !s.is_for_members).length})
-          </Button>
-        ))}
-      </div>
+          {/* Filter tabs */}
+          <div className="flex gap-1">
+            {(["all", "public", "members"] as const).map(f => (
+              <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)} className="h-6 text-[10px] px-2 capitalize">
+                {f} ({f === "all" ? slides.length : slides.filter(s => f === "members" ? s.is_for_members : !s.is_for_members).length})
+              </Button>
+            ))}
+          </div>
 
-      {/* Slides list */}
-      {filteredSlides.length === 0 ? (
-        <p className="text-center text-muted-foreground text-xs py-8">No slides. Click Add to create one.</p>
-      ) : (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={filteredSlides.map(s => s.id)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-1.5">
-              {filteredSlides.map((slide, index) => (
-                <SortableSlideRow
-                  key={slide.id}
-                  slide={slide}
-                  index={index}
-                  blogPosts={blogPosts}
-                  saving={saving}
-                  expanded={expandedId === slide.id}
-                  onToggle={() => setExpandedId(expandedId === slide.id ? null : slide.id)}
-                  onUpdate={updateSlide}
-                  onLinkBlog={linkBlogPost}
-                  onSave={saveSlide}
-                  onDelete={deleteSlide}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-      )}
+          {/* Slides list */}
+          {filteredSlides.length === 0 ? (
+            <p className="text-center text-muted-foreground text-xs py-8">No slides. Click Add to create one.</p>
+          ) : (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={filteredSlides.map(s => s.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-1.5">
+                  {filteredSlides.map((slide, index) => (
+                    <SortableSlideRow
+                      key={slide.id}
+                      slide={slide}
+                      index={index}
+                      blogPosts={blogPosts}
+                      saving={saving}
+                      expanded={expandedId === slide.id}
+                      onToggle={() => setExpandedId(expandedId === slide.id ? null : slide.id)}
+                      onUpdate={updateSlide}
+                      onLinkBlog={linkBlogPost}
+                      onSave={saveSlide}
+                      onDelete={deleteSlide}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
+        </TabsContent>
+
+        <TabsContent value="ai" className="mt-3">
+          <AIHeroSlidesTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

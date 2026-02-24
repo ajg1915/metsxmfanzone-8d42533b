@@ -139,7 +139,6 @@ const PredictionsManagement = lazy(() => import("./pages/admin/PredictionsManage
 const TalentAssessmentManagement = lazy(() => import("./pages/admin/TalentAssessmentManagement"));
 const PollManagement = lazy(() => import("./pages/admin/PollManagement"));
 const SocialMediaSettings = lazy(() => import("./pages/admin/SocialMediaSettings"));
-const AIHeroSlides = lazy(() => import("./pages/admin/AIHeroSlides"));
 const WhatsNew = lazy(() => import("./pages/WhatsNew"));
 const Install = lazy(() => import("./pages/Install"));
 const MetsVsAstros = lazy(() => import("./pages/matchups/MetsVsAstros"));
@@ -388,7 +387,6 @@ const AppContent = () => {
               <Route path="settings" element={<AdminSettings />} />
               <Route path="social-media" element={<SocialMediaSettings />} />
               <Route path="tutorials" element={<TutorialManagement />} />
-              <Route path="ai-hero-slides" element={<AIHeroSlides />} />
             </Route>
             {/* Writer Portal Routes */}
             <Route path="/writer" element={<WriterDashboard />} />
