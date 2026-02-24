@@ -2,13 +2,14 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
-const STREAMING_PATHS = [
+const SUPPRESS_REFRESH_PATHS = [
   '/espn-network',
   '/pix11-network',
   '/mlb-network',
   '/metsxmfanzone-tv',
   '/spring-training-live',
   '/tv/',
+  '/admin',
 ];
 
 /**
@@ -21,8 +22,8 @@ export const useAutoRefresh = () => {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const location = useLocation();
 
-  const isStreamingPage = () => {
-    return STREAMING_PATHS.some(path => location.pathname.startsWith(path));
+  const isSupressedPage = () => {
+    return SUPPRESS_REFRESH_PATHS.some(path => location.pathname.startsWith(path));
   };
 
   useEffect(() => {
@@ -30,8 +31,8 @@ export const useAutoRefresh = () => {
     const MIN_REFRESH_INTERVAL = 10_000;
 
     const triggerRefresh = () => {
-      if (isStreamingPage()) {
-        console.log('[AutoRefresh] Skipping refresh — user is on a streaming page');
+      if (isSupressedPage()) {
+        console.log('[AutoRefresh] Skipping refresh — user is on a suppressed page');
         return;
       }
 
