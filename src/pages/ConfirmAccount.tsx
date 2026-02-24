@@ -166,58 +166,76 @@ export default function ConfirmAccount() {
   const hasPendingPlan = localStorage.getItem("pending_signup_plan");
   const pendingPaymentMethod = localStorage.getItem("pending_signup_payment_method");
 
-  // Create free subscription after successful verification
+  // Handle post-verification: create free sub if needed + always notify admins
   useEffect(() => {
-    if (verificationState === "success" && hasPendingPlan === "free") {
-      const createFreeSubscription = async () => {
-        try {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) return;
+    if (verificationState !== "success") return;
 
-          // Check if subscription already exists
+    const handlePostVerification = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        let planType = "free";
+        let amount = "$0.00";
+        let paymentMethod = "free";
+
+        // Create free subscription if pending
+        if (hasPendingPlan === "free") {
           const { data: existing } = await supabase
             .from("subscriptions")
             .select("id")
             .eq("user_id", user.id)
             .maybeSingle();
 
-          if (existing) return;
+          if (!existing) {
+            paymentMethod = pendingPaymentMethod || user.user_metadata?.preferred_payment_method || "free";
 
-          const paymentMethod = pendingPaymentMethod || user.user_metadata?.preferred_payment_method || "free";
-
-          const { error: subError } = await supabase.from("subscriptions").insert({
-            user_id: user.id,
-            plan_type: "free",
-            status: "active",
-            amount: 0,
-            payment_method: paymentMethod,
-          });
-
-          // Notify admins about new signup
-          if (!subError) {
-            try {
-              await supabase.functions.invoke("notify-admin-new-member", {
-                body: {
-                  userId: user.id,
-                  planType: "free",
-                  amount: "$0.00",
-                  source: `Free Plan (${paymentMethod})`,
-                },
-              });
-            } catch (notifyErr) {
-              console.error("Admin notification failed:", notifyErr);
-            }
+            await supabase.from("subscriptions").insert({
+              user_id: user.id,
+              plan_type: "free",
+              status: "active",
+              amount: 0,
+              payment_method: paymentMethod,
+            });
           }
 
-          // Clean up localStorage
           localStorage.removeItem("pending_signup_plan");
           localStorage.removeItem("pending_signup_payment_method");
-        } catch (err) {
-          console.error("Error creating free subscription:", err);
+        } else {
+          // Check existing subscription for notification details
+          const { data: sub } = await supabase
+            .from("subscriptions")
+            .select("plan_type, amount, payment_method")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (sub) {
+            planType = sub.plan_type || "free";
+            amount = sub.amount ? `$${Number(sub.amount).toFixed(2)}` : "$0.00";
+            paymentMethod = sub.payment_method || "online";
+          }
         }
-      };
-      createFreeSubscription();
-    }
+
+        // Always notify admins about verified signup
+        try {
+          await supabase.functions.invoke("notify-admin-new-member", {
+            body: {
+              userId: user.id,
+              planType,
+              amount,
+              source: `${planType === "free" ? "Free Plan" : planType.charAt(0).toUpperCase() + planType.slice(1)} (${paymentMethod})`,
+            },
+          });
+        } catch (notifyErr) {
+          console.error("Admin notification failed:", notifyErr);
+        }
+      } catch (err) {
+        console.error("Error in post-verification:", err);
+      }
+    };
+    handlePostVerification();
   }, [verificationState]);
   
   const handleContinueAfterConfirmation = () => {
