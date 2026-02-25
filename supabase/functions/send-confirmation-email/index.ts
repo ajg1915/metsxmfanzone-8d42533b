@@ -42,10 +42,7 @@ Deno.serve(async (req) => {
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
           <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
             <div style="text-align: center; margin-bottom: 16px;">
-              <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 40px; height: 40px; margin-bottom: 6px; border-radius: 8px;" />
-              <div style="margin-top: 4px;">
-                <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 120px; height: auto; margin-bottom: 4px;" />
-              </div>
+              <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 85px; height: 85px; margin-bottom: 8px; border-radius: 12px;" />
               <div>
                 <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
               </div>
@@ -97,10 +94,7 @@ Deno.serve(async (req) => {
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
           <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
             <div style="text-align: center; margin-bottom: 16px;">
-              <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 40px; height: 40px; margin-bottom: 6px; border-radius: 8px;" />
-              <div style="margin-top: 4px;">
-                <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 120px; height: auto; margin-bottom: 4px;" />
-              </div>
+              <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 85px; height: 85px; margin-bottom: 8px; border-radius: 12px;" />
               <div>
                 <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
               </div>
