@@ -148,7 +148,7 @@ const MetsGamecast = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Helmet>
-        <title>Mets Gamecast - Live Game Updates | MetsXMFanZone</title>
+        <title>MetsXMFanZone Gamecast - Live Game Updates | MetsXMFanZone</title>
         <meta name="description" content="Follow New York Mets games live with real-time scores, play-by-play, and box scores." />
       </Helmet>
       <Navigation />
