@@ -20,9 +20,11 @@ interface Video {
 
 interface HighlightsSectionProps {
   className?: string;
+  /** If provided, called before opening a video. Return true to prevent the default dialog. */
+  onVideoClick?: (video: Video) => boolean | void;
 }
 
-const HighlightsSection = ({ className }: HighlightsSectionProps) => {
+const HighlightsSection = ({ className, onVideoClick }: HighlightsSectionProps) => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   
@@ -170,7 +172,13 @@ const HighlightsSection = ({ className }: HighlightsSectionProps) => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                onClick={() => setSelectedVideo(video)}
+                onClick={() => {
+                  if (onVideoClick) {
+                    const prevented = onVideoClick(video);
+                    if (prevented) return;
+                  }
+                  setSelectedVideo(video);
+                }}
                 className="flex-shrink-0 w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] cursor-pointer group"
               >
                 <div className="relative overflow-hidden rounded-md sm:rounded-lg transition-all duration-300 group-hover:scale-105 group-hover:z-10 group-hover:shadow-2xl group-hover:shadow-primary/20">
