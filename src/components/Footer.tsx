@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-// App version - displayed in footer
-const APP_VERSION = "1.0.0";
+
+
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -40,9 +40,6 @@ const Footer = () => {
               aria-hidden="true"
             >
               © 2025 MetsXMFanZone.com. All rights reserved.
-            </p>
-            <p className="text-[9px] sm:text-[10px] text-foreground/40">
-              v{APP_VERSION}
             </p>
           </div>
         </div>
