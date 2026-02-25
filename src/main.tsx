@@ -14,6 +14,7 @@ const isPreviewHost =
   window.location.hostname === "lovableproject.com";
 
 const PREVIEW_SW_CLEAN_KEY = "__preview_sw_cleaned_v1";
+const LEGACY_SW_CLEAN_KEY = "__legacy_sw_cleaned_v1";
 
 const cleanupPreviewServiceWorker = async () => {
   try {
@@ -56,10 +57,42 @@ const cleanupPreviewServiceWorker = async () => {
   }
 };
 
+const cleanupLegacyMobileServiceWorker = async () => {
+  try {
+    if (!("serviceWorker" in navigator)) return;
+
+    const alreadyCleaned = sessionStorage.getItem(LEGACY_SW_CLEAN_KEY) === "1";
+    const regs = await navigator.serviceWorker.getRegistrations();
+
+    let unregisteredLegacyCount = 0;
+    await Promise.all(
+      regs.map(async (r) => {
+        const scriptUrl = r.active?.scriptURL || r.waiting?.scriptURL || r.installing?.scriptURL || "";
+        if (scriptUrl.endsWith("/sw.js")) {
+          const ok = await r.unregister();
+          if (ok) unregisteredLegacyCount += 1;
+        }
+      })
+    );
+
+    if ("caches" in window) {
+      await caches.delete("metsxm-fanzone-v1");
+    }
+
+    if (!alreadyCleaned && unregisteredLegacyCount > 0) {
+      sessionStorage.setItem(LEGACY_SW_CLEAN_KEY, "1");
+      window.location.reload();
+    }
+  } catch (e) {
+    console.warn("[App] Legacy SW cleanup failed", e);
+  }
+};
+
 if (isPreviewHost) {
   // Run immediately (not on window load) so we can escape stale cached assets ASAP.
   void cleanupPreviewServiceWorker();
 } else {
+  void cleanupLegacyMobileServiceWorker();
   // VitePWA handles service worker registration automatically via registerType: "autoUpdate"
   // No manual registration needed
 }
