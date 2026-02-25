@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
     }
 
     const logoUrl = "https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png";
-    const dashboardUrl = "https://metsxmfanzone.lovable.app/admin/subscriptions";
+    const dashboardUrl = "https://www.metsxmfanzone.com/admin/subscriptions";
     const now = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
 
     const emailHtml = `<!DOCTYPE html>
