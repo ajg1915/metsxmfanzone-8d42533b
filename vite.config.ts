@@ -40,7 +40,6 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      filename: "pwa-sw.js",
       includeAssets: ["favicon.png", "logo-192.png", "logo-512.png"],
       manifest: {
         name: "MetsXMFanZone",
@@ -79,7 +78,7 @@ export default defineConfig(({ mode }) => ({
         // New service workers will activate on next visit instead of forcing immediate reload
         cleanupOutdatedCaches: true,
         navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/api/, /^\/supabase/, /^\/~oauth/],
+        navigateFallbackDenylist: [/^\/api/, /^\/supabase/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
