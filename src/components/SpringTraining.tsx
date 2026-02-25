@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
-import { Calendar, ChevronRight, Play } from "lucide-react";
+import { Play } from "lucide-react";
 
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -59,15 +59,6 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
               </h2>
               {!isPremium && <PremiumBadge size="sm" noGlow />}
             </div>
-            <Link 
-              to="/mets-schedule-2026" 
-              className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium text-[10px] sm:text-xs transition-colors group flex-shrink-0"
-            >
-              <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              <span className="hidden sm:inline">Full 2026 Schedule</span>
-              <span className="sm:hidden">Schedule</span>
-              <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
           </div>
           <p className="text-muted-foreground text-[10px] sm:text-xs">
             Get ready for spring training
