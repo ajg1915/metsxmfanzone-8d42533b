@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const logoUrl = "https://metsxmfanzone.com/logo-192.png";
+    const logoUrl = "https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png";
     const dashboardUrl = "https://metsxmfanzone.com/admin/subscriptions";
     const now = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
 
@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
     <div style="text-align: center; padding: 15px 0;">
       <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 60px; height: 60px; border-radius: 12px;" />
       <div style="margin-top: 8px;">
-        <img src="https://metsxmfanzone.com/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto;" />
+        <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto;" />
       </div>
       <h2 style="color: #FF4500; margin: 8px 0 0 0; font-size: 18px;">🎉 New Member Alert!</h2>
     </div>

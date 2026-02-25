@@ -39,9 +39,9 @@ Deno.serve(async (req) => {
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #002D72 0%, #FF5910 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-            <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px;" />
+            <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px;" />
             <div style="margin-top: 4px;">
-              <img src="https://metsxmfanzone.com/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto; margin-bottom: 8px;" />
+              <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto; margin-bottom: 8px;" />
             </div>
             <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to the Writer Team!</h1>
           </div>
@@ -73,9 +73,9 @@ Deno.serve(async (req) => {
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: #002D72; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-            <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px;" />
+            <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px;" />
             <div style="margin-top: 4px;">
-              <img src="https://metsxmfanzone.com/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto; margin-bottom: 8px;" />
+              <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto; margin-bottom: 8px;" />
             </div>
             <h1 style="color: white; margin: 0; font-size: 28px;">Application Update</h1>
           </div>
