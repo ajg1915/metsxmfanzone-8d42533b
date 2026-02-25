@@ -58,7 +58,8 @@ const PlayersToWatch = () => {
       if (recentError) throw recentError;
       return (recentData ?? []) as PlayerPrediction[];
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes to avoid refetching on every navigation
+    staleTime: 1000 * 60 * 2, // Cache for 2 minutes for faster sync
+    refetchOnWindowFocus: true,
   });
 
   const generatePredictions = async () => {

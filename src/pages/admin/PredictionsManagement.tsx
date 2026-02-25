@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { RefreshCw, Star, Flame, Snowflake, AlertTriangle, Users, Calendar, Plus, Trash2, PenLine } from "lucide-react";
+import { RefreshCw, Star, Flame, Snowflake, AlertTriangle, Users, Calendar, Plus, Trash2, PenLine, Link2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -104,6 +104,23 @@ export default function PredictionsManagement() {
   const [forceRegenerate, setForceRegenerate] = useState(false);
   const [showManualForm, setShowManualForm] = useState(false);
   const [manual, setManual] = useState(DEFAULT_MANUAL);
+  const [isSyncingLineup, setIsSyncingLineup] = useState(false);
+
+  // Fetch today's lineup card to check sync status
+  const { data: todayLineup } = useQuery({
+    queryKey: ["today-lineup-card"],
+    queryFn: async () => {
+      const today = new Date().toISOString().split("T")[0];
+      const { data, error } = await supabase
+        .from("lineup_cards")
+        .select("*")
+        .eq("game_date", today)
+        .eq("published", true)
+        .single();
+      if (error) return null;
+      return data;
+    },
+  });
 
   const { data: predictions, isLoading } = useQuery({
     queryKey: ["admin-predictions"],
@@ -346,6 +363,132 @@ export default function PredictionsManagement() {
             </Button>
           </CardContent>
         )}
+      </Card>
+
+      {/* Sync with Lineup Override */}
+      <Card className="border-orange-500/30 bg-gradient-to-r from-orange-500/5 to-transparent">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Link2 className="h-5 w-5 text-orange-500" />
+                Sync with Today's Lineup
+              </CardTitle>
+              <CardDescription>
+                {todayLineup 
+                  ? `Lineup found: vs ${todayLineup.opponent} — ${(todayLineup.lineup_data as any[])?.length || 0} players`
+                  : "No lineup card posted for today yet"
+                }
+              </CardDescription>
+            </div>
+            {todayLineup && (
+              <Badge variant="outline" className="border-orange-500/30 text-orange-500">
+                {todayLineup.game_time}
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xs text-muted-foreground mb-4">
+            This will delete all existing predictions for today and regenerate them using the players from today's lineup card. Ensures predictions match the actual game lineup.
+          </p>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white" 
+                disabled={!todayLineup || isSyncingLineup || (todayLineup?.lineup_data as any[])?.length === 0}
+              >
+                {isSyncingLineup ? (
+                  <><RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Syncing with Lineup...</>
+                ) : (
+                  <><Link2 className="h-4 w-4 mr-2" /> Override & Sync Predictions with Lineup</>
+                )}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Sync Predictions with Lineup?</AlertDialogTitle>
+                <AlertDialogDescription className="space-y-2">
+                  <p>This will:</p>
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    <li>Delete all existing predictions for today</li>
+                    <li>Generate new predictions based on today's lineup card ({(todayLineup?.lineup_data as any[])?.length || 0} players + pitcher)</li>
+                    <li>Use AI credits for generation</li>
+                  </ul>
+                  {todayLineup && <p className="text-primary font-medium mt-2">Game: vs {todayLineup.opponent} at {todayLineup.game_time}</p>}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={async () => {
+                    setIsSyncingLineup(true);
+                    try {
+                      const today = new Date().toISOString().split("T")[0];
+                      
+                      // Delete existing predictions
+                      const { error: deleteError } = await supabase
+                        .from("daily_player_predictions")
+                        .delete()
+                        .eq("prediction_date", today);
+                      if (deleteError) throw deleteError;
+
+                      // Extract lineup player data
+                      const lineupData = todayLineup?.lineup_data as any[] || [];
+                      const lineupPlayerIds: number[] = [];
+                      const lineupPlayers: Array<{ name: string; id: number; position: string }> = [];
+
+                      lineupData.forEach((p: any) => {
+                        const match = p.imageUrl?.match(/\/people\/(\d+)\//);
+                        if (match) {
+                          const playerId = parseInt(match[1]);
+                          lineupPlayerIds.push(playerId);
+                          lineupPlayers.push({ name: p.name, id: playerId, position: p.fieldPosition || "DH" });
+                        }
+                      });
+
+                      // Include starting pitcher
+                      const pitcher = todayLineup?.starting_pitcher as any;
+                      if (pitcher?.name) {
+                        const starPitcher = STAR_PLAYERS.find(sp => sp.name === pitcher.name);
+                        if (starPitcher) {
+                          lineupPlayerIds.push(starPitcher.id);
+                          lineupPlayers.push({ name: pitcher.name, id: starPitcher.id, position: "SP" });
+                        }
+                      }
+
+                      // Call generate-daily-predictions with lineup data
+                      const { data, error } = await supabase.functions.invoke("generate-daily-predictions", {
+                        body: {
+                          triggeredBy: "lineup-sync-override",
+                          lineupPlayerIds,
+                          lineupPlayers,
+                          opponent: todayLineup?.opponent,
+                          gameTime: todayLineup?.game_time,
+                          location: todayLineup?.location
+                        },
+                      });
+                      if (error) throw error;
+
+                      queryClient.invalidateQueries({ queryKey: ["admin-predictions"] });
+                      queryClient.invalidateQueries({ queryKey: ["daily-player-predictions"] });
+                      queryClient.invalidateQueries({ queryKey: ["predictions-history"] });
+                      toast.success(`Predictions synced with lineup! ${data?.count || 6} players generated.`);
+                    } catch (err: any) {
+                      console.error("Lineup sync error:", err);
+                      toast.error("Failed to sync predictions with lineup. Try manual entry if AI credits are depleted.");
+                    } finally {
+                      setIsSyncingLineup(false);
+                    }
+                  }} 
+                  className="bg-orange-500 hover:bg-orange-600"
+                >
+                  Confirm & Sync
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </CardContent>
       </Card>
 
       {/* Current Predictions */}
