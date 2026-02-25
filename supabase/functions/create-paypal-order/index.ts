@@ -174,6 +174,9 @@ Deno.serve(async (req: Request) => {
       },
       body: JSON.stringify({
         plan_id: billingPlanId,
+        subscriber: {
+          email_address: user.email,
+        },
         application_context: {
           brand_name: 'MetsXMFanZone',
           locale: 'en-US',
