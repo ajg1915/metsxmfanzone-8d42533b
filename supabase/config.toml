@@ -158,6 +158,3 @@ verify_jwt = false
 
 [functions.generate-ai-hero-slides]
 verify_jwt = true
-
-[functions.notify-admin-new-member]
-verify_jwt = false

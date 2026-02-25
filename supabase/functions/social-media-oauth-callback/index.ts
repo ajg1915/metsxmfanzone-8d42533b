@@ -187,7 +187,7 @@ Deno.serve(async (req) => {
     }
 
     // Redirect back to admin with success
-    const redirectUrl = new URL('/admin/social-media', 'https://www.metsxmfanzone.com');
+    const redirectUrl = new URL('/admin/social-media', Deno.env.get('SUPABASE_URL')!.replace('.supabase.co', '.lovable.app'));
     redirectUrl.searchParams.set('connected', platform);
 
     return new Response(null, {

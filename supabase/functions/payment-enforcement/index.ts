@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
                   <p>Hi ${profile.full_name || "Fan"},</p>
                   <p>Your <strong>${sub.plan_type}</strong> membership has been deactivated due to missed payment. Your subscription expired on <strong>${endDate.toLocaleDateString()}</strong>.</p>
                   <p>To reactivate your account, please visit our plans page and subscribe again.</p>
-                  <a href="https://www.metsxmfanzone.com/plans" style="display:inline-block;background:#FF5910;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin:16px 0">Reactivate Now</a>
+                  <a href="https://metsxmfanzone.lovable.app/plans" style="display:inline-block;background:#FF5910;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin:16px 0">Reactivate Now</a>
                   <p style="color:#666;font-size:12px">If you believe this is an error, please contact us.</p>
                 </div>`,
               }),
@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
                   <p>Hi ${profile.full_name || "Fan"},</p>
                   <p>Your <strong>${sub.plan_type}</strong> membership payment is overdue. Your subscription expired on <strong>${endDate.toLocaleDateString()}</strong>.</p>
                   <p style="color:#cc0000;font-weight:bold">If payment is not received within 4 days, your account will be automatically deactivated.</p>
-                  <a href="https://www.metsxmfanzone.com/plans" style="display:inline-block;background:#FF5910;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin:16px 0">Update Payment</a>
+                  <a href="https://metsxmfanzone.lovable.app/plans" style="display:inline-block;background:#FF5910;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin:16px 0">Update Payment</a>
                   <p style="color:#666;font-size:12px">If you've already made a payment, please disregard this email.</p>
                 </div>`,
               }),

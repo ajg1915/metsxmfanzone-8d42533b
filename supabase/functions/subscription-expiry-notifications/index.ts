@@ -81,7 +81,7 @@ const generateExpiringEmailHtml = (
         <li>Early access to new features</li>
       </ul>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.metsxmfanzone.com/pricing" 
+        <a href="https://metsxmfanzone.lovable.app/pricing" 
            style="display: inline-block; background-color: #FF5910; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 600; font-size: 16px;">
           Renew My Subscription
         </a>
@@ -135,7 +135,7 @@ const generateExpiredEmailHtml = (userName: string, planName: string) => {
         <li>Early access to new features</li>
       </ul>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.metsxmfanzone.com/pricing" 
+        <a href="https://metsxmfanzone.lovable.app/pricing" 
            style="display: inline-block; background-color: #FF5910; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 600; font-size: 16px;">
           Reactivate My Subscription
         </a>
