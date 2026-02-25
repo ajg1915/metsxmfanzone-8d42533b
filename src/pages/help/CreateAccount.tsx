@@ -73,7 +73,7 @@ const CreateAccount = () => {
               <div className="space-y-3 pl-4 border-l-4 border-primary/30">
                 <h3 className="text-xl font-semibold text-primary">Step 4: Complete Payment (for paid plans)</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Choose your preferred payment method (PayPal or Helcim) and complete the checkout process.
+                  Complete the checkout process through PayPal to activate your subscription.
                 </p>
               </div>
 
