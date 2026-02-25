@@ -321,9 +321,9 @@ const Auth = () => {
       
       // Send OTP email
       const otpSent = await sendOtpEmail(biometricEmail, otp);
-      setSendingOtp(false); // Hide loading screen
       
       if (!otpSent) {
+        setSendingOtp(false);
         toast({
           title: "Verification issue",
           description: "Could not send verification code. Please try password login.",
@@ -340,8 +340,9 @@ const Auth = () => {
       });
       setPendingUserData({ userId, isSignup: false });
       
-      // Show 2FA screen
+      // Show 2FA screen - must set show2FA BEFORE clearing sendingOtp to prevent redirect
       setShow2FA(true);
+      setSendingOtp(false);
       setShowBiometricEmailInput(false);
       setResendCooldown(60);
 
@@ -730,14 +731,15 @@ const Auth = () => {
         setPendingUserData({ userId: data.user.id, isSignup: false });
         
         const emailSent = await sendOtpEmail(validated.email, otp);
-        setSendingOtp(false); // Hide loading screen
         
         if (emailSent) {
-          setShow2FA(true);
+          setShow2FA(true); // Must be set BEFORE clearing sendingOtp to prevent redirect race
+          setSendingOtp(false);
           setResendCooldown(60);
         } else {
           // Still show 2FA - user can retry resend. Never bypass 2FA.
-          setShow2FA(true);
+          setShow2FA(true); // Must be set BEFORE clearing sendingOtp to prevent redirect race
+          setSendingOtp(false);
           setResendCooldown(0);
           toast({
             title: "Verification code issue",
@@ -779,10 +781,10 @@ const Auth = () => {
       setPendingUserData({ userId: "remembered", isSignup: false });
       
       const emailSent = await sendOtpEmail(rememberedUser.email, otp);
-      setSendingOtp(false); // Hide loading screen
       
       if (emailSent) {
-        setShow2FA(true);
+        setShow2FA(true); // Must be set BEFORE clearing sendingOtp to prevent redirect race
+        setSendingOtp(false);
         setResendCooldown(60);
       } else {
         toast({
