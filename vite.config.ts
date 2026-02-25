@@ -78,7 +78,7 @@ export default defineConfig(({ mode }) => ({
         // New service workers will activate on next visit instead of forcing immediate reload
         cleanupOutdatedCaches: true,
         navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/api/, /^\/supabase/],
+        navigateFallbackDenylist: [/^\/api/, /^\/supabase/, /^\/~oauth/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
