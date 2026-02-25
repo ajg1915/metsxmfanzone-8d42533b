@@ -139,7 +139,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const { planType } = await req.json();
+    const { planType, returnOrigin } = await req.json();
 
     if (!planType || !PLAN_CONFIG[planType]) {
       return new Response(
@@ -147,6 +147,9 @@ Deno.serve(async (req: Request) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Use the client's origin for return URLs so it works on web, PWA, and preview
+    const baseUrl = returnOrigin || 'https://www.metsxmfanzone.com';
 
     const config = PLAN_CONFIG[planType];
     const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID')!;
@@ -176,8 +179,8 @@ Deno.serve(async (req: Request) => {
           locale: 'en-US',
           shipping_preference: 'NO_SHIPPING',
           user_action: 'SUBSCRIBE_NOW',
-          return_url: 'https://www.metsxmfanzone.com/payment-success',
-          cancel_url: 'https://www.metsxmfanzone.com/plans',
+          return_url: `${baseUrl}/payment-success`,
+          cancel_url: `${baseUrl}/plans`,
         },
       }),
     });
