@@ -62,7 +62,7 @@ export default function GamecastBanner() {
               {/* Game info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-xs sm:text-sm font-bold">Mets Gamecast</span>
+                  <span className="text-xs sm:text-sm font-bold">MetsXMFanZone Gamecast</span>
                   {isLive && (
                     <Badge variant="destructive" className="text-[9px] px-1.5 py-0 animate-pulse">
                       <span className="inline-block w-1.5 h-1.5 rounded-full bg-white mr-1" />
