@@ -176,8 +176,8 @@ Deno.serve(async (req: Request) => {
           locale: 'en-US',
           shipping_preference: 'NO_SHIPPING',
           user_action: 'SUBSCRIBE_NOW',
-          return_url: 'https://metsxmfanzone.lovable.app/payment-success',
-          cancel_url: 'https://metsxmfanzone.lovable.app/plans',
+          return_url: 'https://www.metsxmfanzone.com/payment-success',
+          cancel_url: 'https://www.metsxmfanzone.com/plans',
         },
       }),
     });

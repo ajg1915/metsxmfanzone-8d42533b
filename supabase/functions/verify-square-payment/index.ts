@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
         // Redirect to error page
         return new Response(null, {
           status: 302,
-          headers: { 'Location': 'https://metsxmfanzone.lovable.app/payment-error' },
+          headers: { 'Location': 'https://www.metsxmfanzone.com/payment-error' },
         });
       }
 
@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
         console.error('Error activating subscription:', updateError);
         return new Response(null, {
           status: 302,
-          headers: { 'Location': 'https://metsxmfanzone.lovable.app/payment-error' },
+          headers: { 'Location': 'https://www.metsxmfanzone.com/payment-error' },
         });
       }
 
@@ -114,7 +114,7 @@ Deno.serve(async (req) => {
       // Redirect to home page after successful activation
       return new Response(null, {
         status: 302,
-        headers: { 'Location': 'https://metsxmfanzone.lovable.app/' },
+        headers: { 'Location': 'https://www.metsxmfanzone.com/' },
       });
     }
 
