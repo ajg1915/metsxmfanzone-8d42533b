@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Play, Mic, Radio, Users, MessageCircle, Heart, Share2, Music2, Facebook, Headphones, Music, Podcast as PodcastIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import PodcastAudioRecorder from "@/components/PodcastAudioRecorder";
+
 import SocialShareButtons from "@/components/SocialShareButtons";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
@@ -249,11 +249,6 @@ const CommunityPodcast = () => {
                 </CardContent>
               </Card>
             </div>
-          </section>
-
-          {/* Record / Upload Section */}
-          <section className="mb-8 sm:mb-12">
-            <PodcastAudioRecorder />
           </section>
 
           {/* Social Share Section */}

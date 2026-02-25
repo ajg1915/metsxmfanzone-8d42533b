@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2, Upload, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import PodcastAudioRecorder from "@/components/PodcastAudioRecorder";
 
 interface Podcast {
   id: string;
@@ -234,6 +235,8 @@ export default function PodcastManagement() {
           </form>
         </CardContent>
       </Card>
+
+      <PodcastAudioRecorder />
 
       <Card>
         <CardHeader>
