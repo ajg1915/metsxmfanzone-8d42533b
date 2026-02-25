@@ -1375,7 +1375,7 @@ const Auth = () => {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="paymentMethod">Payment Method</Label>
+                  <Label htmlFor="paymentMethod">Payment Method <span className="text-destructive">*</span></Label>
                   <div className="flex items-center gap-2 rounded-md border border-input bg-muted/50 px-3 py-2">
                     <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal" className="h-5 object-contain" />
                     <span className="text-sm text-foreground font-medium">PayPal</span>
