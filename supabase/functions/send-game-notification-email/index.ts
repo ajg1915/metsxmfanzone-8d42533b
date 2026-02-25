@@ -143,8 +143,9 @@ const getEmailTemplate = (
     
     <!-- Header -->
     <div style="text-align: center; padding: 24px 0 16px 0;">
-      <img src="${logoUrl}" alt="MetsXMFanZone" width="40" height="40" style="width: 40px; height: 40px; display: inline-block; vertical-align: middle; border-radius: 10px;" />
-      <span style="color: #FF4500; font-size: 18px; font-weight: 800; margin-left: 10px; vertical-align: middle; letter-spacing: -0.5px;">MetsXMFanZone</span>
+      <img src="${logoUrl}" alt="MetsXMFanZone" width="60" height="60" style="width: 60px; height: 60px; display: block; margin: 0 auto 8px auto; border-radius: 12px;" />
+      <img src="https://metsxmfanzone.com/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto; display: block; margin: 0 auto 4px auto;" />
+      <span style="color: #FF4500; font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">MetsXMFanZone</span>
     </div>
 
     <!-- Main Card -->
