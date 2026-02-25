@@ -20,8 +20,9 @@ const PaymentSuccess = () => {
     const verifyPayment = async () => {
       const token = searchParams.get('token');
       const sessionId = searchParams.get('session_id');
+      const subscriptionId = searchParams.get('subscription_id');
 
-      if (!token && !sessionId) {
+      if (!token && !sessionId && !subscriptionId) {
         setStatus('error');
         setTimeout(() => navigate('/plans'), 3000);
         return;
@@ -34,8 +35,9 @@ const PaymentSuccess = () => {
             body: { checkoutToken: sessionId }
           });
         } else {
+          // Pass subscriptionId from PayPal's redirect (preferred) or fall back to token
           result = await supabase.functions.invoke('verify-paypal-payment', {
-            body: { orderId: token }
+            body: { subscriptionId: subscriptionId || undefined, orderId: token || undefined }
           });
         }
 
