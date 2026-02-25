@@ -108,7 +108,7 @@ const signupSchema = z.object({
   selectedPlan: z.enum(["free", "premium", "annual"], {
     errorMap: () => ({ message: "Please select a plan" }),
   }),
-  paymentMethod: z.enum(["paypal", "card", "square"], {
+  paymentMethod: z.enum(["paypal"], {
     errorMap: () => ({ message: "Please select a payment method" }),
   }),
 });
@@ -191,7 +191,7 @@ const Auth = () => {
   const [smsOptIn, setSmsOptIn] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string>("");
-  const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [paymentMethod, setPaymentMethod] = useState<string>("paypal");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   
@@ -513,7 +513,7 @@ const Auth = () => {
         smsOptIn,
         agreeToTerms: agreeToTerms as true,
         selectedPlan: selectedPlan as "free" | "premium" | "annual",
-        paymentMethod: paymentMethod as "paypal" | "card" | "square",
+        paymentMethod: paymentMethod as "paypal",
       });
       setLoading(true);
 
@@ -1340,19 +1340,13 @@ const Auth = () => {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="paymentMethod">Payment Method <span className="text-destructive">*</span></Label>
-                  <Select value={paymentMethod} onValueChange={setPaymentMethod} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select payment method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="paypal">PayPal</SelectItem>
-                      <SelectItem value="card">Credit / Debit Card</SelectItem>
-                      <SelectItem value="square">Square</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="paymentMethod">Payment Method</Label>
+                  <div className="flex items-center gap-2 rounded-md border border-input bg-muted/50 px-3 py-2">
+                    <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal" className="h-5 object-contain" />
+                    <span className="text-sm text-foreground font-medium">PayPal</span>
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Required for all accounts. Free plans won't be charged.
+                    All payments are processed securely via PayPal. Free plans won't be charged.
                   </p>
                 </div>
                 <div className="flex items-start space-x-2">
@@ -1488,7 +1482,7 @@ const Auth = () => {
               disabled={
                 loading || 
                 (!isLogin && !isForgotPassword && !isResettingPassword && (
-                  !fullName.trim() || !email.trim() || !password || !phoneNumber.trim() || !selectedPlan || !paymentMethod || !agreeToTerms
+                  !fullName.trim() || !email.trim() || !password || !phoneNumber.trim() || !selectedPlan || !agreeToTerms
                 ))
               }
             >
@@ -1502,8 +1496,6 @@ const Auth = () => {
                 ? "Sign In" 
                 : !selectedPlan 
                 ? "Select a Membership to Continue"
-                : !paymentMethod
-                ? "Select a Payment Method"
                 : !agreeToTerms
                 ? "Agree to Terms to Continue"
                 : "Create Account"}
