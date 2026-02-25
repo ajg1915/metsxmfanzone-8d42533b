@@ -212,6 +212,9 @@ const Auth = () => {
   const [honeypot, setHoneypot] = useState(""); // Should remain empty - bots fill this
   const [formLoadTime] = useState(() => Date.now()); // Track when form loaded
   
+  // Store credentials for re-authentication after OTP
+  const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string } | null>(null);
+  
   // Biometric login states
   const [biometricSupported, setBiometricSupported] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
@@ -722,13 +725,19 @@ const Auth = () => {
           return;
         }
 
+        // CRITICAL: Sign out immediately to prevent session bypass via back navigation
+        // Store credentials so we can re-authenticate after OTP verification
+        const userId = data.user.id;
+        await supabase.auth.signOut();
+        setPendingCredentials({ email: validated.email, password: validated.password });
+        
         // Generate and send OTP for 2FA
         setLoading(false); // Hide form loading
         
         const { otp, expiry } = generateOtp();
         setGeneratedOtp(otp);
         setOtpExpiry(expiry);
-        setPendingUserData({ userId: data.user.id, isSignup: false });
+        setPendingUserData({ userId, isSignup: false });
         
         const emailSent = await sendOtpEmail(validated.email, otp);
         
@@ -897,6 +906,30 @@ const Auth = () => {
         });
         setShow2FA(false);
         setIsRememberedLogin(false);
+        setLoading(false);
+        return;
+      }
+      
+      // For password logins, re-authenticate now that OTP is verified
+      if (pendingCredentials) {
+        const { error: reAuthError } = await supabase.auth.signInWithPassword({
+          email: pendingCredentials.email,
+          password: pendingCredentials.password,
+        });
+        setPendingCredentials(null); // Clear stored credentials
+        
+        if (reAuthError) {
+          toast({
+            title: "Authentication Error",
+            description: "Could not complete login. Please try again.",
+            variant: "destructive",
+          });
+          setShow2FA(false);
+          setLoading(false);
+          return;
+        }
+        
+        await completeAuthentication(pendingUserData.userId, pendingUserData.isSignup);
         setLoading(false);
         return;
       }
