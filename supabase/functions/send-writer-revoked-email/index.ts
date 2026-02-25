@@ -51,9 +51,9 @@ Deno.serve(async (req) => {
       </head>
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: #dc2626; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-          <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px;" />
+          <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 40px; height: 40px; margin-bottom: 6px; border-radius: 8px;" />
           <div style="margin-top: 4px;">
-            <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto; margin-bottom: 8px;" />
+            <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 120px; height: auto; margin-bottom: 8px;" />
           </div>
           <h1 style="color: white; margin: 0; font-size: 28px;">Writer Access Revoked</h1>
         </div>
