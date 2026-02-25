@@ -14,6 +14,8 @@ interface EmailRequest {
   name?: string;
   planType?: string;
   amount?: string;
+  transactionDate?: string;
+  subscriptionId?: string;
 }
 
 Deno.serve(async (req) => {
@@ -25,7 +27,17 @@ Deno.serve(async (req) => {
     const { Resend } = await import("https://esm.sh/resend@4.0.0");
     const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
     
-    const { type, email, name, planType, amount }: EmailRequest = await req.json();
+    const { type, email, name, planType, amount, transactionDate, subscriptionId }: EmailRequest = await req.json();
+    
+    const escapeHtml = (str: string) => {
+      return str.replace(/[&<>"']/g, (m) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m] || m));
+    };
+    const safeName = escapeHtml(name || "Mets Fan");
+    const safeAmount = escapeHtml(amount || "0.00");
+    const safeDate = escapeHtml(transactionDate || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
+    const safeOrderId = subscriptionId ? '****' + escapeHtml(subscriptionId.slice(-4)) : 'N/A';
 
     let emailContent = "";
     let subject = "";
@@ -48,8 +60,8 @@ Deno.serve(async (req) => {
               </div>
             </div>
             
-            <p style="color: #ffffff; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
-              Welcome, ${name || "Mets Fan"}!
+             <p style="color: #ffffff; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
+              Welcome, ${safeName}!
             </p>
             
             <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 16px;">
@@ -83,7 +95,8 @@ Deno.serve(async (req) => {
       `;
     } else if (type === "subscription") {
       const planName = planType === "annual" ? "Annual" : "Premium Monthly";
-      subject = `Payment Confirmed - ${planName} Plan`;
+      const billingCycle = planType === "annual" ? "Yearly" : "Monthly";
+      subject = `MetsXMFanZone Receipt - ${planName} Plan`;
       emailContent = `
         <!DOCTYPE html>
         <html>
@@ -92,7 +105,7 @@ Deno.serve(async (req) => {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
-          <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
+          <div style="max-width: 380px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
             <div style="text-align: center; margin-bottom: 16px;">
               <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 85px; height: 85px; margin-bottom: 8px; border-radius: 12px;" />
               <div>
@@ -100,35 +113,56 @@ Deno.serve(async (req) => {
               </div>
             </div>
             
-            <p style="color: #4ade80; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
-              Payment Successful!
+            <p style="color: #4ade80; text-align: center; font-size: 16px; font-weight: bold; margin: 0 0 4px;">
+              ✓ Payment Receipt
             </p>
-            
             <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 16px;">
-              Hi ${name || "Mets Fan"}, your subscription is active.
+              Hi ${safeName}, here's your payment confirmation.
             </p>
             
-            <div style="background: #002D72; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
-              <div style="margin-bottom: 6px;">
-                <span style="color: #a0a0a0; font-size: 11px;">Plan: </span>
-                <span style="color: #ffffff; font-size: 11px; font-weight: bold;">${planName}</span>
-              </div>
-              <div style="margin-bottom: 6px;">
-                <span style="color: #a0a0a0; font-size: 11px;">Amount: </span>
-                <span style="color: #ffffff; font-size: 11px; font-weight: bold;">$${amount}</span>
-              </div>
-              <div>
-                <span style="color: #a0a0a0; font-size: 11px;">Status: </span>
-                <span style="color: #4ade80; font-size: 11px; font-weight: bold;">Active</span>
-              </div>
+            <div style="background: #002D72; padding: 14px; border-radius: 6px; margin-bottom: 12px;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="color: #a0a0a0; font-size: 11px; padding: 4px 0;">Plan</td>
+                  <td style="color: #ffffff; font-size: 11px; font-weight: bold; text-align: right; padding: 4px 0;">${planName}</td>
+                </tr>
+                <tr>
+                  <td style="color: #a0a0a0; font-size: 11px; padding: 4px 0;">Amount Paid</td>
+                  <td style="color: #ffffff; font-size: 11px; font-weight: bold; text-align: right; padding: 4px 0;">$${safeAmount} USD</td>
+                </tr>
+                <tr>
+                  <td style="color: #a0a0a0; font-size: 11px; padding: 4px 0;">Billing Cycle</td>
+                  <td style="color: #ffffff; font-size: 11px; font-weight: bold; text-align: right; padding: 4px 0;">${billingCycle}</td>
+                </tr>
+                <tr>
+                  <td style="color: #a0a0a0; font-size: 11px; padding: 4px 0;">Date</td>
+                  <td style="color: #ffffff; font-size: 11px; font-weight: bold; text-align: right; padding: 4px 0;">${safeDate}</td>
+                </tr>
+                <tr>
+                  <td style="color: #a0a0a0; font-size: 11px; padding: 4px 0;">Order Ref</td>
+                  <td style="color: #ffffff; font-size: 11px; font-weight: bold; text-align: right; padding: 4px 0;">${safeOrderId}</td>
+                </tr>
+                <tr>
+                  <td style="color: #a0a0a0; font-size: 11px; padding: 4px 0;">Payment Method</td>
+                  <td style="color: #ffffff; font-size: 11px; font-weight: bold; text-align: right; padding: 4px 0;">PayPal</td>
+                </tr>
+                <tr>
+                  <td style="color: #a0a0a0; font-size: 11px; padding: 4px 0;">Status</td>
+                  <td style="color: #4ade80; font-size: 11px; font-weight: bold; text-align: right; padding: 4px 0;">Paid ✓</td>
+                </tr>
+              </table>
             </div>
             
             <div style="background: #1f1f3a; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
               <p style="color: #FF5910; font-size: 10px; margin: 0 0 6px; font-weight: bold;">Your Benefits:</p>
               <p style="color: #d0d0d0; font-size: 10px; margin: 0; line-height: 1.4;">
-                Live streams • Replays • Premium content • Ad-free
+                Live streams • Full game replays • Premium content • Ad-free experience • HD streaming
               </p>
             </div>
+
+            <p style="color: #888; font-size: 9px; text-align: center; margin: 0 0 12px;">
+              You will also receive a receipt from PayPal. Keep this email for your records.
+            </p>
             
             <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
               <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">

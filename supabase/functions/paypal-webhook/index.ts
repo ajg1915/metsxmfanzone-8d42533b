@@ -165,6 +165,31 @@ Deno.serve(async (req: Request) => {
             console.error('Error updating subscription:', updateError);
           } else {
             console.log('Subscription activated:', subscription.id);
+            // Send receipt email
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('email, full_name')
+                .eq('id', subscription.user_id)
+                .single();
+
+              if (profile?.email) {
+                await supabase.functions.invoke('send-confirmation-email', {
+                  body: {
+                    type: 'subscription',
+                    email: profile.email,
+                    name: profile.full_name,
+                    planType: subscription.plan_type,
+                    amount: subscription.amount?.toString() || (subscription.plan_type === 'annual' ? '129.99' : '12.99'),
+                    transactionDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    subscriptionId: orderId,
+                  },
+                });
+                console.log('Receipt email sent for subscription:', subscription.id);
+              }
+            } catch (emailErr) {
+              console.error('Receipt email failed:', emailErr);
+            }
             // Notify admins about new member
             try {
               await supabase.functions.invoke('notify-admin-new-member', {
