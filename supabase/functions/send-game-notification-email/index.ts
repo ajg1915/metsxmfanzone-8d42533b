@@ -88,7 +88,7 @@ const getEmailTemplate = (
 ) => {
   const baseUrl = Deno.env.get('SITE_URL') || 'https://metsxmfanzone.com';
   const actionUrl = url ? `${baseUrl}${url}` : baseUrl;
-  const logoUrl = 'https://metsxmfanzone.com/logo-192.png';
+  const logoUrl = 'https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png';
   const icon = getNotificationIcon(notificationType || 'general');
   const isFinal = notificationType === 'final_score';
   const safeTitle = escapeHtml(title);
@@ -144,7 +144,7 @@ const getEmailTemplate = (
     <!-- Header -->
     <div style="text-align: center; padding: 24px 0 16px 0;">
       <img src="${logoUrl}" alt="MetsXMFanZone" width="60" height="60" style="width: 60px; height: 60px; display: block; margin: 0 auto 8px auto; border-radius: 12px;" />
-      <img src="https://metsxmfanzone.com/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto; display: block; margin: 0 auto 4px auto;" />
+      <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto; display: block; margin: 0 auto 4px auto;" />
       <span style="color: #FF4500; font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">MetsXMFanZone</span>
     </div>
 
