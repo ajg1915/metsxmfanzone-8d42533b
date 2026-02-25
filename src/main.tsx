@@ -59,20 +59,9 @@ const cleanupPreviewServiceWorker = async () => {
 if (isPreviewHost) {
   // Run immediately (not on window load) so we can escape stale cached assets ASAP.
   void cleanupPreviewServiceWorker();
-} else if ("serviceWorker" in navigator && import.meta.env.PROD) {
-  window.addEventListener("load", async () => {
-    try {
-      const registration = await navigator.serviceWorker.register("/sw.js", {
-        scope: "/",
-      });
-      console.log("[App] Service Worker registered:", registration.scope);
-
-      // No periodic update checks - let natural navigation handle updates
-      // This prevents constant refreshing while still maintaining push notification support
-    } catch (error) {
-      console.error("[App] Service Worker registration failed:", error);
-    }
-  });
+} else {
+  // VitePWA handles service worker registration automatically via registerType: "autoUpdate"
+  // No manual registration needed
 }
 
 const rootElement = document.getElementById("root");
