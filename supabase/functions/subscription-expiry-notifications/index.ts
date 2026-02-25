@@ -58,6 +58,10 @@ const generateExpiringEmailHtml = (
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5; padding: 20px; margin: 0;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
     <div style="background: linear-gradient(135deg, #002D72 0%, #FF5910 100%); padding: 30px; text-align: center;">
+      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px;" />
+      <div style="margin-top: 4px;">
+        <img src="https://metsxmfanzone.com/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto; margin-bottom: 8px;" />
+      </div>
       <h1 style="color: #ffffff; margin: 0; font-size: 24px;">MetsXMFanZone</h1>
     </div>
     <div style="padding: 30px;">
@@ -111,6 +115,10 @@ const generateExpiredEmailHtml = (userName: string, planName: string) => {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5; padding: 20px; margin: 0;">
   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
     <div style="background: linear-gradient(135deg, #002D72 0%, #FF5910 100%); padding: 30px; text-align: center;">
+      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px; border-radius: 12px;" />
+      <div style="margin-top: 4px;">
+        <img src="https://metsxmfanzone.com/og-image.png" alt="MetsXMFanZone Logo" style="max-width: 180px; height: auto; margin-bottom: 8px;" />
+      </div>
       <h1 style="color: #ffffff; margin: 0; font-size: 24px;">MetsXMFanZone</h1>
     </div>
     <div style="padding: 30px;">
