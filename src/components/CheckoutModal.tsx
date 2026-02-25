@@ -105,7 +105,7 @@ const CheckoutModal = ({ open, onOpenChange, plan }: CheckoutModalProps) => {
       });
 
       const { data, error } = await supabase.functions.invoke("create-paypal-order", {
-        body: { planType: plan.id, promoCode: appliedPromo },
+        body: { planType: plan.id, promoCode: appliedPromo, returnOrigin: window.location.origin },
       });
 
       if (error) throw error;
