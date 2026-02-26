@@ -303,25 +303,6 @@ const LiveStreamsSection = () => {
           </button>
         </div>
 
-        {/* View All button */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex justify-center mt-4"
-          >
-            <Button 
-              variant="outline" 
-              onClick={handleViewScheduleClick}
-              size="sm"
-              className="text-xs sm:text-sm glass-card border-border/30 hover:border-primary/50 text-[#ff4500]"
-            >
-              View Full 2026 Schedule
-            </Button>
-          </motion.div>
-        </div>
       </section>
     </>
   );
