@@ -55,7 +55,7 @@ interface MLBLeader {
 }
 interface HomeLineupCardProps {
   className?: string;
-  onLineupLoaded?: () => void;
+  onLineupLoaded?: (gameDate?: string) => void;
 }
 
 interface UpcomingGame {
@@ -265,10 +265,10 @@ export default function HomeLineupCard({
   const pitcher = lineupCard?.starting_pitcher as unknown as StartingPitcher | null;
   const metsStanding = standings?.find((s: any) => s.team_name === "Mets");
 
-  // Notify parent when lineup data is loaded
+  // Notify parent when lineup data is loaded, passing game date for sync
   useEffect(() => {
     if (lineupCard && onLineupLoaded) {
-      onLineupLoaded();
+      onLineupLoaded(lineupCard.game_date);
     }
   }, [lineupCard, onLineupLoaded]);
   const ScrollIndicator = () => <div className="flex justify-center py-2">
