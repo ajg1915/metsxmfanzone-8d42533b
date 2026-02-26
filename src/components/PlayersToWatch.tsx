@@ -31,11 +31,11 @@ interface PlayerPrediction {
   confidence: number | null;
 }
 
-const PlayersToWatch = () => {
+const PlayersToWatch = ({ lineupGameDate }: { lineupGameDate?: string | null }) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const { data: predictions, isLoading, refetch } = useQuery({
-    queryKey: ["daily-player-predictions"],
+    queryKey: ["daily-player-predictions", lineupGameDate],
     queryFn: async () => {
       // First try today's predictions
       const today = new Date().toISOString().split('T')[0];
@@ -58,7 +58,7 @@ const PlayersToWatch = () => {
       if (recentError) throw recentError;
       return (recentData ?? []) as PlayerPrediction[];
     },
-    staleTime: 1000 * 60 * 2, // Cache for 2 minutes for faster sync
+    staleTime: 1000 * 60 * 2,
     refetchOnWindowFocus: true,
   });
 

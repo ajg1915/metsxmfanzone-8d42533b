@@ -136,6 +136,7 @@ const Index = () => {
   const { user } = useAuth();
   const [onboardingShown, setOnboardingShown] = useState(false);
   const [lineupLoaded, setLineupLoaded] = useState(false);
+  const [lineupGameDate, setLineupGameDate] = useState<string | null>(null);
 
   // Auto-fetch Mets lineup on game days (every 30 minutes)
   useAutoLineupFetch();
@@ -211,15 +212,18 @@ const Index = () => {
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton height="h-48" />}>
-          <HomeLineupCard onLineupLoaded={() => setLineupLoaded(true)} />
+          <HomeLineupCard onLineupLoaded={(gameDate) => {
+            setLineupLoaded(true);
+            setLineupGameDate(gameDate ?? null);
+          }} />
         </Suspense>
 
-        {/* Anthony's Predictions - only shown after lineup data loads */}
+        {/* Anthony's Predictions - only shown after lineup data loads, re-syncs on lineup change */}
         {lineupLoaded && (
           <>
             <div className="section-divider my-2 sm:my-3" />
             <Suspense fallback={<SectionSkeleton />}>
-              <PlayersToWatch />
+              <PlayersToWatch lineupGameDate={lineupGameDate} />
             </Suspense>
           </>
         )}
