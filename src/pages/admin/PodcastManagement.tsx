@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Upload, Loader2 } from "lucide-react";
+import { Trash2, Upload, Loader2, Pencil, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import PodcastAudioRecorder from "@/components/PodcastAudioRecorder";
 
@@ -24,6 +24,9 @@ export default function PodcastManagement() {
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState({ title: "", description: "" });
+  const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -169,7 +172,37 @@ export default function PodcastManagement() {
       });
     }
   };
+  const startEditing = (podcast: Podcast) => {
+    setEditingId(podcast.id);
+    setEditData({ title: podcast.title, description: podcast.description || "" });
+  };
 
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditData({ title: "", description: "" });
+  };
+
+  const saveEdit = async (id: string) => {
+    if (!editData.title.trim()) {
+      toast({ title: "Title is required", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("podcasts")
+        .update({ title: editData.title, description: editData.description })
+        .eq("id", id);
+      if (error) throw error;
+      toast({ title: "Podcast updated" });
+      setEditingId(null);
+      fetchPodcasts();
+    } catch (error: any) {
+      toast({ title: "Error updating podcast", description: error.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="max-w-full px-2 py-3 space-y-4 overflow-x-hidden">
@@ -246,26 +279,59 @@ export default function PodcastManagement() {
           <div className="space-y-4">
             {podcasts.map((podcast) => (
               <div key={podcast.id} className="p-3 border rounded-lg space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-sm truncate">{podcast.title}</h3>
-                    <p className="text-xs text-muted-foreground line-clamp-2">{podcast.description}</p>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <Switch
-                      checked={podcast.published}
-                      onCheckedChange={() => togglePublished(podcast.id, podcast.published)}
+                {editingId === podcast.id ? (
+                  <div className="space-y-2">
+                    <Input
+                      value={editData.title}
+                      onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                      placeholder="Title"
                     />
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="h-7 w-7 p-0"
-                      onClick={() => deletePodcast(podcast.id, podcast.audio_url)}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                    <Textarea
+                      value={editData.description}
+                      onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                      placeholder="Description"
+                      rows={2}
+                    />
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={() => saveEdit(podcast.id)} disabled={saving}>
+                        {saving ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
+                        Save
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={cancelEditing}>
+                        <X className="w-3 h-3 mr-1" /> Cancel
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-sm truncate">{podcast.title}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{podcast.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={() => startEditing(podcast)}
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      <Switch
+                        checked={podcast.published}
+                        onCheckedChange={() => togglePublished(podcast.id, podcast.published)}
+                      />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={() => deletePodcast(podcast.id, podcast.audio_url)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 <audio controls className="w-full h-8">
                   <source src={podcast.audio_url} type="audio/mpeg" />
                 </audio>
