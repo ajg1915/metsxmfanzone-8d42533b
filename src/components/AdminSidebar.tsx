@@ -54,7 +54,7 @@ const liveItems = [
   { title: "Game Alerts", url: "/admin/game-alerts", icon: Megaphone },
   { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
   { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
-  { title: "Podcast Schedule", url: "/admin/podcast-schedule", icon: CalendarDays },
+  
 ];
 
 // Events & Schedules
