@@ -22,9 +22,11 @@ interface HighlightsSectionProps {
   className?: string;
   /** If provided, called before opening a video. Return true to prevent the default dialog. */
   onVideoClick?: (video: Video) => boolean | void;
+  /** Optional badge element rendered inline next to the title */
+  badge?: React.ReactNode;
 }
 
-const HighlightsSection = ({ className, onVideoClick }: HighlightsSectionProps) => {
+const HighlightsSection = ({ className, onVideoClick, badge }: HighlightsSectionProps) => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   
@@ -125,9 +127,12 @@ const HighlightsSection = ({ className, onVideoClick }: HighlightsSectionProps) 
             <div className="flex items-center gap-2">
               <img src={metsLogo} alt="MetsXM FanZone" className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
               <div>
-                <h2 className="text-sm sm:text-base md:text-lg font-bold text-foreground">
-                  Mets Video Highlights
-                </h2>
+                <div className="flex items-center gap-1.5">
+                  <h2 className="text-sm sm:text-base md:text-lg font-bold text-foreground">
+                    Mets Video Highlights
+                  </h2>
+                  {badge}
+                </div>
                 <p className="text-[9px] sm:text-[10px] text-muted-foreground">
                   Uploaded by Orange &amp; Blue Media
                 </p>

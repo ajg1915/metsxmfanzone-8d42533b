@@ -15,13 +15,11 @@ const GameHighlightsSection = () => {
   const handleVideoClick = !user ? () => { navigate("/auth"); return true; } : undefined;
 
   return (
-    <div className="relative">
-      {showProBadge && (
-        <div className="absolute top-8 right-8 z-20">
-          <PremiumBadge size="md" />
-        </div>
-      )}
-      <HighlightsSection onVideoClick={handleVideoClick} />
+    <div>
+      <HighlightsSection 
+        onVideoClick={handleVideoClick} 
+        badge={showProBadge ? <PremiumBadge size="sm" noGlow /> : undefined}
+      />
     </div>
   );
 };
