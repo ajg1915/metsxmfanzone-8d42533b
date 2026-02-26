@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 const SUPPRESS_REFRESH_PATHS = [
@@ -12,63 +13,74 @@ const SUPPRESS_REFRESH_PATHS = [
   '/admin',
 ];
 
+// Map table names to the React Query keys they should invalidate
+const TABLE_QUERY_KEY_MAP: Record<string, string[]> = {
+  hero_slides: ['hero-slides'],
+  stories: ['stories'],
+  live_streams: ['live-streams'],
+  live_notifications: ['live-notifications'],
+  stream_alerts: ['stream-alerts'],
+  blog_posts: ['blog-posts', 'blog_posts'],
+  game_alerts: ['game-alerts'],
+  podcast_shows: ['podcast-shows', 'podcast_shows'],
+  mets_news_tracker: ['mets-news-tracker', 'mets_news_tracker'],
+  podcast_live_stream: ['podcast-live-stream', 'podcast_live_stream'],
+};
+
 /**
  * Real-time auto-refresh hook.
- * Subscribes to key Supabase tables via Realtime and triggers a hard refresh
- * ONLY when actual data changes occur — no more blind tab-switch reloads.
+ * Subscribes to key Supabase tables via Realtime and invalidates
+ * React Query caches so components re-fetch without a hard page reload.
  */
 export const useAutoRefresh = () => {
-  const lastRefresh = useRef(Date.now());
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const location = useLocation();
+  const queryClient = useQueryClient();
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingInvalidations = useRef<Set<string>>(new Set());
 
-  const isSupressedPage = () => {
+  const isSuppressedPage = () => {
     return SUPPRESS_REFRESH_PATHS.some(path => location.pathname.startsWith(path));
   };
 
   useEffect(() => {
-    // Minimum 10 seconds between refreshes to prevent rapid reloads
-    const MIN_REFRESH_INTERVAL = 10_000;
+    const triggerInvalidation = (tableName: string) => {
+      if (isSuppressedPage()) return;
 
-    const triggerRefresh = () => {
-      if (isSupressedPage()) {
-        console.log('[AutoRefresh] Skipping refresh — user is on a suppressed page');
-        return;
+      // Collect table names and batch-invalidate after a short debounce
+      const queryKeys = TABLE_QUERY_KEY_MAP[tableName];
+      if (queryKeys) {
+        queryKeys.forEach(key => pendingInvalidations.current.add(key));
       }
 
-      const now = Date.now();
-      if (now - lastRefresh.current < MIN_REFRESH_INTERVAL) {
-        return; // Too soon since last refresh
-      }
-
-      // Debounce: wait 2 seconds for batch changes before reloading
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current);
       }
 
       debounceTimer.current = setTimeout(() => {
-        console.log('[AutoRefresh] New data detected — refreshing');
-        lastRefresh.current = Date.now();
-        window.location.reload();
-      }, 2000);
+        const keys = Array.from(pendingInvalidations.current);
+        pendingInvalidations.current.clear();
+
+        console.log('[AutoRefresh] Invalidating queries:', keys);
+        keys.forEach(key => {
+          queryClient.invalidateQueries({ queryKey: [key] });
+        });
+      }, 1500);
     };
 
-    // Subscribe to tables that matter for the public-facing site
-    const channel = supabase
-      .channel('auto-refresh-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'hero_slides' }, triggerRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'stories' }, triggerRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'live_streams' }, triggerRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'live_notifications' }, triggerRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'stream_alerts' }, triggerRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'blog_posts' }, triggerRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'game_alerts' }, triggerRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'podcast_shows' }, triggerRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'mets_news_tracker' }, triggerRefresh)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'podcast_live_stream' }, triggerRefresh)
-      .subscribe((status) => {
-        console.log('[AutoRefresh] Realtime status:', status);
-      });
+    const tables = Object.keys(TABLE_QUERY_KEY_MAP);
+    let channel = supabase.channel('auto-refresh-realtime');
+
+    tables.forEach(table => {
+      channel = channel.on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table },
+        () => triggerInvalidation(table)
+      );
+    });
+
+    channel.subscribe((status) => {
+      console.log('[AutoRefresh] Realtime status:', status);
+    });
 
     return () => {
       if (debounceTimer.current) {
