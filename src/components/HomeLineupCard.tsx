@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, ChevronDown, RefreshCw, User } from "lucide-react";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 import springAstros from "@/assets/spring-mets-astros.jpg";
@@ -55,6 +55,7 @@ interface MLBLeader {
 }
 interface HomeLineupCardProps {
   className?: string;
+  onLineupLoaded?: () => void;
 }
 
 interface UpcomingGame {
@@ -68,7 +69,8 @@ interface UpcomingGame {
   };
 }
 export default function HomeLineupCard({
-  className
+  className,
+  onLineupLoaded
 }: HomeLineupCardProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { toast } = useToast();
@@ -262,6 +264,13 @@ export default function HomeLineupCard({
   const hasLineup = lineup && Array.isArray(lineup) && lineup.length > 0;
   const pitcher = lineupCard?.starting_pitcher as unknown as StartingPitcher | null;
   const metsStanding = standings?.find((s: any) => s.team_name === "Mets");
+
+  // Notify parent when lineup data is loaded
+  useEffect(() => {
+    if (lineupCard && onLineupLoaded) {
+      onLineupLoaded();
+    }
+  }, [lineupCard, onLineupLoaded]);
   const ScrollIndicator = () => <div className="flex justify-center py-2">
       <div className="flex items-center gap-1.5 text-muted-foreground animate-gentle-bounce">
         <ChevronDown className="w-4 h-4" />

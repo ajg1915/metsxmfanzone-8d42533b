@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play, Music2, Facebook, Headphones, Music, Podcast, Radio, Mic, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { motion } from "framer-motion";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import GlassCard from "@/components/GlassCard";
 import PremiumBadge from "@/components/PremiumBadge";
@@ -64,17 +63,7 @@ const PodcastSection = () => {
   return <section className="py-10 sm:py-12 md:py-16 relative overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         {/* Header */}
-        <motion.div initial={{
-        opacity: 0,
-        y: 20
-      }} whileInView={{
-        opacity: 1,
-        y: 0
-      }} viewport={{
-        once: true
-      }} transition={{
-        duration: 0.6
-      }} className="text-center mb-8 sm:mb-10">
+        <div className="text-center mb-8 sm:mb-10">
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             <div className="p-2 rounded-xl glass-card">
               <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
@@ -87,23 +76,33 @@ const PodcastSection = () => {
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">
             Listen to exclusive Mets content, game analysis, and fan discussions
           </p>
-        </motion.div>
+        </div>
+
+        {/* Live Notification Banner */}
+        <div className="mb-6 sm:mb-8">
+          <GlassCard variant="interactive" glow="orange" className="border-orange-500/30">
+            <div className="flex items-center gap-3 p-3 sm:p-4">
+              <div className="relative flex-shrink-0">
+                <Mic className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-orange-500 rounded-full animate-pulse" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm font-semibold text-foreground">
+                  🎙️ New episodes drop instantly when we go live!
+                </p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">
+                  Follow us on any platform below to get notified the moment a new podcast episode is available.
+                </p>
+              </div>
+            </div>
+          </GlassCard>
+        </div>
 
         {/* Listen Live Section */}
         <div className="mb-8 sm:mb-10 md:mb-12">
-          <motion.h3 initial={{
-          opacity: 0,
-          y: 10
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true
-        }} transition={{
-          duration: 0.5
-        }} className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">
+          <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">
             Listen Live On
-          </motion.h3>
+          </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 max-w-5xl mx-auto">
             {platforms.map((platform, index) => {
             const IconComponent = platform.icon;
@@ -121,19 +120,9 @@ const PodcastSection = () => {
 
         {/* Recent Episodes */}
         {podcasts.length > 0 && <div>
-            <motion.h3 initial={{
-          opacity: 0,
-          y: 10
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true
-        }} transition={{
-          duration: 0.5
-        }} className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">
+            <h3 className="text-lg sm:text-xl font-bold text-center mb-4 sm:mb-6">
               Recent Episodes
-            </motion.h3>
+            </h3>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
               {podcasts.map((podcast, index) => <GlassCard key={podcast.id} variant="default" glow="blue" delay={index * 0.1}>
                   <div className="p-6">
@@ -157,22 +146,11 @@ const PodcastSection = () => {
                   </div>
                 </GlassCard>)}
             </div>
-            <motion.div initial={{
-          opacity: 0,
-          y: 10
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true
-        }} transition={{
-          duration: 0.5,
-          delay: 0.3
-        }} className="text-center mt-8 flex flex-wrap justify-center gap-4">
+            <div className="text-center mt-8 flex flex-wrap justify-center gap-4">
               <Button size="lg" asChild className="glass-card border-primary/30 hover:border-primary/50">
                 <Link to="/podcast">View All Episodes</Link>
               </Button>
-            </motion.div>
+            </div>
           </div>}
       </div>
     </section>;
