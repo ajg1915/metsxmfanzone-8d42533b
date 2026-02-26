@@ -18,6 +18,7 @@ const LiveStreamsSection = lazy(() => import("@/components/LiveStreamsSection"))
 const SpringTrainingGamesSection = lazy(() => import("@/components/SpringTrainingGamesSection"));
 const GameHighlightsSection = lazy(() => import("@/components/GameHighlightsSection"));
 const ReplayGamesSection = lazy(() => import("@/components/ReplayGamesSection"));
+// Spring Training 2026 - TODO: Remove this section once the 2026 spring training season concludes
 const SpringTraining = lazy(() => import("@/components/SpringTraining"));
 const PlayersToWatch = lazy(() => import("@/components/PlayersToWatch"));
 const TalentAssessmentSection = lazy(() => import("@/components/TalentAssessmentSection"));
@@ -25,7 +26,6 @@ const MetsNewsTracker = lazy(() => import("@/components/MetsNewsTracker"));
 const BlogSection = lazy(() => import("@/components/BlogSection"));
 const HomeLineupCard = lazy(() => import("@/components/HomeLineupCard"));
 const PodcastSection = lazy(() => import("@/components/PodcastSection"));
-const PodcastScheduleSection = lazy(() => import("@/components/PodcastScheduleSection"));
 const JoinPodcastSection = lazy(() => import("@/components/JoinPodcastSection"));
 const HotStoveGuide = lazy(() => import("@/components/HotStoveGuide"));
 const StoriesSection = lazy(() => import("@/components/StoriesSection"));
@@ -37,7 +37,7 @@ const CommunityPreviewSection = lazy(() => import("@/components/CommunityPreview
 const InstallPrompt = lazy(() => import("@/components/InstallPrompt"));
 const OnboardingWalkthrough = lazy(() => import("@/components/OnboardingWalkthrough"));
 const NotificationPrompt = lazy(() => import("@/components/NotificationPrompt"));
-// Removed: WelcomeBackToast, FeedbackToast, GameAlertsBanner per user request
+const ToastPoll = lazy(() => import("@/components/ToastPoll"));
 
 
 // Section loading skeleton
@@ -135,6 +135,7 @@ const combinedSchemas = [homepageSchema, organizationSchema, websiteSchema];
 const Index = () => {
   const { user } = useAuth();
   const [onboardingShown, setOnboardingShown] = useState(false);
+  const [lineupLoaded, setLineupLoaded] = useState(false);
 
   // Auto-fetch Mets lineup on game days (every 30 minutes)
   useAutoLineupFetch();
@@ -146,7 +147,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Removed: WelcomeBackToast */}
+      {/* Poll Toast notification */}
+      <Suspense fallback={null}>
+        <ToastPoll />
+      </Suspense>
 
       {/* Immersive animated background - lazy loaded */}
       <Suspense fallback={null}>
@@ -166,17 +170,11 @@ const Index = () => {
         breadcrumbs={[{ name: "Home", url: "/" }]}
       />
       <Navigation />
-      {/* Removed: GameAlertsBanner per user request - alerts only via email */}
       <Suspense fallback={null}>
           <FreeTrialExpiryBanner />
         </Suspense>
       <main className="relative z-10">
         <Hero />
-        
-        
-        {/* Removed: LiveNotificationBar */}
-
-        
 
         <Suspense fallback={<SectionSkeleton height="h-16" />}>
           <GamecastBanner />
@@ -213,7 +211,23 @@ const Index = () => {
         </Suspense>
 
         <Suspense fallback={<SectionSkeleton height="h-48" />}>
-          <HomeLineupCard />
+          <HomeLineupCard onLineupLoaded={() => setLineupLoaded(true)} />
+        </Suspense>
+
+        {/* Anthony's Predictions - only shown after lineup data loads */}
+        {lineupLoaded && (
+          <>
+            <div className="section-divider my-2 sm:my-3" />
+            <Suspense fallback={<SectionSkeleton />}>
+              <PlayersToWatch />
+            </Suspense>
+          </>
+        )}
+
+        {/* MetsXMFanZone Radio - directly after Predictions */}
+        <div className="section-divider my-2 sm:my-3" />
+        <Suspense fallback={<SectionSkeleton />}>
+          <PodcastSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
@@ -224,20 +238,11 @@ const Index = () => {
           </Suspense>
         </div>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <PodcastScheduleSection />
-        </Suspense>
-
+        {/* Spring Training 2026 - TODO: Remove once spring training season concludes */}
         <div className="section-divider my-2 sm:my-3" />
 
         <Suspense fallback={<SectionSkeleton />}>
           <SpringTraining />
-        </Suspense>
-
-        <div className="section-divider my-2 sm:my-3" />
-
-        <Suspense fallback={<SectionSkeleton />}>
-          <PlayersToWatch />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
@@ -250,12 +255,6 @@ const Index = () => {
 
         <Suspense fallback={<SectionSkeleton />}>
           <MetsNewsTracker />
-        </Suspense>
-
-        <div className="section-divider my-2 sm:my-3" />
-
-        <Suspense fallback={<SectionSkeleton />}>
-          <PodcastSection />
         </Suspense>
 
         <div className="section-divider my-2 sm:my-3" />
