@@ -216,26 +216,44 @@ export default function HomeLineupCard({
   } = useQuery({
     queryKey: ["mlb-mets-leaders-2026"],
     queryFn: async () => {
-      const [avgRes, hrRes, rbiRes, eraRes, winsRes, soRes] = await Promise.all([fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=battingAverage&season=2026&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=homeRuns&season=2026&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=runsBattedIn&season=2026&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=earnedRunAverage&season=2026&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=wins&season=2026&limit=1"), fetch("https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=strikeouts&season=2026&limit=1")]);
-      const [avgData, hrData, rbiData, eraData, winsData, soData] = await Promise.all([avgRes.json(), hrRes.json(), rbiRes.json(), eraRes.json(), winsRes.json(), soRes.json()]);
-      const getLeader = (data: any) => {
+      const now = new Date();
+      const currentSeason = now.getFullYear();
+      // MLB leader endpoints commonly have no team leader data before regular season starts
+      const primarySeason = now.getMonth() < 3 ? currentSeason - 1 : currentSeason;
+      const fallbackSeason = primarySeason - 1;
+
+      const fetchLeaderCategory = async (category: string) => {
+        const buildUrl = (season: number) =>
+          `https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=${category}&season=${season}&limit=1`;
+
+        const primaryRes = await fetch(buildUrl(primarySeason));
+        const response = primaryRes.ok ? primaryRes : await fetch(buildUrl(fallbackSeason));
+
+        if (!response.ok) return null;
+
+        const data = await response.json();
         const leaders = data.teamLeaders?.[0]?.leaders;
+
         if (leaders && leaders.length > 0) {
           return {
             name: leaders[0].person.fullName,
-            value: leaders[0].value
+            value: leaders[0].value,
           };
         }
+
         return null;
       };
-      return {
-        AVG: getLeader(avgData),
-        HR: getLeader(hrData),
-        RBI: getLeader(rbiData),
-        ERA: getLeader(eraData),
-        W: getLeader(winsData),
-        SO: getLeader(soData)
-      };
+
+      const [AVG, HR, RBI, ERA, W, SO] = await Promise.all([
+        fetchLeaderCategory("battingAverage"),
+        fetchLeaderCategory("homeRuns"),
+        fetchLeaderCategory("runsBattedIn"),
+        fetchLeaderCategory("earnedRunAverage"),
+        fetchLeaderCategory("wins"),
+        fetchLeaderCategory("strikeouts"),
+      ]);
+
+      return { AVG, HR, RBI, ERA, W, SO };
     },
     staleTime: 5 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000
