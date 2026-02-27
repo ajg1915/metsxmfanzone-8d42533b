@@ -193,19 +193,81 @@ async function sendMaintenanceEmails(supabase: any, issueType: string, alertMess
     return;
   }
 
+  const logoUrl = 'https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png';
   const safeMessage = escapeHtml(alertMessage);
+  const issueLabel = issueType.charAt(0).toUpperCase() + issueType.slice(1);
   const subject = `⚠️ MetsXMFanZone Stream Maintenance Notice`;
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #002d72; color: #ffffff; padding: 30px; border-radius: 12px;">
-      <h1 style="color: #ff5910; text-align: center;">🏟️ MetsXMFanZone</h1>
-      <h2 style="text-align: center; color: #ffffff;">Stream Maintenance Notice</h2>
-      <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p style="font-size: 16px; line-height: 1.6;">${safeMessage}</p>
-      </div>
-      <p style="font-size: 14px; color: #cccccc; text-align: center;">Our team is working to restore service as quickly as possible. We'll notify you when the stream is back online.</p>
-      <p style="font-size: 12px; color: #999999; text-align: center; margin-top: 20px;">© MetsXMFanZone. All rights reserved.</p>
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stream Maintenance Notice</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #002D72; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <div style="max-width: 420px; margin: 0 auto; padding: 20px 12px;">
+    
+    <!-- Header: Logo Only -->
+    <div style="text-align: center; padding: 24px 0 16px 0;">
+      <img src="${logoUrl}" alt="MetsXMFanZone" width="85" height="85" style="width: 85px; height: 85px; display: block; margin: 0 auto 8px auto; border-radius: 12px;" />
+      <span style="color: #FF4500; font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">MetsXMFanZone</span>
     </div>
-  `;
+
+    <!-- Main Card -->
+    <div style="background: linear-gradient(180deg, #141a2e 0%, #0d1222 100%); border: 1px solid rgba(255,69,0,0.25); border-radius: 16px; padding: 28px 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+      
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="font-size: 36px; margin-bottom: 12px;">🔧</div>
+        <h1 style="color: white; font-size: 20px; font-weight: 800; margin: 0 0 8px 0; line-height: 1.3;">Stream Maintenance Notice</h1>
+      </div>
+
+      <div style="background: #0a0e1a; border: 1px solid rgba(255,69,0,0.3); border-radius: 12px; padding: 18px; margin: 16px 0;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="color: #9CA3AF; font-size: 11px; padding: 4px 0; text-transform: uppercase; letter-spacing: 1px;">Issue Type</td>
+            <td style="color: #FF4500; font-size: 13px; padding: 4px 0; text-align: right; font-weight: 700;">${escapeHtml(issueLabel)}</td>
+          </tr>
+          <tr>
+            <td style="color: #9CA3AF; font-size: 11px; padding: 4px 0; text-transform: uppercase; letter-spacing: 1px;">Status</td>
+            <td style="color: #FBBF24; font-size: 13px; padding: 4px 0; text-align: right; font-weight: 600;">Under Investigation</td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="color: #D1D5DB; font-size: 14px; line-height: 1.6; text-align: center; margin: 0 0 16px 0;">${safeMessage}</p>
+      
+      <p style="color: #9CA3AF; font-size: 12px; line-height: 1.5; text-align: center; margin: 0;">
+        Our team is working to restore service as quickly as possible. We'll notify you when the stream is back online.
+      </p>
+
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="https://metsxmfanzone.com" style="display: inline-block; background: linear-gradient(135deg, #FF4500 0%, #FF6B35 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 14px; letter-spacing: 0.3px; box-shadow: 0 4px 14px rgba(255,69,0,0.4);">
+          Check Status
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align: center; padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.08);">
+      <div style="margin-bottom: 12px;">
+        <a href="https://facebook.com/metsxmfanzone" style="color: #9CA3AF; text-decoration: none; margin: 0 6px; font-size: 11px;">Facebook</a>
+        <span style="color: #374151;">•</span>
+        <a href="https://twitter.com/metsxmfanzone" style="color: #9CA3AF; text-decoration: none; margin: 0 6px; font-size: 11px;">Twitter</a>
+        <span style="color: #374151;">•</span>
+        <a href="https://instagram.com/metsxmfanzone" style="color: #9CA3AF; text-decoration: none; margin: 0 6px; font-size: 11px;">Instagram</a>
+        <span style="color: #374151;">•</span>
+        <a href="https://youtube.com/@metsxmfanzone" style="color: #9CA3AF; text-decoration: none; margin: 0 6px; font-size: 11px;">YouTube</a>
+      </div>
+      <p style="color: #6B7280; font-size: 10px; margin: 0 0 6px 0;">
+        You're receiving this as a registered MetsXMFanZone member.
+      </p>
+      <p style="color: #4B5563; font-size: 10px; margin: 0;">
+        &copy; ${new Date().getFullYear()} MetsXMFanZone. All rights reserved.
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
 
   let sent = 0;
   let failed = 0;
@@ -220,7 +282,7 @@ async function sendMaintenanceEmails(supabase: any, issueType: string, alertMess
           from: 'MetsXMFanZone <noreply@metsxmfanzone.com>',
           to: [profile.email],
           subject,
-          html: html.replace('{{name}}', escapeHtml(profile.full_name || 'Fan')),
+          html,
         }),
       });
       if (response.ok) sent++; else failed++;
