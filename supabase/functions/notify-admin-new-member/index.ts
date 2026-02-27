@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
 <body style="margin: 0; padding: 0; background-color: #002D72; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
   <div style="max-width: 400px; margin: 0 auto; padding: 20px;">
     <div style="text-align: center; padding: 15px 0;">
-      <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 85px; height: 85px; border-radius: 12px;" />
+      <img src="${logoUrl}" alt="MetsXMFanZone" style="width: 85px; height: auto; border-radius: 12px;" />
       <h2 style="color: #FF4500; margin: 8px 0 0 0; font-size: 18px;">🎉 New Member Alert!</h2>
     </div>
     <div style="background: linear-gradient(180deg, #1a1f2e 0%, #0f1420 100%); border: 1px solid rgba(255, 69, 0, 0.3); border-radius: 12px; padding: 24px;">
