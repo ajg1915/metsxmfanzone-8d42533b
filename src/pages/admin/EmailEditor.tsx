@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Loader2, Send, Users, Newspaper, User, Eye, X, TestTube, ShieldCheck, UserPlus, CreditCard, Paintbrush, RotateCcw, Trophy, PenTool, CheckCircle, Clock, Wrench, Bell } from "lucide-react";
+import { Mail, Loader2, Send, Users, Newspaper, User, Eye, X, TestTube, ShieldCheck, UserPlus, CreditCard, Paintbrush, RotateCcw, Trophy, PenTool, CheckCircle, Clock, Wrench, Bell, Upload, ImageIcon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useRef } from "react";
 
 type RecipientType = "all_users" | "subscribers" | "specific";
 type EmailTemplateType = "custom" | "otp" | "welcome" | "subscription" | "game_day" | "writer_approval" | "writer_revoked" | "email_confirm" | "sub_expiry" | "maintenance";
@@ -43,8 +44,11 @@ interface RecipientCounts {
   subscribers: number;
 }
 
+const DEFAULT_LOGO_URL = 'https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png';
+
 interface EmailStyle {
   logoWidth: number;
+  logoUrl: string;
   primaryColor: string;
   accentColor: string;
   bgColor: string;
@@ -57,6 +61,7 @@ interface EmailStyle {
 
 const DEFAULT_STYLE: EmailStyle = {
   logoWidth: 85,
+  logoUrl: DEFAULT_LOGO_URL,
   primaryColor: "#002D72",
   accentColor: "#FF5910",
   bgColor: "#0a0a0a",
@@ -66,8 +71,6 @@ const DEFAULT_STYLE: EmailStyle = {
   borderColor: "#2a2a3e",
   borderRadius: 8,
 };
-
-const LOGO_URL = 'https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png';
 
 const escapeHtml = (str: string): string => {
   if (!str) return '';
@@ -79,9 +82,9 @@ const escapeHtml = (str: string): string => {
     .replace(/'/g, '&#039;');
 };
 
-const getEmailHeader = (style: EmailStyle) => `
+const getEmailHeader = (style: EmailStyle, logoUrl?: string) => `
   <div style="text-align: center; margin-bottom: 16px;">
-    <img src="${LOGO_URL}" alt="MetsXMFanZone" style="width: ${style.logoWidth}px; height: auto; margin-bottom: 8px; border-radius: 12px;" />
+    <img src="${logoUrl || style.logoUrl}" alt="MetsXMFanZone" style="width: ${style.logoWidth}px; height: auto; margin-bottom: 8px; border-radius: 12px;" />
     <div>
       <span style="color: ${style.primaryColor}; font-size: 18px; font-weight: bold;">Mets</span><span style="color: ${style.accentColor}; font-size: 18px; font-weight: bold;">XM</span><span style="color: ${style.textColor}; font-size: 18px; font-weight: bold;">FanZone</span>
     </div>
@@ -201,7 +204,7 @@ const generateGameDayEmailHtml = (opponent: string, gameDate: string, gameTime: 
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: ${style.primaryColor};">
   <div style="max-width: 420px; margin: 0 auto; padding: 20px 12px;">
     <div style="text-align: center; padding: 24px 0 16px 0;">
-      <img src="${LOGO_URL}" alt="MetsXMFanZone" width="${style.logoWidth}" style="width: ${style.logoWidth}px; height: auto; display: block; margin: 0 auto 8px auto; border-radius: 12px;" />
+      <img src="${style.logoUrl}" alt="MetsXMFanZone" width="${style.logoWidth}" style="width: ${style.logoWidth}px; height: auto; display: block; margin: 0 auto 8px auto; border-radius: 12px;" />
       <span style="color: ${style.accentColor}; font-size: 18px; font-weight: 800;">MetsXMFanZone</span>
     </div>
     <div style="background: linear-gradient(180deg, #141a2e 0%, #0d1222 100%); border: 1px solid rgba(255,69,0,0.25); border-radius: 16px; padding: 28px 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
@@ -387,8 +390,46 @@ export default function EmailEditor() {
   const [expiryPlan, setExpiryPlan] = useState("Premium Monthly");
   const [expiryDays, setExpiryDays] = useState("3");
   const [maintenanceCount, setMaintenanceCount] = useState("2");
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const { toast } = useToast();
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({ title: "Invalid File", description: "Please upload a PNG, JPG, WebP, or GIF image.", variant: "destructive" });
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "File Too Large", description: "Logo must be under 2MB.", variant: "destructive" });
+      return;
+    }
+
+    setIsUploadingLogo(true);
+    try {
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'png';
+      const fileName = `email-logo-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from('email-assets')
+        .upload(fileName, file, { upsert: true, contentType: file.type });
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage.from('email-assets').getPublicUrl(fileName);
+      const publicUrl = urlData.publicUrl;
+      setEmailStyle(s => ({ ...s, logoUrl: publicUrl }));
+      toast({ title: "Logo Uploaded", description: "Email logo updated successfully." });
+    } catch (err: any) {
+      console.error("Logo upload error:", err);
+      toast({ title: "Upload Failed", description: err.message || "Could not upload logo.", variant: "destructive" });
+    } finally {
+      setIsUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = '';
+    }
+  };
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -611,6 +652,36 @@ export default function EmailEditor() {
         <CardDescription className="text-xs">Tweak colors, sizing & borders live</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Logo Upload */}
+        <div className="space-y-2">
+          <Label className="text-xs flex items-center gap-1"><ImageIcon className="w-3 h-3" /> Email Logo</Label>
+          <div className="flex items-center gap-3">
+            <img src={emailStyle.logoUrl} alt="Current logo" className="w-12 h-12 rounded-lg border border-border object-cover bg-muted" />
+            <div className="flex-1 space-y-1">
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                onChange={handleLogoUpload}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full text-xs"
+                disabled={isUploadingLogo}
+                onClick={() => { if (logoInputRef.current) { logoInputRef.current.value = ''; logoInputRef.current.click(); } }}
+              >
+                {isUploadingLogo ? <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Uploading...</> : <><Upload className="w-3 h-3 mr-1" /> Upload Logo</>}
+              </Button>
+              {emailStyle.logoUrl !== DEFAULT_LOGO_URL && (
+                <Button variant="ghost" size="sm" className="w-full text-xs h-6" onClick={() => setEmailStyle(s => ({ ...s, logoUrl: DEFAULT_LOGO_URL }))}>
+                  <RotateCcw className="w-3 h-3 mr-1" /> Reset to Default
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
         <div className="space-y-2">
           <Label className="text-xs">Logo Size: {emailStyle.logoWidth}px</Label>
           <Slider value={[emailStyle.logoWidth]} onValueChange={([v]) => setEmailStyle(s => ({ ...s, logoWidth: v }))} min={40} max={120} step={5} />
