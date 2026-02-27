@@ -390,6 +390,8 @@ export default function EmailEditor() {
   const [testEmail, setTestEmail] = useState("");
   const [showStylePanel, setShowStylePanel] = useState(false);
   const [emailStyle, setEmailStyle] = useState<EmailStyle>({ ...DEFAULT_STYLE });
+  const [emojiSaveStatus, setEmojiSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [emojisChanged, setEmojisChanged] = useState(false);
 
   // Template preview fields
   const [otpCode, setOtpCode] = useState("123456");
@@ -447,6 +449,29 @@ export default function EmailEditor() {
     }
   };
 
+  // Load saved emoji settings from site_settings
+  useEffect(() => {
+    const loadEmojiSettings = async () => {
+      try {
+        const { data } = await supabase
+          .from('site_settings')
+          .select('setting_value')
+          .eq('setting_key', 'email_emojis')
+          .maybeSingle();
+        if (data?.setting_value && typeof data.setting_value === 'object') {
+          const saved = data.setting_value as Record<string, string>;
+          setEmailStyle(s => ({
+            ...s,
+            emojis: { ...s.emojis, ...saved },
+          }));
+        }
+      } catch (err) {
+        console.error('Failed to load emoji settings:', err);
+      }
+    };
+    loadEmojiSettings();
+  }, []);
+
   useEffect(() => {
     const fetchCounts = async () => {
       try {
@@ -464,6 +489,37 @@ export default function EmailEditor() {
     };
     fetchCounts();
   }, []);
+
+  const saveEmojiSettings = async () => {
+    setEmojiSaveStatus('saving');
+    try {
+      const { data: existing } = await supabase
+        .from('site_settings')
+        .select('id')
+        .eq('setting_key', 'email_emojis')
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from('site_settings')
+          .update({ setting_value: emailStyle.emojis as unknown as Record<string, string>, updated_at: new Date().toISOString() })
+          .eq('setting_key', 'email_emojis');
+      } else {
+        await supabase
+          .from('site_settings')
+          .insert({ setting_key: 'email_emojis', setting_type: 'json', setting_value: emailStyle.emojis as unknown as Record<string, string> });
+      }
+
+      setEmojiSaveStatus('saved');
+      setEmojisChanged(false);
+      toast({ title: "Emojis Saved ✓", description: "Template emojis updated successfully." });
+      setTimeout(() => setEmojiSaveStatus('idle'), 3000);
+    } catch (err: any) {
+      console.error('Failed to save emoji settings:', err);
+      setEmojiSaveStatus('idle');
+      toast({ title: "Save Failed", description: err.message || "Could not save emoji settings.", variant: "destructive" });
+    }
+  };
 
   const addEmail = () => {
     const email = emailInput.trim().toLowerCase();
@@ -738,13 +794,32 @@ export default function EmailEditor() {
                 <Label className="text-[10px] text-muted-foreground">{label}</Label>
                 <Input
                   value={emailStyle.emojis[key]}
-                  onChange={e => setEmailStyle(s => ({ ...s, emojis: { ...s.emojis, [key]: e.target.value } }))}
+                  onChange={e => {
+                    setEmailStyle(s => ({ ...s, emojis: { ...s.emojis, [key]: e.target.value } }));
+                    setEmojisChanged(true);
+                    setEmojiSaveStatus('idle');
+                  }}
                   className="h-8 text-center text-lg px-1"
                   maxLength={4}
                 />
               </div>
             ))}
           </div>
+          <Button
+            onClick={saveEmojiSettings}
+            disabled={!emojisChanged || emojiSaveStatus === 'saving'}
+            size="sm"
+            variant={emojiSaveStatus === 'saved' ? 'outline' : 'default'}
+            className="w-full mt-2"
+          >
+            {emojiSaveStatus === 'saving' ? (
+              <><Loader2 className="w-3 h-3 mr-1 animate-spin" /> Saving...</>
+            ) : emojiSaveStatus === 'saved' ? (
+              <><CheckCircle className="w-3 h-3 mr-1 text-green-500" /> Saved ✓</>
+            ) : (
+              <><Upload className="w-3 h-3 mr-1" /> Save Emojis</>
+            )}
+          </Button>
         </div>
       </CardContent>
     </Card>
