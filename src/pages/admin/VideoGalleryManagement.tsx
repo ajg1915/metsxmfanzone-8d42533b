@@ -161,14 +161,36 @@ export default function VideoGalleryManagement() {
       if (uploadMethod === 'file' && videoFile) {
         const fileExt = videoFile.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from('videos')
-          .upload(fileName, videoFile, {
-            cacheControl: '3600',
-            upsert: false
-          });
+        
+        // Upload with progress tracking using XMLHttpRequest
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        const session = (await supabase.auth.getSession()).data.session;
+        const token = session?.access_token || supabaseKey;
 
-        if (uploadError) throw uploadError;
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+              const pct = Math.round((e.loaded / e.total) * 100);
+              setUploadProgress(pct);
+            }
+          });
+          xhr.addEventListener('load', () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve();
+            } else {
+              reject(new Error(`Upload failed: ${xhr.statusText}`));
+            }
+          });
+          xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+          xhr.open('POST', `${supabaseUrl}/storage/v1/object/videos/${fileName}`);
+          xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+          xhr.setRequestHeader('apikey', supabaseKey);
+          xhr.setRequestHeader('x-upsert', 'false');
+          xhr.setRequestHeader('cache-control', '3600');
+          xhr.send(videoFile);
+        });
 
         const { data: { publicUrl } } = supabase.storage
           .from('videos')
@@ -346,6 +368,7 @@ export default function VideoGalleryManagement() {
     setThumbnailFile(null);
     setSelectedFrameBlob(null);
     setUploadMethod('file');
+    setUploadProgress(0);
   };
 
   if (loading) {
@@ -571,16 +594,22 @@ export default function VideoGalleryManagement() {
                 </Button>
                 <Button type="submit" disabled={uploading || generatingThumbnail}>
                   {uploading && <Upload className="mr-2 h-4 w-4 animate-spin" />}
-                  {uploading ? "Uploading..." : generatingThumbnail ? "Generating Thumbnail..." : editingVideo ? "Update" : "Create"}
+                  {uploading ? `Uploading${uploadProgress > 0 ? ` (${uploadProgress}%)` : '...'}` : generatingThumbnail ? "Generating Thumbnail..." : editingVideo ? "Update" : "Create"}
                 </Button>
               </div>
 
-              {uploadProgress > 0 && (
-                <div className="w-full bg-secondary rounded-full h-2">
-                  <div
-                    className="bg-primary h-2 rounded-full transition-all"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
+              {uploading && uploadProgress > 0 && (
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Uploading video...</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-secondary rounded-full h-3">
+                    <div
+                      className="bg-primary h-3 rounded-full transition-all duration-300 ease-out"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
                 </div>
               )}
             </form>
