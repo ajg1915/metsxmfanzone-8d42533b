@@ -18,6 +18,49 @@ const escapeHtml = (str: string): string => {
     .replace(/'/g, '&#039;');
 };
 
+// MLB team ID mapping for official logos
+const MLB_TEAM_IDS: Record<string, number> = {
+  'arizona diamondbacks': 109, 'diamondbacks': 109, 'dbacks': 109, 'ari': 109,
+  'atlanta braves': 144, 'braves': 144, 'atl': 144,
+  'baltimore orioles': 110, 'orioles': 110, 'bal': 110,
+  'boston red sox': 111, 'red sox': 111, 'bos': 111,
+  'chicago cubs': 112, 'cubs': 112, 'chc': 112,
+  'chicago white sox': 145, 'white sox': 145, 'chw': 145, 'cws': 145,
+  'cincinnati reds': 113, 'reds': 113, 'cin': 113,
+  'cleveland guardians': 114, 'guardians': 114, 'cle': 114,
+  'colorado rockies': 115, 'rockies': 115, 'col': 115,
+  'detroit tigers': 116, 'tigers': 116, 'det': 116,
+  'houston astros': 117, 'astros': 117, 'hou': 117,
+  'kansas city royals': 118, 'royals': 118, 'kc': 118,
+  'los angeles angels': 108, 'angels': 108, 'laa': 108,
+  'los angeles dodgers': 119, 'dodgers': 119, 'lad': 119,
+  'miami marlins': 146, 'marlins': 146, 'mia': 146,
+  'milwaukee brewers': 158, 'brewers': 158, 'mil': 158,
+  'minnesota twins': 142, 'twins': 142, 'min': 142,
+  'new york mets': 121, 'mets': 121, 'nym': 121,
+  'new york yankees': 147, 'yankees': 147, 'nyy': 147,
+  'oakland athletics': 133, 'athletics': 133, 'oak': 133, "a's": 133,
+  'philadelphia phillies': 143, 'phillies': 143, 'phi': 143,
+  'pittsburgh pirates': 134, 'pirates': 134, 'pit': 134,
+  'san diego padres': 135, 'padres': 135, 'sd': 135,
+  'san francisco giants': 137, 'giants': 137, 'sf': 137,
+  'seattle mariners': 136, 'mariners': 136, 'sea': 136,
+  'st. louis cardinals': 138, 'cardinals': 138, 'stl': 138,
+  'tampa bay rays': 139, 'rays': 139, 'tb': 139,
+  'texas rangers': 140, 'rangers': 140, 'tex': 140,
+  'toronto blue jays': 141, 'blue jays': 141, 'tor': 141,
+  'washington nationals': 120, 'nationals': 120, 'wsh': 120, 'was': 120,
+};
+
+const getTeamLogoUrl = (teamName: string): string => {
+  const key = teamName.toLowerCase().trim();
+  const teamId = MLB_TEAM_IDS[key];
+  if (teamId) {
+    return `https://www.mlbstatic.com/team-logos/${teamId}.svg`;
+  }
+  return '';
+};
+
 interface GameNotificationRequest {
   title: string;
   message: string;
@@ -78,6 +121,10 @@ const getNotificationIcon = (type: string): string => {
   }
 };
 
+const isGameType = (type: string): boolean => {
+  return ['game_alert', 'score_update', 'final_score', 'lineup'].includes(type);
+};
+
 const getEmailTemplate = (
   title: string,
   message: string,
@@ -91,8 +138,35 @@ const getEmailTemplate = (
   const logoUrl = 'https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png';
   const icon = getNotificationIcon(notificationType || 'general');
   const isFinal = notificationType === 'final_score';
+  const isGame = isGameType(notificationType || 'general');
   const safeTitle = escapeHtml(title);
   const safeMessage = escapeHtml(message);
+
+  // Determine opponent for logo display
+  const opponentName = gameInfo?.opponent || gameInfo?.awayTeam || gameInfo?.homeTeam || '';
+  const opponentLogoUrl = opponentName ? getTeamLogoUrl(opponentName) : '';
+  const metsLogoUrl = 'https://www.mlbstatic.com/team-logos/121.svg';
+
+  // VS header for game-type emails: Mets logo vs Opponent logo
+  const vsHeaderHtml = (isGame && opponentLogoUrl) ? `
+    <div style="text-align: center; padding: 16px 0 8px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 auto; max-width: 280px;">
+        <tr>
+          <td width="40%" style="text-align: center; vertical-align: middle;">
+            <img src="${metsLogoUrl}" alt="New York Mets" width="64" height="64" style="width: 64px; height: 64px; display: block; margin: 0 auto;" />
+            <div style="color: #ffffff; font-size: 11px; font-weight: 700; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px;">Mets</div>
+          </td>
+          <td width="20%" style="text-align: center; vertical-align: middle;">
+            <div style="color: #FF4500; font-size: 20px; font-weight: 900; letter-spacing: 2px;">VS</div>
+          </td>
+          <td width="40%" style="text-align: center; vertical-align: middle;">
+            <img src="${escapeHtml(opponentLogoUrl)}" alt="${escapeHtml(opponentName)}" width="64" height="64" style="width: 64px; height: 64px; display: block; margin: 0 auto;" />
+            <div style="color: #ffffff; font-size: 11px; font-weight: 700; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(opponentName)}</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  ` : '';
 
   // Score box for final score / score update alerts
   const scoreBoxHtml = (gameInfo && (isFinal || notificationType === 'score_update') && gameInfo.homeTeam && gameInfo.awayTeam) ? `
@@ -150,6 +224,8 @@ const getEmailTemplate = (
     <!-- Main Card -->
     <div style="background: linear-gradient(180deg, #141a2e 0%, #0d1222 100%); border: 1px solid rgba(255,69,0,0.25); border-radius: 16px; padding: 28px 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
       
+      ${vsHeaderHtml}
+
       <!-- Icon + Title -->
       <div style="text-align: center; margin-bottom: 16px;">
         <div style="font-size: 36px; margin-bottom: 12px;">${icon}</div>

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Loader2, Send, Users, Newspaper, User, Eye, X, TestTube, ShieldCheck, UserPlus, CreditCard } from "lucide-react";
+import { Mail, Loader2, Send, Users, Newspaper, User, Eye, X, TestTube, ShieldCheck, UserPlus, CreditCard, Paintbrush, RotateCcw } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +32,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
 
 type RecipientType = "all_users" | "subscribers" | "specific";
 type EmailTemplateType = "custom" | "otp" | "welcome" | "subscription";
@@ -40,6 +41,32 @@ interface RecipientCounts {
   allUsers: number;
   subscribers: number;
 }
+
+interface EmailStyle {
+  logoWidth: number;
+  primaryColor: string;
+  accentColor: string;
+  bgColor: string;
+  cardBgColor: string;
+  textColor: string;
+  mutedTextColor: string;
+  borderColor: string;
+  borderRadius: number;
+}
+
+const DEFAULT_STYLE: EmailStyle = {
+  logoWidth: 85,
+  primaryColor: "#002D72",
+  accentColor: "#FF5910",
+  bgColor: "#0a0a0a",
+  cardBgColor: "#1a1a2e",
+  textColor: "#ffffff",
+  mutedTextColor: "#a0a0a0",
+  borderColor: "#2a2a3e",
+  borderRadius: 8,
+};
+
+const LOGO_URL = 'https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png';
 
 // HTML escaping utility to prevent XSS in email templates
 const escapeHtml = (str: string): string => {
@@ -52,8 +79,42 @@ const escapeHtml = (str: string): string => {
     .replace(/'/g, '&#039;');
 };
 
+const getEmailHeader = (style: EmailStyle) => `
+  <div style="text-align: center; margin-bottom: 16px;">
+    <img src="${LOGO_URL}" alt="MetsXMFanZone" style="width: ${style.logoWidth}px; height: ${style.logoWidth}px; margin-bottom: 8px; border-radius: 12px;" />
+    <div>
+      <span style="color: ${style.primaryColor}; font-size: 18px; font-weight: bold;">Mets</span><span style="color: ${style.accentColor}; font-size: 18px; font-weight: bold;">XM</span><span style="color: ${style.textColor}; font-size: 18px; font-weight: bold;">FanZone</span>
+    </div>
+  </div>
+`;
+
+const getEmailFooter = (style: EmailStyle) => `
+  <div style="border-top: 1px solid ${style.borderColor}; padding-top: 12px;">
+    <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
+      The MetsXMFanZone Team
+    </p>
+    <div style="text-align: center; margin-bottom: 8px;">
+      <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+        <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
+      </a>
+      <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+        <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
+      </a>
+      <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+        <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
+      </a>
+      <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
+        <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
+      </a>
+    </div>
+    <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
+      <a href="https://metsxmfanzone.com" style="color: ${style.accentColor}; text-decoration: none;">metsxmfanzone.com</a>
+    </p>
+  </div>
+`;
+
 // Email template HTML generator functions
-const generateOtpEmailHtml = (otp: string) => {
+const generateOtpEmailHtml = (otp: string, style: EmailStyle) => {
   const safeOtp = escapeHtml(otp);
   return `
 <!DOCTYPE html>
@@ -62,57 +123,31 @@ const generateOtpEmailHtml = (otp: string) => {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
-  <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
-    <div style="text-align: center; margin-bottom: 16px;">
-      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px;" />
-      <div>
-        <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
-      </div>
-    </div>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: ${style.bgColor};">
+  <div style="max-width: 320px; margin: 0 auto; background-color: ${style.cardBgColor}; border-radius: ${style.borderRadius}px; padding: 20px; border: 1px solid ${style.borderColor};">
+    ${getEmailHeader(style)}
     
-    <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 12px;">
+    <p style="color: ${style.mutedTextColor}; text-align: center; font-size: 12px; margin: 0 0 12px;">
       Your verification code:
     </p>
     
-    <div style="background: #002D72; padding: 12px 16px; text-align: center; border-radius: 6px; margin-bottom: 12px;">
-      <span style="font-size: 24px; font-weight: bold; letter-spacing: 6px; color: #ffffff; font-family: 'Courier New', monospace;">
+    <div style="background: ${style.primaryColor}; padding: 12px 16px; text-align: center; border-radius: 6px; margin-bottom: 12px;">
+      <span style="font-size: 24px; font-weight: bold; letter-spacing: 6px; color: ${style.textColor}; font-family: 'Courier New', monospace;">
         ${safeOtp}
       </span>
     </div>
     
     <p style="color: #666; text-align: center; font-size: 11px; margin: 0 0 12px;">
-      Expires in <strong style="color: #FF5910;">5 min</strong>
+      Expires in <strong style="color: ${style.accentColor};">5 min</strong>
     </p>
     
-    <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
-      <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
-        Didn't request this? Ignore this email.
-      </p>
-      <div style="text-align: center; margin-bottom: 8px;">
-        <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-        <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-        <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-        <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-      </div>
-      <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
-        <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
-      </p>
-    </div>
+    ${getEmailFooter(style)}
   </div>
 </body>
 </html>`;
 };
 
-const generateWelcomeEmailHtml = (name: string) => {
+const generateWelcomeEmailHtml = (name: string, style: EmailStyle) => {
   const safeName = escapeHtml(name);
   return `
 <!DOCTYPE html>
@@ -121,25 +156,20 @@ const generateWelcomeEmailHtml = (name: string) => {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
-  <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
-    <div style="text-align: center; margin-bottom: 16px;">
-      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px;" />
-      <div>
-        <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
-      </div>
-    </div>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: ${style.bgColor};">
+  <div style="max-width: 320px; margin: 0 auto; background-color: ${style.cardBgColor}; border-radius: ${style.borderRadius}px; padding: 20px; border: 1px solid ${style.borderColor};">
+    ${getEmailHeader(style)}
     
-    <p style="color: #ffffff; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
+    <p style="color: ${style.textColor}; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
       Welcome, ${safeName}!
     </p>
     
-    <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 16px;">
+    <p style="color: ${style.mutedTextColor}; text-align: center; font-size: 12px; margin: 0 0 16px;">
       Your account has been created successfully.
     </p>
     
-    <div style="background: #002D72; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
-      <p style="color: #ffffff; font-size: 11px; margin: 0 0 8px; font-weight: bold;">What's Next:</p>
+    <div style="background: ${style.primaryColor}; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+      <p style="color: ${style.textColor}; font-size: 11px; margin: 0 0 8px; font-weight: bold;">What's Next:</p>
       <ul style="color: #d0d0d0; font-size: 10px; margin: 0; padding-left: 16px;">
         <li style="margin-bottom: 4px;">Choose a subscription plan</li>
         <li style="margin-bottom: 4px;">Watch live streams</li>
@@ -147,38 +177,17 @@ const generateWelcomeEmailHtml = (name: string) => {
       </ul>
     </div>
     
-    <p style="color: #FF5910; text-align: center; font-size: 12px; font-weight: bold; margin: 0 0 12px;">
+    <p style="color: ${style.accentColor}; text-align: center; font-size: 12px; font-weight: bold; margin: 0 0 12px;">
       Let's Go Mets!
     </p>
     
-    <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
-      <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
-        The MetsXMFanZone Team
-      </p>
-      <div style="text-align: center; margin-bottom: 8px;">
-        <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-        <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-        <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-        <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-      </div>
-      <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
-        <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
-      </p>
-    </div>
+    ${getEmailFooter(style)}
   </div>
 </body>
 </html>`;
 };
 
-const generateSubscriptionEmailHtml = (name: string, planName: string, amount: string) => {
+const generateSubscriptionEmailHtml = (name: string, planName: string, amount: string, style: EmailStyle) => {
   const safeName = escapeHtml(name);
   const safePlanName = escapeHtml(planName);
   const safeAmount = escapeHtml(amount);
@@ -189,67 +198,41 @@ const generateSubscriptionEmailHtml = (name: string, planName: string, amount: s
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
-  <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
-    <div style="text-align: center; margin-bottom: 16px;">
-      <img src="https://metsxmfanzone.com/logo-192.png" alt="MetsXMFanZone" style="width: 60px; height: 60px; margin-bottom: 8px;" />
-      <div>
-        <span style="color: #002D72; font-size: 18px; font-weight: bold;">Mets</span><span style="color: #FF5910; font-size: 18px; font-weight: bold;">XM</span><span style="color: #ffffff; font-size: 18px; font-weight: bold;">FanZone</span>
-      </div>
-    </div>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: ${style.bgColor};">
+  <div style="max-width: 320px; margin: 0 auto; background-color: ${style.cardBgColor}; border-radius: ${style.borderRadius}px; padding: 20px; border: 1px solid ${style.borderColor};">
+    ${getEmailHeader(style)}
     
     <p style="color: #4ade80; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">
       Payment Successful!
     </p>
     
-    <p style="color: #a0a0a0; text-align: center; font-size: 12px; margin: 0 0 16px;">
+    <p style="color: ${style.mutedTextColor}; text-align: center; font-size: 12px; margin: 0 0 16px;">
       Hi ${safeName}, your subscription is active.
     </p>
     
-    <div style="background: #002D72; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+    <div style="background: ${style.primaryColor}; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
       <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-        <span style="color: #a0a0a0; font-size: 11px;">Plan:</span>
-        <span style="color: #ffffff; font-size: 11px; font-weight: bold;">${safePlanName}</span>
+        <span style="color: ${style.mutedTextColor}; font-size: 11px;">Plan:</span>
+        <span style="color: ${style.textColor}; font-size: 11px; font-weight: bold;">${safePlanName}</span>
       </div>
       <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-        <span style="color: #a0a0a0; font-size: 11px;">Amount:</span>
-        <span style="color: #ffffff; font-size: 11px; font-weight: bold;">$${safeAmount}</span>
+        <span style="color: ${style.mutedTextColor}; font-size: 11px;">Amount:</span>
+        <span style="color: ${style.textColor}; font-size: 11px; font-weight: bold;">$${safeAmount}</span>
       </div>
       <div style="display: flex; justify-content: space-between;">
-        <span style="color: #a0a0a0; font-size: 11px;">Status:</span>
+        <span style="color: ${style.mutedTextColor}; font-size: 11px;">Status:</span>
         <span style="color: #4ade80; font-size: 11px; font-weight: bold;">Active</span>
       </div>
     </div>
     
     <div style="background: #1f1f3a; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
-      <p style="color: #FF5910; font-size: 10px; margin: 0 0 6px; font-weight: bold;">Your Benefits:</p>
+      <p style="color: ${style.accentColor}; font-size: 10px; margin: 0 0 6px; font-weight: bold;">Your Benefits:</p>
       <p style="color: #d0d0d0; font-size: 10px; margin: 0; line-height: 1.4;">
         Live streams • Replays • Premium content • Ad-free
       </p>
     </div>
     
-    <div style="border-top: 1px solid #2a2a3e; padding-top: 12px;">
-      <p style="color: #555; font-size: 10px; text-align: center; margin: 0 0 10px;">
-        The MetsXMFanZone Team
-      </p>
-      <div style="text-align: center; margin-bottom: 8px;">
-        <a href="https://www.facebook.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-        <a href="https://twitter.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-        <a href="https://www.instagram.com/MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="Instagram" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-        <a href="https://www.youtube.com/@MetsXMFanZone" style="display: inline-block; margin: 0 6px; text-decoration: none;">
-          <img src="https://cdn-icons-png.flaticon.com/24/733/733646.png" alt="YouTube" style="width: 20px; height: 20px; opacity: 0.7;" />
-        </a>
-      </div>
-      <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
-        <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
-      </p>
-    </div>
+    ${getEmailFooter(style)}
   </div>
 </body>
 </html>`;
@@ -268,6 +251,8 @@ export default function EmailEditor() {
   const [showPreview, setShowPreview] = useState(false);
   const [recipientCounts, setRecipientCounts] = useState<RecipientCounts>({ allUsers: 0, subscribers: 0 });
   const [testEmail, setTestEmail] = useState("");
+  const [showStylePanel, setShowStylePanel] = useState(false);
+  const [emailStyle, setEmailStyle] = useState<EmailStyle>({ ...DEFAULT_STYLE });
   
   // Template-specific fields
   const [otpCode, setOtpCode] = useState("123456");
@@ -347,11 +332,11 @@ export default function EmailEditor() {
   const getCurrentEmailHtml = () => {
     switch (activeTab) {
       case "otp":
-        return generateOtpEmailHtml(otpCode);
+        return generateOtpEmailHtml(otpCode, emailStyle);
       case "welcome":
-        return generateWelcomeEmailHtml(welcomeName);
+        return generateWelcomeEmailHtml(welcomeName, emailStyle);
       case "subscription":
-        return generateSubscriptionEmailHtml(subscriptionName, subscriptionPlan, subscriptionAmount);
+        return generateSubscriptionEmailHtml(subscriptionName, subscriptionPlan, subscriptionAmount, emailStyle);
       case "custom":
       default:
         return content;
@@ -382,7 +367,6 @@ export default function EmailEditor() {
       return;
     }
 
-    // Validate custom email has subject and content
     if (activeTab === "custom" && (!subject.trim() || !content.trim())) {
       toast({
         title: "Required Fields",
@@ -417,7 +401,6 @@ export default function EmailEditor() {
         });
         if (error) throw error;
       } else {
-        // Custom email
         const { error } = await supabase.functions.invoke("send-user-email", {
           body: { 
             subject, 
@@ -488,7 +471,6 @@ export default function EmailEditor() {
         description: `Successfully sent to ${data.sent} of ${data.total} recipients`,
       });
       
-      // Clear form after successful send
       if (activeTab === "custom") {
         setSubject("");
         setContent("");
@@ -554,14 +536,107 @@ export default function EmailEditor() {
     });
   };
 
+  const resetStyle = () => {
+    setEmailStyle({ ...DEFAULT_STYLE });
+    toast({ title: "Style Reset", description: "Email styling restored to defaults" });
+  };
+
+  const StylePanel = () => (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Paintbrush className="w-4 h-4" />
+            Style Editor
+          </CardTitle>
+          <Button variant="ghost" size="sm" onClick={resetStyle} className="h-7 px-2">
+            <RotateCcw className="w-3 h-3 mr-1" />
+            <span className="text-xs">Reset</span>
+          </Button>
+        </div>
+        <CardDescription className="text-xs">
+          Tweak colors, sizing & borders live
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label className="text-xs">Logo Size: {emailStyle.logoWidth}px</Label>
+          <Slider
+            value={[emailStyle.logoWidth]}
+            onValueChange={([v]) => setEmailStyle(s => ({ ...s, logoWidth: v }))}
+            min={40}
+            max={120}
+            step={5}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label className="text-xs">Border Radius: {emailStyle.borderRadius}px</Label>
+          <Slider
+            value={[emailStyle.borderRadius]}
+            onValueChange={([v]) => setEmailStyle(s => ({ ...s, borderRadius: v }))}
+            min={0}
+            max={24}
+            step={2}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs">Primary</Label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={emailStyle.primaryColor} onChange={e => setEmailStyle(s => ({ ...s, primaryColor: e.target.value }))} className="w-8 h-8 rounded border border-border cursor-pointer" />
+              <span className="text-xs text-muted-foreground font-mono">{emailStyle.primaryColor}</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Accent</Label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={emailStyle.accentColor} onChange={e => setEmailStyle(s => ({ ...s, accentColor: e.target.value }))} className="w-8 h-8 rounded border border-border cursor-pointer" />
+              <span className="text-xs text-muted-foreground font-mono">{emailStyle.accentColor}</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Background</Label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={emailStyle.bgColor} onChange={e => setEmailStyle(s => ({ ...s, bgColor: e.target.value }))} className="w-8 h-8 rounded border border-border cursor-pointer" />
+              <span className="text-xs text-muted-foreground font-mono">{emailStyle.bgColor}</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Card BG</Label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={emailStyle.cardBgColor} onChange={e => setEmailStyle(s => ({ ...s, cardBgColor: e.target.value }))} className="w-8 h-8 rounded border border-border cursor-pointer" />
+              <span className="text-xs text-muted-foreground font-mono">{emailStyle.cardBgColor}</span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="container mx-auto max-w-5xl px-3 sm:px-4 py-4 sm:py-6">
-      <div className="mb-4 sm:mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold mb-1">Email Editor</h2>
-        <p className="text-xs sm:text-sm text-muted-foreground">
-          Manage and test all email templates
-        </p>
+      <div className="mb-4 sm:mb-6 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold mb-1">Email Editor</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Manage and test all email templates
+          </p>
+        </div>
+        <Button
+          variant={showStylePanel ? "default" : "outline"}
+          size="sm"
+          onClick={() => setShowStylePanel(!showStylePanel)}
+        >
+          <Paintbrush className="w-4 h-4 mr-1" />
+          Style
+        </Button>
       </div>
+
+      {showStylePanel && (
+        <div className="mb-4">
+          <StylePanel />
+        </div>
+      )}
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as EmailTemplateType)} className="space-y-4">
         <TabsList className="grid grid-cols-4 w-full">
@@ -668,7 +743,7 @@ export default function EmailEditor() {
               <CardContent>
                 <div 
                   className="scale-90 origin-top-left"
-                  dangerouslySetInnerHTML={{ __html: generateOtpEmailHtml(otpCode || "123456") }}
+                  dangerouslySetInnerHTML={{ __html: generateOtpEmailHtml(otpCode || "123456", emailStyle) }}
                 />
               </CardContent>
             </Card>
@@ -716,7 +791,7 @@ export default function EmailEditor() {
               <CardContent>
                 <div 
                   className="scale-90 origin-top-left"
-                  dangerouslySetInnerHTML={{ __html: generateWelcomeEmailHtml(welcomeName || "Mets Fan") }}
+                  dangerouslySetInnerHTML={{ __html: generateWelcomeEmailHtml(welcomeName || "Mets Fan", emailStyle) }}
                 />
               </CardContent>
             </Card>
@@ -784,7 +859,7 @@ export default function EmailEditor() {
               <CardContent>
                 <div 
                   className="scale-90 origin-top-left"
-                  dangerouslySetInnerHTML={{ __html: generateSubscriptionEmailHtml(subscriptionName || "Mets Fan", subscriptionPlan, subscriptionAmount || "4.99") }}
+                  dangerouslySetInnerHTML={{ __html: generateSubscriptionEmailHtml(subscriptionName || "Mets Fan", subscriptionPlan, subscriptionAmount || "4.99", emailStyle) }}
                 />
               </CardContent>
             </Card>
@@ -1004,8 +1079,8 @@ export default function EmailEditor() {
                   ? content.replace(/\{\{name\}\}/g, "John Doe").replace(/\{\{email\}\}/g, "johndoe@example.com")
                   : getCurrentEmailHtml(),
                 { 
-                  ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'img'],
-                  ALLOWED_ATTR: ['href', 'src'],
+                  ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'img', 'div', 'span', 'table', 'tr', 'td', 'th'],
+                  ALLOWED_ATTR: ['href', 'src', 'style', 'alt', 'width', 'height'],
                   ALLOW_DATA_ATTR: false,
                 }
               )
