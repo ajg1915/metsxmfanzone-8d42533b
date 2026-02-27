@@ -23,6 +23,26 @@ interface WriterRevokedEmailRequest {
   reasons: string[];
 }
 
+const loadSavedEmojis = async (): Promise<Record<string, string>> => {
+  const defaults: Record<string, string> = { writer_revoked: '📝' };
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const { data } = await supabase
+      .from('site_settings')
+      .select('setting_value')
+      .eq('setting_key', 'email_emojis')
+      .maybeSingle();
+    if (data?.setting_value && typeof data.setting_value === 'object') {
+      return { ...defaults, ...(data.setting_value as Record<string, string>) };
+    }
+  } catch (err) {
+    console.error('Failed to load emoji settings:', err);
+  }
+  return defaults;
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -34,6 +54,8 @@ Deno.serve(async (req) => {
     
     const { email, name, articleTitle, reasons }: WriterRevokedEmailRequest = await req.json();
 
+    const emojis = await loadSavedEmojis();
+
     console.log(`Sending writer revocation email to ${email}`);
 
     // Escape all user-provided content
@@ -41,7 +63,7 @@ Deno.serve(async (req) => {
     const safeTitle = escapeHtml(articleTitle);
     const safeReasons = reasons.map(r => escapeHtml(r));
 
-    const subject = "Important: Your Writer Access Has Been Revoked";
+    const subject = `${emojis.writer_revoked} Important: Your Writer Access Has Been Revoked`;
     const htmlContent = `
       <!DOCTYPE html>
       <html>

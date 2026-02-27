@@ -196,6 +196,23 @@ async function sendMaintenanceEmails(supabase: any, issueType: string, alertMess
   const logoUrl = 'https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png';
   const safeMessage = escapeHtml(alertMessage);
   const issueLabel = issueType.charAt(0).toUpperCase() + issueType.slice(1);
+
+  // Load saved emojis from site_settings
+  let maintenanceEmoji = '🔧';
+  try {
+    const { data: emojiData } = await supabase
+      .from('site_settings')
+      .select('setting_value')
+      .eq('setting_key', 'email_emojis')
+      .maybeSingle();
+    if (emojiData?.setting_value && typeof emojiData.setting_value === 'object') {
+      const saved = emojiData.setting_value as Record<string, string>;
+      if (saved.maintenance) maintenanceEmoji = saved.maintenance;
+    }
+  } catch (err) {
+    console.error('Failed to load emoji settings:', err);
+  }
+
   const subject = `⚠️ MetsXMFanZone Stream Maintenance Notice`;
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -217,7 +234,7 @@ async function sendMaintenanceEmails(supabase: any, issueType: string, alertMess
     <div style="background: linear-gradient(180deg, #141a2e 0%, #0d1222 100%); border: 1px solid rgba(255,69,0,0.25); border-radius: 16px; padding: 28px 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
       
       <div style="text-align: center; margin-bottom: 16px;">
-        <div style="font-size: 36px; margin-bottom: 12px;">🔧</div>
+        <div style="font-size: 36px; margin-bottom: 12px;">${maintenanceEmoji}</div>
         <h1 style="color: white; font-size: 20px; font-weight: 800; margin: 0 0 8px 0; line-height: 1.3;">Stream Maintenance Notice</h1>
       </div>
 

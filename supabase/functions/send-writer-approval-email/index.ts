@@ -12,6 +12,26 @@ interface WriterApprovalEmailRequest {
   adminNotes?: string;
 }
 
+const loadSavedEmojis = async (): Promise<Record<string, string>> => {
+  const defaults: Record<string, string> = { writer_approval: '🎉', writer_revoked: '📝' };
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const { data } = await supabase
+      .from('site_settings')
+      .select('setting_value')
+      .eq('setting_key', 'email_emojis')
+      .maybeSingle();
+    if (data?.setting_value && typeof data.setting_value === 'object') {
+      return { ...defaults, ...(data.setting_value as Record<string, string>) };
+    }
+  } catch (err) {
+    console.error('Failed to load emoji settings:', err);
+  }
+  return defaults;
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -25,11 +45,13 @@ Deno.serve(async (req) => {
 
     console.log(`Sending writer ${status} email to ${email}`);
 
+    const emojis = await loadSavedEmojis();
+
     let subject: string;
     let htmlContent: string;
 
     if (status === "approved") {
-      subject = "🎉 Your Writer Application Has Been Approved!";
+      subject = `${emojis.writer_approval} Your Writer Application Has Been Approved!`;
       htmlContent = `
         <!DOCTYPE html>
         <html>

@@ -108,15 +108,40 @@ const sendEmail = async (apiKey: string, to: string, subject: string, html: stri
   return await response.json();
 };
 
-const getNotificationIcon = (type: string): string => {
+const DEFAULT_EMOJIS: Record<string, string> = {
+  game_day: '⚾',
+  writer_approval: '🎉',
+  writer_revoked: '📝',
+  email_confirm: '✉️',
+  sub_expiry: '⏰',
+  maintenance: '🔧',
+};
+
+const loadSavedEmojis = async (supabase: any): Promise<Record<string, string>> => {
+  try {
+    const { data } = await supabase
+      .from('site_settings')
+      .select('setting_value')
+      .eq('setting_key', 'email_emojis')
+      .maybeSingle();
+    if (data?.setting_value && typeof data.setting_value === 'object') {
+      return { ...DEFAULT_EMOJIS, ...(data.setting_value as Record<string, string>) };
+    }
+  } catch (err) {
+    console.error('Failed to load emoji settings:', err);
+  }
+  return { ...DEFAULT_EMOJIS };
+};
+
+const getNotificationIcon = (type: string, emojis: Record<string, string>): string => {
   switch (type) {
-    case 'game_alert': return '⚾';
+    case 'game_alert': return emojis.game_day || '⚾';
     case 'score_update': return '📊';
     case 'final_score': return '🏆';
     case 'lineup': return '📋';
     case 'live_stream': return '📺';
     case 'news': return '📰';
-    case 'event': return '🎉';
+    case 'event': return emojis.writer_approval || '🎉';
     default: return '🔔';
   }
 };
@@ -131,12 +156,13 @@ const getEmailTemplate = (
   gameInfo?: GameNotificationRequest['gameInfo'],
   notificationType?: string,
   url?: string,
-  imageUrl?: string
+  imageUrl?: string,
+  emojis?: Record<string, string>
 ) => {
   const baseUrl = Deno.env.get('SITE_URL') || 'https://metsxmfanzone.com';
   const actionUrl = url ? `${baseUrl}${url}` : baseUrl;
   const logoUrl = 'https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png';
-  const icon = getNotificationIcon(notificationType || 'general');
+  const icon = getNotificationIcon(notificationType || 'general', emojis || DEFAULT_EMOJIS);
   const isFinal = notificationType === 'final_score';
   const isGame = isGameType(notificationType || 'general');
   const safeTitle = escapeHtml(title);
@@ -325,7 +351,8 @@ Deno.serve(async (req) => {
     }
 
     console.log(`Sending email notifications to ${users.length} users`);
-    const emailHtml = getEmailTemplate(title, message, gameInfo, notificationType, url, imageUrl);
+    const savedEmojis = await loadSavedEmojis(supabase);
+    const emailHtml = getEmailTemplate(title, message, gameInfo, notificationType, url, imageUrl, savedEmojis);
 
     const emailPromises = users.map(async (user) => {
       if (!user.email) return { success: false, userId: user.id, error: 'No email' };
