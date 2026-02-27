@@ -57,6 +57,14 @@ interface EmailStyle {
   mutedTextColor: string;
   borderColor: string;
   borderRadius: number;
+  emojis: {
+    game_day: string;
+    writer_approval: string;
+    writer_revoked: string;
+    email_confirm: string;
+    sub_expiry: string;
+    maintenance: string;
+  };
 }
 
 const DEFAULT_STYLE: EmailStyle = {
@@ -70,6 +78,14 @@ const DEFAULT_STYLE: EmailStyle = {
   mutedTextColor: "#a0a0a0",
   borderColor: "#2a2a3e",
   borderRadius: 8,
+  emojis: {
+    game_day: "⚾",
+    writer_approval: "🎉",
+    writer_revoked: "📝",
+    email_confirm: "✉️",
+    sub_expiry: "⏰",
+    maintenance: "🔧",
+  },
 };
 
 const escapeHtml = (str: string): string => {
@@ -227,7 +243,7 @@ const generateGameDayEmailHtml = (opponent: string, gameDate: string, gameTime: 
         </table>
       </div>` : ''}
       <div style="text-align: center; margin-bottom: 16px;">
-        <div style="font-size: 36px; margin-bottom: 12px;">⚾</div>
+        <div style="font-size: 36px; margin-bottom: 12px;">${style.emojis.game_day}</div>
         <h1 style="color: white; font-size: 20px; font-weight: 800; margin: 0 0 8px 0;">Game Day Alert!</h1>
       </div>
       <div style="background: #0a0e1a; border: 1px solid rgba(255,69,0,0.3); border-radius: 12px; padding: 18px; margin: 20px 0;">
@@ -254,7 +270,7 @@ const generateWriterApprovalHtml = (writerName: string, style: EmailStyle) => {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: ${style.bgColor};">
   <div style="max-width: 320px; margin: 0 auto; background-color: ${style.cardBgColor}; border-radius: ${style.borderRadius}px; padding: 20px; border: 1px solid ${style.borderColor};">
     ${getEmailHeader(style)}
-    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 32px;">🎉</span></div>
+    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 32px;">${style.emojis.writer_approval}</span></div>
     <p style="color: ${style.textColor}; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">Congratulations, ${safeName}!</p>
     <p style="color: ${style.mutedTextColor}; text-align: center; font-size: 12px; margin: 0 0 16px;">Your writer application has been <strong style="color: #4ade80;">approved</strong>! You can now publish articles on MetsXMFanZone.</p>
     <div style="text-align: center; margin-bottom: 16px;">
@@ -271,7 +287,7 @@ const generateWriterRevokedHtml = (writerName: string, style: EmailStyle) => {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: ${style.bgColor};">
   <div style="max-width: 320px; margin: 0 auto; background-color: ${style.cardBgColor}; border-radius: ${style.borderRadius}px; padding: 20px; border: 1px solid ${style.borderColor};">
     ${getEmailHeader(style)}
-    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 32px;">📝</span></div>
+    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 32px;">${style.emojis.writer_revoked}</span></div>
     <p style="color: ${style.textColor}; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">Writer Access Update</p>
     <p style="color: ${style.mutedTextColor}; text-align: center; font-size: 12px; margin: 0 0 16px;">Hi ${safeName}, your writer privileges have been <strong style="color: #ef4444;">revoked</strong>. If you believe this is an error, please contact our support team.</p>
     <div style="text-align: center; margin-bottom: 16px;">
@@ -288,7 +304,7 @@ const generateEmailConfirmHtml = (userName: string, style: EmailStyle) => {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: ${style.bgColor};">
   <div style="max-width: 320px; margin: 0 auto; background-color: ${style.cardBgColor}; border-radius: ${style.borderRadius}px; padding: 20px; border: 1px solid ${style.borderColor};">
     ${getEmailHeader(style)}
-    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 32px;">✉️</span></div>
+    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 32px;">${style.emojis.email_confirm}</span></div>
     <p style="color: ${style.textColor}; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">Confirm Your Email</p>
     <p style="color: ${style.mutedTextColor}; text-align: center; font-size: 12px; margin: 0 0 16px;">Hi ${safeName}, please click the button below to verify your email address.</p>
     <div style="text-align: center; margin-bottom: 16px;">
@@ -308,7 +324,7 @@ const generateSubExpiryHtml = (userName: string, planName: string, daysLeft: str
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: ${style.bgColor};">
   <div style="max-width: 320px; margin: 0 auto; background-color: ${style.cardBgColor}; border-radius: ${style.borderRadius}px; padding: 20px; border: 1px solid ${style.borderColor};">
     ${getEmailHeader(style)}
-    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 32px;">⏰</span></div>
+    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 32px;">${style.emojis.sub_expiry}</span></div>
     <p style="color: ${style.textColor}; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">Subscription Expiring Soon</p>
     <p style="color: ${style.mutedTextColor}; text-align: center; font-size: 12px; margin: 0 0 16px;">Hi ${safeName}, your <strong style="color: ${style.textColor};">${safePlan}</strong> plan expires in <strong style="color: ${style.accentColor};">${safeDays} days</strong>.</p>
     <div style="background: ${style.primaryColor}; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
@@ -329,7 +345,7 @@ const generateMaintenanceHtml = (issueCount: string, style: EmailStyle) => {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: ${style.bgColor};">
   <div style="max-width: 320px; margin: 0 auto; background-color: ${style.cardBgColor}; border-radius: ${style.borderRadius}px; padding: 20px; border: 1px solid ${style.borderColor};">
     ${getEmailHeader(style)}
-    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 32px;">🔧</span></div>
+    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 32px;">${style.emojis.maintenance}</span></div>
     <p style="color: ${style.textColor}; text-align: center; font-size: 14px; font-weight: bold; margin: 0 0 12px;">Stream Health Report</p>
     <p style="color: ${style.mutedTextColor}; text-align: center; font-size: 12px; margin: 0 0 16px;"><strong style="color: #ef4444;">${safeCount} issue(s)</strong> detected with live streams that require attention.</p>
     <div style="background: #1f1f3a; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
@@ -705,6 +721,30 @@ export default function EmailEditor() {
               </div>
             </div>
           ))}
+        </div>
+        {/* Emoji Icons */}
+        <div className="space-y-2">
+          <Label className="text-xs flex items-center gap-1">Template Emojis</Label>
+          <div className="grid grid-cols-3 gap-2">
+            {([
+              { key: "game_day" as const, label: "Game Day" },
+              { key: "writer_approval" as const, label: "Approved" },
+              { key: "writer_revoked" as const, label: "Revoked" },
+              { key: "email_confirm" as const, label: "Confirm" },
+              { key: "sub_expiry" as const, label: "Expiry" },
+              { key: "maintenance" as const, label: "Health" },
+            ]).map(({ key, label }) => (
+              <div key={key} className="space-y-1">
+                <Label className="text-[10px] text-muted-foreground">{label}</Label>
+                <Input
+                  value={emailStyle.emojis[key]}
+                  onChange={e => setEmailStyle(s => ({ ...s, emojis: { ...s.emojis, [key]: e.target.value } }))}
+                  className="h-8 text-center text-lg px-1"
+                  maxLength={4}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>
