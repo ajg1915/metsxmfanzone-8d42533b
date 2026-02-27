@@ -57,18 +57,18 @@ export default function AdminDashboard() {
 
   const quickAccessItems = [
     {
-      title: "Live Streams",
-      description: "Manage live streaming content",
+      title: "Media Library",
+      description: "Upload & manage all assets",
+      icon: Eye,
+      url: "/admin/media-library",
+      stat: "Assets",
+    },
+    {
+      title: "Live Streams & Health",
+      description: "Manage streams & monitor health",
       icon: Radio,
       url: "/admin/live-streams",
       stat: `${stats.activeStreams} Live`,
-    },
-    {
-      title: "Stream Health",
-      description: "Monitor stream issues",
-      icon: HeartPulse,
-      url: "/admin/stream-health",
-      stat: "Monitor",
     },
     {
       title: "Blog Management",
@@ -78,11 +78,11 @@ export default function AdminDashboard() {
       stat: `${stats.totalBlogs} Posts`,
     },
     {
-      title: "Real-Time Analytics",
-      description: "Live visitor tracking",
-      icon: Eye,
-      url: "/admin/realtime-analytics",
-      stat: "Live Data",
+      title: "Members & Subscriptions",
+      description: "Users, roles & subscription plans",
+      icon: UserCog,
+      url: "/admin/user-management",
+      stat: `${stats.totalUsers} Users`,
     },
     {
       title: "Newsletter",
@@ -90,20 +90,6 @@ export default function AdminDashboard() {
       icon: Mail,
       url: "/admin/newsletter",
       stat: "Send",
-    },
-    {
-      title: "User Management",
-      description: "Manage users and subscriptions",
-      icon: UserCog,
-      url: "/admin/user-management",
-      stat: `${stats.totalUsers} Users`,
-    },
-    {
-      title: "Subscriptions",
-      description: "Manage subscription plans",
-      icon: CreditCard,
-      url: "/admin/subscriptions",
-      stat: "Plans",
     },
     {
       title: "SEO",
