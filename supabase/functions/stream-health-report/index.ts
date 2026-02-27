@@ -209,7 +209,7 @@ async function sendMaintenanceEmails(supabase: any, issueType: string, alertMess
     
     <!-- Header: Logo Only -->
     <div style="text-align: center; padding: 24px 0 16px 0;">
-      <img src="${logoUrl}" alt="MetsXMFanZone" width="85" height="85" style="width: 85px; height: 85px; display: block; margin: 0 auto 8px auto; border-radius: 12px;" />
+      <img src="${logoUrl}" alt="MetsXMFanZone" width="85" style="width: 85px; height: auto; display: block; margin: 0 auto 8px auto; border-radius: 12px;" />
       <span style="color: #FF4500; font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">MetsXMFanZone</span>
     </div>
 

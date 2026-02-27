@@ -81,7 +81,7 @@ const escapeHtml = (str: string): string => {
 
 const getEmailHeader = (style: EmailStyle) => `
   <div style="text-align: center; margin-bottom: 16px;">
-    <img src="${LOGO_URL}" alt="MetsXMFanZone" style="width: ${style.logoWidth}px; height: ${style.logoWidth}px; margin-bottom: 8px; border-radius: 12px;" />
+    <img src="${LOGO_URL}" alt="MetsXMFanZone" style="width: ${style.logoWidth}px; height: auto; margin-bottom: 8px; border-radius: 12px;" />
     <div>
       <span style="color: ${style.primaryColor}; font-size: 18px; font-weight: bold;">Mets</span><span style="color: ${style.accentColor}; font-size: 18px; font-weight: bold;">XM</span><span style="color: ${style.textColor}; font-size: 18px; font-weight: bold;">FanZone</span>
     </div>
