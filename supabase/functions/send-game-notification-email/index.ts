@@ -56,7 +56,7 @@ const getTeamLogoUrl = (teamName: string): string => {
   const key = teamName.toLowerCase().trim();
   const teamId = MLB_TEAM_IDS[key];
   if (teamId) {
-    return `https://www.mlbstatic.com/team-logos/${teamId}.svg`;
+    return `https://midfield.mlbstatic.com/v1/team/${teamId}/spots/72`;
   }
   return '';
 };
@@ -145,7 +145,7 @@ const getEmailTemplate = (
   // Determine opponent for logo display
   const opponentName = gameInfo?.opponent || gameInfo?.awayTeam || gameInfo?.homeTeam || '';
   const opponentLogoUrl = opponentName ? getTeamLogoUrl(opponentName) : '';
-  const metsLogoUrl = 'https://www.mlbstatic.com/team-logos/121.svg';
+  const metsLogoUrl = 'https://midfield.mlbstatic.com/v1/team/121/spots/72';
 
   // VS header for game-type emails: Mets logo vs Opponent logo
   const vsHeaderHtml = (isGame && opponentLogoUrl) ? `
