@@ -200,7 +200,7 @@ const CommunityPreviewSection = () => {
               <Users className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
             </div>
             <div>
-              <p className="text-lg sm:text-2xl font-bold text-foreground">{stats.membersCount.toLocaleString()}</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground">50k</p>
               <p className="text-[11px] sm:text-xs text-muted-foreground">Members</p>
             </div>
           </div>
