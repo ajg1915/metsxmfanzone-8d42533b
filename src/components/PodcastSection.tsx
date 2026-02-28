@@ -73,7 +73,10 @@ const PodcastSection = () => {
           </h2>
             {!isPremium && <PremiumBadge size="md" noGlow />}
           </div>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">Listen to exclusive Mets content, game analysis, and fan discussions
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2">Listen to exclusive Mets content,game 
+analysis,  
+ad fan discussions
+
 
         </p>
         </div>
@@ -104,17 +107,14 @@ const PodcastSection = () => {
             Listen Live On
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 max-w-5xl mx-auto">
-            {platforms.map((platform, index) => {
-            const IconComponent = platform.icon;
-            return <GlassCard key={platform.name} variant="interactive" glow="blue" delay={index * 0.05} className="group">
+            {platforms.map((platform, index) => {const IconComponent = platform.icon;return <GlassCard key={platform.name} variant="interactive" glow="blue" delay={index * 0.05} className="group">
                   <a href={platform.url} target="_blank" rel="noopener noreferrer" className="block p-3 sm:p-4 text-center">
                     <div className="flex justify-center mb-1">
                       <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-primary group-hover:scale-110 transition-transform" />
                     </div>
                     <p className="font-semibold text-[10px] sm:text-xs">{platform.name}</p>
                   </a>
-                </GlassCard>;
-          })}
+                </GlassCard>;})}
           </div>
         </div>
 
