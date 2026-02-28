@@ -1,0 +1,102 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, serviceKey);
+
+    const now = new Date().toISOString();
+
+    // Find scheduled streams whose start time has passed
+    const { data: streamsToGoLive, error: fetchError } = await supabase
+      .from("live_streams")
+      .select("id, title, scheduled_start")
+      .eq("status", "scheduled")
+      .eq("published", true)
+      .lte("scheduled_start", now)
+      .not("scheduled_start", "is", null);
+
+    if (fetchError) throw fetchError;
+
+    if (!streamsToGoLive || streamsToGoLive.length === 0) {
+      return new Response(JSON.stringify({ message: "No streams to start", count: 0 }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const results = [];
+
+    for (const stream of streamsToGoLive) {
+      // Update status to live
+      const { error: updateError } = await supabase
+        .from("live_streams")
+        .update({ status: "live", actual_start: now })
+        .eq("id", stream.id);
+
+      if (updateError) {
+        console.error(`Failed to update stream ${stream.id}:`, updateError);
+        results.push({ id: stream.id, success: false });
+        continue;
+      }
+
+      // Send push notification
+      try {
+        await supabase.functions.invoke("send-push-notification", {
+          body: {
+            title: "🔴 LIVE NOW on MetsXMFanZone!",
+            body: stream.title,
+            url: "/metsxmfanzone-tv",
+            icon: "/logo-192.png",
+            tag: `live-stream-${stream.id}`,
+          },
+        });
+      } catch (pushErr) {
+        console.error(`Push notification failed for stream ${stream.id}:`, pushErr);
+      }
+
+      results.push({ id: stream.id, title: stream.title, success: true });
+    }
+
+    // Also end streams whose scheduled_end has passed
+    const { data: streamsToEnd, error: endFetchError } = await supabase
+      .from("live_streams")
+      .select("id")
+      .eq("status", "live")
+      .lte("scheduled_end", now)
+      .not("scheduled_end", "is", null);
+
+    if (!endFetchError && streamsToEnd && streamsToEnd.length > 0) {
+      for (const stream of streamsToEnd) {
+        await supabase
+          .from("live_streams")
+          .update({ status: "ended", actual_end: now })
+          .eq("id", stream.id);
+      }
+    }
+
+    return new Response(
+      JSON.stringify({
+        message: `Started ${results.filter(r => r.success).length} streams, ended ${streamsToEnd?.length || 0} streams`,
+        started: results,
+        ended: streamsToEnd?.length || 0,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Auto stream status error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
