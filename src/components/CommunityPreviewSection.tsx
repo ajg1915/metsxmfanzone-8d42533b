@@ -164,7 +164,7 @@ const CommunityPreviewSection = () => {
               <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 sm:w-10 sm:h-10" />
               MetsXMFanZone Community
             </h2>
-            <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-md">
+            <p className="sm:text-base text-muted-foreground mt-2 max-w-md text-xs">
               Join the conversation with 50k passionate Mets fans
             </p>
           </div>
