@@ -152,7 +152,7 @@ const PodcastSection = () => {
                         </p>
                       </div>
                     </div>
-                    <audio controls className="w-full h-9 rounded-lg [&::-webkit-media-controls-panel]:bg-[hsl(var(--muted))]">
+                    <audio controls className="w-full h-9 rounded-lg [&::-webkit-media-controls-panel]:bg-[hsl(var(--muted))] accent-[hsl(var(--mets-orange))]">
                       <source src={podcast.audio_url} type="audio/mpeg" />
                       Your browser does not support the audio element.
                     </audio>
