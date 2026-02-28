@@ -14,7 +14,7 @@ export function useStreamHealthMonitor({ player, streamId }: StreamHealthMonitor
   const lastErrorTime = useRef<number>(0);
 
   const reportIssue = useCallback(async (issueType: string, severity: string, description: string) => {
-    const issueKey = `${issueType}-${Math.floor(Date.now() / 30000)}`;
+    const issueKey = `${issueType}-${Math.floor(Date.now() / 300000)}`;
     if (reportedIssues.current.has(issueKey)) return;
     reportedIssues.current.add(issueKey);
 
