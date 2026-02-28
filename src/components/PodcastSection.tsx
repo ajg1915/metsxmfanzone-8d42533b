@@ -68,7 +68,7 @@ const PodcastSection = () => {
               {!isPremium && <PremiumBadge size="md" noGlow />}
             </div>
           </div>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-lg">Exclusive Mets content, game analysis, and fan discussions 
+          <p className="text-sm sm:text-base text-muted-foreground max-w-lg">Exclusive Mets content, game analysis All Season Long join The Live Stream on Social Media Channels    
 
           </p>
         </div>
