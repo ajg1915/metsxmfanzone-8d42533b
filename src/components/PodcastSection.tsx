@@ -73,8 +73,8 @@ const PodcastSection = () => {
           </h2>
             {!isPremium && <PremiumBadge size="md" noGlow />}
           </div>
-          <p className="sm:text-base text-muted-foreground max-w-2xl mx-auto px-2 text-xs text-center">Listen to exclusive Mets content, game  analysis,   and fan discussions
-
+          <p className="sm:text-base text-muted-foreground max-w-2xl mx-auto px-2 text-xs text-center">Listen to exclusive Mets content,
+ game  analysis, and fan discussions
 
 
 
