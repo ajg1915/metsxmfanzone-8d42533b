@@ -51,9 +51,13 @@ const MetsNewsTracker = () => {
   };
 
   useEffect(() => {
-    fetchNewsItems();
-    const interval = setInterval(fetchNewsItems, 20 * 60 * 1000); // Refresh every 20 minutes
-    return () => clearInterval(interval);
+    // Defer initial fetch by 6 seconds to avoid blocking page load
+    const initialDelay = setTimeout(fetchNewsItems, 6000);
+    const interval = setInterval(fetchNewsItems, 20 * 60 * 1000);
+    return () => {
+      clearTimeout(initialDelay);
+      clearInterval(interval);
+    };
   }, []);
 
   const getTypeConfig = (type: NewsItem["type"]) => {
