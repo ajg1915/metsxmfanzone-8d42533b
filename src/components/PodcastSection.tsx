@@ -16,13 +16,13 @@ interface PodcastEpisode {
 }
 
 const platforms = [
-  { name: "TikTok", icon: Music2, url: "https://www.tiktok.com/@metsxmfanzone" },
-  { name: "Facebook", icon: Facebook, url: "https://www.facebook.com/metsxmfanzone" },
-  { name: "iHeartRadio", icon: Radio, url: "https://www.iheart.com" },
-  { name: "Amazon Music", icon: Headphones, url: "https://music.amazon.com" },
-  { name: "Spotify", icon: Music, url: "https://open.spotify.com" },
-  { name: "Apple Podcasts", icon: Podcast, url: "https://podcasts.apple.com" },
-];
+{ name: "TikTok", icon: Music2, url: "https://www.tiktok.com/@metsxmfanzone" },
+{ name: "Facebook", icon: Facebook, url: "https://www.facebook.com/metsxmfanzone" },
+{ name: "iHeartRadio", icon: Radio, url: "https://www.iheart.com" },
+{ name: "Amazon Music", icon: Headphones, url: "https://music.amazon.com" },
+{ name: "Spotify", icon: Music, url: "https://open.spotify.com" },
+{ name: "Apple Podcasts", icon: Podcast, url: "https://podcasts.apple.com" }];
+
 
 const PodcastSection = () => {
   const { tier, isAdmin } = useSubscription();
@@ -34,12 +34,12 @@ const PodcastSection = () => {
   }, []);
 
   const fetchPodcasts = async () => {
-    const { data } = await supabase
-      .from("podcasts")
-      .select("*")
-      .eq("published", true)
-      .order("published_at", { ascending: false })
-      .limit(3);
+    const { data } = await supabase.
+    from("podcasts").
+    select("*").
+    eq("published", true).
+    order("published_at", { ascending: false }).
+    limit(3);
     if (data) setPodcasts(data);
   };
 
@@ -68,8 +68,8 @@ const PodcastSection = () => {
               {!isPremium && <PremiumBadge size="md" noGlow />}
             </div>
           </div>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-lg">
-            Exclusive Mets content, game analysis, and fan discussions — all in one place
+          <p className="text-sm sm:text-base text-muted-foreground max-w-lg">Exclusive Mets content, game analysis, and fan discussions 
+
           </p>
         </div>
 
@@ -111,33 +111,33 @@ const PodcastSection = () => {
                   href={platform.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-col items-center gap-1.5 p-3 sm:p-4 rounded-xl bg-card/40 backdrop-blur-sm border border-border/10 hover:border-[hsl(var(--mets-blue)/0.4)] hover:bg-card/70 transition-all duration-300"
-                >
+                  className="group flex flex-col items-center gap-1.5 p-3 sm:p-4 rounded-xl bg-card/40 backdrop-blur-sm border border-border/10 hover:border-[hsl(var(--mets-blue)/0.4)] hover:bg-card/70 transition-all duration-300">
+
                   <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-[hsl(var(--mets-blue-light))] transition-colors" />
                   <span className="text-[10px] sm:text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                     {platform.name}
                   </span>
-                </a>
-              );
+                </a>);
+
             })}
           </div>
         </div>
 
         {/* Recent Episodes */}
-        {podcasts.length > 0 && (
-          <div>
+        {podcasts.length > 0 &&
+        <div>
             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground text-center mb-5 sm:mb-6">
               Recent Episodes
             </h3>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-              {podcasts.map((podcast, index) => (
-                <div
-                  key={podcast.id}
-                  className="group relative rounded-2xl overflow-hidden bg-card/50 backdrop-blur-sm border border-border/10 hover:border-[hsl(var(--mets-blue)/0.3)] transition-all duration-300 hover:-translate-y-0.5"
-                >
-                  {index === 0 && (
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[hsl(var(--mets-blue))] to-[hsl(var(--mets-orange))]" />
-                  )}
+              {podcasts.map((podcast, index) =>
+            <div
+              key={podcast.id}
+              className="group relative rounded-2xl overflow-hidden bg-card/50 backdrop-blur-sm border border-border/10 hover:border-[hsl(var(--mets-blue)/0.3)] transition-all duration-300 hover:-translate-y-0.5">
+
+                  {index === 0 &&
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[hsl(var(--mets-blue))] to-[hsl(var(--mets-orange))]" />
+              }
                   <div className="p-5 sm:p-6">
                     <div className="flex items-start gap-3 mb-4">
                       <div className="w-11 h-11 rounded-xl bg-[hsl(var(--mets-blue)/0.12)] flex items-center justify-center flex-shrink-0 group-hover:bg-[hsl(var(--mets-blue)/0.2)] transition-colors">
@@ -158,15 +158,15 @@ const PodcastSection = () => {
                     </audio>
                   </div>
                 </div>
-              ))}
+            )}
             </div>
             <div className="text-center mt-8">
               <Button
-                size="lg"
-                variant="outline"
-                asChild
-                className="rounded-xl border-border/30 hover:border-[hsl(var(--mets-blue)/0.5)] hover:bg-card/60 gap-2 group"
-              >
+              size="lg"
+              variant="outline"
+              asChild
+              className="rounded-xl border-border/30 hover:border-[hsl(var(--mets-blue)/0.5)] hover:bg-card/60 gap-2 group">
+
                 <Link to="/podcast">
                   View All Episodes
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -174,10 +174,10 @@ const PodcastSection = () => {
               </Button>
             </div>
           </div>
-        )}
+        }
       </div>
-    </section>
-  );
+    </section>);
+
 };
 
 export default PodcastSection;
