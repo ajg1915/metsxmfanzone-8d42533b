@@ -135,9 +135,9 @@ const MetsNewsTracker = () => {
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">MLB Live Tracker</h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mb-2">Real-time news, signings, trades, 
-and updates from around the league
-          </p>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mb-2">Real-time news, signings, trades, and
+
+updates from around the league</p>
 
           {lastUpdated &&
           <p className="text-xs text-muted-foreground mt-2">Last updated: {lastUpdated.toLocaleTimeString()}</p>
