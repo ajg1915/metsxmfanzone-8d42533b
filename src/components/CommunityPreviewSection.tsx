@@ -165,7 +165,7 @@ const CommunityPreviewSection = () => {
               MetsXMFanZone Community
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-md">
-              Join the conversation with {stats.membersCount.toLocaleString()}+ passionate Mets fans
+              Join the conversation with 50k passionate Mets fans
             </p>
           </div>
           <Button
