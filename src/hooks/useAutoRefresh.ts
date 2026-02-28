@@ -80,13 +80,34 @@ export const useAutoRefresh = () => {
 
     channel.subscribe((status) => {
       console.log('[AutoRefresh] Realtime status:', status);
+      if (status === 'TIMED_OUT' || status === 'CHANNEL_ERROR' || status === 'CLOSED') {
+        console.log('[AutoRefresh] Channel lost, reconnecting in 3s...');
+        setTimeout(() => {
+          supabase.removeChannel(channel);
+          // Re-create channel
+          let newChannel = supabase.channel('auto-refresh-realtime-' + Date.now());
+          tables.forEach(table => {
+            newChannel = newChannel.on(
+              'postgres_changes',
+              { event: '*', schema: 'public', table },
+              () => triggerInvalidation(table)
+            );
+          });
+          newChannel.subscribe((s) => {
+            console.log('[AutoRefresh] Reconnected status:', s);
+          });
+          channelRef = newChannel;
+        }, 3000);
+      }
     });
+
+    let channelRef = channel;
 
     return () => {
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current);
       }
-      supabase.removeChannel(channel);
+      supabase.removeChannel(channelRef);
     };
   }, []);
 };
