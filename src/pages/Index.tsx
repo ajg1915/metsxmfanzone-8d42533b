@@ -269,9 +269,11 @@ const Index = () => {
 
         <div className="section-divider my-2 sm:my-3" />
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <FAQSection />
-        </Suspense>
+        {!user && (
+          <Suspense fallback={<SectionSkeleton />}>
+            <FAQSection />
+          </Suspense>
+        )}
 
         <div className="section-divider my-2 sm:my-3" />
 
