@@ -57,15 +57,15 @@ const TalentAssessmentSection = () => {
   const { data: assessments, isLoading } = useQuery({
     queryKey: ["talent-assessments", monthStart],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("daily_talent_assessments")
-        .select("*")
-        .eq("assessment_date", monthStart)
-        .order("created_at", { ascending: true });
+      const { data, error } = await supabase.
+      from("daily_talent_assessments").
+      select("*").
+      eq("assessment_date", monthStart).
+      order("created_at", { ascending: true });
 
       if (error) throw error;
       return data as TalentAssessment[];
-    },
+    }
   });
 
 
@@ -95,7 +95,7 @@ const TalentAssessmentSection = () => {
               <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-orange-400 to-primary bg-clip-text text-transparent">
                 Mets Fan Outlook
               </h2>
-              <p className="text-muted-foreground text-sm">Anthony's monthly player grades & analysis</p>
+              <p className="text-muted-foreground text-xs text-left">Anthony's monthly player grades & analysis</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -108,23 +108,23 @@ const TalentAssessmentSection = () => {
           </div>
         </div>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-16">
+        {isLoading ?
+        <div className="flex items-center justify-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : assessments && assessments.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {assessments.map((assessment) => (
-              <div
-                key={assessment.id}
-                className="relative h-[320px] cursor-pointer perspective-1000"
-                onClick={() => toggleFlip(assessment.id)}
-              >
+          </div> :
+        assessments && assessments.length > 0 ?
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {assessments.map((assessment) =>
+          <div
+            key={assessment.id}
+            className="relative h-[320px] cursor-pointer perspective-1000"
+            onClick={() => toggleFlip(assessment.id)}>
+
                 <div
-                  className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
-                    flippedCards.has(assessment.id) ? "rotate-y-180" : ""
-                  }`}
-                >
+              className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
+              flippedCards.has(assessment.id) ? "rotate-y-180" : ""}`
+              }>
+
                   {/* Front of card */}
                   <div className="absolute inset-0 backface-hidden">
                     <div className="h-full rounded-2xl bg-gradient-to-br from-background/95 to-background/80 border-2 border-primary/20 overflow-hidden shadow-xl hover:shadow-2xl hover:border-primary/40 transition-all">
@@ -145,13 +145,13 @@ const TalentAssessmentSection = () => {
                       <div className="p-4 flex gap-4">
                         <div className="relative">
                           <img
-                            src={assessment.player_image_url || "/placeholder.svg"}
-                            alt={assessment.player_name}
-                            className="w-20 h-20 rounded-xl object-cover border-2 border-primary/30 shadow-lg"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = "/placeholder.svg";
-                            }}
-                          />
+                        src={assessment.player_image_url || "/placeholder.svg"}
+                        alt={assessment.player_name}
+                        className="w-20 h-20 rounded-xl object-cover border-2 border-primary/30 shadow-lg"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "/placeholder.svg";
+                        }} />
+
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-bold text-lg text-foreground truncate">
@@ -161,43 +161,43 @@ const TalentAssessmentSection = () => {
                           
                           {/* Tool Grades */}
                           <div className="flex flex-wrap gap-1">
-                            {isPitcher(assessment.position) ? (
-                              <>
-                                {assessment.pitching_grade && (
-                                  <Badge className={`text-xs ${getGradeBadgeColor(assessment.pitching_grade)}`}>
+                            {isPitcher(assessment.position) ?
+                        <>
+                                {assessment.pitching_grade &&
+                          <Badge className={`text-xs ${getGradeBadgeColor(assessment.pitching_grade)}`}>
                                     Pitch: {assessment.pitching_grade}
                                   </Badge>
-                                )}
-                                {assessment.arm_grade && (
-                                  <Badge className={`text-xs ${getGradeBadgeColor(assessment.arm_grade)}`}>
+                          }
+                                {assessment.arm_grade &&
+                          <Badge className={`text-xs ${getGradeBadgeColor(assessment.arm_grade)}`}>
                                     Arm: {assessment.arm_grade}
                                   </Badge>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                {assessment.hitting_grade && (
-                                  <Badge className={`text-xs ${getGradeBadgeColor(assessment.hitting_grade)}`}>
+                          }
+                              </> :
+
+                        <>
+                                {assessment.hitting_grade &&
+                          <Badge className={`text-xs ${getGradeBadgeColor(assessment.hitting_grade)}`}>
                                     Hit: {assessment.hitting_grade}
                                   </Badge>
-                                )}
-                                {assessment.power_grade && (
-                                  <Badge className={`text-xs ${getGradeBadgeColor(assessment.power_grade)}`}>
+                          }
+                                {assessment.power_grade &&
+                          <Badge className={`text-xs ${getGradeBadgeColor(assessment.power_grade)}`}>
                                     Pwr: {assessment.power_grade}
                                   </Badge>
-                                )}
-                                {assessment.fielding_grade && (
-                                  <Badge className={`text-xs ${getGradeBadgeColor(assessment.fielding_grade)}`}>
+                          }
+                                {assessment.fielding_grade &&
+                          <Badge className={`text-xs ${getGradeBadgeColor(assessment.fielding_grade)}`}>
                                     Fld: {assessment.fielding_grade}
                                   </Badge>
-                                )}
-                                {assessment.speed_grade && (
-                                  <Badge className={`text-xs ${getGradeBadgeColor(assessment.speed_grade)}`}>
+                          }
+                                {assessment.speed_grade &&
+                          <Badge className={`text-xs ${getGradeBadgeColor(assessment.speed_grade)}`}>
                                     Spd: {assessment.speed_grade}
                                   </Badge>
-                                )}
+                          }
                               </>
-                            )}
+                        }
                           </div>
                         </div>
                       </div>
@@ -238,14 +238,14 @@ const TalentAssessmentSection = () => {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
+          )}
+          </div> :
+
+        <div className="text-center py-12">
             <img src={metsLogo} alt="MetsXMFanZone" className="h-16 w-16 mx-auto mb-4 opacity-60" />
             <p className="text-muted-foreground">Assessments not yet available</p>
           </div>
-        )}
+        }
 
         {/* Legend */}
         <div className="mt-8 pt-6 border-t border-primary/20">
@@ -258,8 +258,8 @@ const TalentAssessmentSection = () => {
           </div>
         </div>
       </GlassCard>
-    </section>
-  );
+    </section>);
+
 };
 
 export default TalentAssessmentSection;
