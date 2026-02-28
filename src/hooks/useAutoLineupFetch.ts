@@ -23,12 +23,15 @@ export function useAutoLineupFetch() {
       }
     };
 
-    // Fetch immediately on mount
-    fetchLineup();
+    // Defer initial fetch by 5 seconds to avoid blocking page load
+    const initialDelay = setTimeout(fetchLineup, 5000);
 
     // Set up interval to fetch every 30 minutes
     const interval = setInterval(fetchLineup, 30 * 60 * 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initialDelay);
+      clearInterval(interval);
+    };
   }, []);
 }

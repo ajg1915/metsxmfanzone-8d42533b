@@ -27,8 +27,9 @@ export function useAutoHighlightsFetch() {
   }, []);
 
   useEffect(() => {
-    // Fetch on mount
-    fetchHighlights();
+    // Defer initial fetch by 8 seconds to avoid blocking page load
+    const timer = setTimeout(fetchHighlights, 8000);
+    return () => clearTimeout(timer);
   }, [fetchHighlights]);
 
   return { fetchHighlights };
