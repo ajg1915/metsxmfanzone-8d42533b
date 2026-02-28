@@ -64,7 +64,7 @@ const PodcastSection = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-10">
-          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div className="gap-2 sm:gap-3 mb-3 sm:mb-4 flex items-center justify-start">
             <div className="p-2 rounded-xl glass-card">
               <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
