@@ -145,7 +145,30 @@ export default function AdminSettings() {
 
   const handleSaveBranding = () => saveSetting('site_branding', branding);
   const handleSaveFeatures = () => saveSetting('feature_toggles', features);
-  const handleSaveMaintenance = () => saveSetting('maintenance_mode', maintenance);
+  const [sendingEmails, setSendingEmails] = useState(false);
+
+  const handleSaveMaintenance = async () => {
+    await saveSetting('maintenance_mode', maintenance);
+    
+    // If maintenance is being enabled, send notification emails to all members
+    if (maintenance.enabled) {
+      setSendingEmails(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('send-maintenance-notification', {
+          body: { message: maintenance.message },
+        });
+        
+        if (error) throw error;
+        
+        toast.success(`Maintenance emails sent to ${data?.sent || 0} members`);
+      } catch (error: any) {
+        console.error('Error sending maintenance emails:', error);
+        toast.error('Maintenance saved but failed to send notification emails');
+      } finally {
+        setSendingEmails(false);
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -484,9 +507,9 @@ export default function AdminSettings() {
           </Card>
 
           <div className="flex justify-end">
-            <Button onClick={handleSaveMaintenance} disabled={saving} className="gap-2">
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Save Maintenance Settings
+            <Button onClick={handleSaveMaintenance} disabled={saving || sendingEmails} className="gap-2">
+              {(saving || sendingEmails) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {sendingEmails ? "Sending Emails..." : "Save Maintenance Settings"}
             </Button>
           </div>
         </TabsContent>
