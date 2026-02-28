@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Trash2, Users, UserCheck, UserX, Lock, Unlock, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, Trash2, Users, UserCheck, UserX, Lock, Unlock, ShieldCheck, Eye, EyeOff, Pencil, Check, X } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -38,9 +39,65 @@ export default function MembersTab() {
   const [decrypting, setDecrypting] = useState(false);
   const [decryptedData, setDecryptedData] = useState<Map<string, { email: string; full_name: string; phone_number: string }>>(new Map());
 
+  // Editable count overrides
+  const [countOverrides, setCountOverrides] = useState<{ total: number | null; active: number | null; inactive: number | null }>({ total: null, active: null, inactive: null });
+  const [editingCount, setEditingCount] = useState<"total" | "active" | "inactive" | null>(null);
+  const [editValue, setEditValue] = useState("");
+
   useEffect(() => {
     fetchMembers();
+    fetchCountOverrides();
   }, []);
+
+  const fetchCountOverrides = async () => {
+    const { data } = await supabase
+      .from("site_settings")
+      .select("setting_value")
+      .eq("setting_key", "member_count_overrides")
+      .maybeSingle();
+    if (data?.setting_value) {
+      const val = data.setting_value as any;
+      setCountOverrides({
+        total: val.total ?? null,
+        active: val.active ?? null,
+        inactive: val.inactive ?? null,
+      });
+    }
+  };
+
+  const saveCountOverride = async (key: "total" | "active" | "inactive", value: number) => {
+    const newOverrides = { ...countOverrides, [key]: value };
+    setCountOverrides(newOverrides);
+    setEditingCount(null);
+
+    const settingValue: Record<string, number | null> = {};
+    if (newOverrides.total !== null) settingValue.total = newOverrides.total;
+    if (newOverrides.active !== null) settingValue.active = newOverrides.active;
+    if (newOverrides.inactive !== null) settingValue.inactive = newOverrides.inactive;
+
+    await supabase
+      .from("site_settings")
+      .upsert({ setting_key: "member_count_overrides", setting_value: settingValue, updated_at: new Date().toISOString() }, { onConflict: "setting_key" });
+
+    toast({ title: "Saved", description: `${key} count updated to ${value}` });
+  };
+
+  const resetCountOverride = async (key: "total" | "active" | "inactive") => {
+    const newOverrides = { ...countOverrides, [key]: null };
+    setCountOverrides(newOverrides);
+    setEditingCount(null);
+
+    const settingValue: Record<string, number | null> = {};
+    if (newOverrides.total !== null) settingValue.total = newOverrides.total;
+    if (newOverrides.active !== null) settingValue.active = newOverrides.active;
+    if (newOverrides.inactive !== null) settingValue.inactive = newOverrides.inactive;
+
+    await supabase
+      .from("site_settings")
+      .upsert({ setting_key: "member_count_overrides", setting_value: settingValue, updated_at: new Date().toISOString() }, { onConflict: "setting_key" });
+
+    toast({ title: "Reset", description: `${key} count reset to actual value` });
+  };
 
   const fetchMembers = async () => {
     try {
@@ -192,43 +249,78 @@ export default function MembersTab() {
   const activeMembers = members.filter(m => m.status === "active").length;
   const inactiveMembers = members.filter(m => m.status !== "active").length;
 
+  const displayTotal = countOverrides.total ?? totalMembers;
+  const displayActive = countOverrides.active ?? activeMembers;
+  const displayInactive = countOverrides.inactive ?? inactiveMembers;
+
+  const renderStatCard = (
+    label: string,
+    actual: number,
+    display: number,
+    key: "total" | "active" | "inactive",
+    icon: React.ReactNode,
+    colorClass: string
+  ) => (
+    <Card>
+      <CardContent className="pt-6">
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <p className="text-sm text-muted-foreground">{label}</p>
+            {editingCount === key ? (
+              <div className="flex items-center gap-1.5 mt-1">
+                <Input
+                  type="number"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  className="h-8 w-24 text-lg font-bold"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveCountOverride(key, parseInt(editValue) || 0);
+                    if (e.key === "Escape") setEditingCount(null);
+                  }}
+                />
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveCountOverride(key, parseInt(editValue) || 0)}>
+                  <Check className="w-4 h-4 text-affirmative" />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditingCount(null)}>
+                  <X className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <p className={`text-2xl font-bold ${colorClass}`}>{display.toLocaleString()}</p>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-6 w-6 opacity-50 hover:opacity-100"
+                  onClick={() => { setEditingCount(key); setEditValue(String(display)); }}
+                >
+                  <Pencil className="w-3 h-3" />
+                </Button>
+              </div>
+            )}
+            {countOverrides[key] !== null && editingCount !== key && (
+              <button
+                onClick={() => resetCountOverride(key)}
+                className="text-[10px] text-muted-foreground hover:text-foreground underline mt-0.5"
+              >
+                Reset to actual ({actual})
+              </button>
+            )}
+          </div>
+          {icon}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-4 mt-4">
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{totalMembers}</p>
-              </div>
-              <Users className="w-8 h-8 text-primary opacity-50" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Active</p>
-                <p className="text-2xl font-bold text-affirmative">{activeMembers}</p>
-              </div>
-              <UserCheck className="w-8 h-8 text-affirmative opacity-50" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Inactive</p>
-                <p className="text-2xl font-bold text-destructive">{inactiveMembers}</p>
-              </div>
-              <UserX className="w-8 h-8 text-destructive opacity-50" />
-            </div>
-          </CardContent>
-        </Card>
+        {renderStatCard("Total", totalMembers, displayTotal, "total", <Users className="w-8 h-8 text-primary opacity-50" />, "")}
+        {renderStatCard("Active", activeMembers, displayActive, "active", <UserCheck className="w-8 h-8 text-affirmative opacity-50" />, "text-affirmative")}
+        {renderStatCard("Inactive", inactiveMembers, displayInactive, "inactive", <UserX className="w-8 h-8 text-destructive opacity-50" />, "text-destructive")}
       </div>
 
       {/* Encryption Banner */}
