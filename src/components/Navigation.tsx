@@ -206,6 +206,13 @@ const Navigation = () => {
                     <Users className="w-4 h-4" />
                     Lineup Cards
                   </button>
+                  <button
+                    onClick={() => handleProtectedNavigation("/mets-schedule-2026")}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  >
+                    <CalendarDays className="w-4 h-4" />
+                    2026 Season Games
+                  </button>
                 </div>
               </div>
             </div>
@@ -429,6 +436,13 @@ const Navigation = () => {
                       >
                         <span className="w-1 h-1 rounded-full bg-primary" />
                         Lineup Cards
+                      </button>
+                      <button
+                        onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/mets-schedule-2026"); }}
+                        className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
+                      >
+                        <span className="w-1 h-1 rounded-full bg-orange-500" />
+                        2026 Season Games
                       </button>
                     </CollapsibleContent>
                   </Collapsible>
