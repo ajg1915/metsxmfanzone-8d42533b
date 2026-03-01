@@ -8,7 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
-import { Play, Info, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, Info, ChevronLeft, ChevronRight, Bell, BellRing } from "lucide-react";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useToast } from "@/hooks/use-toast";
 
 interface HeroSlide {
   id: string;
@@ -31,6 +33,20 @@ const Hero = () => {
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [isLiveNow, setIsLiveNow] = useState(false);
   const navigate = useNavigate();
+  const { permission, isSubscribed, requestPermission } = useNotifications();
+  const { toast } = useToast();
+
+  const handleSetReminder = async () => {
+    if (!user) { navigate("/auth"); return; }
+    if (permission === "granted" && isSubscribed) {
+      toast({ title: "Already Subscribed", description: "You'll get notified when games go live!" });
+      return;
+    }
+    const granted = await requestPermission();
+    if (granted) {
+      toast({ title: "Reminder Set!", description: "You'll receive a notification when games go live." });
+    }
+  };
 
   // Auto-advance
   useEffect(() => {
@@ -154,10 +170,10 @@ const Hero = () => {
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                   {slide.show_watch_live && (
                     <div className="relative">
-                      {isLiveNow && <div className="absolute -inset-1 rounded-lg bg-red-500/40 blur-lg animate-pulse" />}
+                      {isLiveNow && <div className="absolute -inset-1 rounded-lg bg-destructive/40 blur-lg animate-pulse" />}
                       <Button
                         onClick={() => handleNav("/metsxmfanzone-tv")}
-                        className={`relative gap-1.5 bg-white text-black hover:bg-white/90 font-bold px-4 sm:px-6 h-8 sm:h-9 md:h-10 text-xs sm:text-sm rounded-sm ${isLiveNow ? "ring-2 ring-red-500/50" : ""}`}
+                        className={`relative gap-1.5 bg-white text-black hover:bg-white/90 font-bold px-4 sm:px-6 h-8 sm:h-9 md:h-10 text-xs sm:text-sm rounded-sm ${isLiveNow ? "ring-2 ring-destructive/50" : ""}`}
                       >
                         <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
                         {isLiveNow ? "Watch Live" : "Watch"}
@@ -174,6 +190,22 @@ const Hero = () => {
                       {slide.link_text}
                     </Button>
                   )}
+                  <Button
+                    onClick={handleSetReminder}
+                    variant="outline"
+                    className={`gap-1.5 h-8 sm:h-9 md:h-10 text-xs sm:text-sm px-3 sm:px-5 rounded-sm ${
+                      permission === "granted" && isSubscribed
+                        ? "bg-primary/20 border-primary/40 text-primary hover:bg-primary/30"
+                        : "bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/40"
+                    }`}
+                  >
+                    {permission === "granted" && isSubscribed ? (
+                      <BellRing className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    ) : (
+                      <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    )}
+                    {permission === "granted" && isSubscribed ? "Reminder On" : "Set Reminder"}
+                  </Button>
                 </div>
 
                 {/* Signup banner */}
