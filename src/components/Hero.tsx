@@ -21,6 +21,7 @@ interface HeroSlide {
   link_url: string | null;
   link_text: string | null;
   show_watch_live: boolean | null;
+  show_reminder: boolean | null;
 }
 
 const Hero = () => {
@@ -87,14 +88,14 @@ const Hero = () => {
   }, []);
 
   const defaultSlides = [
-    { title: "METSXMFANZONE.TV", description: "Connect with thousands of passionate Mets fans. Watch live streams, highlights, podcasts and more.", image: heroImage, link_url: null, link_text: null, show_watch_live: true, tag: "STREAMING" },
-    { title: "Live Game Coverage", description: "Watch exclusive live streams, game highlights, and expert analysis. Never miss a moment.", image: heroImage, link_url: "/metsxmfanzone-tv", link_text: "Watch Now", show_watch_live: false, tag: "LIVE" },
-    { title: "MetsXMFanZone Podcast", description: "Join Anthony and the Mets Universe on the daily MetsXMFanZone podcast.", image: heroImage, link_url: "/podcast", link_text: "Listen", show_watch_live: false, tag: "PODCAST" },
+    { title: "METSXMFANZONE.TV", description: "Connect with thousands of passionate Mets fans. Watch live streams, highlights, podcasts and more.", image: heroImage, link_url: null, link_text: null, show_watch_live: true, show_reminder: true, tag: "STREAMING" },
+    { title: "Live Game Coverage", description: "Watch exclusive live streams, game highlights, and expert analysis. Never miss a moment.", image: heroImage, link_url: "/metsxmfanzone-tv", link_text: "Watch Now", show_watch_live: false, show_reminder: true, tag: "LIVE" },
+    { title: "MetsXMFanZone Podcast", description: "Join Anthony and the Mets Universe on the daily MetsXMFanZone podcast.", image: heroImage, link_url: "/podcast", link_text: "Listen", show_watch_live: false, show_reminder: false, tag: "PODCAST" },
   ];
 
   const mapDbSlides = (slides: HeroSlide[], tag: string) => slides.map(s => ({
     title: s.title, description: s.description, image: s.image_url || heroImage,
-    link_url: s.link_url, link_text: s.link_text, show_watch_live: s.show_watch_live ?? true, tag,
+    link_url: s.link_url, link_text: s.link_text, show_watch_live: s.show_watch_live ?? true, show_reminder: s.show_reminder ?? false, tag,
   }));
 
   const slidesToShow = user
@@ -190,22 +191,24 @@ const Hero = () => {
                       {slide.link_text}
                     </Button>
                   )}
-                  <Button
-                    onClick={handleSetReminder}
-                    variant="outline"
-                    className={`gap-1.5 h-8 sm:h-9 md:h-10 text-xs sm:text-sm px-3 sm:px-5 rounded-sm ${
-                      permission === "granted" && isSubscribed
-                        ? "bg-primary/20 border-primary/40 text-primary hover:bg-primary/30"
-                        : "bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/40"
-                    }`}
-                  >
-                    {permission === "granted" && isSubscribed ? (
-                      <BellRing className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    ) : (
-                      <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    )}
-                    {permission === "granted" && isSubscribed ? "Reminder On" : "Set Reminder"}
-                  </Button>
+                  {slide.show_reminder && (
+                    <Button
+                      onClick={handleSetReminder}
+                      variant="outline"
+                      className={`gap-1.5 h-8 sm:h-9 md:h-10 text-xs sm:text-sm px-3 sm:px-5 rounded-sm ${
+                        permission === "granted" && isSubscribed
+                          ? "bg-primary/20 border-primary/40 text-primary hover:bg-primary/30"
+                          : "bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/40"
+                      }`}
+                    >
+                      {permission === "granted" && isSubscribed ? (
+                        <BellRing className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      ) : (
+                        <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      )}
+                      {permission === "granted" && isSubscribed ? "Reminder On" : "Set Reminder"}
+                    </Button>
+                  )}
                 </div>
 
                 {/* Signup banner */}

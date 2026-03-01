@@ -41,6 +41,7 @@ interface HeroSlide {
   link_url: string | null;
   link_text: string | null;
   show_watch_live: boolean;
+  show_reminder: boolean;
 }
 
 interface BlogPost {
@@ -196,6 +197,10 @@ const SortableSlideRow = ({
               <label className="flex items-center gap-1 text-[10px]">
                 <Switch checked={slide.show_watch_live} onCheckedChange={c => onUpdate(slide.id, "show_watch_live", c)} className="scale-75" />
                 Watch Live
+              </label>
+              <label className="flex items-center gap-1 text-[10px]">
+                <Switch checked={slide.show_reminder ?? false} onCheckedChange={c => onUpdate(slide.id, "show_reminder", c)} className="scale-75" />
+                Reminder
               </label>
               <label className="flex items-center gap-1 text-[10px]">
                 <Switch checked={slide.published} onCheckedChange={c => onUpdate(slide.id, "published", c)} className="scale-75" />
@@ -509,7 +514,7 @@ const HeroManagement = () => {
       const { error } = await supabase.from("hero_slides").update({
         title: slide.title, description: slide.description, image_url: slide.image_url,
         display_order: slide.display_order, is_for_members: slide.is_for_members, published: slide.published,
-        blog_post_id: slide.blog_post_id, link_url: slide.link_url, link_text: slide.link_text, show_watch_live: slide.show_watch_live,
+        blog_post_id: slide.blog_post_id, link_url: slide.link_url, link_text: slide.link_text, show_watch_live: slide.show_watch_live, show_reminder: slide.show_reminder ?? false,
       }).eq("id", slide.id);
       if (error) throw error;
       toast.success("Saved");

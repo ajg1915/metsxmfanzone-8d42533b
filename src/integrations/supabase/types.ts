@@ -678,6 +678,7 @@ export type Database = {
           link_text: string | null
           link_url: string | null
           published: boolean | null
+          show_reminder: boolean | null
           show_watch_live: boolean | null
           title: string
           updated_at: string
@@ -696,6 +697,7 @@ export type Database = {
           link_text?: string | null
           link_url?: string | null
           published?: boolean | null
+          show_reminder?: boolean | null
           show_watch_live?: boolean | null
           title: string
           updated_at?: string
@@ -714,6 +716,7 @@ export type Database = {
           link_text?: string | null
           link_url?: string | null
           published?: boolean | null
+          show_reminder?: boolean | null
           show_watch_live?: boolean | null
           title?: string
           updated_at?: string
