@@ -190,18 +190,7 @@ Deno.serve(async (req: Request) => {
             } catch (emailErr) {
               console.error('Receipt email failed:', emailErr);
             }
-            // Notify admins about new member
-            try {
-              await supabase.functions.invoke('notify-admin-new-member', {
-                body: {
-                  userId: subscription.user_id,
-                  planType: subscription.plan_type,
-                  source: 'PayPal Webhook',
-                },
-              });
-            } catch (notifyErr) {
-              console.error('Admin notification failed:', notifyErr);
-            }
+            // Admin notification handled by verify-paypal-payment — skipped here to prevent duplicates
           }
         }
         break;
