@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Home, Plane, Loader2, RefreshCw } from "lucide-react";
+import { Calendar, MapPin, Home, Plane, Loader2, RefreshCw, Swords } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Helmet } from "react-helmet-async";
@@ -11,6 +12,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO } from "date-fns";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+
+const MATCHUP_ROUTES: Record<string, string> = {
+  'Houston Astros': '/matchup/astros',
+  'Atlanta Braves': '/matchup/braves',
+  'St. Louis Cardinals': '/matchup/cardinals',
+  'Washington Nationals': '/matchup/nationals',
+  'Boston Red Sox': '/matchup/redsox',
+  'New York Yankees': '/matchup/yankees',
+  'Toronto Blue Jays': '/matchup/bluejays',
+};
 
 interface Game {
   gameId: number;
@@ -33,6 +44,7 @@ interface GroupedGames {
 }
 
 export default function MetsSchedule2026() {
+  const navigate = useNavigate();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -256,6 +268,18 @@ export default function MetsSchedule2026() {
                                   <MapPin className="w-3 h-3" />
                                   <span className="line-clamp-1">{game.venue}</span>
                                 </div>
+
+                                {MATCHUP_ROUTES[game.opponent] && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="mt-2 h-7 text-xs gap-1 w-full border-primary/30 hover:bg-primary/10"
+                                    onClick={() => navigate(MATCHUP_ROUTES[game.opponent])}
+                                  >
+                                    <Swords className="w-3 h-3" />
+                                    View Matchup Breakdown
+                                  </Button>
+                                )}
                               </div>
                               
                               {game.metsScore !== undefined && game.opponentScore !== undefined && (
