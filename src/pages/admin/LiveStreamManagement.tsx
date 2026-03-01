@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit, Radio, Upload, X, Loader2, RotateCcw, GripVertical } from "lucide-react";
+import { Trash2, Plus, Edit, Radio, Upload, X, Loader2, RotateCcw, GripVertical, Image } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -35,6 +35,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface LiveStream {
   id: string;
@@ -113,6 +114,9 @@ export default function LiveStreamManagement() {
   const [editingStream, setEditingStream] = useState<LiveStream | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const [mediaItems, setMediaItems] = useState<{ id: string; file_url: string; file_name: string; file_type: string | null }[]>([]);
+  const [mediaLoading, setMediaLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -124,6 +128,24 @@ export default function LiveStreamManagement() {
     assigned_pages: [] as string[],
     published: false,
   });
+
+  const fetchMediaLibrary = async () => {
+    setMediaLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("media_library")
+        .select("id, file_url, file_name, file_type")
+        .or("file_type.ilike.image%,file_type.is.null")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      setMediaItems(data || []);
+    } catch (err) {
+      console.error("Failed to load media library:", err);
+    } finally {
+      setMediaLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchStreams();
@@ -513,6 +535,18 @@ export default function LiveStreamManagement() {
                         </>
                       )}
                     </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        fetchMediaLibrary();
+                        setMediaPickerOpen(true);
+                      }}
+                      className="flex-1"
+                    >
+                      <Image className="w-4 h-4 mr-2" />
+                      Media Library
+                    </Button>
                   </div>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">or URL:</span>
@@ -524,6 +558,46 @@ export default function LiveStreamManagement() {
                       className="pl-14"
                     />
                   </div>
+
+                  {/* Media Library Picker Dialog */}
+                  <Dialog open={mediaPickerOpen} onOpenChange={setMediaPickerOpen}>
+                    <DialogContent className="max-w-3xl max-h-[80vh]">
+                      <DialogHeader>
+                        <DialogTitle>Select from Media Library</DialogTitle>
+                        <DialogDescription>Choose an image to use as the thumbnail</DialogDescription>
+                      </DialogHeader>
+                      {mediaLoading ? (
+                        <div className="flex items-center justify-center py-12">
+                          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                        </div>
+                      ) : mediaItems.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-8">No images found in the media library.</p>
+                      ) : (
+                        <ScrollArea className="h-[50vh]">
+                          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-1">
+                            {mediaItems.map((item) => (
+                              <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => {
+                                  setFormData({ ...formData, thumbnail_url: item.file_url });
+                                  setMediaPickerOpen(false);
+                                  toast({ title: "Image selected", description: item.file_name });
+                                }}
+                                className="aspect-video rounded-md overflow-hidden border-2 border-transparent hover:border-primary transition-colors bg-muted"
+                              >
+                                <img
+                                  src={item.file_url}
+                                  alt={item.file_name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </button>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      )}
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
 
