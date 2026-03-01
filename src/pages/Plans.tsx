@@ -13,9 +13,20 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import CheckoutModal from "@/components/CheckoutModal";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { AlertTriangle } from "lucide-react";
 
 const Plans = () => {
   const navigate = useNavigate();
@@ -24,6 +35,7 @@ const Plans = () => {
   const { tier, loading: subscriptionLoading } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [freeConfirmOpen, setFreeConfirmOpen] = useState(false);
   
   // Check if user must select a plan (coming from signup)
   const pendingPlan = localStorage.getItem("pending_signup_plan");
@@ -52,14 +64,19 @@ const Plans = () => {
     setSelectedPlan(planId);
     
     if (planId === "free") {
-      // Free plan - mark as selected and redirect to home
-      localStorage.removeItem("pending_signup_plan");
-      setHasPlanSelected(true);
-      navigate("/");
+      // Show confirmation dialog for free plan
+      setFreeConfirmOpen(true);
       return;
     }
     
     setCheckoutOpen(true);
+  };
+
+  const handleConfirmFreePlan = () => {
+    setFreeConfirmOpen(false);
+    localStorage.removeItem("pending_signup_plan");
+    setHasPlanSelected(true);
+    navigate("/");
   };
   
   const handleCheckoutClose = (open: boolean) => {
@@ -291,6 +308,35 @@ const Plans = () => {
         </section>
       </main>
       {!mustSelectPlan && <Footer />}
+
+      {/* Free Plan Confirmation Dialog */}
+      <AlertDialog open={freeConfirmOpen} onOpenChange={setFreeConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="mx-auto w-12 h-12 rounded-full bg-[hsl(var(--mets-orange))]/10 flex items-center justify-center mb-2">
+              <AlertTriangle className="w-6 h-6 text-[hsl(var(--mets-orange))]" />
+            </div>
+            <AlertDialogTitle className="text-center">Free (Spring Training) Plan</AlertDialogTitle>
+            <AlertDialogDescription className="text-center space-y-3">
+              <p>
+                You will <strong className="text-foreground">not be charged</strong> for the Free Spring Training plan.
+              </p>
+              <p>
+                However, this plan <strong className="text-foreground">expires on March 31, 2026</strong> when Spring Training ends. After that date, you must select a paid plan (Premium or Annual) or your account will be <strong className="text-foreground">deactivated</strong>.
+              </p>
+              <p className="text-xs">
+                By confirming, you acknowledge that continued access after Spring Training requires a paid subscription.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-center gap-2">
+            <AlertDialogCancel>Go Back</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmFreePlan} className="bg-[hsl(var(--mets-orange))] hover:bg-[hsl(var(--mets-orange))]/90">
+              I Understand, Activate Free Plan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Checkout Modal */}
       <CheckoutModal
