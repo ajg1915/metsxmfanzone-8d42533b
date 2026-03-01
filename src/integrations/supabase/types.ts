@@ -2192,6 +2192,51 @@ export type Database = {
         }
         Relationships: []
       }
+      toast_prompts: {
+        Row: {
+          created_at: string
+          description: string
+          display_order: number | null
+          id: string
+          is_active: boolean
+          location: string
+          name: string
+          title: string
+          trigger_condition: string | null
+          trigger_type: string
+          updated_at: string
+          variant: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          location?: string
+          name: string
+          title: string
+          trigger_condition?: string | null
+          trigger_type?: string
+          updated_at?: string
+          variant?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          location?: string
+          name?: string
+          title?: string
+          trigger_condition?: string | null
+          trigger_type?: string
+          updated_at?: string
+          variant?: string
+        }
+        Relationships: []
+      }
       tutorial_steps: {
         Row: {
           created_at: string

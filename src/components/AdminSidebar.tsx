@@ -45,6 +45,7 @@ const mediaItems = [
 const settingsNavItems = [
   { title: "Admin Settings", url: "/admin/settings", icon: Settings },
   { title: "Social Media", url: "/admin/social-media", icon: Share2 },
+  { title: "Toast Prompts", url: "/admin/toast-prompts", icon: Bell },
 ];
 
 // Live & Streaming
