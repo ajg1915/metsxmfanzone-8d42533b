@@ -24,15 +24,14 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 const homeItems = [
   { title: "Dashboard", url: "/admin", icon: Home },
   { title: "Hero Slides", url: "/admin/hero", icon: Layers },
-  { title: "Backgrounds", url: "/admin/backgrounds", icon: Wallpaper },
+  { title: "Media Library", url: "/admin/media-library", icon: FolderOpen },
+  { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
   { title: "Tutorials", url: "/admin/tutorials", icon: BookOpen },
-  { title: "Predictions", url: "/admin/predictions", icon: Sparkles },
-  { title: "Fan Outlook", url: "/admin/talent-assessments", icon: Star },
+  { title: "Members", url: "/admin/user-management", icon: UserCog },
 ];
 
 // Content & Media items - Blog, Stories, Videos, Podcasts, Newsletter
 const mediaItems = [
-  { title: "Media Library", url: "/admin/media-library", icon: FolderOpen },
   { title: "Blog", url: "/admin/blog", icon: FileText },
   { title: "Stories", url: "/admin/stories", icon: Sparkles },
   { title: "Highlights", url: "/admin/video-gallery-management", icon: Video },
@@ -44,18 +43,17 @@ const mediaItems = [
 // Settings items (moved to prominent position)
 const settingsNavItems = [
   { title: "Admin Settings", url: "/admin/settings", icon: Settings },
+  { title: "Backgrounds", url: "/admin/backgrounds", icon: Wallpaper },
   { title: "Social Media", url: "/admin/social-media", icon: Share2 },
   { title: "Toast Prompts", url: "/admin/toast-prompts", icon: Bell },
 ];
 
 // Live & Streaming
 const liveItems = [
-  { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
   { title: "Push Notifications", url: "/admin/game-notifications", icon: Bell },
   { title: "Game Alerts", url: "/admin/game-alerts", icon: Megaphone },
   { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
   { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
-  
 ];
 
 // Events & Schedules
@@ -66,7 +64,6 @@ const eventsItems = [
 
 // Users & Community - Users, Roles, Subscriptions, Feedback, Posts, etc.
 const usersItems = [
-  { title: "Members", url: "/admin/user-management", icon: UserCog },
   { title: "Writer Apps", url: "/admin/writer-applications", icon: PenLine },
   { title: "Podcaster Apps", url: "/admin/podcaster-applications", icon: Mic },
 ];
