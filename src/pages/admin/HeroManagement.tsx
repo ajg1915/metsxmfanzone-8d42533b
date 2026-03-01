@@ -188,8 +188,8 @@ const SortableSlideRow = ({
             </Select>
           </div>
 
-          <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between flex-wrap gap-1 pt-1">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
               <label className="flex items-center gap-1 text-[10px]">
                 <Switch checked={slide.is_for_members} onCheckedChange={c => onUpdate(slide.id, "is_for_members", c)} className="scale-75" />
                 Members
