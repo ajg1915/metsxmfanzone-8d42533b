@@ -1464,6 +1464,30 @@ export type Database = {
         }
         Relationships: []
       }
+      review_request_emails: {
+        Row: {
+          created_at: string
+          id: string
+          sent_at: string
+          subscription_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sent_at?: string
+          subscription_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sent_at?: string
+          subscription_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       seo_settings: {
         Row: {
           canonical_url: string | null
