@@ -202,7 +202,7 @@ export default function TVHome() {
       {/* Quick Access */}
       <section>
         <h2 className="text-3xl font-bold text-foreground mb-6">Quick Access</h2>
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-3 gap-6">
           <QuickAccessCard 
             id="quick-metsxm"
             title="MetsXM FanZone TV" 
@@ -212,27 +212,43 @@ export default function TVHome() {
             onClick={() => navigate('/metsxmfanzone-tv')} 
           />
           <QuickAccessCard 
+            id="quick-highlights"
+            title="Highlights" 
+            icon="🎬" 
+            row={5} 
+            col={1}
+            onClick={() => navigate('/tv/highlights')} 
+          />
+          <QuickAccessCard 
+            id="quick-podcasts"
+            title="Podcasts" 
+            icon="🎙️" 
+            row={5} 
+            col={2}
+            onClick={() => navigate('/tv/podcasts')} 
+          />
+          <QuickAccessCard 
             id="quick-mlb"
             title="MLB Network" 
             icon="⚾" 
-            row={5} 
-            col={1}
+            row={6} 
+            col={0}
             onClick={() => navigate('/mlb-network')} 
           />
           <QuickAccessCard 
             id="quick-schedule"
             title="2026 Schedule" 
             icon="📅" 
-            row={5} 
-            col={2}
+            row={6} 
+            col={1}
             onClick={() => navigate('/mets-schedule-2026')} 
           />
           <QuickAccessCard 
             id="quick-roster"
             title="Team Roster" 
             icon="👥" 
-            row={5} 
-            col={3}
+            row={6} 
+            col={2}
             onClick={() => navigate('/mets-roster')} 
           />
         </div>
