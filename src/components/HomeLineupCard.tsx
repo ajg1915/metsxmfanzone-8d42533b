@@ -104,7 +104,8 @@ export default function HomeLineupCard({
     }
   };
   const {
-    data: lineupCard
+    data: lineupCard,
+    isFetched: lineupFetched
   } = useQuery({
     queryKey: ["today-lineup-card"],
     queryFn: async () => {
@@ -265,12 +266,12 @@ export default function HomeLineupCard({
   const pitcher = lineupCard?.starting_pitcher as unknown as StartingPitcher | null;
   const metsStanding = standings?.find((s: any) => s.team_name === "Mets");
 
-  // Notify parent when lineup data is loaded, passing game date for sync
+  // Notify parent when lineup query completes (even if no game today)
   useEffect(() => {
-    if (lineupCard && onLineupLoaded) {
-      onLineupLoaded(lineupCard.game_date);
+    if (onLineupLoaded && lineupFetched) {
+      onLineupLoaded(lineupCard?.game_date);
     }
-  }, [lineupCard, onLineupLoaded]);
+  }, [lineupCard, onLineupLoaded, lineupFetched]);
   const ScrollIndicator = () => <div className="flex justify-center py-2">
       <div className="flex items-center gap-1.5 text-muted-foreground animate-gentle-bounce">
         <ChevronDown className="w-4 h-4" />
