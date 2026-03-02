@@ -934,6 +934,54 @@ export type Database = {
         }
         Relationships: []
       }
+      mercari_listings: {
+        Row: {
+          category: string | null
+          condition: string | null
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          image_url: string | null
+          is_sold: boolean | null
+          mercari_url: string
+          price: number
+          published: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          condition?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          is_sold?: boolean | null
+          mercari_url: string
+          price: number
+          published?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          condition?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          is_sold?: boolean | null
+          mercari_url?: string
+          price?: number
+          published?: boolean | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mets_news_tracker: {
         Row: {
           created_at: string

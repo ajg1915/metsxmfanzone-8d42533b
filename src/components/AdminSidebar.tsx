@@ -1,7 +1,7 @@
 import { 
   Home, FileText, Video, Radio, Bell, Mic, TrendingUp, 
   MessageSquare, ChevronDown, Users, Mail, 
-  Megaphone, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, 
+  Megaphone, BookOpen, CalendarDays, Trophy, UserCog, Send, Wallpaper, ShoppingBag, 
   Activity, PenLine, HeartPulse, Globe, Settings, Layers, Sparkles, 
   ClipboardList, Star, BarChart3, Share2, FolderOpen
 } from "lucide-react";
@@ -74,6 +74,7 @@ const communityItems = [
   { title: "Posts", url: "/admin/posts", icon: FileText },
   { title: "Feedback", url: "/admin/feedbacks", icon: MessageSquare },
   { title: "Business Ads", url: "/admin/business-ads", icon: Megaphone },
+  { title: "Mercari Shop", url: "/admin/mercari", icon: ShoppingBag },
   { title: "Polls", url: "/admin/polls", icon: BarChart3 },
 ];
 
