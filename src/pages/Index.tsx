@@ -205,7 +205,7 @@ const Index = () => {
           <ReplayGamesSection />
         </Suspense>
 
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
 
         <Suspense fallback={<SectionSkeleton />}>
           <BlogSection />
@@ -221,7 +221,7 @@ const Index = () => {
         {/* Anthony's Predictions - always shown after lineup loads */}
         {lineupLoaded && (
           <>
-            <div className="section-divider my-2 sm:my-3" />
+            <div className="section-divider my-1" />
             <Suspense fallback={<SectionSkeleton />}>
               <PlayersToWatch lineupGameDate={lineupGameDate} />
             </Suspense>
@@ -229,12 +229,12 @@ const Index = () => {
         )}
 
         {/* MetsXMFanZone Radio - directly after Predictions */}
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
         <Suspense fallback={<SectionSkeleton />}>
           <PodcastSection />
         </Suspense>
 
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
 
         <div id="social">
           <Suspense fallback={<SectionSkeleton />}>
@@ -243,31 +243,31 @@ const Index = () => {
         </div>
 
         {/* Spring Training 2026 - TODO: Remove once spring training season concludes */}
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
 
         <Suspense fallback={<SectionSkeleton />}>
           <SpringTraining />
         </Suspense>
 
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
 
         <Suspense fallback={<SectionSkeleton />}>
           <TalentAssessmentSection />
         </Suspense>
 
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
 
         <Suspense fallback={<SectionSkeleton />}>
           <MetsNewsTracker />
         </Suspense>
 
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
 
         <Suspense fallback={<SectionSkeleton height="h-48" />}>
           <JoinPodcastSection />
         </Suspense>
 
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
 
         {!user && (
           <Suspense fallback={<SectionSkeleton />}>
@@ -275,19 +275,19 @@ const Index = () => {
           </Suspense>
         )}
 
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
 
         <Suspense fallback={<SectionSkeleton />}>
           <TestimonialsSection />
         </Suspense>
 
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
 
         <Suspense fallback={<SectionSkeleton height="h-48" />}>
           <AppInstallSection />
         </Suspense>
 
-        <div className="section-divider my-2 sm:my-3" />
+        <div className="section-divider my-1" />
 
         <Suspense fallback={<SectionSkeleton />}>
           <HotStoveGuide />
