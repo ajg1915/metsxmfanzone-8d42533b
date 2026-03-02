@@ -36,6 +36,7 @@ const mediaItems = [
   { title: "Stories", url: "/admin/stories", icon: Sparkles },
   { title: "Highlights", url: "/admin/video-gallery-management", icon: Video },
   { title: "Podcasts", url: "/admin/podcasts", icon: Mic },
+  { title: "Clubhouse Studio", url: "/admin/studio", icon: Radio },
   { title: "Newsletter", url: "/admin/newsletter", icon: Mail },
   { title: "Email Editor", url: "/admin/email-editor", icon: Send },
 ];

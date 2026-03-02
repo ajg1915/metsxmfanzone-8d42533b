@@ -41,6 +41,7 @@ const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const BlogManagement = lazy(() => import("./pages/admin/BlogManagement"));
 const VideoGalleryManagement = lazy(() => import("./pages/admin/VideoGalleryManagement"));
 const PodcastManagement = lazy(() => import("./pages/admin/PodcastManagement"));
+const ClubhouseStudio = lazy(() => import("./pages/admin/ClubhouseStudio"));
 const PodcastLiveStreamManagement = lazy(() => import("./pages/admin/PodcastLiveStreamManagement"));
 
 
@@ -349,6 +350,7 @@ const AppContent = () => {
               <Route path="blog" element={<BlogManagement />} />
               <Route path="video-gallery-management" element={<VideoGalleryManagement />} />
               <Route path="podcasts" element={<PodcastManagement />} />
+              <Route path="studio" element={<ClubhouseStudio />} />
               <Route path="live-streams" element={<LiveStreamManagement />} />
               <Route path="podcast-live-stream" element={<PodcastLiveStreamManagement />} />
               
