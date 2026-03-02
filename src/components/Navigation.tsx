@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "@/components/NavLink";
 import { Button } from "@/components/ui/button";
-import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles, Tv, ChevronDown, PenLine } from "lucide-react";
+import { Menu, Shield, LogOut, LayoutDashboard, ArrowLeft, Users, CalendarDays, RefreshCw, Sparkles, Tv, ChevronDown, PenLine, ShoppingBag } from "lucide-react";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import liveStreamIcon from "@/assets/live-streaming-icon.png";
 import podcastIcon from "@/assets/podcast-icon.png";
@@ -238,6 +238,13 @@ const Navigation = () => {
                     <img src={logo} alt="" className="w-4 h-4 object-contain" />
                     Blog
                   </button>
+                  <button
+                    onClick={() => navigate("/shop")}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    Shop
+                  </button>
                 </div>
               </div>
             </div>
@@ -463,6 +470,13 @@ const Navigation = () => {
                       >
                         <span className="w-1 h-1 rounded-full bg-primary" />
                         Blog
+                      </button>
+                      <button
+                        onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); navigate("/shop"); }}
+                        className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
+                      >
+                        <span className="w-1 h-1 rounded-full bg-primary" />
+                        Shop
                       </button>
                     </CollapsibleContent>
                   </Collapsible>
