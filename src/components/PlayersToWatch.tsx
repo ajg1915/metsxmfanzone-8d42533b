@@ -77,7 +77,8 @@ const PlayersToWatch = ({ lineupGameDate }: { lineupGameDate?: string | null }) 
     }
   };
 
-  const shouldGenerate = !isLoading && (!predictions || predictions.length === 0);
+  const noGameToday = !lineupGameDate;
+  const shouldGenerate = !noGameToday && !isLoading && (!predictions || predictions.length === 0);
 
   const isPitcherPlayer = (p: PlayerPrediction) => p.is_pitcher === true;
   const isCloser = (p: PlayerPrediction) => (p.predicted_saves ?? 0) > 0;
@@ -107,7 +108,15 @@ const PlayersToWatch = ({ lineupGameDate }: { lineupGameDate?: string | null }) 
             )}
           </div>
 
-          {isLoading && (
+          {noGameToday && (
+            <div className="flex flex-col items-center justify-center py-12 bg-card/30 rounded-xl border border-border/50">
+              <TrendingUp className="w-12 h-12 text-muted-foreground mb-4" />
+              <p className="text-foreground font-semibold mb-1">No Game Today</p>
+              <p className="text-sm text-muted-foreground">Predictions will return on the next game day.</p>
+            </div>
+          )}
+
+          {!noGameToday && isLoading && (
             <div className="flex items-center justify-center py-12">
               <RefreshCw className="w-8 h-8 text-primary animate-spin" />
               <span className="ml-3 text-foreground">Loading predictions...</span>
@@ -128,7 +137,7 @@ const PlayersToWatch = ({ lineupGameDate }: { lineupGameDate?: string | null }) 
             </div>
           )}
 
-          {predictions && predictions.length > 0 && (
+          {!noGameToday && predictions && predictions.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {predictions.map((player) => (
                 <ParlayCard key={player.id} player={player} isPitcher={isPitcherPlayer(player)} isCloser={isCloser(player)} isStarter={isStarter(player)} />
@@ -136,7 +145,7 @@ const PlayersToWatch = ({ lineupGameDate }: { lineupGameDate?: string | null }) 
             </div>
           )}
 
-          {predictions && predictions.length > 0 && (
+          {!noGameToday && predictions && predictions.length > 0 && (
             <div className="mt-6 flex items-center justify-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary" />
               <span className="text-xs text-primary font-semibold">Anthony Approved</span>
