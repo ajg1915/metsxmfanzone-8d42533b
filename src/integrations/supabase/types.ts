@@ -1587,6 +1587,140 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_orders: {
+        Row: {
+          created_at: string
+          customer_email: string
+          customer_name: string
+          id: string
+          notes: string | null
+          paypal_capture_id: string | null
+          paypal_order_id: string | null
+          product_id: string | null
+          quantity: number
+          shipping_address_line1: string | null
+          shipping_address_line2: string | null
+          shipping_city: string | null
+          shipping_country: string | null
+          shipping_state: string | null
+          shipping_zip: string | null
+          status: string
+          total_amount: number
+          unit_price: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          id?: string
+          notes?: string | null
+          paypal_capture_id?: string | null
+          paypal_order_id?: string | null
+          product_id?: string | null
+          quantity?: number
+          shipping_address_line1?: string | null
+          shipping_address_line2?: string | null
+          shipping_city?: string | null
+          shipping_country?: string | null
+          shipping_state?: string | null
+          shipping_zip?: string | null
+          status?: string
+          total_amount: number
+          unit_price: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          id?: string
+          notes?: string | null
+          paypal_capture_id?: string | null
+          paypal_order_id?: string | null
+          product_id?: string | null
+          quantity?: number
+          shipping_address_line1?: string | null
+          shipping_address_line2?: string | null
+          shipping_city?: string | null
+          shipping_country?: string | null
+          shipping_state?: string | null
+          shipping_zip?: string | null
+          status?: string
+          total_amount?: number
+          unit_price?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_products: {
+        Row: {
+          category: string | null
+          compare_at_price: number | null
+          condition: string | null
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          image_url: string | null
+          image_urls: string[] | null
+          price: number
+          published: boolean | null
+          requires_shipping: boolean | null
+          stock_quantity: number | null
+          title: string
+          updated_at: string
+          weight_oz: number | null
+        }
+        Insert: {
+          category?: string | null
+          compare_at_price?: number | null
+          condition?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          image_urls?: string[] | null
+          price: number
+          published?: boolean | null
+          requires_shipping?: boolean | null
+          stock_quantity?: number | null
+          title: string
+          updated_at?: string
+          weight_oz?: number | null
+        }
+        Update: {
+          category?: string | null
+          compare_at_price?: number | null
+          condition?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string | null
+          image_urls?: string[] | null
+          price?: number
+          published?: boolean | null
+          requires_shipping?: boolean | null
+          stock_quantity?: number | null
+          title?: string
+          updated_at?: string
+          weight_oz?: number | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string

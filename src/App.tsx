@@ -140,8 +140,9 @@ const PollManagement = lazy(() => import("./pages/admin/PollManagement"));
 const SocialMediaSettings = lazy(() => import("./pages/admin/SocialMediaSettings"));
 const MediaLibrary = lazy(() => import("./pages/admin/MediaLibrary"));
 const ToastPromptManagement = lazy(() => import("./pages/admin/ToastPromptManagement"));
-const MercariManagement = lazy(() => import("./pages/admin/MercariManagement"));
-const MercariShop = lazy(() => import("./pages/MercariShop"));
+const ShopManagement = lazy(() => import("./pages/admin/ShopManagement"));
+const Shop = lazy(() => import("./pages/Shop"));
+const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
 const WhatsNew = lazy(() => import("./pages/WhatsNew"));
 const Install = lazy(() => import("./pages/Install"));
 const MetsVsAstros = lazy(() => import("./pages/matchups/MetsVsAstros"));
@@ -388,7 +389,7 @@ const AppContent = () => {
               <Route path="tutorials" element={<TutorialManagement />} />
               <Route path="media-library" element={<MediaLibrary />} />
               <Route path="toast-prompts" element={<ToastPromptManagement />} />
-              <Route path="mercari" element={<MercariManagement />} />
+              <Route path="shop" element={<ShopManagement />} />
             </Route>
             {/* Writer Portal Routes */}
             <Route path="/writer" element={<WriterDashboard />} />
@@ -397,7 +398,8 @@ const AppContent = () => {
             <Route path="/spring-training-live" element={<SpringTrainingLive />} />
             <Route path="/replay-games" element={<ReplayGames />} />
             <Route path="/merch" element={<Merch />} />
-            <Route path="/mercari-shop" element={<MercariShop />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/shop/order-success" element={<OrderSuccess />} />
             <Route path="/product/:handle" element={<Product />} />
             <Route path="/mets-schedule-2026" element={<MetsSchedule2026 />} />
             <Route path="/broadcast-schedule" element={<TVBroadcastSchedule />} />
