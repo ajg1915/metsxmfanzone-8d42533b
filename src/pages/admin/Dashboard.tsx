@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Globe, Sparkles, Settings } from "lucide-react";
+import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Globe, Sparkles, Settings, Video, Mic } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -62,6 +62,20 @@ export default function AdminDashboard() {
       icon: Eye,
       url: "/admin/media-library",
       stat: "Assets",
+    },
+    {
+      title: "Highlights",
+      description: "Manage video highlights",
+      icon: Video,
+      url: "/admin/video-gallery-management",
+      stat: "Videos",
+    },
+    {
+      title: "Podcasts",
+      description: "Manage podcast episodes",
+      icon: Mic,
+      url: "/admin/podcasts",
+      stat: "Episodes",
     },
     {
       title: "Live Streams & Health",
