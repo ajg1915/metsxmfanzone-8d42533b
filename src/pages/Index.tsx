@@ -218,8 +218,8 @@ const Index = () => {
           }} />
         </Suspense>
 
-        {/* Anthony's Predictions - only shown after lineup data loads, re-syncs on lineup change */}
-        {lineupLoaded && (
+        {/* Anthony's Predictions - only shown when there's a game today */}
+        {lineupLoaded && lineupGameDate && (
           <>
             <div className="section-divider my-2 sm:my-3" />
             <Suspense fallback={<SectionSkeleton />}>
