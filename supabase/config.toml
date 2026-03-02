@@ -158,3 +158,9 @@ verify_jwt = false
 
 [functions.generate-ai-hero-slides]
 verify_jwt = true
+
+[functions.create-shop-order]
+verify_jwt = false
+
+[functions.capture-shop-order]
+verify_jwt = false

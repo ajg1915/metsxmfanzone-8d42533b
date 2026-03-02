@@ -74,7 +74,7 @@ const communityItems = [
   { title: "Posts", url: "/admin/posts", icon: FileText },
   { title: "Feedback", url: "/admin/feedbacks", icon: MessageSquare },
   { title: "Business Ads", url: "/admin/business-ads", icon: Megaphone },
-  { title: "Mercari Shop", url: "/admin/mercari", icon: ShoppingBag },
+  { title: "Shop", url: "/admin/shop", icon: ShoppingBag },
   { title: "Polls", url: "/admin/polls", icon: BarChart3 },
 ];
 
