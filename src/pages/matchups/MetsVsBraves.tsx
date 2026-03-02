@@ -1,25 +1,6 @@
 import MatchupPage from "./MatchupPage";
+import { metsData2026 } from "./metsRoster2026";
 import springImage from "@/assets/spring-mets-braves.jpg";
-
-const metsData = {
-  name: "New York Mets",
-  abbr: "NYM",
-  primaryColor: "#ff4500",
-  secondaryColor: "#FF5910",
-  logo: "",
-  teamId: 121,
-  record: "89-73",
-  springRecord: "12-8",
-  keyPlayers: [
-    { name: "Francisco Lindor", position: "SS", avg: ".273", hr: 33, rbi: 98, imageId: 596019 },
-    { name: "Pete Alonso", position: "1B", avg: ".231", hr: 46, rbi: 118, imageId: 624413 },
-    { name: "Brandon Nimmo", position: "CF", avg: ".274", hr: 23, rbi: 77, imageId: 607043 },
-  ],
-  keyPitchers: [
-    { name: "Kodai Senga", position: "SP", era: "2.98", wins: 12, strikeouts: 202, imageId: 681739 },
-    { name: "David Peterson", position: "SP", era: "3.65", wins: 9, strikeouts: 142, imageId: 656849 },
-  ],
-};
 
 const opponentData = {
   name: "Atlanta Braves",
@@ -28,22 +9,22 @@ const opponentData = {
   secondaryColor: "#13274F",
   logo: "",
   teamId: 144,
-  record: "101-61",
-  springRecord: "14-6",
+  record: "88-74",
+  springRecord: "12-8",
   keyPlayers: [
-    { name: "Ronald Acuña Jr.", position: "RF", avg: ".337", hr: 41, rbi: 106, imageId: 660670 },
-    { name: "Matt Olson", position: "1B", avg: ".283", hr: 54, rbi: 139, imageId: 621566 },
-    { name: "Austin Riley", position: "3B", avg: ".285", hr: 37, rbi: 97, imageId: 663586 },
+    { name: "Ronald Acuña Jr.", position: "RF", avg: ".290", hr: 30, rbi: 88, imageId: 660670 },
+    { name: "Matt Olson", position: "1B", avg: ".275", hr: 40, rbi: 115, imageId: 621566 },
+    { name: "Austin Riley", position: "3B", avg: ".280", hr: 35, rbi: 95, imageId: 663586 },
   ],
   keyPitchers: [
-    { name: "Spencer Strider", position: "SP", era: "3.15", wins: 16, strikeouts: 281, imageId: 675911 },
-    { name: "Max Fried", position: "SP", era: "3.21", wins: 14, strikeouts: 189, imageId: 608331 },
+    { name: "Spencer Strider", position: "SP", era: "3.05", wins: 15, strikeouts: 260, imageId: 675911 },
+    { name: "Reynaldo López", position: "SP", era: "3.45", wins: 12, strikeouts: 175, imageId: 625643 },
   ],
 };
 
 const bettingLines = {
   spread: "ATL -1.5",
-  moneyline: { mets: "+135", opponent: "-155" },
+  moneyline: { mets: "+125", opponent: "-145" },
   overUnder: "9.0",
 };
 
@@ -59,12 +40,12 @@ export default function MetsVsBraves() {
   return (
     <MatchupPage
       opponent={opponentData}
-      metsData={metsData}
+      metsData={metsData2026}
       bettingLines={bettingLines}
       anthonyPick={anthonyPick}
       headToHead={{ metsWins: 85, opponentWins: 102 }}
       heroImage={springImage}
-      matchupDate="March 2026"
+      matchupDate="2026 Season"
     />
   );
 }
