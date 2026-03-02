@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ShoppingBag, Tag, Loader2 } from "lucide-react";
+import { ShoppingBag, Tag, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import logo from "@/assets/metsxmfanzone-logo.png";
 
@@ -20,10 +20,50 @@ interface ShopProduct {
   price: number;
   compare_at_price: number | null;
   image_url: string | null;
+  image_urls: string[] | null;
   category: string | null;
   condition: string | null;
   stock_quantity: number | null;
 }
+
+const ProductImageGallery = ({ images, title }: { images: string[]; title: string }) => {
+  const [current, setCurrent] = useState(0);
+
+  if (images.length === 0) {
+    return (
+      <div className="w-full h-full bg-secondary/20 flex items-center justify-center">
+        <img src={logo} alt="MetsXMFanZone" className="w-20 h-20 opacity-50" />
+      </div>
+    );
+  }
+
+  if (images.length === 1) {
+    return <img src={images[0]} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />;
+  }
+
+  return (
+    <div className="relative w-full h-full">
+      <img src={images[current]} alt={`${title} ${current + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+      <button
+        onClick={(e) => { e.stopPropagation(); setCurrent(p => (p - 1 + images.length) % images.length); }}
+        className="absolute left-1 top-1/2 -translate-y-1/2 bg-background/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <ChevronLeft className="w-4 h-4" />
+      </button>
+      <button
+        onClick={(e) => { e.stopPropagation(); setCurrent(p => (p + 1) % images.length); }}
+        className="absolute right-1 top-1/2 -translate-y-1/2 bg-background/80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <ChevronRight className="w-4 h-4" />
+      </button>
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+        {images.map((_, i) => (
+          <span key={i} className={`w-1.5 h-1.5 rounded-full ${i === current ? 'bg-primary' : 'bg-background/60'}`} />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const Shop = () => {
   const [products, setProducts] = useState<ShopProduct[]>([]);
@@ -32,13 +72,7 @@ const Shop = () => {
   const [buyingProduct, setBuyingProduct] = useState<ShopProduct | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [customerForm, setCustomerForm] = useState({
-    name: "",
-    email: "",
-    line1: "",
-    line2: "",
-    city: "",
-    state: "",
-    zip: "",
+    name: "", email: "", line1: "", line2: "", city: "", state: "", zip: "",
   });
 
   useEffect(() => {
@@ -57,6 +91,12 @@ const Shop = () => {
   const categories = ["All", ...new Set(products.map(l => l.category || "General"))];
   const filtered = filter === "All" ? products : products.filter(l => l.category === filter);
 
+  const getImages = (product: ShopProduct): string[] => {
+    if (product.image_urls && product.image_urls.length > 0) return product.image_urls;
+    if (product.image_url) return [product.image_url];
+    return [];
+  };
+
   const handleBuyNow = async () => {
     if (!buyingProduct) return;
     if (!customerForm.name || !customerForm.email || !customerForm.line1 || !customerForm.city || !customerForm.state || !customerForm.zip) {
@@ -73,19 +113,15 @@ const Shop = () => {
           customerName: customerForm.name,
           customerEmail: customerForm.email,
           shippingAddress: {
-            line1: customerForm.line1,
-            line2: customerForm.line2,
-            city: customerForm.city,
-            state: customerForm.state,
-            zip: customerForm.zip,
-            country: 'US',
+            line1: customerForm.line1, line2: customerForm.line2,
+            city: customerForm.city, state: customerForm.state,
+            zip: customerForm.zip, country: 'US',
           },
           returnOrigin: window.location.origin,
         },
       });
 
       if (error) throw error;
-
       if (data.approvalUrl) {
         window.location.href = data.approvalUrl;
       } else {
@@ -112,7 +148,6 @@ const Shop = () => {
 
       <main className="flex-1 pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-7xl">
-          {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
               <img src={logo} alt="MetsXMFanZone" className="w-12 h-12" />
@@ -121,7 +156,6 @@ const Shop = () => {
             <p className="text-muted-foreground">Mets collectibles, jerseys, cards & more — secure PayPal checkout</p>
           </div>
 
-          {/* Category Filter */}
           {categories.length > 1 && (
             <div className="flex flex-wrap gap-2 mb-6">
               {categories.map((cat) => (
@@ -132,7 +166,6 @@ const Shop = () => {
             </div>
           )}
 
-          {/* Products Grid */}
           {loading ? (
             <div className="text-center py-12">
               <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary mb-2" />
@@ -152,13 +185,7 @@ const Shop = () => {
                   className={`border-2 ${isOutOfStock(product) ? 'border-muted opacity-75' : 'border-primary'} bg-card overflow-hidden hover:shadow-lg transition-all group`}
                 >
                   <div className="aspect-square overflow-hidden relative">
-                    {product.image_url ? (
-                      <img src={product.image_url} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
-                      <div className="w-full h-full bg-secondary/20 flex items-center justify-center">
-                        <img src={logo} alt="MetsXMFanZone" className="w-20 h-20 opacity-50" />
-                      </div>
-                    )}
+                    <ProductImageGallery images={getImages(product)} title={product.title} />
                     {isOutOfStock(product) && (
                       <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
                         <span className="text-lg font-bold text-destructive bg-background/80 px-4 py-2 rounded-lg">SOLD OUT</span>
@@ -217,8 +244,8 @@ const Shop = () => {
           {buyingProduct && (
             <div className="space-y-4">
               <div className="flex gap-3 p-3 bg-muted/50 rounded-lg">
-                {buyingProduct.image_url && (
-                  <img src={buyingProduct.image_url} alt={buyingProduct.title} className="w-16 h-16 object-cover rounded" />
+                {getImages(buyingProduct).length > 0 && (
+                  <img src={getImages(buyingProduct)[0]} alt={buyingProduct.title} className="w-16 h-16 object-cover rounded" />
                 )}
                 <div>
                   <p className="font-medium text-sm">{buyingProduct.title}</p>

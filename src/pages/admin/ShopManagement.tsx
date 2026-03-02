@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Pencil, Trash2, ShoppingBag, Package, DollarSign } from "lucide-react";
+import { Plus, Pencil, Trash2, ShoppingBag, Package, DollarSign, Upload, X, Loader2, Image as ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
@@ -21,6 +21,7 @@ interface ShopProduct {
   price: number;
   compare_at_price: number | null;
   image_url: string | null;
+  image_urls: string[] | null;
   category: string | null;
   condition: string | null;
   stock_quantity: number | null;
@@ -55,7 +56,7 @@ const emptyForm = {
   description: "",
   price: "",
   compare_at_price: "",
-  image_url: "",
+  image_urls: [] as string[],
   category: "General",
   condition: "New",
   stock_quantity: "1",
@@ -71,6 +72,8 @@ const ShopManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -96,6 +99,47 @@ const ShopManagement = () => {
     if (!error) setOrders((data as unknown as ShopOrder[]) || []);
   };
 
+  const handleUploadImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    const newUrls: string[] = [];
+
+    for (const file of Array.from(files)) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `shop/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('media_library')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        toast.error(`Failed to upload ${file.name}`);
+        continue;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('media_library')
+        .getPublicUrl(fileName);
+
+      newUrls.push(urlData.publicUrl);
+    }
+
+    setForm(prev => ({ ...prev, image_urls: [...prev.image_urls, ...newUrls] }));
+    setUploading(false);
+
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (newUrls.length > 0) toast.success(`${newUrls.length} image(s) uploaded`);
+  };
+
+  const removeImage = (index: number) => {
+    setForm(prev => ({
+      ...prev,
+      image_urls: prev.image_urls.filter((_, i) => i !== index),
+    }));
+  };
+
   const handleSubmit = async () => {
     if (!form.title || !form.price) {
       toast.error("Title and price are required");
@@ -107,7 +151,8 @@ const ShopManagement = () => {
       description: form.description || null,
       price: parseFloat(form.price),
       compare_at_price: form.compare_at_price ? parseFloat(form.compare_at_price) : null,
-      image_url: form.image_url || null,
+      image_url: form.image_urls[0] || null,
+      image_urls: form.image_urls,
       category: form.category,
       condition: form.condition,
       stock_quantity: form.stock_quantity ? parseInt(form.stock_quantity) : null,
@@ -134,12 +179,15 @@ const ShopManagement = () => {
 
   const handleEdit = (product: ShopProduct) => {
     setEditingId(product.id);
+    const urls = product.image_urls && product.image_urls.length > 0
+      ? product.image_urls
+      : product.image_url ? [product.image_url] : [];
     setForm({
       title: product.title,
       description: product.description || "",
       price: String(product.price),
       compare_at_price: product.compare_at_price ? String(product.compare_at_price) : "",
-      image_url: product.image_url || "",
+      image_urls: urls,
       category: product.category || "General",
       condition: product.condition || "New",
       stock_quantity: product.stock_quantity !== null ? String(product.stock_quantity) : "",
@@ -173,6 +221,11 @@ const ShopManagement = () => {
     }
   };
 
+  const getPreviewImage = (product: ShopProduct) => {
+    if (product.image_urls && product.image_urls.length > 0) return product.image_urls[0];
+    return product.image_url;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -203,10 +256,59 @@ const ShopManagement = () => {
                   <Input type="number" step="0.01" value={form.compare_at_price} onChange={(e) => setForm({ ...form, compare_at_price: e.target.value })} placeholder="39.99" />
                 </div>
               </div>
+
+              {/* Image Upload Section */}
               <div>
-                <Label>Image URL</Label>
-                <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
+                <Label>Product Images</Label>
+                <div className="mt-2 space-y-3">
+                  {form.image_urls.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2">
+                      {form.image_urls.map((url, index) => (
+                        <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-border">
+                          <img src={url} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            onClick={() => removeImage(index)}
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                          {index === 0 && (
+                            <span className="absolute bottom-1 left-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded">Main</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleUploadImages}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    disabled={uploading}
+                    onClick={() => {
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                        fileInputRef.current.click();
+                      }
+                    }}
+                  >
+                    {uploading ? (
+                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Uploading...</>
+                    ) : (
+                      <><Upload className="w-4 h-4 mr-2" />Upload Images</>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">Upload multiple images. First image is the main photo.</p>
+                </div>
               </div>
+
               <div>
                 <Label>Description</Label>
                 <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
@@ -273,6 +375,7 @@ const ShopManagement = () => {
                       <TableHead>Price</TableHead>
                       <TableHead>Stock</TableHead>
                       <TableHead>Category</TableHead>
+                      <TableHead>Photos</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -281,8 +384,8 @@ const ShopManagement = () => {
                     {products.map((product) => (
                       <TableRow key={product.id}>
                         <TableCell>
-                          {product.image_url ? (
-                            <img src={product.image_url} alt={product.title} className="w-12 h-12 object-cover rounded" />
+                          {getPreviewImage(product) ? (
+                            <img src={getPreviewImage(product)!} alt={product.title} className="w-12 h-12 object-cover rounded" />
                           ) : (
                             <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
                               <ShoppingBag className="w-5 h-5 text-muted-foreground" />
@@ -298,6 +401,12 @@ const ShopManagement = () => {
                         </TableCell>
                         <TableCell>{product.stock_quantity ?? '∞'}</TableCell>
                         <TableCell>{product.category}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <ImageIcon className="w-3 h-3" />
+                            {(product.image_urls?.length || (product.image_url ? 1 : 0))}
+                          </div>
+                        </TableCell>
                         <TableCell>
                           {product.published ? (
                             <Badge variant="default" className="text-xs">Live</Badge>
