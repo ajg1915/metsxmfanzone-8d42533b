@@ -149,10 +149,10 @@ export default function MetsSchedule2026() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8 text-center"
         >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3">
             2026 New York Mets Schedule
           </h1>
-          <p className="text-muted-foreground text-lg mb-4">
+          <p className="text-muted-foreground text-sm sm:text-base mb-4">
             Full Season Schedule - Spring Training & Regular Season
           </p>
           
