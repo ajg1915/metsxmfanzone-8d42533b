@@ -232,14 +232,22 @@ const getEmailTemplate = (
   ` : '';
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
   <title>${safeTitle}</title>
+  <!--[if mso]><style>body,table,td{font-family:Arial,Helvetica,sans-serif!important}</style><![endif]-->
 </head>
-<body style="margin: 0; padding: 0; background-color: #002D72; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
-  <div style="max-width: 420px; margin: 0 auto; padding: 20px 12px;">
+<body style="margin: 0; padding: 0; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#002D72" style="background-color: #002D72; margin: 0; padding: 0;">
+    <tr>
+      <td align="center" style="padding: 0;">
+        <table width="420" cellpadding="0" cellspacing="0" border="0" style="max-width: 420px; width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+          <tr>
+            <td style="padding: 20px 12px;">
     
     <!-- Header -->
     <div style="text-align: center; padding: 24px 0 16px 0;">
@@ -248,7 +256,9 @@ const getEmailTemplate = (
     </div>
 
     <!-- Main Card -->
-    <div style="background: linear-gradient(180deg, #141a2e 0%, #0d1222 100%); border: 1px solid rgba(255,69,0,0.25); border-radius: 16px; padding: 28px 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#141a2e" style="background-color: #141a2e; border: 1px solid rgba(255,69,0,0.25); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+      <tr>
+        <td style="padding: 28px 20px;">
       
       ${vsHeaderHtml}
 
@@ -267,11 +277,16 @@ const getEmailTemplate = (
 
       <!-- CTA Button -->
       <div style="text-align: center; margin-top: 24px;">
-        <a href="${escapeHtml(actionUrl)}" style="display: inline-block; background: linear-gradient(135deg, #FF4500 0%, #FF6B35 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 14px; letter-spacing: 0.3px; box-shadow: 0 4px 14px rgba(255,69,0,0.4);">
+        <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="${escapeHtml(actionUrl)}" style="height:44px;v-text-anchor:middle;width:200px;" arcsize="23%" fillcolor="#FF4500"><center style="color:#ffffff;font-family:Arial;font-size:14px;font-weight:bold;">${isFinal ? 'View Full Recap' : 'Open MetsXMFanZone'}</center></v:roundrect><![endif]-->
+        <!--[if !mso]><!-->
+        <a href="${escapeHtml(actionUrl)}" style="display: inline-block; background-color: #FF4500; color: white; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 700; font-size: 14px; letter-spacing: 0.3px;">
           ${isFinal ? 'View Full Recap' : 'Open MetsXMFanZone'}
         </a>
+        <!--<![endif]-->
       </div>
-    </div>
+        </td>
+      </tr>
+    </table>
 
     <!-- Footer -->
     <div style="text-align: center; padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.08);">
@@ -294,7 +309,13 @@ const getEmailTemplate = (
         &copy; ${new Date().getFullYear()} MetsXMFanZone. All rights reserved.
       </p>
     </div>
-  </div>
+
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>`;
 };

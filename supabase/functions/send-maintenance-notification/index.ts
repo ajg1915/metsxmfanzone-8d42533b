@@ -51,9 +51,14 @@ const loadEmailStyle = async (supabase: any) => {
 const buildMaintenanceEmail = (message: string, style: any, emojis: any) => {
   const safeMessage = escapeHtml(message);
   
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #ffffff;">
-  <div style="max-width: 480px; margin: 0 auto; background-color: ${style.cardBgColor}; border-radius: ${style.borderRadius}px; padding: 32px; border: 1px solid ${style.borderColor};">
+  return `<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"></head>
+<body style="margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#0a0e1a" style="background-color: #0a0e1a; margin: 0; padding: 0;">
+    <tr>
+      <td align="center" style="padding: 16px;">
+        <table width="480" cellpadding="0" cellspacing="0" border="0" bgcolor="${style.cardBgColor}" style="max-width: 480px; width: 100%; background-color: ${style.cardBgColor}; border-radius: ${style.borderRadius}px; border: 1px solid ${style.borderColor}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          <tr>
+            <td style="padding: 32px;">
     <div style="text-align: center; margin-bottom: 20px;">
       <img src="${style.logoUrl}" alt="MetsXMFanZone" style="width: ${style.logoWidth}px; height: auto; margin-bottom: 8px; border-radius: 12px;" />
     </div>
@@ -62,11 +67,13 @@ const buildMaintenanceEmail = (message: string, style: any, emojis: any) => {
     </div>
     <h1 style="color: ${style.textColor}; text-align: center; font-size: 22px; font-weight: bold; margin: 0 0 12px;">Scheduled Maintenance</h1>
     <p style="color: ${style.mutedTextColor}; text-align: center; font-size: 14px; margin: 0 0 20px; line-height: 1.6;">${safeMessage}</p>
-    <div style="background: rgba(255,107,53,0.1); padding: 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,107,53,0.2);">
-      <p style="color: ${style.accentColor}; font-size: 13px; margin: 0; text-align: center; font-weight: 600;">⏱️ We'll notify you as soon as we're back online!</p>
-    </div>
-    <div style="text-align: center; margin-bottom: 20px;">
-      <a href="https://metsxmfanzone.lovable.app" style="display: inline-block; background: ${style.accentColor}; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 14px;">Visit MetsXMFanZone</a>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#1a0d00" style="background: rgba(255,107,53,0.1); border-radius: 8px; border: 1px solid rgba(255,107,53,0.2);">
+      <tr><td style="padding: 16px;">
+        <p style="color: ${style.accentColor}; font-size: 13px; margin: 0; text-align: center; font-weight: 600;">⏱️ We'll notify you as soon as we're back online!</p>
+      </td></tr>
+    </table>
+    <div style="text-align: center; margin: 20px 0;">
+      <a href="https://www.metsxmfanzone.com" style="display: inline-block; background-color: ${style.accentColor}; color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 14px;">Visit MetsXMFanZone</a>
     </div>
     <div style="text-align: center; border-top: 1px solid ${style.borderColor}; padding-top: 16px;">
       <p style="color: ${style.mutedTextColor}; font-size: 11px; margin: 0;">Follow us on social media for live updates</p>
@@ -76,7 +83,12 @@ const buildMaintenanceEmail = (message: string, style: any, emojis: any) => {
         <a href="https://www.facebook.com/metsxmfanzoneofficial" style="color: ${style.accentColor}; text-decoration: none; font-size: 12px; margin: 0 8px;">Facebook</a>
       </div>
     </div>
-  </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body></html>`;
 };
 

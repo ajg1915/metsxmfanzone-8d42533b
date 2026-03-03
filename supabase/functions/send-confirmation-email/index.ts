@@ -46,13 +46,20 @@ Deno.serve(async (req) => {
       subject = "Welcome to MetsXMFanZone.com";
       emailContent = `
         <!DOCTYPE html>
-        <html>
+        <html xmlns="http://www.w3.org/1999/xhtml">
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <meta name="color-scheme" content="light dark">
+          <meta name="supported-color-schemes" content="light dark">
         </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
-          <div style="max-width: 320px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
+        <body style="margin: 0; padding: 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#0a0a0a" style="background-color: #0a0a0a; margin: 0; padding: 0;">
+            <tr>
+              <td align="center" style="padding: 16px;">
+                <table width="320" cellpadding="0" cellspacing="0" border="0" bgcolor="#1a1a2e" style="max-width: 320px; width: 100%; background-color: #1a1a2e; border-radius: 8px; border: 1px solid #2a2a3e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  <tr>
+                    <td style="padding: 20px;">
             <div style="text-align: center; margin-bottom: 16px;">
               <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 85px; height: auto; margin-bottom: 8px; border-radius: 12px;" />
               <div>
@@ -68,16 +75,18 @@ Deno.serve(async (req) => {
               Your account has been created successfully.
             </p>
             
-            <div style="background: #002D72; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#002D72" style="background-color: #002D72; border-radius: 6px;">
+              <tr><td style="padding: 12px;">
               <p style="color: #ffffff; font-size: 11px; margin: 0 0 8px; font-weight: bold;">What's Next:</p>
               <ul style="color: #d0d0d0; font-size: 10px; margin: 0; padding-left: 16px;">
                 <li style="margin-bottom: 4px;">Choose a subscription plan</li>
                 <li style="margin-bottom: 4px;">Watch live streams</li>
                 <li style="margin-bottom: 4px;">Connect with fans</li>
               </ul>
-            </div>
+              </td></tr>
+            </table>
             
-            <p style="color: #FF5910; text-align: center; font-size: 12px; font-weight: bold; margin: 0 0 12px;">
+            <p style="color: #FF5910; text-align: center; font-size: 12px; font-weight: bold; margin: 12px 0;">
               Let's Go Mets!
             </p>
             
@@ -86,10 +95,15 @@ Deno.serve(async (req) => {
                 The MetsXMFanZone Team
               </p>
               <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
-                <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
+                <a href="https://www.metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
               </p>
             </div>
-          </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
         </body>
         </html>
       `;
@@ -99,13 +113,20 @@ Deno.serve(async (req) => {
       subject = `MetsXMFanZone Receipt - ${planName} Plan`;
       emailContent = `
         <!DOCTYPE html>
-        <html>
+        <html xmlns="http://www.w3.org/1999/xhtml">
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <meta name="color-scheme" content="light dark">
+          <meta name="supported-color-schemes" content="light dark">
         </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 16px; background-color: #0a0a0a;">
-          <div style="max-width: 380px; margin: 0 auto; background-color: #1a1a2e; border-radius: 8px; padding: 20px; border: 1px solid #2a2a3e;">
+        <body style="margin: 0; padding: 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#0a0a0a" style="background-color: #0a0a0a; margin: 0; padding: 0;">
+            <tr>
+              <td align="center" style="padding: 16px;">
+                <table width="380" cellpadding="0" cellspacing="0" border="0" bgcolor="#1a1a2e" style="max-width: 380px; width: 100%; background-color: #1a1a2e; border-radius: 8px; border: 1px solid #2a2a3e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                  <tr>
+                    <td style="padding: 20px;">
             <div style="text-align: center; margin-bottom: 16px;">
               <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 85px; height: auto; margin-bottom: 8px; border-radius: 12px;" />
               <div>
@@ -120,7 +141,8 @@ Deno.serve(async (req) => {
               Hi ${safeName}, here's your payment confirmation.
             </p>
             
-            <div style="background: #002D72; padding: 14px; border-radius: 6px; margin-bottom: 12px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#002D72" style="background-color: #002D72; border-radius: 6px;">
+              <tr><td style="padding: 14px;">
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td style="color: #a0a0a0; font-size: 11px; padding: 4px 0;">Plan</td>
@@ -151,16 +173,19 @@ Deno.serve(async (req) => {
                   <td style="color: #4ade80; font-size: 11px; font-weight: bold; text-align: right; padding: 4px 0;">Paid ✓</td>
                 </tr>
               </table>
-            </div>
+              </td></tr>
+            </table>
             
-            <div style="background: #1f1f3a; padding: 10px; border-radius: 6px; margin-bottom: 12px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#1f1f3a" style="background-color: #1f1f3a; border-radius: 6px; margin-top: 12px;">
+              <tr><td style="padding: 10px;">
               <p style="color: #FF5910; font-size: 10px; margin: 0 0 6px; font-weight: bold;">Your Benefits:</p>
               <p style="color: #d0d0d0; font-size: 10px; margin: 0; line-height: 1.4;">
                 Live streams • Full game replays • Premium content • Ad-free experience • HD streaming
               </p>
-            </div>
+              </td></tr>
+            </table>
 
-            <p style="color: #888; font-size: 9px; text-align: center; margin: 0 0 12px;">
+            <p style="color: #888; font-size: 9px; text-align: center; margin: 12px 0;">
               You will also receive a receipt from PayPal. Keep this email for your records.
             </p>
             
@@ -169,10 +194,15 @@ Deno.serve(async (req) => {
                 The MetsXMFanZone Team
               </p>
               <p style="color: #444; font-size: 9px; text-align: center; margin: 0;">
-                <a href="https://metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
+                <a href="https://www.metsxmfanzone.com" style="color: #FF5910; text-decoration: none;">metsxmfanzone.com</a>
               </p>
             </div>
-          </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
         </body>
         </html>
       `;
