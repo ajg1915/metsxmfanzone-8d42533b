@@ -378,32 +378,30 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`Sending email notifications to ${users.length} users`);
+    console.log(`Sending email notifications to ${allRecipients.length} recipients (${(users || []).length} registered users + ${(subscribers || []).length} newsletter subscribers, deduplicated)`);
     const savedEmojis = await loadSavedEmojis(supabase);
     const emailHtml = getEmailTemplate(title, message, gameInfo, notificationType, url, imageUrl, savedEmojis);
 
-    const emailPromises = users.map(async (user) => {
-      if (!user.email) return { success: false, userId: user.id, error: 'No email' };
-
+    const emailPromises = allRecipients.map(async (recipient) => {
       try {
         await sendEmail(
           resendApiKey,
-          user.email,
+          recipient.email,
           `${title} - MetsXMFanZone`,
           emailHtml
         );
         console.log(`Email sent to [REDACTED]`);
-        return { success: true, userId: user.id };
+        return { success: true };
       } catch (error: any) {
         console.error(`Failed to send email to [REDACTED]:`, error.message);
-        return { success: false, userId: user.id, error: error.message };
+        return { success: false, error: error.message };
       }
     });
 
     const results = await Promise.all(emailPromises);
     const successCount = results.filter(r => r.success).length;
 
-    console.log(`Emails sent: ${successCount}/${users.length}`);
+    console.log(`Emails sent: ${successCount}/${allRecipients.length}`);
 
     return new Response(
       JSON.stringify({
