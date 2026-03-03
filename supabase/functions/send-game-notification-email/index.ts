@@ -323,14 +323,17 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 1. Fetch registered users with notifications enabled
+    // 1. Fetch registered users who are eligible for this notification type
     let query = supabase
       .from('profiles')
       .select('id, email, full_name, email_notifications_enabled, game_notifications_enabled')
-      .eq('email_notifications_enabled', true);
+      .not('email', 'is', null);
 
     if (['game_alert', 'score_update', 'lineup', 'final_score'].includes(notificationType)) {
-      query = query.eq('game_notifications_enabled', true);
+      // Game alerts should reach users who enabled either game alerts or email alerts
+      query = query.or('game_notifications_enabled.eq.true,email_notifications_enabled.eq.true');
+    } else {
+      query = query.eq('email_notifications_enabled', true);
     }
 
     if (targetUsers && targetUsers.length > 0) {
@@ -406,9 +409,9 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         message: `Sent ${successCount} email notifications`,
-        total: users.length,
+        total: allRecipients.length,
         successful: successCount,
-        failed: users.length - successCount
+        failed: allRecipients.length - successCount
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
