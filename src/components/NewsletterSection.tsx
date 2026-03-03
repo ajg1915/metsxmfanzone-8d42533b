@@ -2,26 +2,43 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
+
 const NewsletterSection = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const { error } = await supabase
+        .from("newsletter_subscribers")
+        .upsert(
+          { email: email.trim().toLowerCase(), is_active: true },
+          { onConflict: "email" }
+        );
+
+      if (error) throw error;
+
       toast({
         title: "Successfully subscribed!",
-        description: "You'll receive the latest Mets news and updates."
+        description: "You'll receive the latest Mets news and updates.",
       });
       setEmail("");
+    } catch (error) {
+      console.error("Newsletter signup error:", error);
+      toast({
+        title: "Subscription failed",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
   return <section className="py-6 sm:py-8 md:py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
