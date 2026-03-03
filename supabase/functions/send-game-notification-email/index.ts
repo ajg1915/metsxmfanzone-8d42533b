@@ -385,24 +385,51 @@ Deno.serve(async (req) => {
     const savedEmojis = await loadSavedEmojis(supabase);
     const emailHtml = getEmailTemplate(title, message, gameInfo, notificationType, url, imageUrl, savedEmojis);
 
-    const emailPromises = allRecipients.map(async (recipient) => {
-      try {
-        await sendEmail(
-          resendApiKey,
-          recipient.email,
-          `${title} - MetsXMFanZone`,
-          emailHtml
-        );
-        console.log(`Email sent to [REDACTED]`);
-        return { success: true };
-      } catch (error: any) {
-        console.error(`Failed to send email to [REDACTED]:`, error.message);
-        return { success: false, error: error.message };
-      }
-    });
+    const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    const results = await Promise.all(emailPromises);
-    const successCount = results.filter(r => r.success).length;
+    const results: Array<{ success: boolean; error?: string }> = [];
+
+    for (let i = 0; i < allRecipients.length; i++) {
+      const recipient = allRecipients[i];
+      let sent = false;
+      let lastError = 'Unknown error';
+
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          await sendEmail(
+            resendApiKey,
+            recipient.email,
+            `${title} - MetsXMFanZone`,
+            emailHtml
+          );
+          sent = true;
+          console.log(`Email sent to [REDACTED]`);
+          break;
+        } catch (error: any) {
+          lastError = error?.message || 'Unknown error';
+          const isRateLimited =
+            lastError.includes('rate_limit_exceeded') ||
+            lastError.includes('"statusCode":429');
+
+          if (isRateLimited && attempt < 3) {
+            const backoffMs = 700 * attempt;
+            console.warn(`Rate limit encountered, retrying [REDACTED] in ${backoffMs}ms (attempt ${attempt + 1}/3)`);
+            await delay(backoffMs);
+            continue;
+          }
+
+          console.error(`Failed to send email to [REDACTED]:`, lastError);
+          break;
+        }
+      }
+
+      results.push(sent ? { success: true } : { success: false, error: lastError });
+
+      // Resend limit is 2 requests/sec; keep well below the threshold.
+      if (i < allRecipients.length - 1) {
+        await delay(600);
+      }
+    }
 
     console.log(`Emails sent: ${successCount}/${allRecipients.length}`);
 
