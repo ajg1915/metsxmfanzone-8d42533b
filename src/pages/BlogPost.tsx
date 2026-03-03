@@ -9,7 +9,6 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import RelatedPosts from "@/components/RelatedPosts";
-import InternalLinks, { metsContentLinks, mediaLinks } from "@/components/InternalLinks";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -577,11 +576,8 @@ export default function BlogPost() {
               tags={post.tags}
             />
 
-            {/* Internal Links for SEO */}
-            <InternalLinks
-              title="More Mets Content"
-              links={[...metsContentLinks.slice(0, 3), ...mediaLinks.slice(0, 3)]}
-            />
+
+
           </article>
         </div>
       </main>
