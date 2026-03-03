@@ -50,38 +50,48 @@ const generateExpiringEmailHtml = (
 
   return `
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5; padding: 20px; margin: 0;">
-  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-    <div style="background: linear-gradient(135deg, #002D72 0%, #FF5910 100%); padding: 30px; text-align: center;">
-      <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 85px; height: auto; margin-bottom: 8px; border-radius: 12px;" />
-      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">MetsXMFanZone</h1>
-    </div>
-    <div style="padding: 30px;">
+<body style="margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f4f4f5" style="background-color: #f4f4f5; margin: 0; padding: 0;">
+    <tr>
+      <td align="center" style="padding: 20px;">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+          <tr>
+            <td bgcolor="#002D72" style="background: linear-gradient(135deg, #002D72 0%, #FF5910 100%); padding: 30px; text-align: center;">
+              <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 85px; height: auto; margin-bottom: 8px; border-radius: 12px;" />
+              <h1 style="color: #ffffff; margin: 0; font-size: 24px;">MetsXMFanZone</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px;">
       <h2 style="color: #002D72; margin-top: 0;">Hi ${userName || "Fan"}!</h2>
       <p style="color: #374151; font-size: 16px; line-height: 1.6;">
         Your <strong>${planName}</strong> subscription is expiring ${daysLeft === 1 ? "tomorrow" : `in ${daysLeft} days`}.
       </p>
-      <div style="background-color: #FFF7ED; border-left: 4px solid #FF5910; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
-        <p style="margin: 0; color: #9A3412; font-weight: 500;">
-          Expiration Date: ${formattedDate}
-        </p>
-      </div>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFF7ED" style="background-color: #FFF7ED; border-left: 4px solid #FF5910; border-radius: 0 8px 8px 0; margin: 20px 0;">
+        <tr><td style="padding: 15px;">
+          <p style="margin: 0; color: #9A3412; font-weight: 500;">
+            Expiration Date: ${formattedDate}
+          </p>
+        </td></tr>
+      </table>
       <p style="color: #374151; font-size: 16px; line-height: 1.6;">
         Renew now to keep your access to:
       </p>
       <ul style="color: #374151; font-size: 15px; line-height: 1.8;">
-        <li>Ad-free live streams & podcasts</li>
-        <li>Exclusive Mets content & highlights</li>
+        <li>Ad-free live streams &amp; podcasts</li>
+        <li>Exclusive Mets content &amp; highlights</li>
         <li>Premium community features</li>
         <li>Early access to new features</li>
       </ul>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://metsxmfanzone.lovable.app/pricing" 
+        <a href="https://www.metsxmfanzone.com/plans" 
            style="display: inline-block; background-color: #FF5910; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 600; font-size: 16px;">
           Renew My Subscription
         </a>
@@ -89,13 +99,19 @@ const generateExpiringEmailHtml = (
       <p style="color: #6B7280; font-size: 14px; text-align: center;">
         Questions? Reply to this email or visit our Help Center.
       </p>
-    </div>
-    <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
-      <p style="color: #9CA3AF; font-size: 12px; margin: 0;">
-        © 2026 MetsXMFanZone. All rights reserved.
-      </p>
-    </div>
-  </div>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#f9fafb" style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="color: #9CA3AF; font-size: 12px; margin: 0;">
+                &copy; 2026 MetsXMFanZone. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
   `;
@@ -104,38 +120,48 @@ const generateExpiringEmailHtml = (
 const generateExpiredEmailHtml = (userName: string, planName: string) => {
   return `
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5; padding: 20px; margin: 0;">
-  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-    <div style="background: linear-gradient(135deg, #002D72 0%, #FF5910 100%); padding: 30px; text-align: center;">
-      <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 85px; height: auto; margin-bottom: 8px; border-radius: 12px;" />
-      <h1 style="color: #ffffff; margin: 0; font-size: 24px;">MetsXMFanZone</h1>
-    </div>
-    <div style="padding: 30px;">
+<body style="margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f4f4f5" style="background-color: #f4f4f5; margin: 0; padding: 0;">
+    <tr>
+      <td align="center" style="padding: 20px;">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+          <tr>
+            <td bgcolor="#002D72" style="background: linear-gradient(135deg, #002D72 0%, #FF5910 100%); padding: 30px; text-align: center;">
+              <img src="https://clwghkbtkofacsjeyrtk.supabase.co/storage/v1/object/public/email-assets/logo-192.png" alt="MetsXMFanZone" style="width: 85px; height: auto; margin-bottom: 8px; border-radius: 12px;" />
+              <h1 style="color: #ffffff; margin: 0; font-size: 24px;">MetsXMFanZone</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px;">
       <h2 style="color: #002D72; margin-top: 0;">Hi ${userName || "Fan"}!</h2>
       <p style="color: #374151; font-size: 16px; line-height: 1.6;">
         Your <strong>${planName}</strong> subscription has expired.
       </p>
-      <div style="background-color: #FEF2F2; border-left: 4px solid #DC2626; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
-        <p style="margin: 0; color: #991B1B; font-weight: 500;">
-          Your premium access has ended. You've been moved to the free plan.
-        </p>
-      </div>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FEF2F2" style="background-color: #FEF2F2; border-left: 4px solid #DC2626; border-radius: 0 8px 8px 0; margin: 20px 0;">
+        <tr><td style="padding: 15px;">
+          <p style="margin: 0; color: #991B1B; font-weight: 500;">
+            Your premium access has ended. You've been moved to the free plan.
+          </p>
+        </td></tr>
+      </table>
       <p style="color: #374151; font-size: 16px; line-height: 1.6;">
         We'll miss having you as a premium member! Here's what you're missing:
       </p>
       <ul style="color: #374151; font-size: 15px; line-height: 1.8;">
-        <li>Ad-free live streams & podcasts</li>
-        <li>Exclusive Mets content & highlights</li>
+        <li>Ad-free live streams &amp; podcasts</li>
+        <li>Exclusive Mets content &amp; highlights</li>
         <li>Premium community features</li>
         <li>Early access to new features</li>
       </ul>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://metsxmfanzone.lovable.app/pricing" 
+        <a href="https://www.metsxmfanzone.com/plans" 
            style="display: inline-block; background-color: #FF5910; color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 600; font-size: 16px;">
           Reactivate My Subscription
         </a>
@@ -143,13 +169,19 @@ const generateExpiredEmailHtml = (userName: string, planName: string) => {
       <p style="color: #6B7280; font-size: 14px; text-align: center;">
         Use code <strong>COMEBACK10</strong> for 10% off your next subscription!
       </p>
-    </div>
-    <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
-      <p style="color: #9CA3AF; font-size: 12px; margin: 0;">
-        © 2026 MetsXMFanZone. All rights reserved.
-      </p>
-    </div>
-  </div>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#f9fafb" style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="color: #9CA3AF; font-size: 12px; margin: 0;">
+                &copy; 2026 MetsXMFanZone. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
   `;
