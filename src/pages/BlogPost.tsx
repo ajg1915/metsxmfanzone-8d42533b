@@ -8,6 +8,8 @@ import { Calendar, Tag, ArrowLeft, Headphones, Volume2, Square, Settings } from 
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import SocialShareButtons from "@/components/SocialShareButtons";
+import RelatedPosts from "@/components/RelatedPosts";
+import InternalLinks, { metsContentLinks, mediaLinks } from "@/components/InternalLinks";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -307,6 +309,31 @@ export default function BlogPost() {
     ? (post.excerpt.length > 160 ? post.excerpt.substring(0, 157) + '...' : post.excerpt)
     : post.title;
 
+  // Calculate reading time
+  const wordCount = post.content.split(/\s+/).length;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+  // Article structured data for SEO
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": post.title,
+    "description": post.excerpt || post.title,
+    "image": socialImage,
+    "datePublished": post.published_at,
+    "dateModified": post.published_at,
+    "author": { "@type": "Organization", "name": "MetsXMFanZone", "url": siteUrl },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MetsXMFanZone",
+      "logo": { "@type": "ImageObject", "url": `${siteUrl}/logo-512.png` }
+    },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": currentUrl },
+    "wordCount": wordCount,
+    "articleSection": post.category,
+    "keywords": post.tags.join(", "),
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
       <Helmet>
@@ -343,6 +370,8 @@ export default function BlogPost() {
         <meta name="twitter:description" content={socialDescription} />
         <meta name="twitter:image" content={socialImage} />
         <meta name="twitter:image:alt" content={post.title} />
+        <meta name="twitter:label1" content="Reading time" />
+        <meta name="twitter:data1" content={`${readingTime} min read`} />
         
         <meta property="ia:markup_url" content={currentUrl} />
         <meta property="ia:markup_url_dev" content={currentUrl} />
@@ -351,6 +380,9 @@ export default function BlogPost() {
         
         <meta name="author" content="MetsXMFanZone" />
         <link rel="canonical" href={currentUrl} />
+
+        {/* Article structured data */}
+        <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
       </Helmet>
       
       <Navigation />
@@ -394,6 +426,8 @@ export default function BlogPost() {
                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
                   {post.category}
                 </span>
+                <span className="text-sm">·</span>
+                <span className="text-sm">{readingTime} min read</span>
               </div>
               <p className="text-xs text-muted-foreground mb-4">
                 By <span className="font-semibold text-foreground">MetsXMFanZone</span> · <span className="text-primary">Orange & Blue Media</span>
@@ -535,6 +569,19 @@ export default function BlogPost() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Related Posts for SEO internal linking */}
+            <RelatedPosts
+              currentPostId={post.id}
+              category={post.category}
+              tags={post.tags}
+            />
+
+            {/* Internal Links for SEO */}
+            <InternalLinks
+              title="More Mets Content"
+              links={[...metsContentLinks.slice(0, 3), ...mediaLinks.slice(0, 3)]}
+            />
           </article>
         </div>
       </main>
