@@ -1,5 +1,5 @@
 # MetsXMFanZone Robots.txt
-# Last updated: 2025
+# Last updated: 2026-03-03
 
 # Allow all major search engines
 User-agent: Googlebot
@@ -75,16 +75,19 @@ Disallow: /payment-success
 Disallow: /payment-error
 Disallow: /paypal-success
 Disallow: /helcim-checkout
+Disallow: /writer-auth
+Disallow: /writer-register
+Disallow: /admin-setup
 
 # Allow specific public JSON files
 Allow: /manifest.json
 
 # Sitemaps
 Sitemap: https://www.metsxmfanzone.com/sitemap.xml
-Sitemap: https://clwghkbtkofacsjeyrtk.supabase.co/functions/v1/dynamic-sitemap
+Sitemap: https://clwghkbtkofacsjeyrtk.supabase.co/functions/v1/sitemap
 
 # Host directive
 Host: https://www.metsxmfanzone.com
 
 # Important pages to prioritize
-# Homepage, Blog, Podcast, Community, Spring Training
+# Homepage, Blog, Podcast, Community, Spring Training, Mets Roster, Shop

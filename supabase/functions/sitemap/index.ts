@@ -19,56 +19,115 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('VITE_SUPABASE_PUBLISHABLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Fetch all published blog posts
+    const baseUrl = 'https://www.metsxmfanzone.com';
+    const today = new Date().toISOString().split('T')[0];
+
+    // Fetch published blog posts
     const { data: posts } = await supabase
       .from('blog_posts')
-      .select('slug, published_at')
+      .select('slug, published_at, category')
       .eq('published', true)
       .order('published_at', { ascending: false });
 
-    const baseUrl = 'https://www.metsxmfanzone.com';
-    
-    // Static pages
+    // Fetch published podcasts
+    const { data: podcasts } = await supabase
+      .from('podcasts')
+      .select('id, published_at, title')
+      .eq('published', true)
+      .order('published_at', { ascending: false });
+
+    // Fetch upcoming events
+    const { data: events } = await supabase
+      .from('events')
+      .select('id, event_date, title')
+      .eq('published', true)
+      .order('event_date', { ascending: false });
+
+    // All static pages with priorities
     const staticPages = [
-      { url: '/', changefreq: 'daily', priority: '1.0' },
-      { url: '/spring-training-live', changefreq: 'daily', priority: '0.9' },
-      { url: '/community', changefreq: 'weekly', priority: '0.8' },
-      { url: '/gallery', changefreq: 'weekly', priority: '0.7' },
+      { url: '/', changefreq: 'daily', priority: '1.0', lastmod: today },
+      { url: '/spring-training-live', changefreq: 'daily', priority: '0.95' },
+      { url: '/blog', changefreq: 'daily', priority: '0.9' },
+      { url: '/podcast', changefreq: 'weekly', priority: '0.9' },
+      { url: '/community', changefreq: 'daily', priority: '0.85' },
+      { url: '/mets-roster', changefreq: 'weekly', priority: '0.85' },
+      { url: '/mets-schedule-2026', changefreq: 'monthly', priority: '0.85' },
+      { url: '/mets-scores', changefreq: 'daily', priority: '0.8' },
+      { url: '/mets-lineup-card', changefreq: 'daily', priority: '0.8' },
+      { url: '/mets-history', changefreq: 'monthly', priority: '0.75' },
+      { url: '/player-stats', changefreq: 'daily', priority: '0.8' },
+      { url: '/mets-gamecast', changefreq: 'daily', priority: '0.8' },
+      { url: '/metsxmfanzone-tv', changefreq: 'daily', priority: '0.85' },
+      { url: '/mlb-network', changefreq: 'daily', priority: '0.8' },
+      { url: '/espn-network', changefreq: 'daily', priority: '0.8' },
+      { url: '/pix11-network', changefreq: 'daily', priority: '0.75' },
+      { url: '/gallery', changefreq: 'weekly', priority: '0.75' },
+      { url: '/video-gallery', changefreq: 'weekly', priority: '0.75' },
+      { url: '/events', changefreq: 'weekly', priority: '0.75' },
+      { url: '/replay-games', changefreq: 'weekly', priority: '0.7' },
+      { url: '/nl-scores', changefreq: 'daily', priority: '0.7' },
       { url: '/plans', changefreq: 'monthly', priority: '0.8' },
-      { url: '/blog', changefreq: 'daily', priority: '0.8' },
-      { url: '/podcast', changefreq: 'weekly', priority: '0.8' },
+      { url: '/shop', changefreq: 'weekly', priority: '0.75' },
+      { url: '/merch', changefreq: 'weekly', priority: '0.7' },
+      { url: '/whats-new', changefreq: 'weekly', priority: '0.65' },
+      { url: '/social-media-hub', changefreq: 'weekly', priority: '0.65' },
       { url: '/help-center', changefreq: 'monthly', priority: '0.6' },
-      { url: '/contact', changefreq: 'monthly', priority: '0.7' },
+      { url: '/contact', changefreq: 'monthly', priority: '0.65' },
       { url: '/feedback', changefreq: 'monthly', priority: '0.6' },
       { url: '/faqs', changefreq: 'monthly', priority: '0.6' },
+      { url: '/business-partner', changefreq: 'monthly', priority: '0.5' },
+      { url: '/podcaster-application', changefreq: 'monthly', priority: '0.5' },
+      { url: '/tv-broadcast-schedule', changefreq: 'weekly', priority: '0.7' },
+      // Matchups
+      { url: '/matchups/mets-vs-yankees', changefreq: 'weekly', priority: '0.7' },
+      { url: '/matchups/mets-vs-braves', changefreq: 'weekly', priority: '0.7' },
+      { url: '/matchups/mets-vs-astros', changefreq: 'weekly', priority: '0.7' },
+      { url: '/matchups/mets-vs-cardinals', changefreq: 'weekly', priority: '0.7' },
+      { url: '/matchups/mets-vs-nationals', changefreq: 'weekly', priority: '0.7' },
+      { url: '/matchups/mets-vs-red-sox', changefreq: 'weekly', priority: '0.7' },
+      { url: '/matchups/mets-vs-blue-jays', changefreq: 'weekly', priority: '0.7' },
+      // Legal
       { url: '/privacy', changefreq: 'yearly', priority: '0.3' },
       { url: '/terms', changefreq: 'yearly', priority: '0.3' },
-      { url: '/business-partner', changefreq: 'monthly', priority: '0.5' },
-      { url: '/metsxmfanzone-tv', changefreq: 'weekly', priority: '0.8' },
-      { url: '/mlb-network', changefreq: 'weekly', priority: '0.8' },
     ];
 
-    // Generate XML
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n';
+    xml += '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"\n';
+    xml += '        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">\n';
 
-    // Add static pages
-    staticPages.forEach(page => {
+    // Homepage with image
+    xml += '  <url>\n';
+    xml += `    <loc>${baseUrl}/</loc>\n`;
+    xml += `    <lastmod>${today}</lastmod>\n`;
+    xml += '    <changefreq>daily</changefreq>\n';
+    xml += '    <priority>1.0</priority>\n';
+    xml += '    <image:image>\n';
+    xml += `      <image:loc>${baseUrl}/og-image.png</image:loc>\n`;
+    xml += '      <image:title>MetsXMFanZone - New York Mets Fan Community</image:title>\n';
+    xml += '    </image:image>\n';
+    xml += '  </url>\n';
+
+    // Static pages (skip homepage, already added)
+    staticPages.filter(p => p.url !== '/').forEach(page => {
       xml += '  <url>\n';
       xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
+      if (page.lastmod) xml += `    <lastmod>${page.lastmod}</lastmod>\n`;
       xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
       xml += `    <priority>${page.priority}</priority>\n`;
       xml += '  </url>\n';
     });
 
-    // Add dynamic blog posts
+    // Blog posts
     if (posts && posts.length > 0) {
       posts.forEach(post => {
         xml += '  <url>\n';
         xml += `    <loc>${baseUrl}/blog/${post.slug}</loc>\n`;
-        xml += `    <lastmod>${post.published_at?.split('T')[0]}</lastmod>\n`;
-        xml += `    <changefreq>monthly</changefreq>\n`;
-        xml += `    <priority>0.7</priority>\n`;
+        if (post.published_at) {
+          xml += `    <lastmod>${post.published_at.split('T')[0]}</lastmod>\n`;
+        }
+        xml += '    <changefreq>monthly</changefreq>\n';
+        xml += '    <priority>0.7</priority>\n';
         xml += '  </url>\n';
       });
     }
@@ -76,7 +135,7 @@ Deno.serve(async (req) => {
     xml += '</urlset>';
 
     return new Response(xml, {
-      headers: corsHeaders,
+      headers: { ...corsHeaders, 'Cache-Control': 'public, max-age=3600' },
       status: 200,
     });
   } catch (error) {

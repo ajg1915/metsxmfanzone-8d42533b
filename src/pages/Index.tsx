@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import SEOHead from "@/components/SEOHead";
+import InternalLinks, { metsContentLinks, mediaLinks, communityLinks, matchupLinks } from "@/components/InternalLinks";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 
@@ -292,6 +293,14 @@ const Index = () => {
         <Suspense fallback={<SectionSkeleton />}>
           <HotStoveGuide />
         </Suspense>
+
+        {/* SEO Internal Links Section */}
+        <div className="container mx-auto max-w-7xl px-4">
+          <InternalLinks title="Mets Coverage" links={metsContentLinks} />
+          <InternalLinks title="Watch & Listen" links={mediaLinks} />
+          <InternalLinks title="Matchup Previews" links={matchupLinks} />
+          <InternalLinks title="Fan Zone" links={communityLinks} />
+        </div>
       </main>
       <Footer />
       
