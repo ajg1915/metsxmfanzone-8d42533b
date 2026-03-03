@@ -452,6 +452,7 @@ Deno.serve(async (req) => {
       }
     }
 
+    const successCount = results.filter(r => r.success).length;
     console.log(`Emails sent: ${successCount}/${allRecipients.length}`);
 
     return new Response(
