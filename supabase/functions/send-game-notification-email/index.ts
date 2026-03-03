@@ -323,6 +323,7 @@ Deno.serve(async (req) => {
       );
     }
 
+    // 1. Fetch registered users with notifications enabled
     let query = supabase
       .from('profiles')
       .select('id, email, full_name, email_notifications_enabled, game_notifications_enabled')
@@ -343,9 +344,36 @@ Deno.serve(async (req) => {
       throw usersError;
     }
 
-    if (!users || users.length === 0) {
+    // 2. Fetch newsletter subscribers so they also receive all notifications
+    const { data: subscribers, error: subscribersError } = await supabase
+      .from('newsletter_subscribers')
+      .select('email, full_name')
+      .eq('is_active', true);
+
+    if (subscribersError) {
+      console.error('Error fetching newsletter subscribers:', subscribersError);
+    }
+
+    // 3. Merge both lists, deduplicating by email
+    const emailMap = new Map<string, { email: string; full_name?: string }>();
+
+    for (const user of users || []) {
+      if (user.email) {
+        emailMap.set(user.email.toLowerCase(), { email: user.email, full_name: user.full_name || undefined });
+      }
+    }
+
+    for (const sub of subscribers || []) {
+      if (sub.email && !emailMap.has(sub.email.toLowerCase())) {
+        emailMap.set(sub.email.toLowerCase(), { email: sub.email, full_name: sub.full_name || undefined });
+      }
+    }
+
+    const allRecipients = Array.from(emailMap.values());
+
+    if (allRecipients.length === 0) {
       return new Response(
-        JSON.stringify({ message: 'No users with email notifications enabled' }),
+        JSON.stringify({ message: 'No recipients found' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
