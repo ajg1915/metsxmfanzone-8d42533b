@@ -97,9 +97,9 @@ export default function GamecastBanner() {
                   MetsXMFanZone Live
                 </span>
                 {isLive && (
-                  <span className="flex items-center gap-1 text-[10px] font-bold text-destructive bg-destructive/10 border border-destructive/20 rounded-full px-2.5 py-0.5 shadow-sm">
-                    <Radio className="w-3 h-3 animate-pulse" />
-                    LIVE NOW
+                  <span className="flex items-center gap-0.5 sm:gap-1 text-[7px] sm:text-[9px] font-bold text-destructive bg-destructive/10 border border-destructive/20 rounded-full px-1.5 sm:px-2 py-0.5 shadow-sm">
+                    <Radio className="w-2 h-2 sm:w-2.5 sm:h-2.5 animate-pulse" />
+                    LIVE
                   </span>
                 )}
                 {isFinal && (
