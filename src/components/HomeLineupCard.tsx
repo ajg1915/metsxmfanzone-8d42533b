@@ -219,7 +219,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
   }, [lineupCard, onLineupLoaded, lineupFetched]);
 
   return (
-    <section className="py-10 sm:py-14 relative overflow-hidden">
+    <section className="py-6 sm:py-10 sm:py-14 relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none" style={{
         background: "radial-gradient(ellipse 80% 50% at 50% 50%, hsl(var(--primary) / 0.06), transparent 70%)",
