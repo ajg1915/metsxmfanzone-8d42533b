@@ -300,17 +300,17 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                     </div>
                     <div className="space-y-1">
                       {lineup.slice(0, 9).map((player) => (
-                        <div key={player.position} className="flex items-center gap-2 lg:gap-3 py-1.5 lg:py-2 px-2.5 lg:px-3 rounded-xl bg-muted/20 hover:bg-muted/40 transition-all group border border-transparent hover:border-primary/10">
-                          <span className="text-[10px] lg:text-xs font-black text-primary/70 w-4 lg:w-5 text-center">
+                        <div key={player.position} className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 py-1 sm:py-1.5 lg:py-2 px-2 sm:px-2.5 lg:px-3 rounded-xl bg-muted/20 hover:bg-muted/40 transition-all group border border-transparent hover:border-primary/10">
+                          <span className="text-[9px] sm:text-[10px] lg:text-xs font-black text-primary/70 w-3 sm:w-4 lg:w-5 text-center">
                             {player.position}
                           </span>
                           {player.imageUrl && (
                             <img src={player.imageUrl} alt={player.name} className="hidden lg:block w-8 h-8 rounded-lg object-cover border border-primary/20" />
                           )}
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-xs lg:text-sm truncate group-hover:text-primary transition-colors">{player.name}</p>
+                            <p className="font-semibold text-[11px] sm:text-xs lg:text-sm truncate group-hover:text-primary transition-colors">{player.name}</p>
                           </div>
-                          <span className="text-[9px] lg:text-[10px] text-muted-foreground/60 font-mono font-bold bg-muted/30 px-1.5 py-0.5 rounded">
+                          <span className="text-[8px] sm:text-[9px] lg:text-[10px] text-muted-foreground/60 font-mono font-bold bg-muted/30 px-1 sm:px-1.5 py-0.5 rounded">
                             {player.fieldPosition}
                           </span>
                         </div>
