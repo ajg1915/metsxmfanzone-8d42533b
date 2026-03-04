@@ -420,21 +420,21 @@ const Navigation = () => {
                         onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/mets-schedule-2026"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
-                        <span className="w-1 h-1 rounded-full bg-orange-500" />
+                        <img src={`https://www.mlbstatic.com/team-logos/121.svg`} alt="" className="w-3.5 h-3.5 object-contain" />
                         2026 Schedule
                       </button>
                       <button
                         onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/spring-training-live"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
-                        <span className="w-1 h-1 rounded-full bg-green-500" />
+                        <img src={logo} alt="" className="w-3.5 h-3.5 object-contain" />
                         Spring Training
                       </button>
                       <button
                         onClick={() => { setTvScheduleOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/mets-lineup-card"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
-                        <span className="w-1 h-1 rounded-full bg-primary" />
+                        <img src={logo} alt="" className="w-3.5 h-3.5 object-contain" />
                         Lineup Cards
                       </button>
                     </CollapsibleContent>
@@ -454,28 +454,28 @@ const Navigation = () => {
                         onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); handleProtectedNavigation("/community"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
-                        <span className="w-1 h-1 rounded-full bg-primary" />
+                        <img src={logo} alt="" className="w-3.5 h-3.5 object-contain" />
                         Fan Community
                       </button>
                       <button
                         onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); handleProNavigation("/events"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
-                        <span className="w-1 h-1 rounded-full bg-yellow-500" />
+                        <img src={logo} alt="" className="w-3.5 h-3.5 object-contain" />
                         Events
                       </button>
                       <button
                         onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); handleProNavigation("/blog"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
-                        <span className="w-1 h-1 rounded-full bg-primary" />
+                        <img src={logo} alt="" className="w-3.5 h-3.5 object-contain" />
                         Blog
                       </button>
                       <button
                         onClick={() => { setCommunityOpen(false); setMobileMenuOpen(false); navigate("/shop"); }}
                         className="flex items-center gap-2 w-full text-muted-foreground hover:text-primary py-1.5 px-2.5 rounded-md text-left text-[11px]"
                       >
-                        <span className="w-1 h-1 rounded-full bg-primary" />
+                        <img src={logo} alt="" className="w-3.5 h-3.5 object-contain" />
                         Shop
                       </button>
                     </CollapsibleContent>
