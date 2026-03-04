@@ -44,31 +44,31 @@ const PodcastSection = () => {
   };
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 relative overflow-hidden">
+    <section className="py-8 sm:py-16 md:py-20 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[hsl(var(--mets-blue)/0.08)] blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-[hsl(var(--mets-orange)/0.06)] blur-[100px]" />
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative z-10">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-6xl relative z-10">
         {/* Header */}
-        <div className="flex flex-col items-center text-center mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-3 mb-4">
+        <div className="flex flex-col items-center text-center mb-6 sm:mb-14">
+          <div className="inline-flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             <div className="relative">
               <div className="absolute inset-0 rounded-2xl bg-[hsl(var(--mets-orange)/0.3)] blur-lg" />
-              <div className="relative p-2.5 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/20">
-                <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 sm:w-10 sm:h-10" />
+              <div className="relative p-2 sm:p-2.5 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/20">
+                <img src={logo} alt="MetsXMFanZone" className="w-7 h-7 sm:w-10 sm:h-10" />
               </div>
             </div>
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-foreground">
+            <div className="flex items-center gap-1.5 sm:gap-2.5 flex-wrap">
+              <h2 className="text-base sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-foreground">
                 MetsXMFanZone Radio
               </h2>
               {!isPremium && <PremiumBadge size="md" noGlow />}
             </div>
           </div>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-lg">Exclusive Mets content, game analysis All Season Long join The Live Stream on Social Media Channels    
+          <p className="text-xs sm:text-base text-muted-foreground max-w-lg">Exclusive Mets content, game analysis All Season Long join The Live Stream on Social Media Channels    
 
           </p>
         </div>

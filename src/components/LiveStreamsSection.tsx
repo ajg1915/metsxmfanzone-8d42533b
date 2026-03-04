@@ -175,9 +175,9 @@ const LiveStreamsSection = () => {
             transition={{ duration: 0.5 }}
             className="flex items-center justify-between mb-4"
           >
-            <div className="flex items-center gap-2">
-              <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 animate-pulse" />
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Radio className="w-4 h-4 sm:w-6 sm:h-6 text-red-500 animate-pulse" />
+              <h2 className="text-sm sm:text-xl md:text-2xl font-bold text-foreground">
                 Live Streams
               </h2>
             </div>
