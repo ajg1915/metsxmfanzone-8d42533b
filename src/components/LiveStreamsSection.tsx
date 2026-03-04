@@ -167,7 +167,7 @@ const LiveStreamsSection = () => {
     <>
       <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
       <section className="py-6 sm:py-8 relative">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
