@@ -30,25 +30,35 @@ export { getTeamAbbreviation };
 export default function GamecastTicker({ games }: { games: OtherGame[] }) {
   if (!games.length) return null;
   return (
-    <div className="bg-black/95 border-b border-primary/20">
+    <div className="bg-card/60 backdrop-blur-sm border-b border-border/10">
       <ScrollArea className="w-full">
-        <div className="flex items-center gap-1.5 p-2 min-w-max">
+        <div className="flex items-center gap-1 px-3 py-1.5 min-w-max max-w-[1400px] mx-auto">
+          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mr-2 shrink-0">Scores</span>
           {games.slice(0, 15).map((game) => {
             const isLive = game.status.abstractGameState === 'Live';
             const isFinal = game.status.abstractGameState === 'Final';
             return (
-              <div key={game.gamePk} className={`flex-shrink-0 rounded-lg px-3 py-1.5 text-xs border ${isLive ? 'bg-red-500/10 border-red-500/30' : isFinal ? 'bg-muted/20 border-border/50' : 'bg-muted/10 border-border/30'}`}>
-                <div className="flex items-center gap-2 mb-0.5">
-                  <img src={`https://www.mlbstatic.com/team-logos/${game.teams.away.team.id}.svg`} alt="" className="w-4 h-4" />
-                  <span className="text-muted-foreground font-medium w-8">{getTeamAbbreviation(game.teams.away.team.name)}</span>
-                  <span className="font-bold w-4 text-right">{game.teams.away.score ?? '-'}</span>
+              <div
+                key={game.gamePk}
+                className={`flex-shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] transition-colors ${
+                  isLive
+                    ? 'bg-red-500/8 border border-red-500/20'
+                    : isFinal
+                    ? 'bg-muted/15 border border-border/10'
+                    : 'bg-muted/8 border border-border/5 opacity-70'
+                }`}
+              >
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <img src={`https://www.mlbstatic.com/team-logos/${game.teams.away.team.id}.svg`} alt="" className="w-3.5 h-3.5" />
+                  <span className="text-muted-foreground font-bold w-7">{getTeamAbbreviation(game.teams.away.team.name)}</span>
+                  <span className="font-black w-4 text-right tabular-nums">{game.teams.away.score ?? '-'}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <img src={`https://www.mlbstatic.com/team-logos/${game.teams.home.team.id}.svg`} alt="" className="w-4 h-4" />
-                  <span className="text-muted-foreground font-medium w-8">{getTeamAbbreviation(game.teams.home.team.name)}</span>
-                  <span className="font-bold w-4 text-right">{game.teams.home.score ?? '-'}</span>
+                <div className="flex items-center gap-1.5">
+                  <img src={`https://www.mlbstatic.com/team-logos/${game.teams.home.team.id}.svg`} alt="" className="w-3.5 h-3.5" />
+                  <span className="text-muted-foreground font-bold w-7">{getTeamAbbreviation(game.teams.home.team.name)}</span>
+                  <span className="font-black w-4 text-right tabular-nums">{game.teams.home.score ?? '-'}</span>
                 </div>
-                <div className={`text-center text-[10px] mt-1 ${isLive ? 'text-red-400 font-semibold' : 'text-muted-foreground'}`}>
+                <div className={`text-center text-[9px] mt-1 font-semibold ${isLive ? 'text-red-400' : 'text-muted-foreground/60'}`}>
                   {game.status.detailedState}
                 </div>
               </div>
