@@ -139,7 +139,7 @@ const CommunityPreviewSection = () => {
   }
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-6 relative overflow-hidden">
+    <section className="py-8 sm:py-16 md:py-20 px-3 sm:px-6 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -153,28 +153,28 @@ const CommunityPreviewSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8 sm:mb-10">
+          className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3 sm:gap-4 mb-6 sm:mb-10">
 
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-primary">Fan Hub</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+              <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-primary">Fan Hub</span>
             </div>
-            <h2 className="text-base sm:text-3xl font-bold text-foreground flex items-center gap-3 leading-tight text-left md:text-2xl">
-              <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 sm:w-10 sm:h-10" />
-              MetsXMFanZone Community
+            <h2 className="text-sm sm:text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2 sm:gap-3 leading-tight text-left">
+              <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-10 sm:h-10 shrink-0" />
+              <span className="break-words">MetsXMFanZone Community</span>
             </h2>
-            <p className="sm:text-base text-muted-foreground mt-2 max-w-md text-xs">
+            <p className="text-[10px] sm:text-base text-muted-foreground mt-1 sm:mt-2 max-w-md">
               Join the conversation with 50k passionate Mets fans
             </p>
           </div>
           <Button
             onClick={() => navigate("/community")}
-            size="lg"
-            className="group text-sm font-semibold rounded-full px-6 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+            size="sm"
+            className="group text-xs sm:text-sm font-semibold rounded-full px-4 sm:px-6 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
 
             Join Community
-            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1.5 sm:ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
         </motion.div>
 

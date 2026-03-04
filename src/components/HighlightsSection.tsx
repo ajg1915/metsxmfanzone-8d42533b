@@ -116,31 +116,31 @@ const HighlightsSection = ({ className, onVideoClick, badge }: HighlightsSection
   return (
     <>
       <section className={cn("py-6 sm:py-8 relative", className)}>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="flex items-center justify-between mb-4"
+            className="flex items-center justify-between mb-3 sm:mb-4"
           >
-            <div className="flex items-center gap-2">
-              <img src={metsLogo} alt="MetsXM FanZone" className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <img src={metsLogo} alt="MetsXM FanZone" className="w-4 h-4 sm:w-6 sm:h-6 object-contain shrink-0" />
               <div>
-                <div className="flex items-center gap-1.5">
-                  <h2 className="text-sm sm:text-base md:text-lg font-bold text-foreground">
+                <div className="flex items-center gap-1 sm:gap-1.5">
+                  <h2 className="text-xs sm:text-base md:text-lg font-bold text-foreground">
                     Mets Video Highlights
                   </h2>
                   {badge}
                 </div>
-                <p className="text-[9px] sm:text-[10px] text-muted-foreground">
+                <p className="text-[8px] sm:text-[10px] text-muted-foreground">
                   Uploaded by Orange &amp; Blue Media
                 </p>
               </div>
             </div>
             <a
               href="/video-gallery"
-              className="flex items-center gap-1 text-[10px] sm:text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+              className="flex items-center gap-1 text-[9px] sm:text-xs font-medium text-primary hover:text-primary/80 transition-colors shrink-0"
             >
               View All
               <ChevronRight className="w-3 h-3" />

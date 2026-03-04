@@ -85,24 +85,24 @@ const PlayersToWatch = ({ lineupGameDate }: { lineupGameDate?: string | null }) 
   const isStarter = (p: PlayerPrediction) => isPitcherPlayer(p) && !isCloser(p);
 
   return (
-    <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 overflow-hidden w-full box-border">
+    <section className="py-6 sm:py-12 px-3 sm:px-6 lg:px-8 overflow-hidden w-full box-border">
       <div className="w-full max-w-full mx-auto">
-        <GlassCard glow="blue" className="p-4 sm:p-6 md:p-8 lg:p-10 w-full max-w-full border-2 border-primary/30 shadow-[0_0_30px_rgba(var(--primary),0.3)]">
+        <GlassCard glow="blue" className="p-3 sm:p-6 md:p-8 lg:p-10 w-full max-w-full border-2 border-primary/30 shadow-[0_0_30px_rgba(var(--primary),0.3)]">
           {/* Section Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 sm:mb-6 md:mb-8">
             <div className="flex items-center gap-2 sm:gap-3">
-              <img src={metsLogo} alt="MetsXMFanZone" className="h-10 w-10 sm:h-12 sm:w-12 object-contain" />
+              <img src={metsLogo} alt="MetsXMFanZone" className="h-8 w-8 sm:h-12 sm:w-12 object-contain shrink-0" />
               <div>
-                <h2 className="text-lg sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-orange-400 to-primary bg-clip-text text-transparent">
+                <h2 className="text-sm sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary via-orange-400 to-primary bg-clip-text text-transparent">
                   Anthony's Predictions
                 </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground">
+                <p className="text-[10px] sm:text-sm text-muted-foreground">
                   Daily parlay picks & stat projections
                 </p>
               </div>
             </div>
             {predictions && predictions.length > 0 && (
-              <div className="text-[10px] sm:text-xs text-muted-foreground bg-card/50 px-2 sm:px-3 py-1 rounded-full w-fit">
+              <div className="text-[9px] sm:text-xs text-muted-foreground bg-card/50 px-2 sm:px-3 py-1 rounded-full w-fit">
                 Updated: {new Date().toLocaleDateString()}
               </div>
             )}

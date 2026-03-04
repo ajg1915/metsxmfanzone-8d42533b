@@ -120,7 +120,7 @@ const ReplayGamesSection = () => {
 
   return (
     <section className="py-6 sm:py-8 relative">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -128,9 +128,9 @@ const ReplayGamesSection = () => {
           transition={{ duration: 0.5 }}
           className="flex items-center justify-between mb-4"
         >
-          <div className="flex items-center gap-2">
-            <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <RotateCcw className="w-4 h-4 sm:w-6 sm:h-6 text-primary" />
+            <h2 className="text-sm sm:text-xl md:text-2xl font-bold text-foreground">
               Replay Games
             </h2>
           </div>

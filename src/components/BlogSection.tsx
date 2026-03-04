@@ -77,25 +77,25 @@ const BlogSection = () => {
   }
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 relative overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+    <section className="py-6 sm:py-12 md:py-16 relative overflow-hidden">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-5 sm:mb-6 md:mb-8"
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-6 md:mb-8"
         >
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl glass-card">
-              <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+            <div className="p-1 sm:p-2 rounded-lg sm:rounded-xl glass-card shrink-0">
+              <img src={logo} alt="MetsXMFanZone" className="w-5 h-5 sm:w-8 sm:h-8 object-contain" />
             </div>
             <div>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground leading-tight">
+              <h2 className="text-sm sm:text-xl md:text-2xl font-bold text-foreground leading-tight">
                 Latest News
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">Stay updated with MetsXMFanZone</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Stay updated with MetsXMFanZone</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
