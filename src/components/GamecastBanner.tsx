@@ -156,13 +156,13 @@ export default function GamecastBanner() {
 
                   {/* Live inning info */}
                   {(isLive && game.linescore?.currentInningOrdinal) && (
-                    <span className="hidden sm:flex ml-auto items-center gap-1.5 text-[10px] text-destructive font-bold bg-destructive/10 border border-destructive/20 rounded-full px-2.5 py-1">
-                      <Activity className="w-3 h-3 animate-pulse" />
+                    <span className="flex ml-auto items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[10px] text-destructive font-bold bg-destructive/10 border border-destructive/20 rounded-full px-1.5 sm:px-2.5 py-0.5 sm:py-1">
+                      <Activity className="w-2.5 h-2.5 sm:w-3 sm:h-3 animate-pulse" />
                       {game.linescore.inningState} {game.linescore.currentInningOrdinal}
                     </span>
                   )}
                   {isFinal && (
-                    <span className="hidden sm:flex ml-auto items-center gap-1.5 text-[10px] text-muted-foreground font-bold bg-muted/30 border border-border/30 rounded-full px-2.5 py-1">
+                    <span className="flex ml-auto items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[10px] text-muted-foreground font-bold bg-muted/30 border border-border/30 rounded-full px-1.5 sm:px-2.5 py-0.5 sm:py-1">
                       FINAL
                     </span>
                   )}
