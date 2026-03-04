@@ -85,7 +85,7 @@ const BlogSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-6 md:mb-8"
+          className="flex flex-row justify-between items-center gap-2 sm:gap-4 mb-4 sm:mb-6 md:mb-8"
         >
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="p-1 sm:p-2 rounded-lg sm:rounded-xl glass-card shrink-0">
