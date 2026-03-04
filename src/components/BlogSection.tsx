@@ -95,7 +95,7 @@ const BlogSection = () => {
               <h2 className="text-sm sm:text-xl md:text-2xl font-bold text-foreground leading-tight">
                 Latest News
               </h2>
-              <p className="text-[10px] sm:text-sm text-muted-foreground">Stay updated with MetsXMFanZone</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Stay updated MetsXMFanZone</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
