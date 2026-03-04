@@ -83,6 +83,20 @@ const Community = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
+  const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .then(({ data }) => {
+          setIsCurrentUserAdmin((data || []).length > 0);
+        });
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user) {
