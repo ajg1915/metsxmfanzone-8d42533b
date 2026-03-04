@@ -568,7 +568,13 @@ const Community = () => {
 
           <div className="space-y-4">
             {feedItems.map((item) => (
-              <Card key={`${item.type}-${item.id}`}>
+              <Card key={`${item.type}-${item.id}`} className={item.type === 'post' && item.is_pinned ? 'border-primary border-2 relative' : ''}>
+                {item.type === 'post' && item.is_pinned && (
+                  <div className="absolute top-2 right-2 flex items-center gap-1 text-primary">
+                    <Pin className="w-4 h-4 fill-primary" />
+                    <span className="text-xs font-semibold">Pinned</span>
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
