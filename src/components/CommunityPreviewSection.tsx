@@ -160,7 +160,7 @@ const CommunityPreviewSection = () => {
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-xs font-semibold uppercase tracking-widest text-primary">Fan Hub</span>
             </div>
-            <h2 className="sm:text-3xl md:text-4xl font-bold text-foreground flex items-center gap-3 leading-tight text-sm text-left">
+            <h2 className="text-base sm:text-3xl md:text-4xl font-bold text-foreground flex items-center gap-3 leading-tight text-left">
               <img src={logo} alt="MetsXMFanZone" className="w-8 h-8 sm:w-10 sm:h-10" />
               MetsXMFanZone Community
             </h2>
