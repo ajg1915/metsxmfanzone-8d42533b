@@ -225,33 +225,33 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
         background: "radial-gradient(ellipse 80% 50% at 50% 50%, hsl(var(--primary) / 0.06), transparent 70%)",
       }} />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         {/* Modern Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden border border-primary/20 shadow-lg">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-primary/20 shadow-lg shrink-0">
               <img src={logoImage} alt="MetsXMFanZone" className="w-full h-full object-cover" />
             </div>
             <div>
-              <h2 className="text-lg sm:text-xl font-black tracking-tight text-foreground">
+              <h2 className="text-sm sm:text-lg font-black tracking-tight text-foreground">
                 Mets Game Center
               </h2>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">Live Stats & Lineup</p>
+              <p className="text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] text-muted-foreground font-semibold">Live Stats & Lineup</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleRefreshLineup}
               disabled={isRefreshing}
-              className="text-primary hover:text-primary/80 hover:bg-primary/10 h-8 px-3 text-xs rounded-xl"
+              className="text-primary hover:text-primary/80 hover:bg-primary/10 h-7 sm:h-8 px-2 sm:px-3 text-[10px] sm:text-xs rounded-xl"
             >
-              <RefreshCw className={`w-3.5 h-3.5 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 mr-0.5 sm:mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </Button>
-            <Link to="/video-gallery" className="flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors text-xs font-semibold bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-xl">
-              <Video className="w-3.5 h-3.5" />
+            <Link to="/video-gallery" className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors text-[10px] sm:text-xs font-semibold bg-primary/5 hover:bg-primary/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl">
+              <Video className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               <span className="hidden sm:inline">Videos</span>
             </Link>
           </div>
