@@ -189,11 +189,16 @@ const Community = () => {
       isAdmin: adminUserIds.has(blog.user_id)
     }));
 
-    // Combine and sort by created_at/published_at
+    // Combine and sort: pinned posts first, then by date
     const combinedFeed: FeedItem[] = [
       ...postsWithSignedUrls,
       ...blogPostsWithType
     ].sort((a, b) => {
+      // Pinned posts first
+      const aPinned = a.type === 'post' && a.is_pinned ? 1 : 0;
+      const bPinned = b.type === 'post' && b.is_pinned ? 1 : 0;
+      if (aPinned !== bPinned) return bPinned - aPinned;
+      
       const dateA = a.type === 'blog' ? (a.published_at || a.created_at) : a.created_at;
       const dateB = b.type === 'blog' ? (b.published_at || b.created_at) : b.created_at;
       return new Date(dateB).getTime() - new Date(dateA).getTime();
