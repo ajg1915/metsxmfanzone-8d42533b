@@ -4,24 +4,26 @@ import logo from "@/assets/metsxmfanzone-logo.png";
 
 interface PremiumBadgeProps {
   className?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   variant?: "default" | "corner" | "inline";
   noGlow?: boolean;
 }
 
 const PremiumBadge = ({ 
   className, 
-  size = "sm",
+  size = "xs",
   variant = "default",
   noGlow = false
 }: PremiumBadgeProps) => {
   const sizeClasses = {
+    xs: "text-[8px] px-1.5 py-0.5 gap-0.5",
     sm: "text-[10px] px-2 py-0.5 gap-1",
     md: "text-xs px-2.5 py-1 gap-1.5",
     lg: "text-sm px-3 py-1.5 gap-2"
   };
 
   const iconSizes = {
+    xs: "w-3 h-3",
     sm: "w-4 h-4",
     md: "w-5 h-5",
     lg: "w-6 h-6"
