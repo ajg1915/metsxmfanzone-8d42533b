@@ -165,10 +165,16 @@ export default function GamecastBanner() {
                     </div>
                   </div>
 
-                  {/* Venue */}
-                  {game.venue?.name && (
-                    <span className="hidden sm:block ml-auto text-[9px] text-muted-foreground/50 font-medium italic">
-                      {game.venue.name}
+                  {/* Live inning info */}
+                  {(isLive && game.linescore?.currentInningOrdinal) && (
+                    <span className="hidden sm:flex ml-auto items-center gap-1.5 text-[10px] text-destructive font-bold bg-destructive/10 border border-destructive/20 rounded-full px-2.5 py-1">
+                      <Activity className="w-3 h-3 animate-pulse" />
+                      {game.linescore.inningState} {game.linescore.currentInningOrdinal}
+                    </span>
+                  )}
+                  {isFinal && (
+                    <span className="hidden sm:flex ml-auto items-center gap-1.5 text-[10px] text-muted-foreground font-bold bg-muted/30 border border-border/30 rounded-full px-2.5 py-1">
+                      FINAL
                     </span>
                   )}
                 </div>
