@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone, FileText, Pencil, X, Check } from "lucide-react";
+import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone, FileText, Pencil, X, Check, Pin, PinOff } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import SocialShareButtons from "@/components/SocialShareButtons";
@@ -26,6 +26,8 @@ interface Post {
   content: string;
   image_url: string | null;
   created_at: string;
+  is_pinned: boolean | null;
+  pinned_at: string | null;
   profiles: {
     full_name: string | null;
     email: string | null;
@@ -81,6 +83,20 @@ const Community = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
+  const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .then(({ data }) => {
+          setIsCurrentUserAdmin((data || []).length > 0);
+        });
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -173,11 +189,16 @@ const Community = () => {
       isAdmin: adminUserIds.has(blog.user_id)
     }));
 
-    // Combine and sort by created_at/published_at
+    // Combine and sort: pinned posts first, then by date
     const combinedFeed: FeedItem[] = [
       ...postsWithSignedUrls,
       ...blogPostsWithType
     ].sort((a, b) => {
+      // Pinned posts first
+      const aPinned = a.type === 'post' && a.is_pinned ? 1 : 0;
+      const bPinned = b.type === 'post' && b.is_pinned ? 1 : 0;
+      if (aPinned !== bPinned) return bPinned - aPinned;
+      
       const dateA = a.type === 'blog' ? (a.published_at || a.created_at) : a.created_at;
       const dateB = b.type === 'blog' ? (b.published_at || b.created_at) : b.created_at;
       return new Date(dateB).getTime() - new Date(dateA).getTime();
@@ -380,6 +401,32 @@ const Community = () => {
     }
   };
 
+  const handleTogglePin = async (postId: string, currentlyPinned: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("posts")
+        .update({ 
+          is_pinned: !currentlyPinned, 
+          pinned_at: !currentlyPinned ? new Date().toISOString() : null 
+        })
+        .eq("id", postId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: currentlyPinned ? "Post unpinned" : "Post pinned to top",
+      });
+      fetchFeed();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -521,7 +568,13 @@ const Community = () => {
 
           <div className="space-y-4">
             {feedItems.map((item) => (
-              <Card key={`${item.type}-${item.id}`}>
+              <Card key={`${item.type}-${item.id}`} className={item.type === 'post' && item.is_pinned ? 'border-primary border-2 relative' : ''}>
+                {item.type === 'post' && item.is_pinned && (
+                  <div className="absolute top-2 right-2 flex items-center gap-1 text-primary">
+                    <Pin className="w-4 h-4 fill-primary" />
+                    <span className="text-xs font-semibold">Pinned</span>
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -553,30 +606,45 @@ const Community = () => {
                         </p>
                       </div>
                     </div>
-                    {item.type === 'post' && item.user_id === user?.id && (
-                      <div className="flex items-center gap-1">
-                        {editingPostId !== item.id && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditPost(item as Post & { type: 'post' })}
-                            className="text-muted-foreground hover:text-primary"
-                            title="Edit post"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                        )}
+                    <div className="flex items-center gap-1">
+                      {/* Admin pin/unpin button */}
+                      {item.type === 'post' && isCurrentUserAdmin && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeletePost(item.id)}
-                          className="text-muted-foreground hover:text-destructive"
-                          title="Delete post"
+                          onClick={() => handleTogglePin(item.id, !!item.is_pinned)}
+                          className={item.is_pinned ? "text-primary hover:text-primary/80" : "text-muted-foreground hover:text-primary"}
+                          title={item.is_pinned ? "Unpin post" : "Pin post"}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          {item.is_pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
                         </Button>
-                      </div>
-                    )}
+                      )}
+                      {/* Owner edit/delete buttons */}
+                      {item.type === 'post' && item.user_id === user?.id && (
+                        <>
+                          {editingPostId !== item.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditPost(item as Post & { type: 'post' })}
+                              className="text-muted-foreground hover:text-primary"
+                              title="Edit post"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeletePost(item.id)}
+                            className="text-muted-foreground hover:text-destructive"
+                            title="Delete post"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>

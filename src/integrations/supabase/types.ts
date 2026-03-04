@@ -1359,6 +1359,8 @@ export type Database = {
           created_at: string | null
           id: string
           image_url: string | null
+          is_pinned: boolean | null
+          pinned_at: string | null
           updated_at: string | null
           user_id: string
         }
@@ -1367,6 +1369,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           image_url?: string | null
+          is_pinned?: boolean | null
+          pinned_at?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -1375,6 +1379,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           image_url?: string | null
+          is_pinned?: boolean | null
+          pinned_at?: string | null
           updated_at?: string | null
           user_id?: string
         }
