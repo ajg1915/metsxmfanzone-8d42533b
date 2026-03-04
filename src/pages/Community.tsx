@@ -672,20 +672,9 @@ const Community = () => {
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex gap-3">
-                      {/* Thumbnail - same size as Latest News cards */}
-                      {item.image_url && (
-                        <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-muted">
-                          <img
-                            src={item.image_url}
-                            alt="Post"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      )}
-                      
+                    <div className="space-y-3">
                       {/* Content */}
-                      <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                      <div className="flex-1 min-w-0">
                         {editingPostId === item.id ? (
                           <div className="space-y-2">
                             <Textarea
@@ -712,6 +701,16 @@ const Community = () => {
                           </>
                         )}
                       </div>
+                      {/* Full-width image */}
+                      {item.image_url && (
+                        <div className="relative w-full rounded-lg overflow-hidden bg-muted">
+                          <img
+                            src={item.image_url}
+                            alt="Post"
+                            className="w-full h-auto object-contain rounded-lg"
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                   <div className="flex items-center gap-4 mt-4 pt-4 border-t">
