@@ -4,6 +4,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Activity, BarChart3, Users, Radio } from "lucide-react";
 import GamecastTicker from "@/components/gamecast/GamecastTicker";
 import GamecastScoreboard from "@/components/gamecast/GamecastScoreboard";
 import GamecastLineScore from "@/components/gamecast/GamecastLineScore";
@@ -88,7 +89,6 @@ const MetsGamecast = () => {
             const liveData = await liveRes.json();
             setBoxScore(liveData.liveData?.boxscore);
 
-            // Extract play-by-play
             const allPlays = liveData.liveData?.plays?.allPlays || [];
             const completedPlays: PlayEvent[] = allPlays
               .filter((p: any) => p.about?.isComplete)
@@ -131,14 +131,16 @@ const MetsGamecast = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const isLive = gameData?.status.abstractGameState === 'Live';
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Navigation />
-        <main className="flex-1 container mx-auto px-3 py-8 pt-14 space-y-4">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-32 w-full" />
+        <main className="flex-1 pt-14 px-3 sm:px-6 max-w-[1400px] mx-auto w-full space-y-4">
+          <Skeleton className="h-10 w-full rounded-xl" />
+          <Skeleton className="h-56 w-full rounded-2xl" />
+          <Skeleton className="h-40 w-full rounded-xl" />
         </main>
         <Footer />
       </div>
@@ -154,33 +156,79 @@ const MetsGamecast = () => {
       <Navigation />
 
       <main className="flex-1 pt-12">
+        {/* Broadcast Header Bar */}
+        <div className="relative overflow-hidden border-b border-border/20">
+          <div className="absolute inset-0 bg-gradient-to-r from-mets-blue/20 via-transparent to-mets-orange/10" />
+          <div className="relative max-w-[1400px] mx-auto px-3 sm:px-6 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-5 rounded-full bg-primary" />
+              <h1 className="text-sm sm:text-base font-black tracking-tight uppercase text-foreground">
+                Game Center
+              </h1>
+              {isLive && (
+                <span className="flex items-center gap-1 text-[10px] font-bold text-red-400 bg-red-500/10 border border-red-500/20 rounded-full px-2 py-0.5">
+                  <Radio className="w-3 h-3 animate-pulse" />
+                  LIVE
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] sm:text-xs text-muted-foreground font-mono">
+              {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            </span>
+          </div>
+        </div>
+
+        {/* MLB Ticker */}
         <GamecastTicker games={otherGames} />
 
-        <div className="flex flex-col lg:flex-row">
-          {/* Main content */}
-          <div className="flex-1 p-3 sm:p-4 space-y-3 sm:space-y-4">
-            {gameData && <GamecastScoreboard gameData={gameData} />}
-            {gameData && <GamecastLineScore gameData={gameData} />}
-          </div>
+        {/* Main Content Grid */}
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-col lg:flex-row">
+            {/* Left Column - Scoreboard + Line Score */}
+            <div className="flex-1 p-3 sm:p-5 space-y-4">
+              {gameData && <GamecastScoreboard gameData={gameData} />}
+              {gameData && <GamecastLineScore gameData={gameData} />}
+            </div>
 
-          {/* Sidebar */}
-          <div className="w-full lg:w-[400px] border-t lg:border-t-0 lg:border-l border-border/50 bg-muted/5 p-3 sm:p-4 pb-20 sm:pb-4">
-            <Tabs defaultValue="plays" className="w-full">
-              <TabsList className="w-full mb-3">
-                <TabsTrigger value="plays" className="flex-1 text-xs">PLAYS</TabsTrigger>
-                <TabsTrigger value="lineup" className="flex-1 text-xs">LINEUP</TabsTrigger>
-                <TabsTrigger value="box" className="flex-1 text-xs">BOX SCORE</TabsTrigger>
-              </TabsList>
-              <TabsContent value="plays">
-                <GamecastPlays plays={plays} />
-              </TabsContent>
-              <TabsContent value="lineup">
-                {gameData && <GamecastLineup gameData={gameData} boxScore={boxScore} />}
-              </TabsContent>
-              <TabsContent value="box">
-                {gameData && <GamecastBoxScore gameData={gameData} boxScore={boxScore} />}
-              </TabsContent>
-            </Tabs>
+            {/* Right Column - Tabs Panel */}
+            <div className="w-full lg:w-[420px] border-t lg:border-t-0 lg:border-l border-border/10 bg-card/30 backdrop-blur-sm">
+              <Tabs defaultValue="plays" className="w-full h-full flex flex-col">
+                <TabsList className="w-full rounded-none border-b border-border/10 bg-transparent p-0 h-auto shrink-0">
+                  <TabsTrigger
+                    value="plays"
+                    className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-xs font-bold uppercase tracking-wider py-3 gap-1.5"
+                  >
+                    <Activity className="w-3.5 h-3.5" />
+                    Plays
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="lineup"
+                    className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-xs font-bold uppercase tracking-wider py-3 gap-1.5"
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    Lineup
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="box"
+                    className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary text-xs font-bold uppercase tracking-wider py-3 gap-1.5"
+                  >
+                    <BarChart3 className="w-3.5 h-3.5" />
+                    Box Score
+                  </TabsTrigger>
+                </TabsList>
+                <div className="flex-1 p-3 sm:p-4 pb-20 sm:pb-4 overflow-y-auto">
+                  <TabsContent value="plays" className="mt-0">
+                    <GamecastPlays plays={plays} />
+                  </TabsContent>
+                  <TabsContent value="lineup" className="mt-0">
+                    {gameData && <GamecastLineup gameData={gameData} boxScore={boxScore} />}
+                  </TabsContent>
+                  <TabsContent value="box" className="mt-0">
+                    {gameData && <GamecastBoxScore gameData={gameData} boxScore={boxScore} />}
+                  </TabsContent>
+                </div>
+              </Tabs>
+            </div>
           </div>
         </div>
       </main>

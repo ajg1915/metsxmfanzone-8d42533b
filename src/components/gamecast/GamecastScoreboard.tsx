@@ -1,6 +1,6 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { Radio, Tv } from "lucide-react";
 
 interface GameData {
   gamePk: number;
@@ -25,42 +25,84 @@ interface GameData {
 }
 
 function BaseDiamond({ offense }: { offense?: GameData['linescore']['offense'] }) {
+  const baseClass = (active?: boolean) =>
+    `w-4 h-4 sm:w-[18px] sm:h-[18px] rotate-45 border-2 transition-all duration-300 ${
+      active
+        ? 'bg-primary border-primary shadow-[0_0_12px_hsl(16_100%_50%/0.6)]'
+        : 'bg-muted/30 border-muted-foreground/15'
+    }`;
+
   return (
-    <div className="relative w-14 h-14 sm:w-16 sm:h-16">
-      <div className={`absolute top-0.5 left-1/2 -translate-x-1/2 w-3.5 h-3.5 rotate-45 border-2 transition-colors ${offense?.second ? 'bg-yellow-400 border-yellow-500 shadow-[0_0_8px_rgba(250,204,21,0.5)]' : 'bg-muted/50 border-muted-foreground/20'}`} />
-      <div className={`absolute top-1/2 left-0.5 -translate-y-1/2 w-3.5 h-3.5 rotate-45 border-2 transition-colors ${offense?.third ? 'bg-yellow-400 border-yellow-500 shadow-[0_0_8px_rgba(250,204,21,0.5)]' : 'bg-muted/50 border-muted-foreground/20'}`} />
-      <div className={`absolute top-1/2 right-0.5 -translate-y-1/2 w-3.5 h-3.5 rotate-45 border-2 transition-colors ${offense?.first ? 'bg-yellow-400 border-yellow-500 shadow-[0_0_8px_rgba(250,204,21,0.5)]' : 'bg-muted/50 border-muted-foreground/20'}`} />
-      {/* Home plate */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 bg-white/80 border border-white/40" />
+    <div className="relative w-16 h-16 sm:w-[72px] sm:h-[72px]">
+      <div className={`absolute top-0.5 left-1/2 -translate-x-1/2 ${baseClass(offense?.second)}`} />
+      <div className={`absolute top-1/2 left-1 -translate-y-1/2 ${baseClass(offense?.third)}`} />
+      <div className={`absolute top-1/2 right-1 -translate-y-1/2 ${baseClass(offense?.first)}`} />
+      <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-foreground/60 border border-foreground/30" />
     </div>
+  );
+}
+
+function CountDot({ active, color }: { active: boolean; color: string }) {
+  const colorMap: Record<string, string> = {
+    green: 'bg-green-500 shadow-[0_0_6px_hsl(142_71%_45%/0.5)]',
+    red: 'bg-red-500 shadow-[0_0_6px_hsl(0_84%_60%/0.5)]',
+    orange: 'bg-primary shadow-[0_0_6px_hsl(16_100%_50%/0.5)]',
+  };
+  return (
+    <div className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${active ? colorMap[color] : 'bg-muted-foreground/15'}`} />
   );
 }
 
 function CountDisplay({ balls, strikes, outs }: { balls: number; strikes: number; outs: number }) {
   return (
-    <div className="flex flex-col gap-1 text-xs">
+    <div className="flex flex-col gap-1.5 text-[10px]">
       <div className="flex items-center gap-1.5">
-        <span className="text-muted-foreground font-mono w-3">B</span>
-        <div className="flex gap-0.5">
-          {[0, 1, 2, 3].map(i => (
-            <div key={i} className={`w-2.5 h-2.5 rounded-full transition-colors ${i < balls ? 'bg-green-500 shadow-[0_0_4px_rgba(34,197,94,0.4)]' : 'bg-muted/40'}`} />
-          ))}
+        <span className="text-muted-foreground font-mono w-3 font-bold">B</span>
+        <div className="flex gap-1">
+          {[0, 1, 2, 3].map(i => <CountDot key={i} active={i < balls} color="green" />)}
         </div>
       </div>
       <div className="flex items-center gap-1.5">
-        <span className="text-muted-foreground font-mono w-3">S</span>
-        <div className="flex gap-0.5">
-          {[0, 1, 2].map(i => (
-            <div key={i} className={`w-2.5 h-2.5 rounded-full transition-colors ${i < strikes ? 'bg-red-500 shadow-[0_0_4px_rgba(239,68,68,0.4)]' : 'bg-muted/40'}`} />
-          ))}
+        <span className="text-muted-foreground font-mono w-3 font-bold">S</span>
+        <div className="flex gap-1">
+          {[0, 1, 2].map(i => <CountDot key={i} active={i < strikes} color="red" />)}
         </div>
       </div>
       <div className="flex items-center gap-1.5">
-        <span className="text-muted-foreground font-mono w-3">O</span>
-        <div className="flex gap-0.5">
-          {[0, 1, 2].map(i => (
-            <div key={i} className={`w-2.5 h-2.5 rounded-full transition-colors ${i < outs ? 'bg-orange-500 shadow-[0_0_4px_rgba(249,115,22,0.4)]' : 'bg-muted/40'}`} />
-          ))}
+        <span className="text-muted-foreground font-mono w-3 font-bold">O</span>
+        <div className="flex gap-1">
+          {[0, 1, 2].map(i => <CountDot key={i} active={i < outs} color="orange" />)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TeamBlock({ team, side, isMets }: { team: GameData['teams']['away']; side: 'away' | 'home'; isMets: boolean }) {
+  return (
+    <div className={`flex items-center gap-3 sm:gap-4 ${side === 'home' ? 'flex-row-reverse' : ''}`}>
+      <div className="relative">
+        <img
+          src={`https://www.mlbstatic.com/team-logos/${team.team.id}.svg`}
+          alt={team.team.name}
+          className="w-14 h-14 sm:w-[72px] sm:h-[72px] drop-shadow-lg"
+        />
+        {isMets && (
+          <Link
+            to="/metsxmfanzone-tv"
+            className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-0.5 text-[9px] font-bold text-primary hover:text-primary/80 bg-primary/10 border border-primary/20 rounded-full px-1.5 py-0.5 whitespace-nowrap"
+          >
+            <Tv className="w-2.5 h-2.5" />
+            WATCH
+          </Link>
+        )}
+      </div>
+      <div className={`${side === 'home' ? 'text-right' : ''}`}>
+        <div className="text-[10px] sm:text-xs text-muted-foreground font-semibold uppercase tracking-wider truncate max-w-[90px] sm:max-w-none">
+          {team.team.name}
+        </div>
+        <div className="text-4xl sm:text-5xl font-black tabular-nums tracking-tight leading-none mt-0.5">
+          {team.score ?? 0}
         </div>
       </div>
     </div>
@@ -70,38 +112,44 @@ function CountDisplay({ balls, strikes, outs }: { balls: number; strikes: number
 export default function GamecastScoreboard({ gameData }: { gameData: GameData }) {
   const isLive = gameData.status.abstractGameState === 'Live';
   const isFinal = gameData.status.abstractGameState === 'Final';
+  const metsAreHome = gameData.teams.home.team.id === 121;
 
   return (
-    <Card className={`border-2 overflow-hidden ${isLive ? 'border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.15)]' : isFinal ? 'border-muted-foreground/20' : 'border-primary/20'}`}>
-      {/* Status bar */}
-      <div className={`px-3 py-1.5 flex items-center justify-between text-xs ${isLive ? 'bg-red-500/20' : isFinal ? 'bg-muted/30' : 'bg-primary/10'}`}>
+    <div className={`relative rounded-2xl overflow-hidden transition-all duration-500 ${
+      isLive ? 'glass-card glow-blue-pulse' : 'glass-card'
+    }`}>
+      {/* Top gradient accent */}
+      <div className={`h-1 w-full ${isLive ? 'bg-gradient-to-r from-red-500 via-primary to-red-500 animate-pulse' : isFinal ? 'bg-gradient-to-r from-muted-foreground/30 to-muted-foreground/10' : 'bg-gradient-to-r from-secondary via-primary to-secondary'}`} />
+
+      {/* Status Bar */}
+      <div className="flex items-center justify-between px-4 py-2 border-b border-border/10">
         <div className="flex items-center gap-2">
-          <Badge variant={isLive ? 'destructive' : 'secondary'} className="text-[10px] px-2 py-0">
-            {isLive && <span className="inline-block w-1.5 h-1.5 rounded-full bg-white animate-pulse mr-1" />}
-            {gameData.status.detailedState}
-          </Badge>
+          {isLive ? (
+            <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[10px] px-2 py-0.5 gap-1 font-bold">
+              <Radio className="w-3 h-3 animate-pulse" />
+              LIVE
+            </Badge>
+          ) : (
+            <Badge variant="secondary" className="text-[10px] px-2 py-0.5 font-bold">
+              {gameData.status.detailedState}
+            </Badge>
+          )}
           {gameData.linescore?.currentInningOrdinal && (
-            <span className="font-bold text-sm">
+            <span className="text-sm font-black text-foreground">
               {gameData.linescore.inningState} {gameData.linescore.currentInningOrdinal}
             </span>
           )}
         </div>
-        <span className="text-muted-foreground">{gameData.venue?.name}</span>
+        <span className="text-[10px] text-muted-foreground font-medium">{gameData.venue?.name}</span>
       </div>
 
-      <CardContent className="p-3 sm:p-4">
-        <div className="grid grid-cols-[1fr_auto_1fr] gap-2 sm:gap-4 items-center">
-          {/* Away Team */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <img src={`https://www.mlbstatic.com/team-logos/${gameData.teams.away.team.id}.svg`} alt={gameData.teams.away.team.name} className="w-10 h-10 sm:w-14 sm:h-14" />
-            <div>
-              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate max-w-[70px] sm:max-w-none">{gameData.teams.away.team.name}</div>
-              <div className="text-2xl sm:text-4xl font-black tabular-nums">{gameData.teams.away.score ?? 0}</div>
-            </div>
-          </div>
+      {/* Scoreboard Body */}
+      <div className="px-4 sm:px-6 py-5 sm:py-6">
+        <div className="grid grid-cols-[1fr_auto_1fr] gap-3 sm:gap-6 items-center">
+          <TeamBlock team={gameData.teams.away} side="away" isMets={!metsAreHome} />
 
-          {/* Center - Count/Bases */}
-          <div className="flex flex-col items-center gap-1">
+          {/* Center Diamond + Count */}
+          <div className="flex flex-col items-center gap-2">
             <BaseDiamond offense={gameData.linescore?.offense} />
             {isLive && (
               <CountDisplay
@@ -110,43 +158,30 @@ export default function GamecastScoreboard({ gameData }: { gameData: GameData })
                 outs={gameData.linescore?.outs || 0}
               />
             )}
+            {!isLive && !isFinal && (
+              <span className="text-[10px] text-muted-foreground font-mono mt-1">VS</span>
+            )}
           </div>
 
-          {/* Home Team */}
-          <div className="flex items-center gap-2 sm:gap-3 justify-end">
-            <div className="text-right">
-              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate max-w-[70px] sm:max-w-none">{gameData.teams.home.team.name}</div>
-              <div className="text-2xl sm:text-4xl font-black tabular-nums">{gameData.teams.home.score ?? 0}</div>
-            </div>
-            <div className="flex flex-col items-center">
-              <img src={`https://www.mlbstatic.com/team-logos/${gameData.teams.home.team.id}.svg`} alt={gameData.teams.home.team.name} className="w-10 h-10 sm:w-14 sm:h-14" />
-              {gameData.teams.home.team.id === 121 && (
-                <Link to="/metsxmfanzone-tv" className="text-[10px] sm:text-xs font-bold text-primary hover:text-primary/80 mt-0.5 animate-pulse">
-                  WATCH Live
-                </Link>
-              )}
-            </div>
-          </div>
+          <TeamBlock team={gameData.teams.home} side="home" isMets={metsAreHome} />
         </div>
 
-        {/* At Bat Info */}
+        {/* At Bat Strip */}
         {isLive && (
-          <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-border/50">
-            <div className="text-center bg-muted/20 rounded-lg p-2">
-              <div className="text-[9px] text-muted-foreground uppercase tracking-wider">At Bat</div>
-              <div className="text-xs sm:text-sm font-bold truncate">{gameData.linescore?.offense?.batter?.fullName || 'TBD'}</div>
-            </div>
-            <div className="text-center bg-muted/20 rounded-lg p-2">
-              <div className="text-[9px] text-muted-foreground uppercase tracking-wider">Pitching</div>
-              <div className="text-xs sm:text-sm font-bold truncate">{gameData.linescore?.defense?.pitcher?.fullName || 'TBD'}</div>
-            </div>
-            <div className="text-center bg-muted/20 rounded-lg p-2">
-              <div className="text-[9px] text-muted-foreground uppercase tracking-wider">On Deck</div>
-              <div className="text-xs sm:text-sm font-bold truncate">{gameData.linescore?.offense?.onDeck?.fullName || 'TBD'}</div>
-            </div>
+          <div className="grid grid-cols-3 gap-2 mt-5 pt-4 border-t border-border/10">
+            {[
+              { label: 'At Bat', name: gameData.linescore?.offense?.batter?.fullName },
+              { label: 'Pitching', name: gameData.linescore?.defense?.pitcher?.fullName },
+              { label: 'On Deck', name: gameData.linescore?.offense?.onDeck?.fullName },
+            ].map(({ label, name }) => (
+              <div key={label} className="text-center rounded-xl bg-muted/15 border border-border/10 p-2.5">
+                <div className="text-[8px] sm:text-[9px] text-muted-foreground uppercase tracking-[0.15em] font-bold mb-0.5">{label}</div>
+                <div className="text-[11px] sm:text-xs font-bold truncate text-foreground">{name || 'TBD'}</div>
+              </div>
+            ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
