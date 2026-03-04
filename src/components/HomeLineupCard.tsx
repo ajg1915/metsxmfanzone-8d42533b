@@ -257,7 +257,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-5">
           {/* Main Lineup Card */}
           <div className="lg:col-span-2 rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-xl">
             {/* Top Bar */}
