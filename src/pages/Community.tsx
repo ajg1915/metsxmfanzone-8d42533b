@@ -401,6 +401,32 @@ const Community = () => {
     }
   };
 
+  const handleTogglePin = async (postId: string, currentlyPinned: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("posts")
+        .update({ 
+          is_pinned: !currentlyPinned, 
+          pinned_at: !currentlyPinned ? new Date().toISOString() : null 
+        })
+        .eq("id", postId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: currentlyPinned ? "Post unpinned" : "Post pinned to top",
+      });
+      fetchFeed();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
