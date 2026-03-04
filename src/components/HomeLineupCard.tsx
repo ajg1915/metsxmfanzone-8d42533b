@@ -408,7 +408,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-4 lg:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4 lg:gap-6">
                   {/* Lineup TBA */}
                   <div>
                     <div className="flex items-center gap-1.5 mb-3">
