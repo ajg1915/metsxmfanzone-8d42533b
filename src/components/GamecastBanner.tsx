@@ -93,12 +93,9 @@ export default function GamecastBanner() {
             {/* Game info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <div className="flex items-center gap-1 sm:gap-1.5">
-                  <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
-                  <span className="text-[10px] sm:text-sm font-black uppercase tracking-wider sm:tracking-widest text-foreground">
-                    MetsXMFanZone Live
-                  </span>
-                </div>
+                <span className="text-[10px] sm:text-sm font-black uppercase tracking-wider sm:tracking-widest text-foreground">
+                  MetsXMFanZone Live
+                </span>
                 {isLive && (
                   <span className="flex items-center gap-1 text-[10px] font-bold text-destructive bg-destructive/10 border border-destructive/20 rounded-full px-2.5 py-0.5 shadow-sm">
                     <Radio className="w-3 h-3 animate-pulse" />
