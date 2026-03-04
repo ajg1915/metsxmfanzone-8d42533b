@@ -707,7 +707,7 @@ const Community = () => {
                         ) : (
                           <>
                             {item.content && (
-                              <p className="text-sm text-foreground line-clamp-3 leading-snug">{item.content}</p>
+                              <p className="text-sm text-foreground leading-snug whitespace-pre-wrap">{item.content}</p>
                             )}
                           </>
                         )}
