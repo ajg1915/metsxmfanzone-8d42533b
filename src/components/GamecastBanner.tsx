@@ -132,18 +132,7 @@ export default function GamecastBanner() {
 
                   {/* Divider */}
                   <div className="flex flex-col items-center px-0.5 sm:px-1">
-                    {isLive && game.linescore?.currentInningOrdinal ? (
-                      <div className="flex flex-col items-center">
-                        <span className="text-[8px] sm:text-[9px] font-bold text-destructive whitespace-nowrap leading-tight">
-                          {game.linescore.inningState}
-                        </span>
-                        <span className="text-[9px] sm:text-[10px] font-bold text-destructive whitespace-nowrap">
-                          {game.linescore.currentInningOrdinal}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-[9px] sm:text-[10px] text-muted-foreground/40 font-black tracking-widest">VS</span>
-                    )}
+                    <span className="text-[9px] sm:text-[10px] text-muted-foreground/40 font-black tracking-widest">VS</span>
                   </div>
 
                   {/* Home team */}
