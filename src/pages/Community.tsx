@@ -606,30 +606,45 @@ const Community = () => {
                         </p>
                       </div>
                     </div>
-                    {item.type === 'post' && item.user_id === user?.id && (
-                      <div className="flex items-center gap-1">
-                        {editingPostId !== item.id && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditPost(item as Post & { type: 'post' })}
-                            className="text-muted-foreground hover:text-primary"
-                            title="Edit post"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                        )}
+                    <div className="flex items-center gap-1">
+                      {/* Admin pin/unpin button */}
+                      {item.type === 'post' && isCurrentUserAdmin && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeletePost(item.id)}
-                          className="text-muted-foreground hover:text-destructive"
-                          title="Delete post"
+                          onClick={() => handleTogglePin(item.id, !!item.is_pinned)}
+                          className={item.is_pinned ? "text-primary hover:text-primary/80" : "text-muted-foreground hover:text-primary"}
+                          title={item.is_pinned ? "Unpin post" : "Pin post"}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          {item.is_pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
                         </Button>
-                      </div>
-                    )}
+                      )}
+                      {/* Owner edit/delete buttons */}
+                      {item.type === 'post' && item.user_id === user?.id && (
+                        <>
+                          {editingPostId !== item.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditPost(item as Post & { type: 'post' })}
+                              className="text-muted-foreground hover:text-primary"
+                              title="Edit post"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeletePost(item.id)}
+                            className="text-muted-foreground hover:text-destructive"
+                            title="Delete post"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
