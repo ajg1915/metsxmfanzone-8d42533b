@@ -5,7 +5,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Radio, Users, Play, ChevronRight, ChevronLeft, Lock } from "lucide-react";
+import { Radio, Users, Play, ChevronRight, ChevronLeft, Lock, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -269,6 +269,12 @@ const LiveStreamsSection = () => {
                         {stream.status === 'live' && <Radio className="w-2.5 h-2.5 mr-1 animate-pulse" />}
                         {stream.status === 'live' ? 'LIVE' : 'UPCOMING'}
                       </Badge>
+                    </div>
+
+                    {/* VPN Secured badge */}
+                    <div className="absolute bottom-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-600/80 backdrop-blur-sm">
+                      <ShieldCheck className="w-2.5 h-2.5 text-white" />
+                      <span className="text-[8px] font-semibold text-white uppercase tracking-wide">VPN Secured</span>
                     </div>
 
                     {/* Viewer count */}
