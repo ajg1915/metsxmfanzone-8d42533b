@@ -135,7 +135,6 @@ const PodcasterApplication = lazy(() => import("./pages/PodcasterApplication"));
 const PodcasterApplicationsManagement = lazy(() => import("./pages/admin/PodcasterApplicationsManagement"));
 const DailyReports = lazy(() => import("./pages/admin/DailyReports"));
 const PredictionsManagement = lazy(() => import("./pages/admin/PredictionsManagement"));
-const TalentAssessmentManagement = lazy(() => import("./pages/admin/TalentAssessmentManagement"));
 const PollManagement = lazy(() => import("./pages/admin/PollManagement"));
 const SocialMediaSettings = lazy(() => import("./pages/admin/SocialMediaSettings"));
 const MediaLibrary = lazy(() => import("./pages/admin/MediaLibrary"));
@@ -382,7 +381,6 @@ const AppContent = () => {
               <Route path="daily-reports" element={<DailyReports />} />
               <Route path="daily-reports" element={<DailyReports />} />
               <Route path="predictions" element={<PredictionsManagement />} />
-              <Route path="talent-assessments" element={<TalentAssessmentManagement />} />
               <Route path="polls" element={<PollManagement />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="social-media" element={<SocialMediaSettings />} />
