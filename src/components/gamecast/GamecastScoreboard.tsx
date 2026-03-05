@@ -89,7 +89,7 @@ function TeamBlock({ team, side, isMets }: { team: GameData['teams']['away']; si
         />
         {isMets && (
           <Link
-            to="/metsxmfanzone-tv"
+            to="/metsxmfanzone"
             className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-0.5 text-[9px] font-bold text-primary hover:text-primary/80 bg-primary/10 border border-primary/20 rounded-full px-1.5 py-0.5 whitespace-nowrap"
           >
             <Tv className="w-2.5 h-2.5" />

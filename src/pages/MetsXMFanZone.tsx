@@ -86,7 +86,7 @@ const MetsXMFanZone = () => {
       <SEOHead
         title="MetsXMFanZone TV - Watch Live Mets Shows & Exclusive Content"
         description="Watch MetsXMFanZone TV for exclusive Mets live shows, fan discussions, and 24/7 coverage. Your ultimate destination for Mets content."
-        canonical="https://www.metsxmfanzone.com/metsxmfanzone-tv"
+        canonical="https://www.metsxmfanzone.com/metsxmfanzone"
         keywords="MetsXMFanZone TV, Mets live show, Mets fan TV, exclusive Mets content, Mets 24/7"
         ogType="video.other"
       />

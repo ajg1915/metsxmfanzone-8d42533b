@@ -411,7 +411,7 @@ const AppContent = () => {
             <Route path="/mets-roster" element={<MetsRoster />} />
             <Route path="/player/:playerId" element={<PlayerStats />} />
             <Route path="/mets-history" element={<MetsHistory />} />
-            <Route path="/metsxmfanzone-tv" element={<MetsXMFanZone />} />
+            <Route path="/metsxmfanzone" element={<MetsXMFanZone />} />
             <Route path="/mlb-network" element={<MLBNetwork />} />
             <Route path="/espn-network" element={<ESPNNetwork />} />
             <Route path="/pix11-network" element={<PIX11Network />} />

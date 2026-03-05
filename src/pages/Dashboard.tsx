@@ -164,7 +164,7 @@ const Dashboard = () => {
   const planPrice = userPlan === "free" ? "$0" : userPlan === "premium" ? "$12.99/mo" : "$129.99/yr";
 
   const quickLinks = [
-    { label: "Watch Live", icon: Tv, href: "/metsxmfanzone-tv", premium: true },
+    { label: "Watch Live", icon: Tv, href: "/metsxmfanzone", premium: true },
     { label: "Community", icon: MessageSquarePlus, href: "/community", premium: true },
     { label: "Blog", icon: BookOpen, href: "/blog", premium: true },
     { label: "Podcast", icon: Mic, href: "/podcast", premium: true },

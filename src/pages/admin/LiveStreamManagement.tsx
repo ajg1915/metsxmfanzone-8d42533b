@@ -179,7 +179,7 @@ export default function LiveStreamManagement() {
         body: {
           title: "🔴 LIVE NOW on MetsXMFanZone!",
           body: title,
-          url: "/metsxmfanzone-tv",
+          url: "/metsxmfanzone",
           icon: "/logo-192.png",
           tag: `live-stream-${streamId}`,
         },

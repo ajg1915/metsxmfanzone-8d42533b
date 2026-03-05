@@ -89,7 +89,7 @@ const Hero = () => {
 
   const defaultSlides = [
     { title: "METSXMFANZONE.TV", description: "Connect with thousands of passionate Mets fans. Watch live streams, highlights, podcasts and more.", image: heroImage, link_url: null, link_text: null, show_watch_live: true, show_reminder: true, tag: "STREAMING" },
-    { title: "Live Game Coverage", description: "Watch exclusive live streams, game highlights, and expert analysis. Never miss a moment.", image: heroImage, link_url: "/metsxmfanzone-tv", link_text: "Watch Now", show_watch_live: false, show_reminder: true, tag: "LIVE" },
+    { title: "Live Game Coverage", description: "Watch exclusive live streams, game highlights, and expert analysis. Never miss a moment.", image: heroImage, link_url: "/metsxmfanzone", link_text: "Watch Now", show_watch_live: false, show_reminder: true, tag: "LIVE" },
     { title: "MetsXMFanZone Podcast", description: "Join Anthony and the Mets Universe on the daily MetsXMFanZone podcast.", image: heroImage, link_url: "/podcast", link_text: "Listen", show_watch_live: false, show_reminder: false, tag: "PODCAST" },
   ];
 
@@ -102,7 +102,7 @@ const Hero = () => {
     ? (memberSlides.length > 0 ? mapDbSlides(memberSlides, "MEMBER") : defaultSlides)
     : (publicSlides.length > 0 ? mapDbSlides(publicSlides, "FEATURED") : defaultSlides);
 
-  const premiumRoutes = ['/live', '/metsxmfanzone-tv', '/mlb-network', '/espn-network', '/pix11-network', '/spring-training-live'];
+  const premiumRoutes = ['/live', '/metsxmfanzone', '/mlb-network', '/espn-network', '/pix11-network', '/spring-training-live'];
   const requiresPremium = (url: string) => premiumRoutes.some(r => url.toLowerCase().includes(r.toLowerCase().replace('/', '')));
 
   const handleNav = (url: string) => {
@@ -173,7 +173,7 @@ const Hero = () => {
                     <div className="relative">
                       {isLiveNow && <div className="absolute -inset-1 rounded-lg bg-destructive/40 blur-lg animate-pulse" />}
                       <Button
-                        onClick={() => handleNav("/metsxmfanzone-tv")}
+                        onClick={() => handleNav("/metsxmfanzone")}
                         className={`relative gap-1.5 bg-white text-black hover:bg-white/90 font-bold px-4 sm:px-6 h-8 sm:h-9 md:h-10 text-xs sm:text-sm rounded-sm ${isLiveNow ? "ring-2 ring-destructive/50" : ""}`}
                       >
                         <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />

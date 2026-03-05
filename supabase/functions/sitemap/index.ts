@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
       { url: '/mets-history', changefreq: 'monthly', priority: '0.75' },
       { url: '/player-stats', changefreq: 'daily', priority: '0.8' },
       { url: '/mets-gamecast', changefreq: 'daily', priority: '0.8' },
-      { url: '/metsxmfanzone-tv', changefreq: 'daily', priority: '0.85' },
+      { url: '/metsxmfanzone', changefreq: 'daily', priority: '0.85' },
       { url: '/mlb-network', changefreq: 'daily', priority: '0.8' },
       { url: '/espn-network', changefreq: 'daily', priority: '0.8' },
       { url: '/pix11-network', changefreq: 'daily', priority: '0.75' },

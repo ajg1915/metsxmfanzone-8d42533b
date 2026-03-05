@@ -569,7 +569,7 @@ export default function MatchupPage({
                     </Link>
                   </Button>
                   <Button asChild>
-                    <Link to="/metsxmfanzone-tv">
+                    <Link to="/metsxmfanzone">
                       <Play className="w-4 h-4 mr-2" />
                       Watch Live
                     </Link>

@@ -161,7 +161,7 @@ const NotificationsPanel = ({ children }: { children: React.ReactNode }) => {
       items.push({
         id: `live-${s.id}`, type: "live",
         title: s.status === "live" ? "🔴 LIVE NOW" : "Coming Soon",
-        message: s.title, time: s.updated_at, link: "/metsxmfanzone-tv",
+        message: s.title, time: s.updated_at, link: "/metsxmfanzone",
         isNew: !ls || new Date(s.updated_at) > new Date(ls),
       });
     });

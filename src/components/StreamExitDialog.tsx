@@ -18,7 +18,7 @@ interface StreamExitDialogProps {
 }
 
 export function StreamExitDialog({ 
-  streamPagePaths = ['/live', '/metsxmfanzone-tv', '/mlb-network', '/espn-network', '/pix11-network', '/spring-training-live', '/community-podcast']
+  streamPagePaths = ['/live', '/metsxmfanzone', '/mlb-network', '/espn-network', '/pix11-network', '/spring-training-live', '/community-podcast']
 }: StreamExitDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -58,7 +58,7 @@ export function StreamExitDialog({
   const handleBackToStreams = () => {
     setIsOpen(false);
     sessionStorage.removeItem('stream_exit_shown');
-    navigate('/metsxmfanzone-tv');
+    navigate('/metsxmfanzone');
   };
 
   return (

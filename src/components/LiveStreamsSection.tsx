@@ -90,7 +90,7 @@ const LiveStreamsSection = () => {
 
   const getStreamPageUrl = (stream: LiveStream) => {
     const networkPages = stream.assigned_pages.filter(page => page !== 'live' && page !== 'guide');
-    if (networkPages.includes('metsxmfanzone')) return '/metsxmfanzone-tv';
+    if (networkPages.includes('metsxmfanzone')) return '/metsxmfanzone';
     if (networkPages.includes('mlb-network')) return '/mlb-network';
     if (networkPages.includes('espn-network')) return '/espn-network';
     if (networkPages.includes('pix11-network')) return '/pix11-network';

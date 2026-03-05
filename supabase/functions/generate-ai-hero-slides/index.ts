@@ -66,7 +66,7 @@ ${contentSummary.podcasts || "No recent podcasts"}
 NEWS:
 ${contentSummary.news || "No recent news"}
 
-Valid link_url values: /auth (signup), /pricing (plans), /metsxmfanzone-tv (streams), /podcast (podcasts), /blog (blog), /community (community), /mets-roster (roster)
+Valid link_url values: /auth (signup), /pricing (plans), /metsxmfanzone (streams), /podcast (podcasts), /blog (blog), /community (community), /mets-roster (roster)
 
 Return ONLY a valid JSON array, no markdown.`
           }

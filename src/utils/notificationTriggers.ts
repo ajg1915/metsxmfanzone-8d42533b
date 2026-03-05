@@ -152,9 +152,9 @@ export const setupNotificationListeners = () => {
         
         if (stream.status === 'live') {
           const title = '🔴 LIVE NOW!';
-          await sendPushNotification(title, stream.title, '/metsxmfanzone-tv', 'live-stream');
+          await sendPushNotification(title, stream.title, '/metsxmfanzone', 'live-stream');
           await sendSMSNotification(`🔴 LIVE NOW: ${stream.title}`);
-          await sendEmailNotification(title, stream.description || stream.title, 'live_stream', '/metsxmfanzone-tv');
+          await sendEmailNotification(title, stream.description || stream.title, 'live_stream', '/metsxmfanzone');
           showBrowserNotification(title, stream.title);
         }
       }
@@ -178,9 +178,9 @@ export const setupNotificationListeners = () => {
         // Check if stream just went live
         if (oldStream.status !== 'live' && newStream.status === 'live' && newStream.published) {
           const title = '🔴 LIVE NOW!';
-          await sendPushNotification(title, newStream.title, '/metsxmfanzone-tv', 'live-stream');
+          await sendPushNotification(title, newStream.title, '/metsxmfanzone', 'live-stream');
           await sendSMSNotification(`🔴 LIVE NOW: ${newStream.title}`);
-          await sendEmailNotification(title, newStream.description || newStream.title, 'live_stream', '/metsxmfanzone-tv');
+          await sendEmailNotification(title, newStream.description || newStream.title, 'live_stream', '/metsxmfanzone');
           showBrowserNotification(title, newStream.title);
         }
         
@@ -212,7 +212,7 @@ export const setupNotificationListeners = () => {
         if (report.severity === 'high' || report.severity === 'critical') {
           const title = '⚠️ Stream Issue Detected';
           const message = report.description || 'We are experiencing technical difficulties. Please standby.';
-          await sendPushNotification(title, message, '/metsxmfanzone-tv', 'stream-issue');
+          await sendPushNotification(title, message, '/metsxmfanzone', 'stream-issue');
           showBrowserNotification(title, message);
         }
       }
@@ -236,7 +236,7 @@ export const setupNotificationListeners = () => {
         // Check if alert just became active
         if (!oldAlert.is_active && newAlert.is_active) {
           const title = '⚠️ Stream Alert';
-          await sendPushNotification(title, newAlert.message, '/metsxmfanzone-tv', 'stream-alert');
+          await sendPushNotification(title, newAlert.message, '/metsxmfanzone', 'stream-alert');
           showBrowserNotification(title, newAlert.message);
         }
       }

@@ -209,7 +209,7 @@ export default function TVHome() {
             icon="📺" 
             row={5} 
             col={0}
-            onClick={() => navigate('/metsxmfanzone-tv')} 
+            onClick={() => navigate('/metsxmfanzone')} 
           />
           <QuickAccessCard 
             id="quick-highlights"
