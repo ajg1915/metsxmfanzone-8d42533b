@@ -152,9 +152,8 @@ const MetsVsRedSox = lazy(() => import("./pages/matchups/MetsVsRedSox"));
 const MetsVsYankees = lazy(() => import("./pages/matchups/MetsVsYankees"));
 const MetsVsBlueJays = lazy(() => import("./pages/matchups/MetsVsBlueJays"));
 
-// TV Mode Pages
-const TVHome = lazy(() => import("./pages/tv/TVHome"));
-const TVPlayer = lazy(() => import("./pages/tv/TVPlayer"));
+
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -247,20 +246,8 @@ const AppContent = () => {
     };
   }, []);
 
-  // Auto-redirect to TV mode on TV devices
-  useEffect(() => {
-    const isTVRoute = location.pathname.startsWith('/tv');
-    const isAdminRoute = location.pathname.startsWith('/admin');
-    const isAuthRoute = location.pathname === '/auth' || location.pathname === '/logout';
-    
-    // Redirect to TV mode if on a TV device and not already on TV/admin/auth routes
-    if (isTV && !isTVRoute && !isAdminRoute && !isAuthRoute) {
-      // Map regular routes to TV equivalents
-      if (location.pathname === '/') {
-        navigate('/tv', { replace: true });
-      }
-    }
-  }, [isTV, location.pathname, navigate]);
+
+
 
   // Check if current route is admin route (admins should bypass maintenance)
   const isAdminRoute = location.pathname.startsWith("/admin");
@@ -287,15 +274,8 @@ const AppContent = () => {
         
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            {/* TV Mode Routes */}
-            <Route path="/tv" element={<TVHome />} />
-            <Route path="/tv/watch/:streamId" element={<TVPlayer />} />
-            <Route path="/tv/video/:videoId" element={<TVPlayer />} />
-            <Route path="/tv/live" element={<TVHome />} />
-            <Route path="/tv/highlights" element={<TVHome />} />
-            <Route path="/tv/podcasts" element={<TVHome />} />
-            <Route path="/tv/schedule" element={<TVHome />} />
-            
+
+
             <Route path="/" element={<Index />} />
             <Route path="/community" element={<Community />} />
             <Route path="/gallery" element={<Gallery />} />
