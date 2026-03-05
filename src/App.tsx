@@ -17,7 +17,7 @@ import { LiveStreamToast } from "@/components/LiveStreamToast";
 import SocialMediaBar from "@/components/SocialMediaBar";
 
 import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
-import { useDevice } from "@/hooks/use-device";
+
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Eager load critical pages
