@@ -26,7 +26,7 @@ const homeItems = [
   { title: "Hero Slides", url: "/admin/hero", icon: Layers },
   { title: "Media Library", url: "/admin/media-library", icon: FolderOpen },
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
-  { title: "Tutorials", url: "/admin/tutorials", icon: BookOpen },
+  { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
   { title: "Members", url: "/admin/user-management", icon: UserCog },
 ];
 
@@ -47,13 +47,13 @@ const settingsNavItems = [
   { title: "Backgrounds", url: "/admin/backgrounds", icon: Wallpaper },
   { title: "Social Media", url: "/admin/social-media", icon: Share2 },
   { title: "Toast Prompts", url: "/admin/toast-prompts", icon: Bell },
+  { title: "Tutorials", url: "/admin/tutorials", icon: BookOpen },
 ];
 
 // Live & Streaming
 const liveItems = [
   { title: "Push Notifications", url: "/admin/game-notifications", icon: Bell },
   { title: "Game Alerts", url: "/admin/game-alerts", icon: Megaphone },
-  { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
   { title: "Podcast Live", url: "/admin/podcast-live-stream", icon: Mic },
 ];
 
