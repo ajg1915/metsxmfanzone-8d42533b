@@ -21,7 +21,7 @@ const ReplayGamesSection = lazy(() => import("@/components/ReplayGamesSection"))
 // Spring Training 2026 - TODO: Remove this section once the 2026 spring training season concludes
 const SpringTraining = lazy(() => import("@/components/SpringTraining"));
 const PlayersToWatch = lazy(() => import("@/components/PlayersToWatch"));
-const TalentAssessmentSection = lazy(() => import("@/components/TalentAssessmentSection"));
+
 const MetsNewsTracker = lazy(() => import("@/components/MetsNewsTracker"));
 const BlogSection = lazy(() => import("@/components/BlogSection"));
 const HomeLineupCard = lazy(() => import("@/components/HomeLineupCard"));
@@ -251,11 +251,6 @@ const Index = () => {
 
         <div className="section-divider my-1" />
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <TalentAssessmentSection />
-        </Suspense>
-
-        <div className="section-divider my-1" />
 
         <Suspense fallback={<SectionSkeleton />}>
           <MetsNewsTracker />
