@@ -33,7 +33,7 @@ const Footer = () => {
           </div>
 
           {/* Security Trust Badge */}
-          <div className="flex items-center justify-center gap-2 py-2.5 my-2 border-y border-border/30">
+          <div className="flex items-center justify-center gap-2 py-2.5 my-2">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span className="text-[11px] sm:text-xs font-semibold text-emerald-500 uppercase tracking-wide">VPN Secured</span>
