@@ -6,6 +6,7 @@ import { TVHighlightCard } from "@/components/tv/TVHighlightCard";
 import { TVPodcastCard } from "@/components/tv/TVPodcastCard";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronRight } from "lucide-react";
+import { FocusableCard } from "@/components/tv/FocusableCard";
 
 interface LiveStream {
   id: string;
@@ -272,8 +273,6 @@ function QuickAccessCard({
   col: number;
   onClick: () => void;
 }) {
-  const { FocusableCard } = require('@/components/tv/FocusableCard');
-  
   return (
     <FocusableCard
       id={id}
