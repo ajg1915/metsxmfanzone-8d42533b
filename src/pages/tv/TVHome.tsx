@@ -272,8 +272,6 @@ function QuickAccessCard({
   col: number;
   onClick: () => void;
 }) {
-  const { FocusableCard } = require('@/components/tv/FocusableCard');
-  
   return (
     <FocusableCard
       id={id}
