@@ -182,7 +182,7 @@ const AppContent = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isEnabled: maintenanceEnabled, message: maintenanceMessage, isLoading } = useMaintenanceMode();
-  const { isTV } = useDevice();
+  
   
   useAutoRefresh();
   useSessionExpiryWarning();
