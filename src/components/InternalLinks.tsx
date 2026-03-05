@@ -49,7 +49,7 @@ export const metsContentLinks: InternalLink[] = [
 ];
 
 export const mediaLinks: InternalLink[] = [
-  { title: "MetsXMFanZone TV", description: "Live streaming and on-demand Mets content", href: "/metsxmfanzone-tv" },
+  { title: "MetsXMFanZone TV", description: "Live streaming and on-demand Mets content", href: "/metsxmfanzone" },
   { title: "Podcast", description: "Weekly Mets analysis, interviews, and hot takes", href: "/podcast" },
   { title: "Blog", description: "In-depth articles, analysis, and opinion pieces", href: "/blog" },
   { title: "Video Gallery", description: "Highlights, replays, and exclusive video content", href: "/video-gallery" },

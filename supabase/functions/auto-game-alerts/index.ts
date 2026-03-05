@@ -275,7 +275,7 @@ serve(async (req) => {
         continue;
       }
 
-      const linkUrl = gameType === 'S' ? '/spring-training-live' : '/metsxmfanzone-tv';
+      const linkUrl = gameType === 'S' ? '/spring-training-live' : '/metsxmfanzone';
       const alertTypeDb = gameType === 'S' ? 'spring_training' : 'game_day';
 
       const { error: insertError } = await supabase

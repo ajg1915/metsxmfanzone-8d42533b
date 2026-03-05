@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
           body: {
             title: "🔴 LIVE NOW on MetsXMFanZone!",
             body: stream.title,
-            url: "/metsxmfanzone-tv",
+            url: "/metsxmfanzone",
             icon: "/logo-192.png",
             tag: `live-stream-${stream.id}`,
           },

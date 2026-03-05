@@ -229,7 +229,7 @@ const Podcast = () => {
     {
       title: "MetsXMFanZoneTV",
       description: "Exclusive Mets live content and discussions",
-      path: "/metsxmfanzone-tv",
+      path: "/metsxmfanzone",
     },
   ];
 

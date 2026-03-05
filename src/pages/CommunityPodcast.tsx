@@ -225,7 +225,7 @@ const CommunityPodcast = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full gap-2 text-sm sm:text-base" size="lg" onClick={() => navigate("/metsxmfanzone-tv")}>
+                  <Button className="w-full gap-2 text-sm sm:text-base" size="lg" onClick={() => navigate("/metsxmfanzone")}>
                     <Play className="w-4 h-4 sm:w-5 sm:h-5" />
                     Join Live
                   </Button>
@@ -242,7 +242,7 @@ const CommunityPodcast = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button className="w-full gap-2 text-sm sm:text-base" size="lg" onClick={() => navigate("/metsxmfanzone-tv")}>
+                  <Button className="w-full gap-2 text-sm sm:text-base" size="lg" onClick={() => navigate("/metsxmfanzone")}>
                     <Play className="w-4 h-4 sm:w-5 sm:h-5" />
                     Watch Now
                   </Button>

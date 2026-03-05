@@ -26,7 +26,7 @@ const staticPages = [
   { url: "/events", changefreq: "weekly", priority: "0.75" },
   { url: "/plans", changefreq: "monthly", priority: "0.8" },
   { url: "/merch", changefreq: "weekly", priority: "0.7" },
-  { url: "/metsxmfanzone-tv", changefreq: "daily", priority: "0.85" },
+  { url: "/metsxmfanzone", changefreq: "daily", priority: "0.85" },
   { url: "/mlb-network", changefreq: "daily", priority: "0.8" },
   { url: "/espn-network", changefreq: "daily", priority: "0.8" },
   { url: "/pix11-network", changefreq: "daily", priority: "0.75" },

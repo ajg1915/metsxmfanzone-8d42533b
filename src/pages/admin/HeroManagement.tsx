@@ -432,7 +432,7 @@ const HeroManagement = () => {
 
     const { data: streams } = await supabase.from("live_streams").select("title, description, thumbnail_url").eq("status", "live").eq("published", true).limit(2);
     streams?.forEach(s => {
-      suggested.push({ title: s.title, description: s.description || "Watch live on MetsXMFanZone TV", image_url: s.thumbnail_url, link_url: "/metsxmfanzone-tv", link_text: "Watch Live", source: "Live Stream" });
+      suggested.push({ title: s.title, description: s.description || "Watch live on MetsXMFanZone TV", image_url: s.thumbnail_url, link_url: "/metsxmfanzone", link_text: "Watch Live", source: "Live Stream" });
     });
 
     const { data: podcasts } = await supabase.from("podcast_shows").select("title, description, thumbnail_url, show_date").eq("published", true).order("show_date", { ascending: false }).limit(2);

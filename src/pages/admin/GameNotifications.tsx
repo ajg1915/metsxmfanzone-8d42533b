@@ -38,7 +38,7 @@ const GameNotifications = () => {
   const [title, setTitle] = useState("🔴 Mets Game Going Live!");
   const [body, setBody] = useState("The Mets game is about to start! Tune in now to watch live.");
   const [selectedStream, setSelectedStream] = useState<string>("");
-  const [customUrl, setCustomUrl] = useState("/metsxmfanzone-tv");
+  const [customUrl, setCustomUrl] = useState("/metsxmfanzone");
 
   useEffect(() => {
     fetchSubscriberCount();
@@ -166,7 +166,7 @@ const GameNotifications = () => {
   };
 
   const quickTemplates = [
-    { title: "🔴 Mets Game Starting!", body: "The Mets are taking the field!", url: "/metsxmfanzone-tv" },
+    { title: "🔴 Mets Game Starting!", body: "The Mets are taking the field!", url: "/metsxmfanzone" },
     { title: "⚾ Spring Training Live", body: "Spring Training is about to begin!", url: "/spring-training-live" },
     { title: "🎙️ Podcast Going Live", body: "Join us for a live discussion!", url: "/community-podcast" },
     { title: "📺 MLB Network", body: "Tune in for MLB Network coverage!", url: "/mlb-network" },
@@ -275,7 +275,7 @@ const GameNotifications = () => {
               <Input
                 value={customUrl}
                 onChange={(e) => setCustomUrl(e.target.value)}
-                placeholder="/metsxmfanzone-tv"
+                placeholder="/metsxmfanzone"
                 className="h-8 text-xs"
               />
             </div>

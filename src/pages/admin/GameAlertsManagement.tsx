@@ -151,8 +151,8 @@ const GameAlertsManagement = () => {
   };
 
   const quickTemplates = [
-    { title: "⚾ Game Day Alert", message: "Mets game starting soon! Tune in live!", type: "game_day", sev: "info", url: "/metsxmfanzone-tv" },
-    { title: "🔴 LIVE NOW", message: "The Mets are LIVE! Watch now!", type: "live_stream", sev: "urgent", url: "/metsxmfanzone-tv" },
+    { title: "⚾ Game Day Alert", message: "Mets game starting soon! Tune in live!", type: "game_day", sev: "info", url: "/metsxmfanzone" },
+    { title: "🔴 LIVE NOW", message: "The Mets are LIVE! Watch now!", type: "live_stream", sev: "urgent", url: "/metsxmfanzone" },
     { title: "📢 Breaking News", message: "Major Mets news just dropped!", type: "breaking_news", sev: "warning", url: "/blog" },
     { title: "🌴 Spring Training", message: "Spring Training game starting!", type: "spring_training", sev: "info", url: "/spring-training-live" },
   ];

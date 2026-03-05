@@ -31,7 +31,7 @@ const Sitemap = () => {
         { url: '/privacy', changefreq: 'yearly', priority: '0.3' },
         { url: '/terms', changefreq: 'yearly', priority: '0.3' },
         { url: '/business-partner', changefreq: 'monthly', priority: '0.5' },
-        { url: '/metsxmfanzone-tv', changefreq: 'weekly', priority: '0.8' },
+        { url: '/metsxmfanzone', changefreq: 'weekly', priority: '0.8' },
         { url: '/mlb-network', changefreq: 'weekly', priority: '0.8' },
       ];
 

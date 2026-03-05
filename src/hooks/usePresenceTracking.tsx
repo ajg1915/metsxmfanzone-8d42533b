@@ -15,7 +15,7 @@ const getSessionId = (): string => {
 // Determine page type based on path
 const getPageType = (path: string): string => {
   if (path.startsWith('/blog/') || path === '/blog') return 'blog';
-  if (path.includes('live') || path.includes('stream') || path.includes('network') || path === '/metsxmfanzone-tv') return 'stream';
+  if (path.includes('live') || path.includes('stream') || path.includes('network') || path === '/metsxmfanzone') return 'stream';
   if (path === '/community') return 'community';
   if (path.startsWith('/admin')) return 'admin';
   return 'general';
