@@ -272,7 +272,7 @@ const LiveStreamsSection = () => {
                     </div>
 
                     {/* VPN Secured badge */}
-                    <div className="absolute bottom-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-600/80 backdrop-blur-sm">
+                    <div className="absolute bottom-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-600/80 backdrop-blur-sm">
                       <ShieldCheck className="w-2.5 h-2.5 text-white" />
                       <span className="text-[8px] font-semibold text-white uppercase tracking-wide">VPN Secured</span>
                     </div>
