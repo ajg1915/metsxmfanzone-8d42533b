@@ -162,7 +162,7 @@ const CommunityPreviewSection = () => {
             </div>
             <h2 className="text-sm sm:text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2 sm:gap-3 leading-tight text-left">
               <img src={logo} alt="MetsXMFanZone" className="w-6 h-6 sm:w-10 sm:h-10 shrink-0" />
-              <span className="break-words">MetsXMFanZone Community</span>
+              <span className="break-words text-xl">MetsXMFanZone Community</span>
             </h2>
             <p className="text-[10px] sm:text-base text-muted-foreground mt-1 sm:mt-2 max-w-md">
               Join the conversation with 50k passionate Mets fans
