@@ -94,7 +94,7 @@ export default function GamecastBanner() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-[10px] sm:text-sm font-black uppercase tracking-wider sm:tracking-widest text-foreground">
-                  Watch Gamecast
+                  Gamecast
                 </span>
                 {isLive && (
                   <span className="flex items-center gap-0.5 sm:gap-1 text-[7px] sm:text-[9px] font-bold text-destructive bg-destructive/10 border border-destructive/20 rounded-full px-1.5 sm:px-2 py-0.5 shadow-sm">
