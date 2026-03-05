@@ -1,8 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-
-
-
+import { ShieldCheck, Lock } from "lucide-react";
 
 const Footer = () => {
   const navigate = useNavigate();
@@ -33,6 +31,22 @@ const Footer = () => {
               <Link to="/terms" className="text-foreground/70 hover:text-primary transition-colors">Terms</Link>
             </div>
           </div>
+
+          {/* Security Trust Badge */}
+          <div className="flex items-center justify-center gap-2 py-2.5 my-2 border-y border-border/30">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+              <span className="text-[11px] sm:text-xs font-semibold text-emerald-500 uppercase tracking-wide">VPN Secured</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+              <Lock className="w-3.5 h-3.5 text-primary" />
+              <span className="text-[11px] sm:text-xs font-semibold text-primary uppercase tracking-wide">AES-256 Encrypted</span>
+            </div>
+          </div>
+          <p className="text-[10px] text-center text-muted-foreground/60 mb-2">
+            Your data is protected with enterprise-grade VPN security and end-to-end AES-256 encryption.
+          </p>
+
           <div className="border-t border-border/40 pt-2 text-center space-y-0.5">
             <p 
               onClick={handleSecretClick}
