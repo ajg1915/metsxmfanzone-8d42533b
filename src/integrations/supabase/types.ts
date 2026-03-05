@@ -456,63 +456,6 @@ export type Database = {
         }
         Relationships: []
       }
-      daily_talent_assessments: {
-        Row: {
-          arm_grade: string | null
-          assessment_date: string
-          created_at: string
-          fielding_grade: string | null
-          hitting_grade: string | null
-          id: string
-          opinion: string
-          overall_grade: string
-          pitching_grade: string | null
-          player_id: number | null
-          player_image_url: string | null
-          player_name: string
-          position: string | null
-          power_grade: string | null
-          speed_grade: string | null
-          updated_at: string
-        }
-        Insert: {
-          arm_grade?: string | null
-          assessment_date?: string
-          created_at?: string
-          fielding_grade?: string | null
-          hitting_grade?: string | null
-          id?: string
-          opinion: string
-          overall_grade: string
-          pitching_grade?: string | null
-          player_id?: number | null
-          player_image_url?: string | null
-          player_name: string
-          position?: string | null
-          power_grade?: string | null
-          speed_grade?: string | null
-          updated_at?: string
-        }
-        Update: {
-          arm_grade?: string | null
-          assessment_date?: string
-          created_at?: string
-          fielding_grade?: string | null
-          hitting_grade?: string | null
-          id?: string
-          opinion?: string
-          overall_grade?: string
-          pitching_grade?: string | null
-          player_id?: number | null
-          player_image_url?: string | null
-          player_name?: string
-          position?: string | null
-          power_grade?: string | null
-          speed_grade?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       email_confirmation_tokens: {
         Row: {
           confirmed_at: string | null
