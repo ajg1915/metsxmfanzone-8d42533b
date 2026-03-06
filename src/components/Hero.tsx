@@ -163,7 +163,7 @@ const Hero = () => {
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                   {slide.show_watch_live && (
                     <div className="relative">
-                      {isLiveNow && <div className="absolute -inset-1 rounded-lg bg-destructive/40 blur-lg animate-pulse" />}
+                      {isLiveNow && <div className="absolute -inset-1 rounded-lg bg-destructive/40 blur-lg" />}
                       <Button
                         onClick={() => handleNav("/metsxmfanzone")}
                         className={`relative gap-1.5 bg-white text-black hover:bg-white/90 font-bold px-4 sm:px-6 h-8 sm:h-9 md:h-10 text-xs sm:text-sm rounded-sm ${isLiveNow ? "ring-2 ring-destructive/50" : ""}`}
@@ -206,7 +206,7 @@ const Hero = () => {
                 {/* Signup banner */}
                 {!user && (
                   <div className="mt-3 sm:mt-4">
-                    <button onClick={() => navigate("/auth")} className="text-[10px] sm:text-xs text-white/60 hover:text-white/80 transition-colors">
+                    <button onClick={() => navigate("/auth")} className="text-[10px] sm:text-xs text-white/60 hover:text-white/80">
                       ⚡ <span className="text-primary font-semibold">FREE Spring Training</span> access · Regular season <span className="text-primary font-semibold">$12.99/mo</span>
                     </button>
                   </div>
@@ -220,10 +220,10 @@ const Hero = () => {
       {/* Nav arrows */}
       {slidesToShow.length > 1 && (
         <>
-          <button onClick={() => emblaApi?.scrollPrev()} className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white transition-all opacity-0 group-hover/hero:opacity-100" aria-label="Previous">
+          <button onClick={() => emblaApi?.scrollPrev()} className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white" aria-label="Previous">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <button onClick={() => emblaApi?.scrollNext()} className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white transition-all opacity-0 group-hover/hero:opacity-100" aria-label="Next">
+          <button onClick={() => emblaApi?.scrollNext()} className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white" aria-label="Next">
             <ChevronRight className="w-4 h-4" />
           </button>
         </>
@@ -235,7 +235,7 @@ const Hero = () => {
           <button
             key={i}
             onClick={() => emblaApi?.scrollTo(i)}
-            className={`h-[3px] rounded-full transition-all duration-500 ${selectedIndex === i ? "w-5 sm:w-7 bg-white" : "w-1.5 sm:w-2 bg-white/30 hover:bg-white/50"}`}
+            className={`h-[3px] rounded-full ${selectedIndex === i ? "w-5 sm:w-7 bg-white" : "w-1.5 sm:w-2 bg-white/30 hover:bg-white/50"}`}
           />
         ))}
       </div>
