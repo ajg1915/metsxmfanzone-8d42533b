@@ -153,13 +153,13 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
           </div>
 
           {/* Image */}
-          <div className="relative h-24 sm:h-28 overflow-hidden rounded-t-2xl bg-muted/30">
+          <div className="relative h-24 sm:h-28 overflow-hidden rounded-t-2xl">
             <img 
               src={step.image_url || heroImage} 
               alt={step.title}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-background/10 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
             
             {/* Logo */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-10">
