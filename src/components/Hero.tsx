@@ -49,12 +49,6 @@ const Hero = () => {
     }
   };
 
-  // Auto-advance
-  useEffect(() => {
-    if (!emblaApi) return;
-    const t = setInterval(() => emblaApi.scrollNext(), 10000);
-    return () => clearInterval(t);
-  }, [emblaApi]);
 
   // Live check
   useEffect(() => {
