@@ -122,7 +122,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   return (
     <Dialog open={open} onOpenChange={() => handleSkip()}>
       <DialogContent 
-        className="max-w-[90vw] sm:max-w-[380px] p-0 gap-0 overflow-hidden border-0 rounded-2xl bg-transparent shadow-2xl [&>button]:hidden"
+        className="max-w-[85vw] sm:max-w-[340px] max-h-[80vh] p-0 gap-0 overflow-hidden border-0 rounded-2xl bg-transparent shadow-2xl [&>button]:hidden"
         onPointerDownOutside={() => handleSkip()}
         onEscapeKeyDown={() => handleSkip()}
       >
@@ -158,7 +158,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
           </div>
 
           {/* Image section with animation */}
-          <div className="relative h-48 sm:h-56 overflow-hidden">
+          <div className="relative h-36 sm:h-44 overflow-hidden">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentStep}
@@ -189,16 +189,16 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-orange-600 p-0.5 shadow-lg shadow-primary/30">
-                <div className="w-full h-full rounded-2xl bg-background flex items-center justify-center overflow-hidden">
-                  <img src={logoIcon} alt="MetsXMFanZone" className="w-9 h-9 object-contain" />
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-orange-600 p-0.5 shadow-lg shadow-primary/30">
+                <div className="w-full h-full rounded-xl bg-background flex items-center justify-center overflow-hidden">
+                  <img src={logoIcon} alt="MetsXMFanZone" className="w-7 h-7 object-contain" />
                 </div>
               </div>
             </motion.div>
           </div>
 
           {/* Content */}
-          <div className="px-5 pt-10 pb-5 space-y-4">
+          <div className="px-4 pt-8 pb-4 space-y-3">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div 
                 key={`content-${currentStep}`}
@@ -210,10 +210,10 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="text-center space-y-2"
               >
-                <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary via-orange-400 to-primary bg-clip-text text-transparent">
+                <h2 className="text-base sm:text-lg font-bold bg-gradient-to-r from-primary via-orange-400 to-primary bg-clip-text text-transparent">
                   {step.title}
                 </h2>
-                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
                   {step.description}
                 </p>
               </motion.div>
@@ -244,20 +244,20 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
             </div>
 
             {/* Navigation buttons */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 onClick={handlePrevious}
                 disabled={currentStep === 0}
-                className="flex-1 h-11 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30"
+                className="flex-1 h-9 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-30 text-xs"
               >
-                <ChevronLeft className="w-4 h-4 mr-1" />
+                <ChevronLeft className="w-3.5 h-3.5 mr-1" />
                 Back
               </Button>
 
               <Button
                 onClick={handleNext}
-                className={`flex-1 h-11 rounded-xl font-medium transition-all ${
+                className={`flex-1 h-9 rounded-xl font-medium text-xs transition-all ${
                   isLastStep 
                     ? 'bg-gradient-to-r from-primary via-orange-500 to-primary hover:opacity-90 shadow-lg shadow-primary/30' 
                     : 'bg-gradient-to-r from-primary to-orange-500 hover:opacity-90'
