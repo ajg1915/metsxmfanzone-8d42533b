@@ -122,7 +122,6 @@ const Hero = () => {
               style={{
                 opacity: selectedIndex === index ? 1 : 0,
                 zIndex: selectedIndex === index ? 10 : 0,
-                transition: "opacity 0.8s ease-in-out",
                 pointerEvents: selectedIndex === index ? "auto" : "none",
               }}
             >
@@ -131,8 +130,6 @@ const Hero = () => {
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                 style={{
                   backgroundImage: `url(${slide.image})`,
-                  transform: selectedIndex === index ? "scale(1)" : "scale(1.08)",
-                  transition: "transform 8s ease-out",
                 }}
               />
 
