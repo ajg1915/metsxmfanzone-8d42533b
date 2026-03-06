@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-stadium.jpg";
 import logoIcon from "@/assets/metsxmfanzone-logo.png";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
+
 interface OnboardingStep {
   id: string;
   step_number: number;
@@ -23,6 +25,7 @@ interface OnboardingWalkthroughProps {
 
 const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps = [] }: OnboardingWalkthroughProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [open, setOpen] = useState(false);
   const [steps, setSteps] = useState<OnboardingStep[]>([]);
@@ -35,7 +38,18 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       setOpen(true);
       setLoading(false);
     } else {
-      // Don't show if already dismissed this session
+      // If user is signed in, don't show until next login session
+      if (user) {
+        const shownThisSession = sessionStorage.getItem('onboarding_shown_session');
+        if (shownThisSession === user.id) {
+          setLoading(false);
+          return;
+        }
+        // Mark as shown for this login session
+        sessionStorage.setItem('onboarding_shown_session', user.id);
+      }
+
+      // Don't show if already dismissed this browser session
       const dismissed = sessionStorage.getItem('onboarding_dismissed');
       if (dismissed === 'true') {
         setLoading(false);
@@ -43,7 +57,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       }
       fetchAndShow();
     }
-  }, [previewMode, previewSteps]);
+  }, [previewMode, previewSteps, user]);
 
   const fetchAndShow = async () => {
     try {
