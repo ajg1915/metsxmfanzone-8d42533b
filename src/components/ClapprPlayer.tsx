@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useId } from "react";
 
 declare global {
   interface Window {
@@ -21,47 +21,54 @@ export function ClapprPlayer({
   pageTitle = "Live Stream",
   pageDescription = "Watch live content",
 }: ClapprPlayerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerId = useRef(`clappr-${Math.random().toString(36).slice(2, 9)}`);
   const playerRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!containerRef.current || !window.Clappr) {
-      // Retry if Clappr CDN hasn't loaded yet
-      const retryTimeout = setTimeout(() => {
-        if (containerRef.current && window.Clappr && !playerRef.current) {
-          initPlayer();
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const initPlayer = () => {
+      const el = document.getElementById(containerId.current);
+      if (!el || !window.Clappr) return false;
+
+      // Destroy existing player first
+      if (playerRef.current) {
+        playerRef.current.destroy();
+        playerRef.current = null;
+      }
+
+      playerRef.current = new window.Clappr.Player({
+        source,
+        parentId: `#${containerId.current}`,
+        width: "100%",
+        height: "100%",
+        autoPlay,
+      });
+      return true;
+    };
+
+    if (!initPlayer()) {
+      // Retry until Clappr CDN loads
+      let attempts = 0;
+      const retry = () => {
+        attempts++;
+        if (attempts > 10) return;
+        if (!initPlayer()) {
+          retryTimer = setTimeout(retry, 500);
         }
-      }, 1000);
-      return () => clearTimeout(retryTimeout);
+      };
+      retryTimer = setTimeout(retry, 500);
     }
 
-    initPlayer();
-
     return () => {
+      if (retryTimer) clearTimeout(retryTimer);
       if (playerRef.current) {
         playerRef.current.destroy();
         playerRef.current = null;
       }
     };
-  }, [source]);
-
-  const initPlayer = () => {
-    if (!containerRef.current || !window.Clappr) return;
-
-    // Destroy existing player first
-    if (playerRef.current) {
-      playerRef.current.destroy();
-      playerRef.current = null;
-    }
-
-    playerRef.current = new window.Clappr.Player({
-      source,
-      parentId: `#${containerRef.current.id}`,
-      width: "100%",
-      height: "100%",
-      autoPlay,
-    });
-  };
+  }, [source, autoPlay]);
 
   return (
     <div className="mb-8 rounded-lg border border-border bg-card overflow-hidden">
@@ -71,9 +78,9 @@ export function ClapprPlayer({
       </div>
       <div className="p-4 sm:p-6">
         <div
-          id="clappr-player-container"
+          id={containerId.current}
           ref={containerRef}
-          className="relative w-full min-h-[240px] sm:min-h-[320px] landscape:min-h-[50vh] bg-black rounded-lg overflow-hidden"
+          className="relative w-full min-h-[240px] sm:min-h-[320px] landscape:min-h-[50vh] bg-black rounded-lg overflow-hidden [&>div]:!w-full [&>div]:!h-full [&>div]:!absolute"
           style={{ aspectRatio: "16/9" }}
         />
       </div>
