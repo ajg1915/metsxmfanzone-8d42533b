@@ -122,7 +122,6 @@ const Hero = () => {
               style={{
                 opacity: selectedIndex === index ? 1 : 0,
                 zIndex: selectedIndex === index ? 10 : 0,
-                transition: "opacity 0.8s ease-in-out",
                 pointerEvents: selectedIndex === index ? "auto" : "none",
               }}
             >
@@ -131,8 +130,6 @@ const Hero = () => {
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                 style={{
                   backgroundImage: `url(${slide.image})`,
-                  transform: selectedIndex === index ? "scale(1)" : "scale(1.08)",
-                  transition: "transform 8s ease-out",
                 }}
               />
 
@@ -143,11 +140,6 @@ const Hero = () => {
               {/* Content overlay — bottom-left like Netflix */}
               <div
                 className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 lg:p-12 pb-12 sm:pb-14 md:pb-16"
-                style={{
-                  opacity: selectedIndex === index ? 1 : 0,
-                  transform: selectedIndex === index ? "translateY(0)" : "translateY(16px)",
-                  transition: "opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s",
-                }}
               >
                 {/* Logo + tag */}
                 <div className="flex items-center gap-2 mb-2 sm:mb-3">
