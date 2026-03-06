@@ -3,8 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
-import "videojs-landscape-fullscreen";
-import { useStreamHealthMonitor } from "./StreamHealthMonitor";
 import { StreamAlertBanner } from "./StreamAlertBanner";
 
 interface LiveStream {
@@ -34,12 +32,6 @@ export function StreamPlayer({
   const [playerReady, setPlayerReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
-
-  // Initialize health monitoring - only when player is ready
-  useStreamHealthMonitor({
-    player: playerReady ? playerRef.current : null,
-    streamId: stream?.id || ''
-  });
 
   useEffect(() => {
     fetchStream();
@@ -106,18 +98,15 @@ export function StreamPlayer({
         html5: {
           vhs: {
             overrideNative: !useNativeHLS,
-            // Low-latency HLS tuning
             fastQualityChange: true,
             handlePartialData: true,
-            maxPlaylistRetries: 10,
-            smoothQualityChange: true,
+            maxPlaylistRetries: 5,
+            smoothQualityChange: false,
             allowSeeksWithinUnsafeLiveWindow: true,
-            experimentalLLHLS: true,
-            useNetworkInformationApi: true,
-            // Buffer tuning — keep buffers small for live
+            useNetworkInformationApi: false,
             ...(useNativeHLS ? {} : {
-              bandwidth: 5000000, // Start with 5Mbps estimate
-              enableLowInitialPlaylist: false,
+              bandwidth: 3000000,
+              enableLowInitialPlaylist: true,
             }),
           },
           nativeVideoTracks: useNativeHLS,
@@ -125,23 +114,13 @@ export function StreamPlayer({
           nativeTextTracks: useNativeHLS
         },
         liveTracker: {
-          trackingThreshold: 0.5,  // How far behind live edge before seeking
-          liveTolerance: 15,       // Seconds behind live edge allowed
+          trackingThreshold: 1,
+          liveTolerance: 20,
         },
         sources: [{
           src: stream.stream_url,
           type: 'application/x-mpegURL'
         }]
-      });
-
-      // Enable landscape fullscreen plugin
-      playerRef.current.landscapeFullscreen({
-        fullscreen: {
-          enterOnRotate: true,
-          exitOnRotate: true,
-          lockOnRotate: true,
-          lockToLandscapeOnEnter: true
-        }
       });
 
       playerRef.current.ready(() => {

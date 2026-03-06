@@ -35,8 +35,9 @@ const SpringTrainingLive = () => {
     }
   }, [user, loading, navigate]);
 
+  // Defer blog fetch so stream player loads first
   useEffect(() => {
-    const fetchBlogPosts = async () => {
+    const timer = setTimeout(async () => {
       const { data } = await supabase
         .from("blog_posts")
         .select("id, title, slug, excerpt, featured_image_url, category, published_at")
@@ -47,9 +48,8 @@ const SpringTrainingLive = () => {
       if (data) {
         setBlogPosts(data as BlogPost[]);
       }
-    };
-
-    fetchBlogPosts();
+    }, 3000);
+    return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
@@ -72,14 +72,8 @@ const SpringTrainingLive = () => {
       <Navigation />
 
       <main className="flex-1 pt-12">
-        {/* Hero Banner */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#00843D] via-[#006B32] to-background">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-96 h-96 bg-primary/15 rounded-full blur-3xl opacity-40" />
-            <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-[#00843D]/20 rounded-full blur-3xl opacity-30" />
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#FFD700]/10 rounded-full blur-3xl opacity-40" />
-            <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,132,61,0.02)_50%)] bg-[length:100%_4px] pointer-events-none" />
-          </div>
+        {/* Hero Banner - lightweight for TV browsers */}
+        <div className="relative overflow-hidden bg-[#00843D]">
           
           <div className="container mx-auto px-4 py-8 sm:py-12 relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -115,11 +109,11 @@ const SpringTrainingLive = () => {
                 </div>
                 
                 <div className="flex flex-wrap gap-3 mt-4">
-                  <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-2 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 bg-background/50 px-3 py-2 rounded-lg border border-border/50">
                     <MapPin className="w-4 h-4 text-primary" />
                     <span className="text-xs text-foreground">Port St. Lucie, FL</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-2 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 bg-background/50 px-3 py-2 rounded-lg border border-border/50">
                     <Clock className="w-4 h-4 text-[#00843D]" />
                     <span className="text-xs text-foreground">Live Coverage</span>
                   </div>
