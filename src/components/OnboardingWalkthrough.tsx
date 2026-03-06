@@ -92,13 +92,11 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   };
 
   const handleComplete = () => {
-    sessionStorage.setItem('onboarding_dismissed', 'true');
     onComplete();
     setOpen(false);
   };
 
   const handleSkip = () => {
-    sessionStorage.setItem('onboarding_dismissed', 'true');
     onComplete();
     setOpen(false);
   };
