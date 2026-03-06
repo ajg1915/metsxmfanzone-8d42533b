@@ -35,11 +35,11 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       setOpen(true);
       setLoading(false);
     } else {
-      checkForUpdatesAndFetch();
+      fetchAndShow();
     }
   }, [previewMode, previewSteps]);
 
-  const checkForUpdatesAndFetch = async () => {
+  const fetchAndShow = async () => {
     try {
       const { data, error } = await supabase
         .from("tutorial_steps")
@@ -50,18 +50,8 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       if (error) throw error;
       
       if (data && data.length > 0) {
-        const latestUpdate = data.reduce((latest, step) => {
-          const stepTime = new Date(step.updated_at).getTime();
-          return stepTime > latest ? stepTime : latest;
-        }, 0);
-
-        const lastSeenTime = localStorage.getItem('tutorialLastSeen');
-        const lastSeen = lastSeenTime ? parseInt(lastSeenTime, 10) : 0;
-
-        if (latestUpdate > lastSeen) {
-          setSteps(data as OnboardingStep[]);
-          setOpen(true);
-        }
+        setSteps(data as OnboardingStep[]);
+        setOpen(true);
       }
     } catch (error) {
       console.error("Error fetching tutorial steps:", error);
@@ -92,13 +82,11 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   };
 
   const handleComplete = () => {
-    localStorage.setItem('tutorialLastSeen', Date.now().toString());
     onComplete();
     setOpen(false);
   };
 
   const handleSkip = () => {
-    localStorage.setItem('tutorialLastSeen', Date.now().toString());
     onComplete();
     setOpen(false);
   };
