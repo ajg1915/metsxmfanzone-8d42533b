@@ -35,6 +35,12 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       setOpen(true);
       setLoading(false);
     } else {
+      // Don't show if already dismissed this session
+      const dismissed = sessionStorage.getItem('onboarding_dismissed');
+      if (dismissed === 'true') {
+        setLoading(false);
+        return;
+      }
       fetchAndShow();
     }
   }, [previewMode, previewSteps]);
@@ -82,11 +88,13 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   };
 
   const handleComplete = () => {
+    sessionStorage.setItem('onboarding_dismissed', 'true');
     onComplete();
     setOpen(false);
   };
 
   const handleSkip = () => {
+    sessionStorage.setItem('onboarding_dismissed', 'true');
     onComplete();
     setOpen(false);
   };
