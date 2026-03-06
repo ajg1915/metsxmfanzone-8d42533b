@@ -6,7 +6,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
 import MetsRSSFeed from "@/components/MetsRSSFeed";
-import { StreamPlayer } from "@/components/StreamPlayer";
+import { ClapprPlayer } from "@/components/ClapprPlayer";
 import SEOHead from "@/components/SEOHead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -147,8 +147,7 @@ const SpringTrainingLive = () => {
         {/* Stream Player Section */}
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="max-w-6xl mx-auto">
-            <StreamPlayer
-              pageName="spring-training-live"
+            <ClapprPlayer
               pageTitle="Spring Training Live Stream"
               pageDescription="Live coverage from Clover Park"
             />
