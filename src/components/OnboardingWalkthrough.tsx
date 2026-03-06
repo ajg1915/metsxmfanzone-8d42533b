@@ -158,7 +158,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
           </div>
 
           {/* Image section with animation */}
-          <div className="relative h-36 sm:h-44 overflow-hidden">
+          <div className="relative h-28 sm:h-36 overflow-hidden">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentStep}
