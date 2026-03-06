@@ -141,18 +141,24 @@ export function StreamPlayer({
         playerRef.current.on('dispose', () => clearInterval(liveEdgeInterval));
       });
 
+      // Capped retry with exponential backoff
+      let retryCount = 0;
+      const MAX_RETRIES = 3;
       playerRef.current.on('error', (e: any) => {
         console.error('Video.js error:', e);
         const error = playerRef.current?.error();
-        if (error) {
-          console.error('Error details:', error.message, error.code);
+        if (error && retryCount < MAX_RETRIES) {
+          retryCount++;
+          const delay = Math.min(2000 * Math.pow(2, retryCount - 1), 16000);
+          console.log(`Retry ${retryCount}/${MAX_RETRIES} in ${delay}ms`);
           setTimeout(() => {
             if (playerRef.current && stream) {
-              console.log('Retrying stream source...');
               playerRef.current.src({ src: stream.stream_url, type: 'application/x-mpegURL' });
               playerRef.current.play();
             }
-          }, 2000);
+          }, delay);
+        } else if (retryCount >= MAX_RETRIES) {
+          console.error('Max retries reached, stopping.');
         }
       });
     }

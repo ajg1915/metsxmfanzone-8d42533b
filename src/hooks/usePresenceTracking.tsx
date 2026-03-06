@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
-// Generate a unique session ID for anonymous tracking
 const getSessionId = (): string => {
   let sessionId = sessionStorage.getItem('presence_session_id');
   if (!sessionId) {
@@ -12,7 +11,6 @@ const getSessionId = (): string => {
   return sessionId;
 };
 
-// Determine page type based on path
 const getPageType = (path: string): string => {
   if (path.startsWith('/blog/') || path === '/blog') return 'blog';
   if (path.includes('live') || path.includes('stream') || path.includes('network') || path === '/metsxmfanzone') return 'stream';
@@ -21,16 +19,12 @@ const getPageType = (path: string): string => {
   return 'general';
 };
 
-// Determine referrer source for traffic analytics
 const getReferrerSource = (): string => {
   const referrer = document.referrer.toLowerCase();
   const storedSource = sessionStorage.getItem('referrer_source');
-  
-  // Return stored source if already determined this session
   if (storedSource) return storedSource;
   
   let source = 'direct';
-  
   if (!referrer) {
     source = 'direct';
   } else if (referrer.includes('google.') || referrer.includes('bing.') || referrer.includes('yahoo.') || referrer.includes('duckduckgo.') || referrer.includes('baidu.')) {
@@ -40,8 +34,6 @@ const getReferrerSource = (): string => {
   } else if (!referrer.includes(window.location.hostname)) {
     source = 'referral';
   }
-  
-  // Store for this session
   sessionStorage.setItem('referrer_source', source);
   return source;
 };
@@ -50,56 +42,59 @@ export const usePresenceTracking = () => {
   const location = useLocation();
   const sessionId = useRef(getSessionId());
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const userRef = useRef<string | null>(null);
+  const checkedAuth = useRef(false);
+
+  // Check auth once on mount, not every 60s
+  useEffect(() => {
+    if (checkedAuth.current) return;
+    checkedAuth.current = true;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      userRef.current = user?.id || null;
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
-    const updatePresence = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const pageType = getPageType(location.pathname);
+    // Skip presence for anonymous users — they fail RLS anyway
+    // We'll do one deferred check
+    const timer = setTimeout(() => {
+      if (!userRef.current) return; // anonymous — skip entirely
 
-        // Use upsert to handle both insert and update
-        await supabase.from('realtime_presence').upsert({
-          session_id: sessionId.current,
-          current_page: location.pathname,
-          page_type: pageType,
-          user_id: user?.id || null,
-          is_authenticated: !!user,
-          user_agent: navigator.userAgent,
-          last_seen_at: new Date().toISOString(),
-          referrer_source: getReferrerSource(),
-        }, {
-          onConflict: 'session_id'
-        });
-      } catch (error) {
-        // Silently fail - don't disrupt user experience
-        console.debug('Presence tracking error:', error);
-      }
-    };
+      const updatePresence = async () => {
+        try {
+          await supabase.from('realtime_presence').upsert({
+            session_id: sessionId.current,
+            current_page: location.pathname,
+            page_type: getPageType(location.pathname),
+            user_id: userRef.current,
+            is_authenticated: true,
+            user_agent: navigator.userAgent,
+            last_seen_at: new Date().toISOString(),
+            referrer_source: getReferrerSource(),
+          }, { onConflict: 'session_id' });
+        } catch {
+          // Silently fail
+        }
+      };
 
-    // Update immediately on page change
-    updatePresence();
+      updatePresence();
+      // Reduced from 30s to 60s
+      intervalRef.current = setInterval(updatePresence, 60000);
+    }, 3000); // Defer 3s so it doesn't block initial render
 
-    // Update every 30 seconds to keep presence alive
-    intervalRef.current = setInterval(updatePresence, 30000);
-
-    // Cleanup on unmount
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      clearTimeout(timer);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [location.pathname]);
 
-  // Cleanup presence on window unload
   useEffect(() => {
     const handleBeforeUnload = async () => {
+      if (!userRef.current) return;
       try {
         await supabase.from('realtime_presence').delete().eq('session_id', sessionId.current);
-      } catch (error) {
-        // Ignore errors on unload
-      }
+      } catch {}
     };
-
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
@@ -116,19 +111,16 @@ export const useBlogViewTracking = (blogPostId: string | undefined) => {
       try {
         const sessionId = getSessionId();
         const { data: { user } } = await supabase.auth.getUser();
-
         await supabase.from('blog_views').insert({
           blog_post_id: blogPostId,
           user_id: user?.id || null,
           session_id: sessionId,
         });
-
         hasTracked.current = true;
-      } catch (error) {
-        console.debug('Blog view tracking error:', error);
+      } catch {
+        // silent
       }
     };
-
     trackView();
   }, [blogPostId]);
 };
@@ -144,19 +136,16 @@ export const useStreamViewTracking = (streamId: string | undefined) => {
       try {
         const sessionId = getSessionId();
         const { data: { user } } = await supabase.auth.getUser();
-
         await supabase.from('stream_views').insert({
           stream_id: streamId,
           user_id: user?.id || null,
           session_id: sessionId,
         });
-
         hasTracked.current = true;
-      } catch (error) {
-        console.debug('Stream view tracking error:', error);
+      } catch {
+        // silent
       }
     };
-
     trackView();
   }, [streamId]);
 };

@@ -1,13 +1,12 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 
 import Footer from "@/components/Footer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { setupNotificationListeners } from "@/utils/notificationTriggers";
+import LazySection from "@/components/LazySection";
 
-import { useAutoLineupFetch } from "@/hooks/useAutoLineupFetch";
 import { useAuth } from "@/hooks/useAuth";
 
 // Lazy load heavy components that are below the fold
@@ -138,13 +137,7 @@ const Index = () => {
   const [lineupLoaded, setLineupLoaded] = useState(false);
   const [lineupGameDate, setLineupGameDate] = useState<string | null>(null);
 
-  // Auto-fetch Mets lineup on game days (every 30 minutes)
-  useAutoLineupFetch();
-
-  useEffect(() => {
-    const cleanup = setupNotificationListeners();
-    return cleanup;
-  }, []);
+  // Auto lineup fetch removed from homepage to reduce load — triggered by admin instead
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -177,6 +170,7 @@ const Index = () => {
       <main className="relative z-10">
         <Hero />
 
+        {/* Above-the-fold: mount immediately */}
         <Suspense fallback={<SectionSkeleton height="h-16" />}>
           <GamecastBanner />
         </Suspense>
@@ -193,95 +187,119 @@ const Index = () => {
           <LiveStreamsSection />
         </Suspense>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <SpringTrainingGamesSection />
-        </Suspense>
+        {/* Below-the-fold: only mount when scrolled into view */}
+        <LazySection fallback={<SectionSkeleton />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <SpringTrainingGamesSection />
+          </Suspense>
+        </LazySection>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <GameHighlightsSection />
-        </Suspense>
+        <LazySection fallback={<SectionSkeleton />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <GameHighlightsSection />
+          </Suspense>
+        </LazySection>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <ReplayGamesSection />
-        </Suspense>
+        <LazySection fallback={<SectionSkeleton />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <ReplayGamesSection />
+          </Suspense>
+        </LazySection>
 
         <div className="section-divider my-1" />
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <BlogSection />
-        </Suspense>
+        <LazySection fallback={<SectionSkeleton />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <BlogSection />
+          </Suspense>
+        </LazySection>
 
-        <Suspense fallback={<SectionSkeleton height="h-48" />}>
-          <HomeLineupCard onLineupLoaded={(gameDate) => {
-            setLineupLoaded(true);
-            setLineupGameDate(gameDate ?? null);
-          }} />
-        </Suspense>
+        <LazySection fallback={<SectionSkeleton height="h-48" />}>
+          <Suspense fallback={<SectionSkeleton height="h-48" />}>
+            <HomeLineupCard onLineupLoaded={(gameDate) => {
+              setLineupLoaded(true);
+              setLineupGameDate(gameDate ?? null);
+            }} />
+          </Suspense>
+        </LazySection>
 
-        {/* Anthony's Predictions - always shown after lineup loads */}
         {lineupLoaded && (
           <>
             <div className="section-divider my-1" />
-            <Suspense fallback={<SectionSkeleton />}>
-              <PlayersToWatch lineupGameDate={lineupGameDate} />
-            </Suspense>
+            <LazySection fallback={<SectionSkeleton />}>
+              <Suspense fallback={<SectionSkeleton />}>
+                <PlayersToWatch lineupGameDate={lineupGameDate} />
+              </Suspense>
+            </LazySection>
           </>
         )}
 
-        {/* MetsXMFanZone Radio - directly after Predictions */}
         <div className="section-divider my-1" />
-        <Suspense fallback={<SectionSkeleton />}>
-          <PodcastSection />
-        </Suspense>
+        <LazySection fallback={<SectionSkeleton />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <PodcastSection />
+          </Suspense>
+        </LazySection>
 
         <div className="section-divider my-1" />
 
         <div id="social">
-          <Suspense fallback={<SectionSkeleton />}>
-            <CommunityPreviewSection />
-          </Suspense>
+          <LazySection fallback={<SectionSkeleton />}>
+            <Suspense fallback={<SectionSkeleton />}>
+              <CommunityPreviewSection />
+            </Suspense>
+          </LazySection>
         </div>
 
-        {/* Spring Training 2026 - TODO: Remove once spring training season concludes */}
         <div className="section-divider my-1" />
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <SpringTraining />
-        </Suspense>
+        <LazySection fallback={<SectionSkeleton />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <SpringTraining />
+          </Suspense>
+        </LazySection>
 
         <div className="section-divider my-1" />
 
-
-
-        <Suspense fallback={<SectionSkeleton height="h-48" />}>
-          <JoinPodcastSection />
-        </Suspense>
+        <LazySection fallback={<SectionSkeleton height="h-48" />}>
+          <Suspense fallback={<SectionSkeleton height="h-48" />}>
+            <JoinPodcastSection />
+          </Suspense>
+        </LazySection>
 
         <div className="section-divider my-1" />
 
         {!user && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <FAQSection />
-          </Suspense>
+          <LazySection fallback={<SectionSkeleton />}>
+            <Suspense fallback={<SectionSkeleton />}>
+              <FAQSection />
+            </Suspense>
+          </LazySection>
         )}
 
         <div className="section-divider my-1" />
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <TestimonialsSection />
-        </Suspense>
+        <LazySection fallback={<SectionSkeleton />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <TestimonialsSection />
+          </Suspense>
+        </LazySection>
 
         <div className="section-divider my-1" />
 
-        <Suspense fallback={<SectionSkeleton height="h-48" />}>
-          <AppInstallSection />
-        </Suspense>
+        <LazySection fallback={<SectionSkeleton height="h-48" />}>
+          <Suspense fallback={<SectionSkeleton height="h-48" />}>
+            <AppInstallSection />
+          </Suspense>
+        </LazySection>
 
         <div className="section-divider my-1" />
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <HotStoveGuide />
-        </Suspense>
+        <LazySection fallback={<SectionSkeleton />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <HotStoveGuide />
+          </Suspense>
+        </LazySection>
 
       </main>
       <Footer />
