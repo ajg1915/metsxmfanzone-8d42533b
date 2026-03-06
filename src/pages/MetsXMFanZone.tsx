@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Radio, Tv, Signal, Clock, MapPin, Users, Mic, Trophy, Swords, Calendar, Loader2, Home, Plane } from "lucide-react";
-import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO } from "date-fns";
 import logo from "@/assets/metsxmfanzone-logo.png";
@@ -66,7 +65,6 @@ const MetsXMFanZone = () => {
         body: { year: 2026, gameTypes: ['S', 'R'] }
       });
       if (data?.success && data?.games) {
-        // Show next 10 upcoming games
         const now = new Date();
         const upcoming = (data.games as ScheduleGame[])
           .filter(g => new Date(g.date) >= now)
@@ -93,50 +91,28 @@ const MetsXMFanZone = () => {
       <Navigation />
       
       <main className="flex-1 pt-12">
-        {/* Hero Banner with MetsXMFanZone Branding */}
+        {/* Hero Banner */}
         <div className="relative overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-background">
-          {/* Animated background elements */}
           <div className="absolute inset-0 overflow-hidden">
-            <motion.div
-              className="absolute -top-20 -right-20 w-96 h-96 bg-primary/15 rounded-full blur-3xl"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute -bottom-20 -left-20 w-80 h-80 bg-secondary/20 rounded-full blur-3xl"
-              animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.4, 0.2] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            />
+            <div className="absolute -top-20 -right-20 w-96 h-96 bg-primary/15 rounded-full blur-3xl opacity-40" />
+            <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-secondary/20 rounded-full blur-3xl opacity-30" />
             <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(255,102,0,0.02)_50%)] bg-[length:100%_4px] pointer-events-none" />
           </div>
           
           <div className="container mx-auto px-4 py-8 sm:py-12 relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              <motion.div 
-                className="relative"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-              >
+              <div className="relative">
                 <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-xl shadow-primary/20 p-2">
                   <img src={logo} alt="MetsXMFanZone" className="w-full h-full object-contain" />
                 </div>
-                <motion.div 
-                  className="absolute -top-2 -right-2 flex items-center gap-1 bg-destructive text-destructive-foreground px-2 py-1 rounded-full text-xs font-bold shadow-lg"
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
+                <div className="absolute -top-2 -right-2 flex items-center gap-1 bg-destructive text-destructive-foreground px-2 py-1 rounded-full text-xs font-bold shadow-lg">
                   <Radio className="w-3 h-3" />
                   LIVE
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
               
               <div className="flex-1">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                >
+                <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
                       <Signal className="w-3 h-3 mr-1" />
@@ -154,14 +130,9 @@ const MetsXMFanZone = () => {
                     Your ultimate destination for exclusive Mets content, live fan discussions, 
                     and 24/7 coverage from the heart of the fanbase.
                   </p>
-                </motion.div>
+                </div>
                 
-                <motion.div 
-                  className="flex flex-wrap gap-3 mt-4"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                >
+                <div className="flex flex-wrap gap-3 mt-4">
                   <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-2 rounded-lg border border-border/50">
                     <MapPin className="w-4 h-4 text-primary" />
                     <span className="text-xs text-foreground">New York, NY</span>
@@ -170,7 +141,7 @@ const MetsXMFanZone = () => {
                     <Clock className="w-4 h-4 text-primary" />
                     <span className="text-xs text-foreground">24/7 Fan Coverage</span>
                   </div>
-                </motion.div>
+                </div>
               </div>
             </div>
           </div>
@@ -179,25 +150,14 @@ const MetsXMFanZone = () => {
         {/* Stream Player Section */}
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="max-w-6xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <StreamPlayer 
-                pageName="metsxmfanzone"
-                pageTitle="MetsXMFanZone Live Stream"
-                pageDescription="Ultimate Destination Where the Fans Go"
-              />
-            </motion.div>
+            <StreamPlayer 
+              pageName="metsxmfanzone"
+              pageTitle="MetsXMFanZone Live Stream"
+              pageDescription="Ultimate Destination Where the Fans Go"
+            />
 
             {/* Upcoming Games & Matchup Breakdowns */}
-            <motion.div
-              className="mt-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
+            <div className="mt-8">
               <div className="flex items-center gap-3 mb-4">
                 <Swords className="w-5 h-5 text-primary" />
                 <h2 className="text-xl sm:text-2xl font-bold text-foreground">Upcoming Games & Matchups</h2>
@@ -205,13 +165,13 @@ const MetsXMFanZone = () => {
 
               {gamesLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  <Loader2 className="w-6 h-6 text-primary" />
                   <span className="ml-2 text-sm text-muted-foreground">Loading schedule...</span>
                 </div>
               ) : games.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {games.map((game) => (
-                    <Card key={game.gameId} className="border-border/50 hover:border-primary/40 transition-colors overflow-hidden">
+                    <Card key={game.gameId} className="border-border/50 overflow-hidden">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3 mb-2">
                           <img 
@@ -251,7 +211,7 @@ const MetsXMFanZone = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="w-full h-7 text-xs gap-1 border-primary/30 hover:bg-primary/10"
+                            className="w-full h-7 text-xs gap-1 border-primary/30"
                             onClick={() => navigate(MATCHUP_ROUTES[game.opponent])}
                           >
                             <Swords className="w-3 h-3" />
@@ -265,18 +225,13 @@ const MetsXMFanZone = () => {
               ) : (
                 <p className="text-sm text-muted-foreground text-center py-4">No upcoming games found.</p>
               )}
-            </motion.div>
+            </div>
             
             {/* Channel Info Cards */}
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-            >
-              <Card className="bg-gradient-to-br from-card to-card/50 border-border/50 hover:border-primary/50 transition-colors group">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+              <Card className="bg-gradient-to-br from-card to-card/50 border-border/50">
                 <CardContent className="p-4 sm:p-6">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <Mic className="w-6 h-6 text-primary" />
                   </div>
                   <h3 className="font-bold text-lg text-foreground mb-2">Live Shows</h3>
@@ -286,9 +241,9 @@ const MetsXMFanZone = () => {
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-br from-card to-card/50 border-border/50 hover:border-secondary/50 transition-colors group">
+              <Card className="bg-gradient-to-br from-card to-card/50 border-border/50">
                 <CardContent className="p-4 sm:p-6">
-                  <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-4">
                     <Users className="w-6 h-6 text-secondary" />
                   </div>
                   <h3 className="font-bold text-lg text-foreground mb-2">Fan Community</h3>
@@ -298,9 +253,9 @@ const MetsXMFanZone = () => {
                 </CardContent>
               </Card>
               
-              <Card className="bg-gradient-to-br from-card to-card/50 border-border/50 hover:border-primary/50 transition-colors group">
+              <Card className="bg-gradient-to-br from-card to-card/50 border-border/50">
                 <CardContent className="p-4 sm:p-6">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <Trophy className="w-6 h-6 text-primary" />
                   </div>
                   <h3 className="font-bold text-lg text-foreground mb-2">Exclusive Content</h3>
@@ -309,7 +264,7 @@ const MetsXMFanZone = () => {
                   </p>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           </div>
         </div>
       </main>
