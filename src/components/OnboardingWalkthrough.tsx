@@ -122,14 +122,14 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   return (
     <Dialog open={open} onOpenChange={() => handleSkip()}>
       <DialogContent 
-        className="max-w-[85vw] sm:max-w-[340px] max-h-[80vh] p-0 gap-0 overflow-hidden border-0 rounded-2xl bg-transparent shadow-2xl [&>button]:hidden"
+        className="max-w-[85vw] sm:max-w-[340px] max-h-[75vh] p-0 gap-0 overflow-hidden border-0 rounded-2xl bg-transparent shadow-2xl [&>button]:hidden"
         onPointerDownOutside={() => handleSkip()}
         onEscapeKeyDown={() => handleSkip()}
       >
         {/* Outer glow effect */}
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-blue-500/30 to-primary/30 rounded-2xl blur-xl opacity-60" />
         
-        <div className="relative bg-gradient-to-b from-background/95 to-background backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
+        <div className="relative bg-gradient-to-b from-background/95 to-background backdrop-blur-xl rounded-2xl border border-white/10 overflow-y-auto max-h-[75vh]">
           {/* Animated progress bar */}
           <div className="absolute top-0 left-0 right-0 z-20 h-1 bg-muted/30">
             <motion.div 
