@@ -249,7 +249,7 @@ export function StreamPlayer({
             
             {isMuted && showUnmuteBanner && (
               <div 
-                className="bg-primary/20 border-2 border-primary rounded-lg p-4 text-center animate-pulse cursor-pointer hover:bg-primary/30 transition-colors"
+                className="bg-primary/20 border-2 border-primary rounded-lg p-4 text-center cursor-pointer"
                 onClick={toggleMute}
                 role="button"
                 tabIndex={0}
