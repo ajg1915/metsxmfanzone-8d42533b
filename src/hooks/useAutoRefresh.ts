@@ -23,7 +23,7 @@ const TABLE_QUERY_KEY_MAP: Record<string, string[]> = {
   blog_posts: ['blog-posts', 'blog_posts'],
   game_alerts: ['game-alerts'],
   podcast_shows: ['podcast-shows', 'podcast_shows'],
-  mets_news_tracker: ['mets-news-tracker', 'mets_news_tracker'],
+  
   podcast_live_stream: ['podcast-live-stream', 'podcast_live_stream'],
 };
 
