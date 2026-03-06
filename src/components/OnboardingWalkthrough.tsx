@@ -82,13 +82,11 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   };
 
   const handleComplete = () => {
-    localStorage.setItem('tutorialLastSeen', Date.now().toString());
     onComplete();
     setOpen(false);
   };
 
   const handleSkip = () => {
-    localStorage.setItem('tutorialLastSeen', Date.now().toString());
     onComplete();
     setOpen(false);
   };
