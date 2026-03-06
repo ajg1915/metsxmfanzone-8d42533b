@@ -38,15 +38,10 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       setOpen(true);
       setLoading(false);
     } else {
-      // If user is signed in, don't show until next login session
+      // If user is signed in, never show the popup
       if (user) {
-        const shownThisSession = sessionStorage.getItem('onboarding_shown_session');
-        if (shownThisSession === user.id) {
-          setLoading(false);
-          return;
-        }
-        // Mark as shown for this login session
-        sessionStorage.setItem('onboarding_shown_session', user.id);
+        setLoading(false);
+        return;
       }
 
       // Don't show if already dismissed this browser session
