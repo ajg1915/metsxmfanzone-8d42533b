@@ -22,7 +22,7 @@ const ReplayGamesSection = lazy(() => import("@/components/ReplayGamesSection"))
 const SpringTraining = lazy(() => import("@/components/SpringTraining"));
 const PlayersToWatch = lazy(() => import("@/components/PlayersToWatch"));
 
-const MetsNewsTracker = lazy(() => import("@/components/MetsNewsTracker"));
+
 const BlogSection = lazy(() => import("@/components/BlogSection"));
 const HomeLineupCard = lazy(() => import("@/components/HomeLineupCard"));
 const PodcastSection = lazy(() => import("@/components/PodcastSection"));
@@ -252,11 +252,6 @@ const Index = () => {
         <div className="section-divider my-1" />
 
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <MetsNewsTracker />
-        </Suspense>
-
-        <div className="section-divider my-1" />
 
         <Suspense fallback={<SectionSkeleton height="h-48" />}>
           <JoinPodcastSection />
