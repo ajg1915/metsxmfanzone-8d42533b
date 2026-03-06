@@ -1,4 +1,20 @@
+import { useDevice } from "@/hooks/use-device";
+
 const ImmersiveBackground = () => {
+  const { isTV } = useDevice();
+
+  // TV browsers have weak GPUs - skip blur filters and animations entirely
+  if (isTV) {
+    return (
+      <div 
+        className="fixed inset-0 pointer-events-none"
+        style={{ zIndex: -1 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background" />
+      </div>
+    );
+  }
+
   return (
     <div 
       className="fixed inset-0 pointer-events-none overflow-hidden"
