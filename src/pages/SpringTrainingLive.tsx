@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import MetsNewsTracker from "@/components/MetsNewsTracker";
+
 import MetsRSSFeed from "@/components/MetsRSSFeed";
 import { StreamPlayer } from "@/components/StreamPlayer";
 // NOTE: Re-enable StreamTimeLimit after Spring Training ends (last day of March 2026)
@@ -278,8 +278,6 @@ const SpringTrainingLive = () => {
           </div>
         </div>
 
-        {/* Game Stats & News Tracker */}
-        <MetsNewsTracker />
 
         {/* Latest Mets News */}
         <section className="py-12 bg-secondary/20">
