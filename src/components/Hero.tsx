@@ -211,17 +211,6 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Nav arrows */}
-      {slidesToShow.length > 1 && (
-        <>
-          <button onClick={() => emblaApi?.scrollPrev()} className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white" aria-label="Previous">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button onClick={() => emblaApi?.scrollNext()} className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center text-white/70 hover:text-white" aria-label="Next">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </>
-      )}
 
       {/* Slide indicators */}
       <div className="absolute bottom-2 sm:bottom-3 left-0 right-0 z-20 flex justify-center gap-1 sm:gap-1.5">
