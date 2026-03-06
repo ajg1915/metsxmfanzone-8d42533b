@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Radio, Users, Play, ChevronRight, ChevronLeft, Lock, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { motion } from "framer-motion";
+
 import { cn } from "@/lib/utils";
 import PremiumBadge from "@/components/PremiumBadge";
 
@@ -168,13 +168,7 @@ const LiveStreamsSection = () => {
       <UpgradePrompt open={showUpgradePrompt} onOpenChange={setShowUpgradePrompt} />
       <section className="py-6 sm:py-8 relative">
         <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center justify-between mb-4"
-          >
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <Radio className="w-4 h-4 sm:w-6 sm:h-6 text-red-500 animate-pulse" />
               <h2 className="text-sm sm:text-xl md:text-2xl font-bold text-foreground">
@@ -188,7 +182,7 @@ const LiveStreamsSection = () => {
               In Game Post
               <ChevronRight className="w-4 h-4" />
             </a>
-          </motion.div>
+          </div>
         </div>
 
         {/* Netflix-style carousel container */}
@@ -213,13 +207,9 @@ const LiveStreamsSection = () => {
             {/* Add left padding spacer */}
             <div className="flex-shrink-0 w-0 lg:w-[calc((100vw-1280px)/2)]" />
             
-            {streams.map((stream, index) => (
-              <motion.div
+            {streams.map((stream) => (
+              <div
                 key={stream.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
                 onClick={() => handleStreamClick(stream)}
                 className="flex-shrink-0 w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] cursor-pointer group"
               >
@@ -293,7 +283,7 @@ const LiveStreamsSection = () => {
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
             
             {/* Add right padding spacer */}
