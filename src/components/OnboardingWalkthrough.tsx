@@ -44,12 +44,7 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
         return;
       }
 
-      // Don't show if already dismissed this browser session
-      const dismissed = sessionStorage.getItem('onboarding_dismissed');
-      if (dismissed === 'true') {
-        setLoading(false);
-        return;
-      }
+      // Show once per page view for logged-out users (no session persistence)
       fetchAndShow();
     }
   }, [previewMode, previewSteps, user]);

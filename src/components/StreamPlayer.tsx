@@ -244,12 +244,12 @@ export function StreamPlayer({
                 <p className="text-xs sm:text-sm text-muted-foreground">Stream is muted by default for autoplay</p>
               </div>
             )}
-            <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden landscape:max-h-[80vh] landscape:mx-auto landscape:w-full">
               <video 
                 ref={videoRef} 
                 className="video-js vjs-big-play-centered vjs-theme-fantasy" 
                 playsInline
-                style={{ width: '100%', height: '100%' }} 
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
               />
             </div>
             <div>
