@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -55,8 +55,10 @@ const MetsXMFanZone = () => {
   const [games, setGames] = useState<ScheduleGame[]>([]);
   const [gamesLoading, setGamesLoading] = useState(true);
 
+  // Defer schedule fetch so stream player loads first
   useEffect(() => {
-    fetchUpcomingGames();
+    const timer = setTimeout(() => fetchUpcomingGames(), 3000);
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchUpcomingGames = async () => {
@@ -91,13 +93,8 @@ const MetsXMFanZone = () => {
       <Navigation />
       
       <main className="flex-1 pt-12">
-        {/* Hero Banner */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-background">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-96 h-96 bg-primary/15 rounded-full blur-3xl opacity-40" />
-            <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-secondary/20 rounded-full blur-3xl opacity-30" />
-            <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(255,102,0,0.02)_50%)] bg-[length:100%_4px] pointer-events-none" />
-          </div>
+        {/* Hero Banner - lightweight for TV browsers */}
+        <div className="relative overflow-hidden bg-primary/10">
           
           <div className="container mx-auto px-4 py-8 sm:py-12 relative z-10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -133,11 +130,11 @@ const MetsXMFanZone = () => {
                 </div>
                 
                 <div className="flex flex-wrap gap-3 mt-4">
-                  <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-2 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 bg-background/50 px-3 py-2 rounded-lg border border-border/50">
                     <MapPin className="w-4 h-4 text-primary" />
                     <span className="text-xs text-foreground">New York, NY</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-background/50 backdrop-blur-sm px-3 py-2 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 bg-background/50 px-3 py-2 rounded-lg border border-border/50">
                     <Clock className="w-4 h-4 text-primary" />
                     <span className="text-xs text-foreground">24/7 Fan Coverage</span>
                   </div>
