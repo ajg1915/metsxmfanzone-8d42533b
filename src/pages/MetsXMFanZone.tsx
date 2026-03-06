@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { StreamPlayer } from "@/components/StreamPlayer";
+import { ClapprPlayer } from "@/components/ClapprPlayer";
 import StreamTimeLimit from "@/components/StreamTimeLimit";
 import SEOHead from "@/components/SEOHead";
 import { Badge } from "@/components/ui/badge";
@@ -147,8 +147,7 @@ const MetsXMFanZone = () => {
         {/* Stream Player Section */}
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="max-w-6xl mx-auto">
-            <StreamPlayer 
-              pageName="metsxmfanzone"
+            <ClapprPlayer
               pageTitle="MetsXMFanZone Live Stream"
               pageDescription="Ultimate Destination Where the Fans Go"
             />
