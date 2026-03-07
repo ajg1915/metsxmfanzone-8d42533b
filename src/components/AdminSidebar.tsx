@@ -27,6 +27,7 @@ const homeItems = [
   { title: "Media Library", url: "/admin/media-library", icon: FolderOpen },
   { title: "Live Streams", url: "/admin/live-streams", icon: Radio },
   { title: "Stream Health", url: "/admin/stream-health", icon: HeartPulse },
+  { title: "Stream Tester", url: "/admin/stream-tester", icon: Activity },
   { title: "Members", url: "/admin/user-management", icon: UserCog },
 ];
 
