@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import { StreamAlertBanner } from "./StreamAlertBanner";
+import { Cast, Tv } from "lucide-react";
 
 interface LiveStream {
   id: string;
@@ -30,13 +31,70 @@ export function StreamPlayer({
   const [isMuted, setIsMuted] = useState(false);
   const [showUnmuteBanner, setShowUnmuteBanner] = useState(false);
   const [playerReady, setPlayerReady] = useState(false);
+  const [isCasting, setIsCasting] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
+
+  // Initialize Chromecast
+  useEffect(() => {
+    const initChromecast = () => {
+      const cast = (window as any).cast;
+      const chrome = (window as any).chrome;
+      if (!cast || !chrome?.cast) return;
+
+      const sessionRequest = new chrome.cast.SessionRequest(
+        chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
+      );
+      const apiConfig = new chrome.cast.ApiConfig(
+        sessionRequest,
+        (session: any) => {
+          console.log("[Cast] Session established");
+          setIsCasting(true);
+        },
+        (availability: string) => {
+          console.log("[Cast] Receiver availability:", availability);
+        }
+      );
+      chrome.cast.initialize(apiConfig,
+        () => console.log("[Cast] Initialized"),
+        (err: any) => console.warn("[Cast] Init error:", err)
+      );
+    };
+
+    (window as any).__onGCastApiAvailable = (isAvailable: boolean) => {
+      if (isAvailable) initChromecast();
+    };
+    if ((window as any).chrome?.cast) initChromecast();
+  }, []);
+
+  const startCasting = () => {
+    const chrome = (window as any).chrome;
+    if (!chrome?.cast) {
+      alert("Chromecast is not available. Make sure you have a Chromecast device on your network.");
+      return;
+    }
+    const streamUrl = stream?.stream_url;
+    if (!streamUrl) return;
+
+    chrome.cast.requestSession(
+      (session: any) => {
+        setIsCasting(true);
+        const mediaInfo = new chrome.cast.media.MediaInfo(streamUrl, "application/x-mpegURL");
+        const request = new chrome.cast.media.LoadRequest(mediaInfo);
+        session.loadMedia(request,
+          () => console.log("[Cast] Media loaded"),
+          (err: any) => console.error("[Cast] Media load error:", err)
+        );
+      },
+      (err: any) => {
+        if (err.code !== "cancel") console.error("[Cast] Request error:", err);
+      }
+    );
+  };
 
   useEffect(() => {
     fetchStream();
 
-    // Set up realtime subscription
     const channel = supabase.channel(`${pageName}-stream-changes`).on('postgres_changes', {
       event: '*',
       schema: 'public',
@@ -48,7 +106,6 @@ export function StreamPlayer({
 
     return () => {
       supabase.removeChannel(channel);
-      // Dispose player on cleanup
       if (playerRef.current) {
         playerRef.current.dispose();
         playerRef.current = null;
@@ -56,13 +113,11 @@ export function StreamPlayer({
     };
   }, [pageName]);
 
-  // Detect if the browser supports native HLS (Safari/iPad/iOS)
   const supportsNativeHLS = () => {
     const video = document.createElement('video');
     return video.canPlayType('application/vnd.apple.mpegurl') !== '';
   };
 
-  // Dispose player helper
   const disposePlayer = () => {
     if (playerRef.current) {
       playerRef.current.dispose();
@@ -71,11 +126,8 @@ export function StreamPlayer({
     }
   };
 
-  // Dispose player when pageName changes (navigating between stream pages)
   useEffect(() => {
-    return () => {
-      disposePlayer();
-    };
+    return () => { disposePlayer(); };
   }, [pageName]);
 
   // Initialize Video.js player when stream changes
@@ -127,10 +179,8 @@ export function StreamPlayer({
         console.log('Video.js player is ready');
         setPlayerReady(true);
 
-        // Try unmuted playback; if blocked, fall back to muted with banner
         const p = playerRef.current;
         if (p.muted()) {
-          // autoplay:'any' fell back to muted
           setIsMuted(true);
           setShowUnmuteBanner(true);
         } else {
@@ -138,7 +188,7 @@ export function StreamPlayer({
           setShowUnmuteBanner(false);
         }
 
-        // Auto-seek to live edge periodically to prevent drift/lag
+        // Auto-seek to live edge
         const liveEdgeInterval = setInterval(() => {
           const p = playerRef.current;
           if (!p || p.paused() || !p.liveTracker?.isLive?.()) return;
@@ -174,9 +224,7 @@ export function StreamPlayer({
       });
     }
 
-    return () => {
-      disposePlayer();
-    };
+    return () => { disposePlayer(); };
   }, [stream]);
 
   const toggleMute = () => {
@@ -186,7 +234,6 @@ export function StreamPlayer({
       setIsMuted(newMutedState);
       if (!newMutedState) {
         setShowUnmuteBanner(false);
-        // On mobile, ensure playback continues after unmuting
         const playPromise = playerRef.current.play();
         if (playPromise && typeof playPromise.catch === 'function') {
           playPromise.catch(() => {
@@ -233,14 +280,25 @@ export function StreamPlayer({
 
   return (
     <Card className="mb-8">
-      <CardHeader>
-        <CardTitle className="text-lg">{pageTitle}</CardTitle>
-        <CardDescription>{pageDescription}</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <div>
+          <CardTitle className="text-lg">{pageTitle}</CardTitle>
+          <CardDescription>{pageDescription}</CardDescription>
+        </div>
+        {stream && (
+          <button
+            onClick={startCasting}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors text-sm font-medium"
+            title="Cast to TV"
+          >
+            {isCasting ? <Tv className="w-4 h-4" /> : <Cast className="w-4 h-4" />}
+            <span className="hidden sm:inline">{isCasting ? "Casting" : "Cast"}</span>
+          </button>
+        )}
       </CardHeader>
       <CardContent>
         {stream ? (
           <div className="space-y-4">
-            {/* Stream Alert Banner for viewers */}
             <StreamAlertBanner streamId={stream.id} />
             
             {isMuted && showUnmuteBanner && (
@@ -260,11 +318,17 @@ export function StreamPlayer({
                 ref={videoRef} 
                 className="video-js vjs-big-play-centered vjs-theme-fantasy" 
                 playsInline
+                // @ts-ignore - webkit AirPlay attribute
+                x-webkit-airplay="allow"
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
               />
             </div>
-            <div>
+            <div className="flex items-center justify-between">
               {stream.description && <p className="text-muted-foreground">{stream.description}</p>}
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Cast className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Cast to TV via button above, AirPlay, or Chrome cast menu</span>
+              </div>
             </div>
           </div>
         ) : (

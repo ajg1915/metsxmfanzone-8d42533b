@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
-import { Cast, Volume2, VolumeX } from "lucide-react";
+import { Cast, Volume2, VolumeX, Tv } from "lucide-react";
 
 interface NativeStreamPlayerProps {
   pageTitle?: string;
@@ -19,6 +19,64 @@ export function ClapprPlayer({
   const hlsRef = useRef<Hls | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [showUnmuteBanner, setShowUnmuteBanner] = useState(false);
+  const [isCasting, setIsCasting] = useState(false);
+
+  // Initialize Chromecast when available
+  useEffect(() => {
+    const initChromecast = () => {
+      const cast = (window as any).cast;
+      const chrome = (window as any).chrome;
+      if (!cast || !chrome?.cast) return;
+
+      const sessionRequest = new chrome.cast.SessionRequest(
+        chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
+      );
+      const apiConfig = new chrome.cast.ApiConfig(
+        sessionRequest,
+        (session: any) => {
+          console.log("[Cast] Session established");
+          setIsCasting(true);
+        },
+        (availability: string) => {
+          console.log("[Cast] Receiver availability:", availability);
+        }
+      );
+      chrome.cast.initialize(apiConfig, 
+        () => console.log("[Cast] Initialized"),
+        (err: any) => console.warn("[Cast] Init error:", err)
+      );
+    };
+
+    // Listen for Cast API readiness
+    (window as any).__onGCastApiAvailable = (isAvailable: boolean) => {
+      if (isAvailable) initChromecast();
+    };
+
+    // If already loaded
+    if ((window as any).chrome?.cast) initChromecast();
+  }, []);
+
+  const startCasting = () => {
+    const chrome = (window as any).chrome;
+    if (!chrome?.cast) {
+      alert("Chromecast is not available. Make sure you have a Chromecast device on your network.");
+      return;
+    }
+    chrome.cast.requestSession(
+      (session: any) => {
+        setIsCasting(true);
+        const mediaInfo = new chrome.cast.media.MediaInfo(source, "application/x-mpegURL");
+        const request = new chrome.cast.media.LoadRequest(mediaInfo);
+        session.loadMedia(request,
+          () => console.log("[Cast] Media loaded"),
+          (err: any) => console.error("[Cast] Media load error:", err)
+        );
+      },
+      (err: any) => {
+        if (err.code !== "cancel") console.error("[Cast] Request error:", err);
+      }
+    );
+  };
 
   useEffect(() => {
     const video = videoRef.current;
@@ -34,13 +92,11 @@ export function ClapprPlayer({
       hls.loadSource(source);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        // Try unmuted autoplay first
         video.muted = false;
         video.play().then(() => {
           setIsMuted(false);
           setShowUnmuteBanner(false);
         }).catch(() => {
-          // Browser blocked unmuted, fall back to muted
           video.muted = true;
           setIsMuted(true);
           setShowUnmuteBanner(true);
@@ -89,9 +145,20 @@ export function ClapprPlayer({
 
   return (
     <div className="mb-8 rounded-lg border border-border bg-card overflow-hidden">
-      <div className="p-4 sm:p-6 border-b border-border">
-        <h3 className="text-lg font-semibold text-foreground">{pageTitle}</h3>
-        <p className="text-sm text-muted-foreground">{pageDescription}</p>
+      <div className="p-4 sm:p-6 border-b border-border flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">{pageTitle}</h3>
+          <p className="text-sm text-muted-foreground">{pageDescription}</p>
+        </div>
+        {/* Cast button */}
+        <button
+          onClick={startCasting}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors text-sm font-medium"
+          title="Cast to TV"
+        >
+          {isCasting ? <Tv className="w-4 h-4" /> : <Cast className="w-4 h-4" />}
+          <span className="hidden sm:inline">{isCasting ? "Casting" : "Cast"}</span>
+        </button>
       </div>
       <div className="p-4 sm:p-6 space-y-3">
         {isMuted && showUnmuteBanner && (
@@ -119,6 +186,8 @@ export function ClapprPlayer({
             autoPlay
             controls
             controlsList="nodownload"
+            // @ts-ignore - webkit AirPlay attribute
+            x-webkit-airplay="allow"
             style={{ width: "100%", height: "100%" }}
           />
         </div>
@@ -127,7 +196,7 @@ export function ClapprPlayer({
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Cast className="w-3.5 h-3.5" />
           <span>
-            AirPlay: Use the AirPlay icon in video controls (iOS/Safari). Chromecast: Use your browser's cast menu.
+            Cast to TV via the Cast button above, AirPlay icon in controls (Apple), or your browser's cast menu (Chrome).
           </span>
         </div>
       </div>
