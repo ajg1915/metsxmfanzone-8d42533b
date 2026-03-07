@@ -32,11 +32,42 @@ export default function StreamTester() {
     setStreamInfo(null);
   };
 
-  const testStream = () => {
-    const trimmed = url.trim();
-    if (!trimmed) {
-      toast({ title: "Enter a URL", description: "Paste an M3U8 link to test.", variant: "destructive" });
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith('.m3u8') && !file.name.endsWith('.m3u')) {
+      toast({ title: "Invalid file", description: "Please upload a .m3u8 or .m3u file.", variant: "destructive" });
       return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      setPlaylistContent(text);
+      setMode("playlist");
+      toast({ title: "Playlist loaded", description: `Loaded ${file.name}` });
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  const testStream = () => {
+    let source: string;
+
+    if (mode === "playlist") {
+      const content = playlistContent.trim();
+      if (!content) {
+        toast({ title: "Empty playlist", description: "Paste or upload M3U8 playlist content.", variant: "destructive" });
+        return;
+      }
+      // Create a blob URL from the playlist text
+      const blob = new Blob([content], { type: "application/vnd.apple.mpegurl" });
+      source = URL.createObjectURL(blob);
+    } else {
+      source = url.trim();
+      if (!source) {
+        toast({ title: "Enter a URL", description: "Paste an M3U8 link to test.", variant: "destructive" });
+        return;
+      }
     }
 
     cleanup();
