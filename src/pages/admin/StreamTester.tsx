@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import Hls from "hls.js";
-import { Play, Square, AlertCircle, CheckCircle, Loader2, Link2 } from "lucide-react";
+import { Play, Square, AlertCircle, CheckCircle, Loader2, Link2, Upload, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
 export default function StreamTester() {
