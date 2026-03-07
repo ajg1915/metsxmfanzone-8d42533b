@@ -788,15 +788,22 @@ All colors MUST be HSL.
 }
 
 /* ========================================
-   TV MODE STYLES
+   TV MODE STYLES — scale-to-fit approach
    ======================================== */
 
 .tv-mode {
-  --tv-min-font-size: 24px;
+  /* Scale the entire page to fit TV viewport without oversizing */
+  font-size: 16px;
 }
 
-.tv-mode * {
-  font-size: max(var(--tv-min-font-size), inherit);
+/* Fit-to-screen: constrain the body so nothing overflows */
+.tv-mode body {
+  overflow-x: hidden;
+}
+
+/* Scale containers to use TV real estate without blowing up */
+.tv-mode .container {
+  max-width: 1600px;
 }
 
 /* Override for elements that should remain smaller */
@@ -808,9 +815,8 @@ All colors MUST be HSL.
 .tv-focus-ring {
   outline: none !important;
   box-shadow: 
-    0 0 0 4px hsl(var(--mets-orange)),
-    0 0 30px hsl(var(--mets-orange) / 0.5),
-    0 0 60px hsl(var(--mets-orange) / 0.3) !important;
+    0 0 0 3px hsl(var(--mets-orange)),
+    0 0 20px hsl(var(--mets-orange) / 0.4) !important;
   border-color: hsl(var(--mets-orange)) !important;
 }
 
@@ -825,15 +831,15 @@ All colors MUST be HSL.
 
 .tv-mode .focus\:scale-105:focus,
 .tv-mode .tv-focus-ring {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 /* Hide scrollbars in TV mode for cleaner look */
-.tv-mode .scrollbar-hide::-webkit-scrollbar {
+.tv-mode ::-webkit-scrollbar {
   display: none;
 }
 
-.tv-mode .scrollbar-hide {
+.tv-mode {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -842,13 +848,13 @@ All colors MUST be HSL.
 @keyframes tv-pulse {
   0%, 100% {
     box-shadow: 
-      0 0 0 4px hsl(var(--mets-orange)),
-      0 0 20px hsl(var(--mets-orange) / 0.4);
+      0 0 0 3px hsl(var(--mets-orange)),
+      0 0 15px hsl(var(--mets-orange) / 0.3);
   }
   50% {
     box-shadow: 
-      0 0 0 6px hsl(var(--mets-orange)),
-      0 0 40px hsl(var(--mets-orange) / 0.6);
+      0 0 0 5px hsl(var(--mets-orange)),
+      0 0 30px hsl(var(--mets-orange) / 0.5);
   }
 }
 
@@ -856,12 +862,12 @@ All colors MUST be HSL.
   animation: tv-pulse 2s ease-in-out infinite;
 }
 
-/* Large touch targets for TV remote */
+/* Reasonable touch targets for TV remote - not oversized */
 .tv-mode button,
 .tv-mode a,
 .tv-mode [role="button"] {
-  min-height: 48px;
-  min-width: 48px;
+  min-height: 36px;
+  min-width: 36px;
 }
 
 /* TV Player specific styles */
