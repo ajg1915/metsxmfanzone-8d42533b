@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import Hls from "hls.js";
-import { Cast, Volume2, VolumeX, Tv } from "lucide-react";
+import videojs from "video.js";
+import "video.js/dist/video-js.css";
+import { Cast, Tv } from "lucide-react";
 
 interface NativeStreamPlayerProps {
   pageTitle?: string;
@@ -16,12 +17,13 @@ export function ClapprPlayer({
   source = DEFAULT_SOURCE,
 }: NativeStreamPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
+  const playerRef = useRef<any>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [showUnmuteBanner, setShowUnmuteBanner] = useState(false);
   const [isCasting, setIsCasting] = useState(false);
+  const [playerReady, setPlayerReady] = useState(false);
 
-  // Initialize Chromecast when available
+  // Initialize Chromecast
   useEffect(() => {
     const initChromecast = () => {
       const cast = (window as any).cast;
@@ -41,18 +43,15 @@ export function ClapprPlayer({
           console.log("[Cast] Receiver availability:", availability);
         }
       );
-      chrome.cast.initialize(apiConfig, 
+      chrome.cast.initialize(apiConfig,
         () => console.log("[Cast] Initialized"),
         (err: any) => console.warn("[Cast] Init error:", err)
       );
     };
 
-    // Listen for Cast API readiness
     (window as any).__onGCastApiAvailable = (isAvailable: boolean) => {
       if (isAvailable) initChromecast();
     };
-
-    // If already loaded
     if ((window as any).chrome?.cast) initChromecast();
   }, []);
 
@@ -78,68 +77,139 @@ export function ClapprPlayer({
     );
   };
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+  const supportsNativeHLS = () => {
+    const video = document.createElement('video');
+    return video.canPlayType('application/vnd.apple.mpegurl') !== '';
+  };
 
-    if (Hls.isSupported()) {
-      const hls = new Hls({
-        enableWorker: true,
-        lowLatencyMode: true,
-        maxBufferLength: 30,
-        maxMaxBufferLength: 60,
-      });
-      hls.loadSource(source);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.muted = false;
-        video.play().then(() => {
-          setIsMuted(false);
-          setShowUnmuteBanner(false);
-        }).catch(() => {
-          video.muted = true;
-          setIsMuted(true);
-          setShowUnmuteBanner(true);
-          video.play().catch(() => {});
-        });
-      });
-      hlsRef.current = hls;
-    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = source;
-      video.addEventListener("loadedmetadata", () => {
-        video.muted = false;
-        video.play().then(() => {
-          setIsMuted(false);
-          setShowUnmuteBanner(false);
-        }).catch(() => {
-          video.muted = true;
-          setIsMuted(true);
-          setShowUnmuteBanner(true);
-          video.play().catch(() => {});
-        });
-      });
+  const disposePlayer = () => {
+    if (playerRef.current) {
+      playerRef.current.dispose();
+      playerRef.current = null;
+      setPlayerReady(false);
     }
+  };
+
+  // Initialize Video.js player
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    // Wait a tick so the DOM element is fully mounted
+    const initTimeout = setTimeout(() => {
+      if (!videoRef.current || playerRef.current) return;
+
+      const useNativeHLS = supportsNativeHLS();
+      console.log('[ClapprPlayer] Initializing Video.js for:', source, '| Native HLS:', useNativeHLS);
+
+      playerRef.current = videojs(videoRef.current, {
+        controls: true,
+        autoplay: 'any',
+        muted: false,
+        preload: 'auto',
+        fluid: true,
+        liveui: true,
+        playsinline: true,
+        controlBar: {
+          fullscreenToggle: true,
+        },
+        html5: {
+          vhs: {
+            overrideNative: !useNativeHLS,
+            fastQualityChange: true,
+            handlePartialData: true,
+            maxPlaylistRetries: 5,
+            smoothQualityChange: false,
+            allowSeeksWithinUnsafeLiveWindow: true,
+            useNetworkInformationApi: false,
+            ...(useNativeHLS ? {} : {
+              bandwidth: 3000000,
+              enableLowInitialPlaylist: true,
+            }),
+          },
+          nativeVideoTracks: useNativeHLS,
+          nativeAudioTracks: useNativeHLS,
+          nativeTextTracks: useNativeHLS,
+        },
+        liveTracker: {
+          trackingThreshold: 0.5,
+          liveTolerance: 15,
+        },
+        sources: [{
+          src: source,
+          type: 'application/x-mpegURL',
+        }],
+      });
+
+      playerRef.current.ready(() => {
+        console.log('[ClapprPlayer] Video.js player is ready');
+        setPlayerReady(true);
+
+        const p = playerRef.current;
+        if (p.muted()) {
+          setIsMuted(true);
+          setShowUnmuteBanner(true);
+        } else {
+          setIsMuted(false);
+          setShowUnmuteBanner(false);
+        }
+
+        // Auto-seek to live edge
+        const liveEdgeInterval = setInterval(() => {
+          const p = playerRef.current;
+          if (!p || p.paused() || !p.liveTracker?.isLive?.()) return;
+          const behindLive = p.liveTracker.liveCurrentTime() - p.currentTime();
+          if (behindLive > 30) {
+            console.log(`[ClapprPlayer] ${Math.round(behindLive)}s behind live, seeking to edge`);
+            p.liveTracker.seekToLiveEdge();
+          }
+        }, 10000);
+
+        playerRef.current.on('dispose', () => clearInterval(liveEdgeInterval));
+      });
+
+      // Capped retry with exponential backoff
+      let retryCount = 0;
+      const MAX_RETRIES = 3;
+      playerRef.current.on('error', (e: any) => {
+        console.error('[ClapprPlayer] Video.js error:', e);
+        const error = playerRef.current?.error();
+        if (error && retryCount < MAX_RETRIES) {
+          retryCount++;
+          const delay = Math.min(2000 * Math.pow(2, retryCount - 1), 16000);
+          console.log(`[ClapprPlayer] Retry ${retryCount}/${MAX_RETRIES} in ${delay}ms`);
+          setTimeout(() => {
+            if (playerRef.current) {
+              playerRef.current.src({ src: source, type: 'application/x-mpegURL' });
+              playerRef.current.play();
+            }
+          }, delay);
+        }
+      });
+    }, 50);
 
     return () => {
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
-      }
+      clearTimeout(initTimeout);
+      disposePlayer();
     };
   }, [source]);
 
   const toggleMute = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setIsMuted(video.muted);
-    if (!video.muted) {
-      setShowUnmuteBanner(false);
-      video.play().catch(() => {
-        video.muted = true;
-        setIsMuted(true);
-        video.play().catch(() => {});
-      });
+    if (playerRef.current) {
+      const newMutedState = !isMuted;
+      playerRef.current.muted(newMutedState);
+      setIsMuted(newMutedState);
+      if (!newMutedState) {
+        setShowUnmuteBanner(false);
+        const playPromise = playerRef.current.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {
+            console.log('[ClapprPlayer] Play after unmute failed, retrying muted');
+            playerRef.current.muted(true);
+            setIsMuted(true);
+            playerRef.current.play();
+          });
+        }
+      }
     }
   };
 
@@ -150,7 +220,6 @@ export function ClapprPlayer({
           <h3 className="text-lg font-semibold text-foreground">{pageTitle}</h3>
           <p className="text-sm text-muted-foreground">{pageDescription}</p>
         </div>
-        {/* Cast button */}
         <button
           onClick={startCasting}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors text-sm font-medium"
@@ -181,18 +250,14 @@ export function ClapprPlayer({
         <div className="relative w-full rounded-lg overflow-hidden bg-black" style={{ aspectRatio: "16/9" }}>
           <video
             ref={videoRef}
-            className="w-full h-full object-contain"
+            className="video-js vjs-big-play-centered vjs-theme-fantasy"
             playsInline
-            autoPlay
-            controls
-            controlsList="nodownload"
             // @ts-ignore - webkit AirPlay attribute
             x-webkit-airplay="allow"
             style={{ width: "100%", height: "100%" }}
           />
         </div>
 
-        {/* Casting info */}
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Cast className="w-3.5 h-3.5" />
           <span>
