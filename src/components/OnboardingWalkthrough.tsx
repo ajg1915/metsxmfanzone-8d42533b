@@ -141,13 +141,16 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => handleSkip()}>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleSkip(); }}>
       <DialogContent 
         className="max-w-[90vw] sm:max-w-[380px] p-0 gap-0 overflow-hidden border-0 rounded-2xl bg-transparent shadow-2xl [&>button]:hidden [&>button]:pointer-events-none"
         onPointerDownOutside={(e) => { e.preventDefault(); handleSkip(); }}
         onEscapeKeyDown={() => handleSkip()}
         onInteractOutside={(e) => { e.preventDefault(); handleSkip(); }}
       >
+        <DialogTitle className="sr-only">Welcome walkthrough</DialogTitle>
+        <DialogDescription className="sr-only">You can close this popup and sign up or log in later.</DialogDescription>
+
         {/* Outer glow effect */}
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-blue-500/30 to-primary/30 rounded-2xl blur-xl opacity-60" />
         
@@ -163,14 +166,16 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
           </div>
 
           {/* Close button */}
-          <button
-            type="button"
-            aria-label="Close"
-            className="absolute right-2 top-2 z-50 bg-black/60 hover:bg-black/80 text-white h-10 w-10 min-h-[44px] min-w-[44px] rounded-full backdrop-blur-sm border border-white/20 transition-all hover:scale-110 flex items-center justify-center cursor-pointer"
-            onClick={(e) => { e.stopPropagation(); handleSkip(); }}
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <DialogClose asChild>
+            <button
+              type="button"
+              aria-label="Close"
+              className="absolute right-2 top-2 z-50 bg-black/60 hover:bg-black/80 text-white h-10 w-10 min-h-[44px] min-w-[44px] rounded-full backdrop-blur-sm border border-white/20 transition-all hover:scale-110 flex items-center justify-center cursor-pointer"
+              onClick={(e) => { e.stopPropagation(); handleSkip(); }}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
 
           {/* Step counter */}
           <div className="absolute left-3 top-3 z-30 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/10">
