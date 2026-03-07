@@ -11,6 +11,9 @@ export default function StreamTester() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [url, setUrl] = useState("");
+  const [mode, setMode] = useState<"url" | "playlist">("url");
+  const [playlistContent, setPlaylistContent] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "playing" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [streamInfo, setStreamInfo] = useState<{ levels: number; currentLevel: string; duration: string } | null>(null);
