@@ -114,11 +114,11 @@ export default function StreamTester() {
           });
       });
 
-      hls.loadSource(trimmed);
+      hls.loadSource(source);
       hls.attachMedia(video);
       hlsRef.current = hls;
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = trimmed;
+      video.src = source;
       video.addEventListener("loadedmetadata", () => {
         setStreamInfo({
           levels: 1,
