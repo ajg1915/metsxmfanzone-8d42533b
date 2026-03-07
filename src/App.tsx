@@ -267,6 +267,7 @@ const AppContent = () => {
   
   return (
     <TooltipProvider>
+      <TVModeWrapper>
       <PullToRefresh>
         <Toaster />
         <Sonner />
