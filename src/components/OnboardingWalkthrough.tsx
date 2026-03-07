@@ -23,6 +23,8 @@ interface OnboardingWalkthroughProps {
   previewSteps?: OnboardingStep[];
 }
 
+const ONBOARDING_DISMISSED_KEY = "onboarding_walkthrough_dismissed";
+
 const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps = [] }: OnboardingWalkthroughProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -37,16 +39,23 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       setSteps(previewSteps);
       setOpen(true);
       setLoading(false);
-    } else {
-      // If user is signed in, never show the popup
-      if (user) {
-        setLoading(false);
-        return;
-      }
-
-      // Show once per page view for logged-out users (no session persistence)
-      fetchAndShow();
+      return;
     }
+
+    // If user is signed in, never show the popup
+    if (user) {
+      setLoading(false);
+      return;
+    }
+
+    // Allow guests to dismiss and continue browsing for this session
+    const dismissed = sessionStorage.getItem(ONBOARDING_DISMISSED_KEY) === "true";
+    if (dismissed) {
+      setLoading(false);
+      return;
+    }
+
+    fetchAndShow();
   }, [previewMode, previewSteps, user]);
 
   const fetchAndShow = async () => {
