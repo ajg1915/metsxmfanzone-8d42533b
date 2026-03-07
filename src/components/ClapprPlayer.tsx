@@ -17,8 +17,8 @@ export function ClapprPlayer({
 }: NativeStreamPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
-  const [isMuted, setIsMuted] = useState(true);
-  const [showUnmuteBanner, setShowUnmuteBanner] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showUnmuteBanner, setShowUnmuteBanner] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -34,18 +34,33 @@ export function ClapprPlayer({
       hls.loadSource(source);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch(() => {
-          // Autoplay blocked, muted autoplay should work
+        // Try unmuted autoplay first
+        video.muted = false;
+        video.play().then(() => {
+          setIsMuted(false);
+          setShowUnmuteBanner(false);
+        }).catch(() => {
+          // Browser blocked unmuted, fall back to muted
           video.muted = true;
+          setIsMuted(true);
+          setShowUnmuteBanner(true);
           video.play().catch(() => {});
         });
       });
       hlsRef.current = hls;
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      // Native HLS (Safari/iOS)
       video.src = source;
       video.addEventListener("loadedmetadata", () => {
-        video.play().catch(() => {});
+        video.muted = false;
+        video.play().then(() => {
+          setIsMuted(false);
+          setShowUnmuteBanner(false);
+        }).catch(() => {
+          video.muted = true;
+          setIsMuted(true);
+          setShowUnmuteBanner(true);
+          video.play().catch(() => {});
+        });
       });
     }
 
@@ -102,7 +117,6 @@ export function ClapprPlayer({
             className="w-full h-full object-contain"
             playsInline
             autoPlay
-            muted
             controls
             controlsList="nodownload"
             style={{ width: "100%", height: "100%" }}
