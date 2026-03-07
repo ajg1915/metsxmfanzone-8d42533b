@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, X, Sparkles, Rocket, UserPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +23,8 @@ interface OnboardingWalkthroughProps {
   previewSteps?: OnboardingStep[];
 }
 
+const ONBOARDING_DISMISSED_KEY = "onboarding_walkthrough_dismissed";
+
 const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps = [] }: OnboardingWalkthroughProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -37,16 +39,23 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
       setSteps(previewSteps);
       setOpen(true);
       setLoading(false);
-    } else {
-      // If user is signed in, never show the popup
-      if (user) {
-        setLoading(false);
-        return;
-      }
-
-      // Show once per page view for logged-out users (no session persistence)
-      fetchAndShow();
+      return;
     }
+
+    // If user is signed in, never show the popup
+    if (user) {
+      setLoading(false);
+      return;
+    }
+
+    // Allow guests to dismiss and continue browsing for this session
+    const dismissed = sessionStorage.getItem(ONBOARDING_DISMISSED_KEY) === "true";
+    if (dismissed) {
+      setLoading(false);
+      return;
+    }
+
+    fetchAndShow();
   }, [previewMode, previewSteps, user]);
 
   const fetchAndShow = async () => {
@@ -92,11 +101,13 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   };
 
   const handleComplete = () => {
+    sessionStorage.setItem(ONBOARDING_DISMISSED_KEY, "true");
     onComplete();
     setOpen(false);
   };
 
   const handleSkip = () => {
+    sessionStorage.setItem(ONBOARDING_DISMISSED_KEY, "true");
     onComplete();
     setOpen(false);
   };
@@ -130,13 +141,16 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => handleSkip()}>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleSkip(); }}>
       <DialogContent 
         className="max-w-[90vw] sm:max-w-[380px] p-0 gap-0 overflow-hidden border-0 rounded-2xl bg-transparent shadow-2xl [&>button]:hidden [&>button]:pointer-events-none"
         onPointerDownOutside={(e) => { e.preventDefault(); handleSkip(); }}
         onEscapeKeyDown={() => handleSkip()}
         onInteractOutside={(e) => { e.preventDefault(); handleSkip(); }}
       >
+        <DialogTitle className="sr-only">Welcome walkthrough</DialogTitle>
+        <DialogDescription className="sr-only">You can close this popup and sign up or log in later.</DialogDescription>
+
         {/* Outer glow effect */}
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-blue-500/30 to-primary/30 rounded-2xl blur-xl opacity-60" />
         
@@ -152,14 +166,16 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
           </div>
 
           {/* Close button */}
-          <button
-            type="button"
-            aria-label="Close"
-            className="absolute right-2 top-2 z-50 bg-black/60 hover:bg-black/80 text-white h-10 w-10 min-h-[44px] min-w-[44px] rounded-full backdrop-blur-sm border border-white/20 transition-all hover:scale-110 flex items-center justify-center cursor-pointer"
-            onClick={(e) => { e.stopPropagation(); handleSkip(); }}
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <DialogClose asChild>
+            <button
+              type="button"
+              aria-label="Close"
+              className="absolute right-2 top-2 z-50 bg-black/60 hover:bg-black/80 text-white h-10 w-10 min-h-[44px] min-w-[44px] rounded-full backdrop-blur-sm border border-white/20 transition-all hover:scale-110 flex items-center justify-center cursor-pointer"
+              onClick={(e) => { e.stopPropagation(); handleSkip(); }}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
 
           {/* Step counter */}
           <div className="absolute left-3 top-3 z-30 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/10">
