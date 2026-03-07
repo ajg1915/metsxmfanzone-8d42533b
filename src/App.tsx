@@ -15,6 +15,7 @@ import { usePresenceTracking } from "@/hooks/usePresenceTracking";
 import { StreamExitDialog } from "@/components/StreamExitDialog";
 import { LiveStreamToast } from "@/components/LiveStreamToast";
 import SocialMediaBar from "@/components/SocialMediaBar";
+import { TVModeWrapper } from "@/components/TVModeWrapper";
 
 import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
 
