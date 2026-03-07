@@ -132,9 +132,10 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
   return (
     <Dialog open={open} onOpenChange={() => handleSkip()}>
       <DialogContent 
-        className="max-w-[90vw] sm:max-w-[380px] p-0 gap-0 overflow-hidden border-0 rounded-2xl bg-transparent shadow-2xl [&>button]:hidden"
-        onPointerDownOutside={() => handleSkip()}
+        className="max-w-[90vw] sm:max-w-[380px] p-0 gap-0 overflow-hidden border-0 rounded-2xl bg-transparent shadow-2xl [&>button]:hidden [&>button]:pointer-events-none"
+        onPointerDownOutside={(e) => { e.preventDefault(); handleSkip(); }}
         onEscapeKeyDown={() => handleSkip()}
+        onInteractOutside={(e) => { e.preventDefault(); handleSkip(); }}
       >
         {/* Outer glow effect */}
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-blue-500/30 to-primary/30 rounded-2xl blur-xl opacity-60" />
