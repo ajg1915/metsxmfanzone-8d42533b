@@ -27,8 +27,8 @@ export function StreamPlayer({
 }: StreamPlayerProps) {
   const [stream, setStream] = useState<LiveStream | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
-  const [showUnmuteBanner, setShowUnmuteBanner] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showUnmuteBanner, setShowUnmuteBanner] = useState(false);
   const [playerReady, setPlayerReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<any>(null);
@@ -86,8 +86,8 @@ export function StreamPlayer({
 
       playerRef.current = videojs(videoRef.current, {
         controls: true,
-        autoplay: true,
-        muted: true,
+        autoplay: 'any',
+        muted: false,
         preload: 'auto',
         fluid: true,
         liveui: true,
@@ -126,6 +126,17 @@ export function StreamPlayer({
       playerRef.current.ready(() => {
         console.log('Video.js player is ready');
         setPlayerReady(true);
+
+        // Try unmuted playback; if blocked, fall back to muted with banner
+        const p = playerRef.current;
+        if (p.muted()) {
+          // autoplay:'any' fell back to muted
+          setIsMuted(true);
+          setShowUnmuteBanner(true);
+        } else {
+          setIsMuted(false);
+          setShowUnmuteBanner(false);
+        }
 
         // Auto-seek to live edge periodically to prevent drift/lag
         const liveEdgeInterval = setInterval(() => {
