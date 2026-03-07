@@ -412,6 +412,7 @@ const AppContent = () => {
           </Routes>
         </Suspense>
       </PullToRefresh>
+      </TVModeWrapper>
     </TooltipProvider>
   );
 };
