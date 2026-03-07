@@ -177,25 +177,92 @@ export default function StreamTester() {
         </p>
       </div>
 
-      {/* URL Input */}
+      {/* Mode Toggle */}
       <div className="flex gap-2">
-        <Input
-          placeholder="https://example.com/stream/playlist.m3u8"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && testStream()}
-          className="flex-1"
-        />
-        {status === "playing" || status === "loading" ? (
-          <Button variant="destructive" onClick={stopStream} className="gap-2">
-            <Square className="w-4 h-4" /> Stop
-          </Button>
-        ) : (
-          <Button onClick={testStream} className="gap-2">
-            <Play className="w-4 h-4" /> Test
-          </Button>
-        )}
+        <Button
+          variant={mode === "url" ? "default" : "outline"}
+          onClick={() => setMode("url")}
+          className="gap-2"
+          size="sm"
+        >
+          <Link2 className="w-4 h-4" /> URL
+        </Button>
+        <Button
+          variant={mode === "playlist" ? "default" : "outline"}
+          onClick={() => setMode("playlist")}
+          className="gap-2"
+          size="sm"
+        >
+          <FileText className="w-4 h-4" /> Playlist
+        </Button>
       </div>
+
+      {/* URL Input or Playlist Textarea */}
+      {mode === "url" ? (
+        <div className="flex gap-2">
+          <Input
+            placeholder="https://example.com/stream/playlist.m3u8"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && testStream()}
+            className="flex-1"
+            inputMode="url"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+          />
+          {status === "playing" || status === "loading" ? (
+            <Button variant="destructive" onClick={stopStream} className="gap-2 shrink-0">
+              <Square className="w-4 h-4" /> Stop
+            </Button>
+          ) : (
+            <Button onClick={testStream} className="gap-2 shrink-0">
+              <Play className="w-4 h-4" /> Test
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".m3u8,.m3u"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              onClick={() => { if (fileInputRef.current) { fileInputRef.current.value = ""; fileInputRef.current.click(); } }}
+              className="gap-2"
+              size="sm"
+            >
+              <Upload className="w-4 h-4" /> Upload .m3u8
+            </Button>
+            {status === "playing" || status === "loading" ? (
+              <Button variant="destructive" onClick={stopStream} className="gap-2 shrink-0 ml-auto" size="sm">
+                <Square className="w-4 h-4" /> Stop
+              </Button>
+            ) : (
+              <Button onClick={testStream} className="gap-2 shrink-0 ml-auto" size="sm">
+                <Play className="w-4 h-4" /> Test
+              </Button>
+            )}
+          </div>
+          <Textarea
+            placeholder={"#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-STREAM-INF:BANDWIDTH=...\nhttps://..."}
+            value={playlistContent}
+            onChange={(e) => setPlaylistContent(e.target.value)}
+            rows={6}
+            className="font-mono text-xs"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+          />
+        </div>
+      )}
 
       {/* Status Bar */}
       <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
