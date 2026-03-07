@@ -151,14 +151,14 @@ const OnboardingWalkthrough = ({ onComplete, previewMode = false, previewSteps =
           </div>
 
           {/* Close button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-3 top-3 z-30 bg-black/40 hover:bg-black/60 text-white h-8 w-8 rounded-full backdrop-blur-sm border border-white/10 transition-all hover:scale-105"
-            onClick={() => handleSkip()}
+          <button
+            type="button"
+            aria-label="Close"
+            className="absolute right-2 top-2 z-50 bg-black/60 hover:bg-black/80 text-white h-10 w-10 min-h-[44px] min-w-[44px] rounded-full backdrop-blur-sm border border-white/20 transition-all hover:scale-110 flex items-center justify-center cursor-pointer"
+            onClick={(e) => { e.stopPropagation(); handleSkip(); }}
           >
-            <X className="w-4 h-4" />
-          </Button>
+            <X className="w-5 h-5" />
+          </button>
 
           {/* Step counter */}
           <div className="absolute left-3 top-3 z-30 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/10">
