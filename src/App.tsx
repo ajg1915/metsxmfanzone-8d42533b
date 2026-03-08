@@ -386,6 +386,7 @@ const AppContent = () => {
             <Route path="/product/:handle" element={<Product />} />
             <Route path="/mets-schedule-2026" element={<MetsSchedule2026 />} />
             <Route path="/broadcast-schedule" element={<TVBroadcastSchedule />} />
+            <Route path="/tv" element={<TVDashboard />} />
             <Route path="/mets-lineup-card" element={<MetsLineupCard />} />
             <Route path="/mets-scores" element={<MetsScores />} />
             <Route path="/mets-gamecast" element={<MetsGamecast />} />
