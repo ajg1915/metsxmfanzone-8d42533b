@@ -357,7 +357,33 @@ export default function MediaLibrary() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{item.file_name}</p>
+                  {editingId === item.id ? (
+                    <div className="flex items-center gap-1">
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="h-7 text-sm px-2"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") renameMutation.mutate({ id: item.id, newName: editName });
+                          if (e.key === "Escape") setEditingId(null);
+                        }}
+                      />
+                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => renameMutation.mutate({ id: item.id, newName: editName })}>
+                        <Check className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setEditingId(null)}>
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <p className="text-sm font-medium truncate">{item.file_name}</p>
+                      <Button size="icon" variant="ghost" className="h-6 w-6 flex-shrink-0" onClick={() => { setEditingId(item.id); setEditName(item.file_name); }}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 mt-0.5">
                     <Badge variant="outline" className="text-[10px] capitalize">{item.folder}</Badge>
                     <span className="text-xs text-muted-foreground">{formatFileSize(item.file_size)}</span>
