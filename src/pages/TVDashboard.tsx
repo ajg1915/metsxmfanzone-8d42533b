@@ -12,6 +12,10 @@ export type TVCategory = "home" | "live" | "highlights" | "replays";
 
 const TVDashboard = () => {
   const [activeCategory, setActiveCategory] = useState<TVCategory>("home");
+  const navigate = useNavigate();
+
+  const goToMetsTV = useCallback(() => navigate("/metsxmfanzone"), [navigate]);
+  const goToSpring = useCallback(() => navigate("/spring-training-live"), [navigate]);
 
   const { data: liveStreams = [], isLoading: streamsLoading } = useQuery({
     queryKey: ["tv-live-streams"],
