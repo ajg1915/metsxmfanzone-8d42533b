@@ -12,8 +12,6 @@ const categories: { key: TVCategory; label: string; icon: React.ElementType }[] 
   { key: "live", label: "Live", icon: Radio },
   { key: "highlights", label: "Highlights", icon: Film },
   { key: "replays", label: "Replays", icon: RotateCcw },
-  { key: "schedule", label: "Schedule", icon: Calendar },
-  { key: "community", label: "Community", icon: Users },
 ];
 
 export function TVSidebar({ activeCategory, onCategoryChange }: TVSidebarProps) {
