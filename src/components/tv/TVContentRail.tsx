@@ -15,6 +15,7 @@ interface TVContentRailProps {
   title: string;
   items: TVRailItem[];
   accent?: boolean;
+  onItemClick?: (item: TVRailItem) => void;
 }
 
 export function TVContentRail({ title, items, accent }: TVContentRailProps) {
