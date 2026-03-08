@@ -861,6 +861,8 @@ export default function LiveStreamManagement() {
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                   getStatusBadge={getStatusBadge}
+                  selected={selectedIds.has(stream.id)}
+                  onToggleSelect={toggleSelect}
                 />
               ))}
             </div>
