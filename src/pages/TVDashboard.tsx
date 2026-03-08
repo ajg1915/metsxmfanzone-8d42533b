@@ -163,9 +163,9 @@ const TVDashboard = () => {
   const [selectedStory, setSelectedStory] = useState<any>(null);
 
   const handleStoryClick = useCallback((item: any) => {
-    const story = stories.find((s) => s.id === item.id);
+    const story = resolvedStories.find((s) => s.id === item.id);
     if (story) setSelectedStory(story);
-  }, [stories]);
+  }, [resolvedStories]);
 
   const heroStream = liveStreams.find((s) => s.status === "live") || liveStreams[0];
 
