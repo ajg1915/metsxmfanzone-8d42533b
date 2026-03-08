@@ -166,7 +166,10 @@ export default function LiveStreamManagement() {
     published: "" as "" | "true" | "false",
     assigned_pages: [] as string[],
     applyPages: false,
+    thumbnail_url: "",
+    applyThumbnail: false,
   });
+  const [bulkMediaPickerOpen, setBulkMediaPickerOpen] = useState(false);
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
@@ -189,6 +192,7 @@ export default function LiveStreamManagement() {
     if (bulkData.status) updates.status = bulkData.status;
     if (bulkData.published) updates.published = bulkData.published === "true";
     if (bulkData.applyPages) updates.assigned_pages = bulkData.assigned_pages;
+    if (bulkData.applyThumbnail) updates.thumbnail_url = bulkData.thumbnail_url || null;
 
     if (Object.keys(updates).length === 0) {
       toast({ title: "No changes", description: "Select at least one field to update", variant: "destructive" });
@@ -203,7 +207,7 @@ export default function LiveStreamManagement() {
       toast({ title: "Bulk update complete", description: `Updated ${selectedIds.size} streams` });
       setSelectedIds(new Set());
       setBulkEditOpen(false);
-      setBulkData({ status: "", published: "", assigned_pages: [], applyPages: false });
+      setBulkData({ status: "", published: "", assigned_pages: [], applyPages: false, thumbnail_url: "", applyThumbnail: false });
       fetchStreams();
     } catch (err) {
       console.error("Bulk update error:", err);
@@ -923,11 +927,92 @@ export default function LiveStreamManagement() {
                 </div>
               )}
             </div>
+            {/* Bulk Thumbnail */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Checkbox checked={bulkData.applyThumbnail} onCheckedChange={(c) => setBulkData({ ...bulkData, applyThumbnail: !!c })} />
+                <Label>Update Thumbnail</Label>
+              </div>
+              {bulkData.applyThumbnail && (
+                <div className="space-y-2 pl-6">
+                  {bulkData.thumbnail_url && (
+                    <div className="relative w-full aspect-video rounded-md overflow-hidden bg-muted max-w-[200px]">
+                      <img src={bulkData.thumbnail_url} alt="Bulk thumbnail" className="w-full h-full object-cover" />
+                      <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={() => setBulkData({ ...bulkData, thumbnail_url: "" })}>
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
+                  <Label className="text-xs text-muted-foreground block">Team Presets</Label>
+                  <div className="grid grid-cols-5 gap-1 max-h-[120px] overflow-y-auto rounded border border-border/50 p-1">
+                    {TEAM_PRESET_IMAGES.map((preset) => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => setBulkData({ ...bulkData, thumbnail_url: preset.src })}
+                        className={`aspect-video rounded overflow-hidden border-2 transition-colors ${bulkData.thumbnail_url === preset.src ? 'border-primary ring-1 ring-primary' : 'border-transparent hover:border-primary/50'}`}
+                        title={preset.label}
+                      >
+                        <img src={preset.src} alt={preset.label} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" size="sm" className="flex-1" onClick={() => { fetchMediaLibrary(); setBulkMediaPickerOpen(true); }}>
+                      <Image className="w-3.5 h-3.5 mr-1" /> Media Library
+                    </Button>
+                  </div>
+                  <Input
+                    type="url"
+                    value={bulkData.thumbnail_url}
+                    onChange={(e) => setBulkData({ ...bulkData, thumbnail_url: e.target.value })}
+                    placeholder="Or paste URL..."
+                    className="text-xs"
+                  />
+                </div>
+              )}
+            </div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setBulkEditOpen(false)}>Cancel</Button>
               <Button onClick={handleBulkEdit}>Apply to {selectedIds.size} Streams</Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Media Library Picker */}
+      <Dialog open={bulkMediaPickerOpen} onOpenChange={setBulkMediaPickerOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Select Thumbnail for Bulk Edit</DialogTitle>
+            <DialogDescription>Choose an image to apply to all selected streams</DialogDescription>
+          </DialogHeader>
+          {mediaLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : mediaItems.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">No images found.</p>
+          ) : (
+            <ScrollArea className="h-[50vh]">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-1">
+                {mediaItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setBulkData({ ...bulkData, thumbnail_url: item.file_url });
+                      setBulkMediaPickerOpen(false);
+                      toast({ title: "Image selected", description: item.file_name });
+                    }}
+                    className="aspect-video rounded-md overflow-hidden border-2 border-transparent hover:border-primary transition-colors bg-muted"
+                  >
+                    <img src={item.file_url} alt={item.file_name} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
         </DialogContent>
       </Dialog>
     </div>
