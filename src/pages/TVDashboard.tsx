@@ -26,14 +26,15 @@ const TVDashboard = () => {
     },
   });
 
-  const { data: podcasts = [], isLoading: podcastsLoading } = useQuery({
-    queryKey: ["tv-podcasts"],
+  const { data: highlights = [], isLoading: highlightsLoading } = useQuery({
+    queryKey: ["tv-highlights"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("podcast_shows")
+        .from("videos")
         .select("*")
         .eq("published", true)
-        .order("show_date", { ascending: false })
+        .eq("video_type", "highlight")
+        .order("published_at", { ascending: false })
         .limit(12);
       if (error) throw error;
       return data;
