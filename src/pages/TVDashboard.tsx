@@ -305,12 +305,12 @@ const TVDashboard = () => {
 
               {/* Highlights section */}
               <div ref={highlightsRef}>
-                {highlightItems.length > 0 && <TVContentRail title="Video Highlights" items={highlightItems} />}
+                {highlightItems.length > 0 && <TVContentRail title="Video Highlights" items={highlightItems} onItemClick={handleHighlightClick} />}
               </div>
 
               {/* Replays section */}
               <div ref={replaysRef}>
-                {replayItems.length > 0 && <TVContentRail title="Game Replays" items={replayItems} />}
+                {replayItems.length > 0 && <TVContentRail title="Game Replays" items={replayItems} onItemClick={handleReplayClick} />}
               </div>
             </div>
           </>
