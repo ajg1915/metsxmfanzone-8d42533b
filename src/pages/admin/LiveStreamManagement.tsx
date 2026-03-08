@@ -500,7 +500,16 @@ export default function LiveStreamManagement() {
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) => {
+                    const newTitle = e.target.value;
+                    const updates: any = { ...formData, title: newTitle };
+                    // Auto-match team thumbnail if no custom thumbnail is set
+                    if (!formData.thumbnail_url || TEAM_PRESET_IMAGES.some(p => p.src === formData.thumbnail_url)) {
+                      const matched = autoMatchTeamImage(newTitle);
+                      if (matched) updates.thumbnail_url = matched;
+                    }
+                    setFormData(updates);
+                  }}
                   required
                 />
               </div>
