@@ -190,11 +190,23 @@ const TVDashboard = () => {
   );
 
   const [selectedStory, setSelectedStory] = useState<any>(null);
+  const [selectedHighlight, setSelectedHighlight] = useState<any>(null);
+  const [selectedReplay, setSelectedReplay] = useState<any>(null);
 
   const handleStoryClick = useCallback((item: any) => {
     const story = resolvedStories.find((s) => s.id === item.id);
     if (story) setSelectedStory(story);
   }, [resolvedStories]);
+
+  const handleHighlightClick = useCallback((item: any) => {
+    const video = highlights.find((v: any) => v.id === item.id);
+    if (video) setSelectedHighlight(video);
+  }, [highlights]);
+
+  const handleReplayClick = useCallback((item: any) => {
+    const replay = replays.find((r) => r.id === item.id);
+    if (replay) setSelectedReplay(replay);
+  }, [replays]);
 
   const heroStream = liveStreams.find((s) => s.status === "live") || liveStreams[0];
 
@@ -293,12 +305,12 @@ const TVDashboard = () => {
 
               {/* Highlights section */}
               <div ref={highlightsRef}>
-                {highlightItems.length > 0 && <TVContentRail title="Video Highlights" items={highlightItems} />}
+                {highlightItems.length > 0 && <TVContentRail title="Video Highlights" items={highlightItems} onItemClick={handleHighlightClick} />}
               </div>
 
               {/* Replays section */}
               <div ref={replaysRef}>
-                {replayItems.length > 0 && <TVContentRail title="Game Replays" items={replayItems} />}
+                {replayItems.length > 0 && <TVContentRail title="Game Replays" items={replayItems} onItemClick={handleReplayClick} />}
               </div>
             </div>
           </>
@@ -335,6 +347,62 @@ const TVDashboard = () => {
                 <p className="text-muted-foreground text-xs mt-1">
                   {selectedStory.media_type === "video" ? "Video Story" : "Photo Story"}
                 </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Highlight Video Player Dialog */}
+      <Dialog open={!!selectedHighlight} onOpenChange={(open) => !open && setSelectedHighlight(null)}>
+        <DialogContent className="max-w-2xl p-0 bg-card border-border overflow-hidden">
+          <button
+            onClick={() => setSelectedHighlight(null)}
+            className="absolute top-3 right-3 z-50 text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          {selectedHighlight && (
+            <div className="flex flex-col">
+              <video
+                src={selectedHighlight.video_url}
+                controls
+                autoPlay
+                className="w-full aspect-video object-contain bg-black"
+              />
+              <div className="p-4">
+                <h3 className="text-foreground font-semibold text-sm">{selectedHighlight.title}</h3>
+                {selectedHighlight.description && (
+                  <p className="text-muted-foreground text-xs mt-1 line-clamp-2">{selectedHighlight.description}</p>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Replay Player Dialog */}
+      <Dialog open={!!selectedReplay} onOpenChange={(open) => !open && setSelectedReplay(null)}>
+        <DialogContent className="max-w-2xl p-0 bg-card border-border overflow-hidden">
+          <button
+            onClick={() => setSelectedReplay(null)}
+            className="absolute top-3 right-3 z-50 text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          {selectedReplay && (
+            <div className="flex flex-col">
+              <iframe
+                src={selectedReplay.embed_url}
+                title={selectedReplay.title}
+                className="w-full aspect-video bg-black"
+                allowFullScreen
+              />
+              <div className="p-4">
+                <h3 className="text-foreground font-semibold text-sm">{selectedReplay.title}</h3>
+                {selectedReplay.description && (
+                  <p className="text-muted-foreground text-xs mt-1 line-clamp-2">{selectedReplay.description}</p>
+                )}
               </div>
             </div>
           )}
