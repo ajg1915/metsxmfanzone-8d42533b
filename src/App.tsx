@@ -85,6 +85,7 @@ const Merch = lazy(() => import("./pages/Merch"));
 const Product = lazy(() => import("./pages/Product"));
 const MetsSchedule2026 = lazy(() => import("./pages/MetsSchedule2026"));
 const TVBroadcastSchedule = lazy(() => import("./pages/TVBroadcastSchedule"));
+const TVDashboard = lazy(() => import("./pages/TVDashboard"));
 const MetsLineupCard = lazy(() => import("./pages/MetsLineupCard"));
 const MetsScores = lazy(() => import("./pages/MetsScores"));
 const MetsGamecast = lazy(() => import("./pages/MetsGamecast"));
