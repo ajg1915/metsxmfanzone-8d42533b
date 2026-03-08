@@ -42,7 +42,7 @@ export function TVContentRail({ title, items, accent, onItemClick }: TVContentRa
       </div>
 
       {/* Horizontal scroll rail */}
-      <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-secondary/30">
+      <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none">
         {items.map((item) => (
           <button
             key={item.id}
