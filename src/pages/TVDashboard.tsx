@@ -235,6 +235,42 @@ const TVDashboard = () => {
       <main className="flex-1 overflow-y-auto overflow-x-hidden">
         {renderContent()}
       </main>
+
+      {/* Story Viewer Dialog */}
+      <Dialog open={!!selectedStory} onOpenChange={(open) => !open && setSelectedStory(null)}>
+        <DialogContent className="max-w-lg p-0 bg-black border-white/10 overflow-hidden">
+          <button
+            onClick={() => setSelectedStory(null)}
+            className="absolute top-3 right-3 z-50 text-white/70 hover:text-white"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          {selectedStory && (
+            <div className="flex flex-col">
+              {selectedStory.media_type === "video" ? (
+                <video
+                  src={selectedStory.media_url}
+                  controls
+                  autoPlay
+                  className="w-full aspect-video object-contain bg-black"
+                />
+              ) : (
+                <img
+                  src={selectedStory.media_url}
+                  alt={selectedStory.title}
+                  className="w-full aspect-video object-contain bg-black"
+                />
+              )}
+              <div className="p-4">
+                <h3 className="text-white font-semibold text-sm">{selectedStory.title}</h3>
+                <p className="text-white/50 text-xs mt-1">
+                  {selectedStory.media_type === "video" ? "Video Story" : "Photo Story"}
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
