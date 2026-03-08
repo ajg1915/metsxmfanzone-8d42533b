@@ -12,6 +12,7 @@ import { useDevice } from "@/hooks/use-device";
 export default function AdminPortal() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isTV } = useDevice();
   const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkingLockout, setCheckingLockout] = useState(true);
