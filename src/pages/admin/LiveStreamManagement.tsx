@@ -18,31 +18,21 @@ import springMetsRedsox from "@/assets/spring-mets-redsox.jpg";
 import springMetsYankees from "@/assets/spring-mets-yankees.jpg";
 
 const TEAM_PRESET_IMAGES = [
-  { label: "Mets Home", src: fanartMetsHome, keywords: ["home", "citi field"] },
-  { label: "Mets Away", src: fanartMetsAway, keywords: ["away", "road"] },
-  { label: "Mets General", src: fanartMetsGeneral, keywords: ["mets", "general"] },
-  { label: "vs Braves", src: fanartMetsBraves, keywords: ["braves", "atlanta"] },
-  { label: "vs Dodgers", src: fanartMetsDodgers, keywords: ["dodgers", "los angeles", "la dodgers"] },
-  { label: "vs Phillies", src: fanartMetsPhillies, keywords: ["phillies", "philadelphia"] },
-  { label: "vs Yankees", src: fanartMetsYankees, keywords: ["yankees", "subway"] },
-  { label: "Spring Training", src: fanartMetsSpring, keywords: ["spring training", "grapefruit"] },
-  { label: "ST vs Astros", src: springMetsAstros, keywords: ["astros", "houston"] },
-  { label: "ST vs Braves", src: springMetsBraves, keywords: ["braves spring", "atlanta spring"] },
-  { label: "ST vs Cardinals", src: springMetsCards, keywords: ["cardinals", "st. louis", "cards"] },
-  { label: "ST vs Nationals", src: springMetsNats, keywords: ["nationals", "nats", "washington"] },
-  { label: "ST vs Red Sox", src: springMetsRedsox, keywords: ["red sox", "redsox", "boston"] },
-  { label: "ST vs Yankees", src: springMetsYankees, keywords: ["yankees spring"] },
+  { label: "Mets Home", src: fanartMetsHome },
+  { label: "Mets Away", src: fanartMetsAway },
+  { label: "Mets General", src: fanartMetsGeneral },
+  { label: "vs Braves", src: fanartMetsBraves },
+  { label: "vs Dodgers", src: fanartMetsDodgers },
+  { label: "vs Phillies", src: fanartMetsPhillies },
+  { label: "vs Yankees", src: fanartMetsYankees },
+  { label: "Spring Training", src: fanartMetsSpring },
+  { label: "ST vs Astros", src: springMetsAstros },
+  { label: "ST vs Braves", src: springMetsBraves },
+  { label: "ST vs Cardinals", src: springMetsCards },
+  { label: "ST vs Nationals", src: springMetsNats },
+  { label: "ST vs Red Sox", src: springMetsRedsox },
+  { label: "ST vs Yankees", src: springMetsYankees },
 ];
-
-const autoMatchTeamImage = (title: string): string | null => {
-  const lower = title.toLowerCase();
-  // Check spring training variants first (more specific)
-  const stMatch = TEAM_PRESET_IMAGES.find(p => p.label.startsWith("ST") && p.keywords.some(k => lower.includes(k)));
-  if (stMatch && lower.includes("spring")) return stMatch.src;
-  // Then check regular matchups
-  const match = TEAM_PRESET_IMAGES.find(p => p.keywords.some(k => lower.includes(k)));
-  return match?.src || null;
-};
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -456,37 +446,7 @@ export default function LiveStreamManagement() {
     <div className="max-w-7xl mx-auto px-2 py-3">
       <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
         <h1 className="text-lg font-bold">Live Stream Management</h1>
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-8"
-            onClick={async () => {
-              // Bulk auto-match team images to existing streams
-              const streamsToUpdate = streams.filter(s => {
-                const matched = autoMatchTeamImage(s.title);
-                return matched && !s.thumbnail_url;
-              });
-              const allMatched = streams.filter(s => autoMatchTeamImage(s.title));
-              if (allMatched.length === 0) {
-                toast({ title: "No matches found", description: "No stream titles matched any team keywords." });
-                return;
-              }
-              let updated = 0;
-              for (const stream of allMatched) {
-                const matched = autoMatchTeamImage(stream.title);
-                if (matched && matched !== stream.thumbnail_url) {
-                  const { error } = await supabase.from("live_streams").update({ thumbnail_url: matched }).eq("id", stream.id);
-                  if (!error) updated++;
-                }
-              }
-              toast({ title: `Updated ${updated} stream thumbnails`, description: `Matched ${allMatched.length} streams to team images.` });
-              fetchStreams();
-            }}
-          >
-            <Image className="w-3.5 h-3.5 mr-1.5" />
-            Match Team Images
-          </Button>
+        <div className="flex items-center gap-2">
           <Button
             size="sm"
             variant="outline"
@@ -530,16 +490,7 @@ export default function LiveStreamManagement() {
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => {
-                    const newTitle = e.target.value;
-                    const updates: any = { ...formData, title: newTitle };
-                    // Auto-match team thumbnail if no custom thumbnail is set
-                    if (!formData.thumbnail_url || TEAM_PRESET_IMAGES.some(p => p.src === formData.thumbnail_url)) {
-                      const matched = autoMatchTeamImage(newTitle);
-                      if (matched) updates.thumbnail_url = matched;
-                    }
-                    setFormData(updates);
-                  }}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
                 />
               </div>
