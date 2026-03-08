@@ -274,7 +274,10 @@ export default function MediaLibrary() {
                   )}
                 </div>
                 {/* Overlay actions */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <div className="absolute inset-0 aspect-square bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <Button size="icon" variant="secondary" onClick={() => { setEditingId(item.id); setEditName(item.file_name); }} title="Rename">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                   <Button size="icon" variant="secondary" onClick={() => copyUrl(item.file_url)} title="Copy URL">
                     <Copy className="h-4 w-4" />
                   </Button>
