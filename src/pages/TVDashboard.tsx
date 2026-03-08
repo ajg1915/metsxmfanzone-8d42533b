@@ -2,10 +2,9 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import SEOHead from "@/components/SEOHead";
-import { TVSidebar } from "@/components/tv/TVSidebar";
-import { TVContentRow } from "@/components/tv/TVContentRow";
-import { TVHeroPlayer } from "@/components/tv/TVHeroPlayer";
-import { TVHeader } from "@/components/tv/TVHeader";
+import { TVHeroBanner } from "@/components/tv/TVHeroBanner";
+import { TVNavBar } from "@/components/tv/TVNavBar";
+import { TVContentRail } from "@/components/tv/TVContentRail";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export type TVCategory = "home" | "live" | "highlights" | "replays" | "schedule" | "community";
@@ -77,7 +76,9 @@ const TVDashboard = () => {
       title: s.title,
       thumbnail: s.thumbnail_url || "/placeholder.svg",
       badge: s.status === "live" ? "LIVE" : s.status === "scheduled" ? "Upcoming" : undefined,
-      subtitle: s.description?.slice(0, 60) || "",
+      subtitle: s.description?.slice(0, 80) || "",
+      streamUrl: s.stream_url,
+      isLive: s.status === "live",
     })),
     [liveStreams]
   );
@@ -87,7 +88,7 @@ const TVDashboard = () => {
       id: v.id,
       title: v.title,
       thumbnail: v.thumbnail_url || "/placeholder.svg",
-      subtitle: v.description?.slice(0, 60) || "",
+      subtitle: v.description?.slice(0, 80) || "",
     })),
     [highlights]
   );
@@ -97,7 +98,7 @@ const TVDashboard = () => {
       id: r.id,
       title: r.title,
       thumbnail: r.thumbnail_url || "/placeholder.svg",
-      subtitle: r.description?.slice(0, 60) || "",
+      subtitle: r.description?.slice(0, 80) || "",
     })),
     [replays]
   );
@@ -107,22 +108,26 @@ const TVDashboard = () => {
       id: h.id,
       title: h.title,
       thumbnail: h.image_url || "/placeholder.svg",
-      subtitle: h.description?.slice(0, 60) || "",
+      subtitle: h.description?.slice(0, 80) || "",
       badge: h.is_for_members ? "Members" : undefined,
     })),
     [heroSlides]
   );
 
+  // Pick hero stream for banner
+  const heroStream = liveStreams.find((s) => s.status === "live") || liveStreams[0];
+
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="space-y-4 p-3">
-          {[1, 2, 3].map((i) => (
+        <div className="space-y-6 px-6">
+          <Skeleton className="h-[220px] w-full rounded-lg" />
+          {[1, 2].map((i) => (
             <div key={i} className="space-y-2">
-              <Skeleton className="h-3 w-24" />
-              <div className="flex gap-2 overflow-hidden">
-                {[1, 2, 3, 4].map((j) => (
-                  <Skeleton key={j} className="h-20 w-36 shrink-0 rounded" />
+              <Skeleton className="h-4 w-32" />
+              <div className="flex gap-3">
+                {[1, 2, 3, 4, 5].map((j) => (
+                  <Skeleton key={j} className="h-28 w-48 shrink-0 rounded-md" />
                 ))}
               </div>
             </div>
@@ -134,23 +139,45 @@ const TVDashboard = () => {
     switch (activeCategory) {
       case "home":
         return (
-          <div className="space-y-3">
-            {liveStreams.length > 0 && <TVHeroPlayer streams={liveStreams} />}
-            {featuredItems.length > 0 && <TVContentRow title="Featured" items={featuredItems} />}
-            {liveItems.length > 0 && <TVContentRow title="Live Now" items={liveItems} highlight />}
-            {highlightItems.length > 0 && <TVContentRow title="Video Highlights" items={highlightItems} />}
-            {replayItems.length > 0 && <TVContentRow title="Game Replays" items={replayItems} />}
-          </div>
+          <>
+            {heroStream && (
+              <TVHeroBanner
+                title={heroStream.title}
+                description={heroStream.description || ""}
+                thumbnail={heroStream.thumbnail_url || "/placeholder.svg"}
+                streamUrl={heroStream.stream_url}
+                isLive={heroStream.status === "live"}
+              />
+            )}
+            <div className="space-y-1 px-6 pb-6 -mt-8 relative z-10">
+              {liveItems.length > 0 && <TVContentRail title="Live Now" items={liveItems} accent />}
+              {featuredItems.length > 0 && <TVContentRail title="Featured" items={featuredItems} />}
+              {highlightItems.length > 0 && <TVContentRail title="Video Highlights" items={highlightItems} />}
+              {replayItems.length > 0 && <TVContentRail title="Game Replays" items={replayItems} />}
+            </div>
+          </>
         );
       case "live":
-        return <TVContentRow title="Live Streams" items={liveItems} highlight />;
+        return (
+          <div className="px-6 pt-4 pb-6">
+            <TVContentRail title="Live Streams" items={liveItems} accent />
+          </div>
+        );
       case "highlights":
-        return <TVContentRow title="Video Highlights" items={highlightItems} />;
+        return (
+          <div className="px-6 pt-4 pb-6">
+            <TVContentRail title="Video Highlights" items={highlightItems} />
+          </div>
+        );
       case "replays":
-        return <TVContentRow title="Game Replays" items={replayItems} />;
+        return (
+          <div className="px-6 pt-4 pb-6">
+            <TVContentRail title="Game Replays" items={replayItems} />
+          </div>
+        );
       default:
         return (
-          <div className="flex items-center justify-center h-full text-muted-foreground text-xs">
+          <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">
             Coming soon
           </div>
         );
@@ -158,21 +185,18 @@ const TVDashboard = () => {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-background flex">
+    <div className="h-screen w-screen overflow-hidden bg-[hsl(220,20%,6%)] flex flex-col">
       <SEOHead
         title="TV Dashboard | MetsXMFanZone"
-        description="Netflix-style TV dashboard for MetsXMFanZone content."
+        description="Amazon TV-style dashboard for MetsXMFanZone streaming content."
         keywords="Mets TV, streaming, live games"
       />
 
-      <TVSidebar activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
+      <TVNavBar activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <TVHeader />
-        <main className="flex-1 overflow-y-auto p-3 space-y-1">
-          {renderContent()}
-        </main>
-      </div>
+      <main className="flex-1 overflow-y-auto overflow-x-hidden">
+        {renderContent()}
+      </main>
     </div>
   );
 };
