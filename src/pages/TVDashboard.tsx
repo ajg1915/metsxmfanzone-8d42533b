@@ -7,7 +7,7 @@ import { TVContentRow } from "@/components/tv/TVContentRow";
 import { TVHeader } from "@/components/tv/TVHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export type TVCategory = "home" | "live" | "highlights" | "podcasts" | "replays" | "schedule" | "community";
+export type TVCategory = "home" | "live" | "highlights" | "replays" | "schedule" | "community";
 
 const TVDashboard = () => {
   const [activeCategory, setActiveCategory] = useState<TVCategory>("home");
@@ -26,14 +26,15 @@ const TVDashboard = () => {
     },
   });
 
-  const { data: podcasts = [], isLoading: podcastsLoading } = useQuery({
-    queryKey: ["tv-podcasts"],
+  const { data: highlights = [], isLoading: highlightsLoading } = useQuery({
+    queryKey: ["tv-highlights"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("podcast_shows")
+        .from("videos")
         .select("*")
         .eq("published", true)
-        .order("show_date", { ascending: false })
+        .eq("video_type", "highlight")
+        .order("published_at", { ascending: false })
         .limit(12);
       if (error) throw error;
       return data;
@@ -67,7 +68,7 @@ const TVDashboard = () => {
     },
   });
 
-  const isLoading = streamsLoading || podcastsLoading || replaysLoading || heroLoading;
+  const isLoading = streamsLoading || highlightsLoading || replaysLoading || heroLoading;
 
   const liveItems = useMemo(() =>
     liveStreams.map((s) => ({
@@ -80,15 +81,14 @@ const TVDashboard = () => {
     [liveStreams]
   );
 
-  const podcastItems = useMemo(() =>
-    podcasts.map((p) => ({
-      id: p.id,
-      title: p.title,
-      thumbnail: p.thumbnail_url || "/placeholder.svg",
-      badge: p.is_live ? "LIVE" : p.is_featured ? "Featured" : undefined,
-      subtitle: p.description?.slice(0, 60) || "",
+  const highlightItems = useMemo(() =>
+    highlights.map((v: any) => ({
+      id: v.id,
+      title: v.title,
+      thumbnail: v.thumbnail_url || "/placeholder.svg",
+      subtitle: v.description?.slice(0, 60) || "",
     })),
-    [podcasts]
+    [highlights]
   );
 
   const replayItems = useMemo(() =>
@@ -136,16 +136,14 @@ const TVDashboard = () => {
           <div className="space-y-3">
             {featuredItems.length > 0 && <TVContentRow title="Featured" items={featuredItems} />}
             {liveItems.length > 0 && <TVContentRow title="Live Now" items={liveItems} highlight />}
-            {podcastItems.length > 0 && <TVContentRow title="Podcasts" items={podcastItems} />}
+            {highlightItems.length > 0 && <TVContentRow title="Video Highlights" items={highlightItems} />}
             {replayItems.length > 0 && <TVContentRow title="Game Replays" items={replayItems} />}
           </div>
         );
       case "live":
         return <TVContentRow title="Live Streams" items={liveItems} highlight />;
       case "highlights":
-        return <TVContentRow title="Featured Highlights" items={featuredItems} />;
-      case "podcasts":
-        return <TVContentRow title="All Podcasts" items={podcastItems} />;
+        return <TVContentRow title="Video Highlights" items={highlightItems} />;
       case "replays":
         return <TVContentRow title="Game Replays" items={replayItems} />;
       default:
