@@ -891,7 +891,7 @@ export default function LiveStreamManagement() {
             </div>
             <div>
               <Label>Published</Label>
-              <Select value={bulkData.published} onValueChange={(v) => setBulkData({ ...bulkData, published: v })}>
+              <Select value={bulkData.published} onValueChange={(v) => setBulkData({ ...bulkData, published: v as "" | "true" | "false" })}>
                 <SelectTrigger><SelectValue placeholder="No change" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="true">Published</SelectItem>
