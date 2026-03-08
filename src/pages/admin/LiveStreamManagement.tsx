@@ -581,6 +581,29 @@ export default function LiveStreamManagement() {
                       Media Library
                     </Button>
                   </div>
+                  {/* Team Matchup Presets */}
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1.5 block">Team Matchup Presets</Label>
+                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 max-h-[160px] overflow-y-auto rounded-md border border-border/50 p-1.5">
+                      {TEAM_PRESET_IMAGES.map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, thumbnail_url: preset.src });
+                            toast({ title: "Image selected", description: preset.label });
+                          }}
+                          className={`aspect-video rounded overflow-hidden border-2 transition-colors ${
+                            formData.thumbnail_url === preset.src ? 'border-primary ring-1 ring-primary' : 'border-transparent hover:border-primary/50'
+                          }`}
+                          title={preset.label}
+                        >
+                          <img src={preset.src} alt={preset.label} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">or URL:</span>
                     <Input
