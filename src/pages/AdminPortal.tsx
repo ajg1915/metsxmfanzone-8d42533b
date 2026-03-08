@@ -128,7 +128,7 @@ export default function AdminPortal() {
           title: "Welcome, Admin",
           description: data.isNewDevice ? "New device registered and trusted" : "Successfully authenticated",
         });
-        setTimeout(() => navigate("/admin"), 500);
+        setTimeout(() => navigate(isTV ? "/tv" : "/admin"), 500);
       }
     } catch (err) {
       console.error('Login error:', err);
