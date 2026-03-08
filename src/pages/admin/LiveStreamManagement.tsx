@@ -166,7 +166,10 @@ export default function LiveStreamManagement() {
     published: "" as "" | "true" | "false",
     assigned_pages: [] as string[],
     applyPages: false,
+    thumbnail_url: "",
+    applyThumbnail: false,
   });
+  const [bulkMediaPickerOpen, setBulkMediaPickerOpen] = useState(false);
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
