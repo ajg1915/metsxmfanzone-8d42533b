@@ -11,7 +11,6 @@ const categories: { key: TVCategory; label: string; icon: React.ElementType }[] 
   { key: "home", label: "Home", icon: Home },
   { key: "live", label: "Live", icon: Radio },
   { key: "highlights", label: "Highlights", icon: Film },
-  { key: "podcasts", label: "Podcasts", icon: Mic2 },
   { key: "replays", label: "Replays", icon: RotateCcw },
   { key: "schedule", label: "Schedule", icon: Calendar },
   { key: "community", label: "Community", icon: Users },

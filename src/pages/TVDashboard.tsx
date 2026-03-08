@@ -143,9 +143,7 @@ const TVDashboard = () => {
       case "live":
         return <TVContentRow title="Live Streams" items={liveItems} highlight />;
       case "highlights":
-        return <TVContentRow title="Featured Highlights" items={featuredItems} />;
-      case "podcasts":
-        return <TVContentRow title="All Podcasts" items={podcastItems} />;
+        return <TVContentRow title="Video Highlights" items={highlightItems} />;
       case "replays":
         return <TVContentRow title="Game Replays" items={replayItems} />;
       default:
