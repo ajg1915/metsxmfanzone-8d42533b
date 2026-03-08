@@ -456,7 +456,37 @@ export default function LiveStreamManagement() {
     <div className="max-w-7xl mx-auto px-2 py-3">
       <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
         <h1 className="text-lg font-bold">Live Stream Management</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8"
+            onClick={async () => {
+              // Bulk auto-match team images to existing streams
+              const streamsToUpdate = streams.filter(s => {
+                const matched = autoMatchTeamImage(s.title);
+                return matched && !s.thumbnail_url;
+              });
+              const allMatched = streams.filter(s => autoMatchTeamImage(s.title));
+              if (allMatched.length === 0) {
+                toast({ title: "No matches found", description: "No stream titles matched any team keywords." });
+                return;
+              }
+              let updated = 0;
+              for (const stream of allMatched) {
+                const matched = autoMatchTeamImage(stream.title);
+                if (matched && matched !== stream.thumbnail_url) {
+                  const { error } = await supabase.from("live_streams").update({ thumbnail_url: matched }).eq("id", stream.id);
+                  if (!error) updated++;
+                }
+              }
+              toast({ title: `Updated ${updated} stream thumbnails`, description: `Matched ${allMatched.length} streams to team images.` });
+              fetchStreams();
+            }}
+          >
+            <Image className="w-3.5 h-3.5 mr-1.5" />
+            Match Team Images
+          </Button>
           <Button
             size="sm"
             variant="outline"
