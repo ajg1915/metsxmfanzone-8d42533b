@@ -135,22 +135,37 @@ const TVDashboard = () => {
     [springGames]
   );
 
+  const resolvedStories = useMemo(() =>
+    stories.map((s) => {
+      const fileName = s.media_url.split('/stories/')[1] || s.media_url;
+      const { data: urlData } = supabase.storage.from('stories').getPublicUrl(fileName);
+      let thumbnailUrl = s.thumbnail_url;
+      if (thumbnailUrl) {
+        const thumbFileName = thumbnailUrl.split('/stories/')[1] || thumbnailUrl;
+        const { data: thumbData } = supabase.storage.from('stories').getPublicUrl(thumbFileName);
+        thumbnailUrl = thumbData?.publicUrl || thumbnailUrl;
+      }
+      return { ...s, media_url: urlData?.publicUrl || s.media_url, thumbnail_url: thumbnailUrl };
+    }),
+    [stories]
+  );
+
   const storyItems = useMemo(() =>
-    stories.map((s) => ({
+    resolvedStories.map((s) => ({
       id: s.id,
       title: s.title,
       thumbnail: s.thumbnail_url || s.media_url || "/placeholder.svg",
       subtitle: s.media_type === 'video' ? 'Video Story' : 'Photo Story',
     })),
-    [stories]
+    [resolvedStories]
   );
 
   const [selectedStory, setSelectedStory] = useState<any>(null);
 
   const handleStoryClick = useCallback((item: any) => {
-    const story = stories.find((s) => s.id === item.id);
+    const story = resolvedStories.find((s) => s.id === item.id);
     if (story) setSelectedStory(story);
-  }, [stories]);
+  }, [resolvedStories]);
 
   const heroStream = liveStreams.find((s) => s.status === "live") || liveStreams[0];
 
