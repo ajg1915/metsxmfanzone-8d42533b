@@ -50,7 +50,7 @@ export function TVHeroBanner({ title, description, thumbnail, streamUrl, isLive 
 
         <div className="flex items-center gap-2">
           <Button
-            onClick={() => setPlaying(true)}
+            onClick={() => navigate("/metsxmfanzone")}
             className="h-8 px-4 text-xs font-semibold gap-1.5 bg-white text-black hover:bg-white/90 rounded-sm"
           >
             <Play className="w-3.5 h-3.5 fill-current" />

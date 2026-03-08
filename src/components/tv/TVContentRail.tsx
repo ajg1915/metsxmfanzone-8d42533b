@@ -46,6 +46,7 @@ export function TVContentRail({ title, items, accent, onItemClick }: TVContentRa
         {items.map((item) => (
           <button
             key={item.id}
+            onClick={() => onItemClick?.(item)}
             className="group shrink-0 w-[180px] rounded-md overflow-hidden bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/15 transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 hover:scale-[1.03] hover:shadow-xl hover:shadow-black/30"
           >
             <div className="relative aspect-video w-full overflow-hidden">
