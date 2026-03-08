@@ -979,6 +979,42 @@ export default function LiveStreamManagement() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Media Library Picker */}
+      <Dialog open={bulkMediaPickerOpen} onOpenChange={setBulkMediaPickerOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Select Thumbnail for Bulk Edit</DialogTitle>
+            <DialogDescription>Choose an image to apply to all selected streams</DialogDescription>
+          </DialogHeader>
+          {mediaLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : mediaItems.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">No images found.</p>
+          ) : (
+            <ScrollArea className="h-[50vh]">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-1">
+                {mediaItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setBulkData({ ...bulkData, thumbnail_url: item.file_url });
+                      setBulkMediaPickerOpen(false);
+                      toast({ title: "Image selected", description: item.file_name });
+                    }}
+                    className="aspect-video rounded-md overflow-hidden border-2 border-transparent hover:border-primary transition-colors bg-muted"
+                  >
+                    <img src={item.file_url} alt={item.file_name} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
