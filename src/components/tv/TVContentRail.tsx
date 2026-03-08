@@ -18,7 +18,7 @@ interface TVContentRailProps {
   onItemClick?: (item: TVRailItem) => void;
 }
 
-export function TVContentRail({ title, items, accent }: TVContentRailProps) {
+export function TVContentRail({ title, items, accent, onItemClick }: TVContentRailProps) {
   if (items.length === 0) return null;
 
   return (
