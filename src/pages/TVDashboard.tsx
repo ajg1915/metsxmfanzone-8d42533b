@@ -291,7 +291,10 @@ const TVDashboard = () => {
               />
             )}
             <div className="space-y-1 px-6 pb-6 -mt-8 relative z-10">
-              {/* Stories at the top */}
+              {/* Gamecast Banner */}
+              <GamecastBanner />
+
+              {/* Stories */}
               <div ref={storiesRef}>
                 {storyItems.length > 0 && <TVContentRail title="Stories" items={storyItems} onItemClick={handleStoryClick} />}
               </div>
