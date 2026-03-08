@@ -136,7 +136,7 @@ const TVDashboard = () => {
           <div className="space-y-3">
             {featuredItems.length > 0 && <TVContentRow title="Featured" items={featuredItems} />}
             {liveItems.length > 0 && <TVContentRow title="Live Now" items={liveItems} highlight />}
-            {podcastItems.length > 0 && <TVContentRow title="Podcasts" items={podcastItems} />}
+            {highlightItems.length > 0 && <TVContentRow title="Video Highlights" items={highlightItems} />}
             {replayItems.length > 0 && <TVContentRow title="Game Replays" items={replayItems} />}
           </div>
         );
