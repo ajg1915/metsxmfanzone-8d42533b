@@ -7,7 +7,7 @@ import { TVContentRow } from "@/components/tv/TVContentRow";
 import { TVHeader } from "@/components/tv/TVHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export type TVCategory = "home" | "live" | "highlights" | "podcasts" | "replays" | "schedule" | "community";
+export type TVCategory = "home" | "live" | "highlights" | "replays" | "schedule" | "community";
 
 const TVDashboard = () => {
   const [activeCategory, setActiveCategory] = useState<TVCategory>("home");
