@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import SEOHead from "@/components/SEOHead";
 import { TVSidebar } from "@/components/tv/TVSidebar";
 import { TVContentRow } from "@/components/tv/TVContentRow";
+import { TVHeroPlayer } from "@/components/tv/TVHeroPlayer";
 import { TVHeader } from "@/components/tv/TVHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 
