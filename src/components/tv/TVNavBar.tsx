@@ -22,7 +22,7 @@ export function TVNavBar({ activeCategory, onCategoryChange }: TVNavBarProps) {
   const navigate = useNavigate();
 
   return (
-    <nav className="h-12 shrink-0 flex items-center justify-between px-6 bg-gradient-to-b from-secondary/90 to-secondary/70 backdrop-blur-md z-50 border-b border-primary/30">
+    <nav className="h-12 shrink-0 flex items-center justify-between px-6 bg-gradient-to-b from-mets-blue-dark to-mets-blue-dark/90 backdrop-blur-md z-50 border-b border-primary/30">
       {/* Left: Logo + Nav */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2 shrink-0">
