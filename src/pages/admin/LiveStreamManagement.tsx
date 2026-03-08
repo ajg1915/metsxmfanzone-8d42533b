@@ -207,7 +207,7 @@ export default function LiveStreamManagement() {
       toast({ title: "Bulk update complete", description: `Updated ${selectedIds.size} streams` });
       setSelectedIds(new Set());
       setBulkEditOpen(false);
-      setBulkData({ status: "", published: "", assigned_pages: [], applyPages: false });
+      setBulkData({ status: "", published: "", assigned_pages: [], applyPages: false, thumbnail_url: "", applyThumbnail: false });
       fetchStreams();
     } catch (err) {
       console.error("Bulk update error:", err);
