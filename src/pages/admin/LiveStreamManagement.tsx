@@ -523,6 +523,24 @@ export default function LiveStreamManagement() {
       <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
         <h1 className="text-lg font-bold">Live Stream Management</h1>
         <div className="flex items-center gap-2">
+          {streams.length > 0 && (
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={selectAll}>
+              <CheckSquare className="w-3.5 h-3.5 mr-1" />
+              {selectedIds.size === streams.length ? "Deselect All" : "Select All"}
+            </Button>
+          )}
+          {selectedIds.size > 0 && (
+            <>
+              <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setBulkEditOpen(true)}>
+                <Edit className="w-3.5 h-3.5 mr-1" />
+                Bulk Edit ({selectedIds.size})
+              </Button>
+              <Button size="sm" variant="destructive" className="h-8 text-xs" onClick={handleBulkDelete}>
+                <Trash2 className="w-3.5 h-3.5 mr-1" />
+                Delete ({selectedIds.size})
+              </Button>
+            </>
+          )}
           <Button
             size="sm"
             variant="outline"
