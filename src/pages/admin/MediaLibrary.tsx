@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Upload, Download, Copy, Trash2, Search, Image as ImageIcon,
-  FileText, Film, Music, File, Grid3X3, List, FolderOpen
+  FileText, Film, Music, File, Grid3X3, List, FolderOpen, Pencil, Check, X
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose
