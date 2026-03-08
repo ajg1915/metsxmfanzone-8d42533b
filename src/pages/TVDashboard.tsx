@@ -1,4 +1,12 @@
 import { useState, useMemo, useCallback } from "react";
+import fanartGeneral from "@/assets/fanart-mets-general.jpg";
+import fanartHome from "@/assets/fanart-mets-home.jpg";
+import fanartAway from "@/assets/fanart-mets-away.jpg";
+import fanartBraves from "@/assets/fanart-mets-braves.jpg";
+import fanartDodgers from "@/assets/fanart-mets-dodgers.jpg";
+import fanartPhillies from "@/assets/fanart-mets-phillies.jpg";
+import fanartSpring from "@/assets/fanart-mets-spring.jpg";
+import fanartYankees from "@/assets/fanart-mets-yankees.jpg";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -143,7 +151,16 @@ const TVDashboard = () => {
     [stories]
   );
 
-  // Pick hero stream for banner
+  const fanArtItems = useMemo(() => [
+    { id: "fa-1", title: "Mets General", thumbnail: fanartGeneral, subtitle: "Fan Art" },
+    { id: "fa-2", title: "Mets Home", thumbnail: fanartHome, subtitle: "Fan Art" },
+    { id: "fa-3", title: "Mets Away", thumbnail: fanartAway, subtitle: "Fan Art" },
+    { id: "fa-4", title: "Mets vs Braves", thumbnail: fanartBraves, subtitle: "Fan Art" },
+    { id: "fa-5", title: "Mets vs Dodgers", thumbnail: fanartDodgers, subtitle: "Fan Art" },
+    { id: "fa-6", title: "Mets vs Phillies", thumbnail: fanartPhillies, subtitle: "Fan Art" },
+    { id: "fa-7", title: "Spring Training", thumbnail: fanartSpring, subtitle: "Fan Art" },
+    { id: "fa-8", title: "Mets vs Yankees", thumbnail: fanartYankees, subtitle: "Fan Art" },
+  ], []);
   const heroStream = liveStreams.find((s) => s.status === "live") || liveStreams[0];
 
   const renderContent = () => {
@@ -182,6 +199,7 @@ const TVDashboard = () => {
               {liveItems.length > 0 && <TVContentRail title="Live Now" items={liveItems} accent onItemClick={goToMetsTV} />}
               {springItems.length > 0 && <TVContentRail title="Spring Training" items={springItems} onItemClick={goToSpring} />}
               {storyItems.length > 0 && <TVContentRail title="Stories" items={storyItems} />}
+              <TVContentRail title="Fan Art" items={fanArtItems} />
               {highlightItems.length > 0 && <TVContentRail title="Video Highlights" items={highlightItems} />}
               {replayItems.length > 0 && <TVContentRail title="Game Replays" items={replayItems} />}
             </div>
