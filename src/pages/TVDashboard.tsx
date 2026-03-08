@@ -135,6 +135,7 @@ const TVDashboard = () => {
       case "home":
         return (
           <div className="space-y-3">
+            {liveStreams.length > 0 && <TVHeroPlayer streams={liveStreams} />}
             {featuredItems.length > 0 && <TVContentRow title="Featured" items={featuredItems} />}
             {liveItems.length > 0 && <TVContentRow title="Live Now" items={liveItems} highlight />}
             {highlightItems.length > 0 && <TVContentRow title="Video Highlights" items={highlightItems} />}
