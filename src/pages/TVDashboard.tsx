@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SEOHead from "@/components/SEOHead";
 import { TVHeroBanner } from "@/components/tv/TVHeroBanner";
@@ -11,6 +12,10 @@ export type TVCategory = "home" | "live" | "highlights" | "replays";
 
 const TVDashboard = () => {
   const [activeCategory, setActiveCategory] = useState<TVCategory>("home");
+  const navigate = useNavigate();
+
+  const goToMetsTV = useCallback(() => navigate("/metsxmfanzone"), [navigate]);
+  const goToSpring = useCallback(() => navigate("/spring-training-live"), [navigate]);
 
   const { data: liveStreams = [], isLoading: streamsLoading } = useQuery({
     queryKey: ["tv-live-streams"],
@@ -174,8 +179,8 @@ const TVDashboard = () => {
               />
             )}
             <div className="space-y-1 px-6 pb-6 -mt-8 relative z-10">
-              {liveItems.length > 0 && <TVContentRail title="Live Now" items={liveItems} accent />}
-              {springItems.length > 0 && <TVContentRail title="Spring Training" items={springItems} />}
+              {liveItems.length > 0 && <TVContentRail title="Live Now" items={liveItems} accent onItemClick={goToMetsTV} />}
+              {springItems.length > 0 && <TVContentRail title="Spring Training" items={springItems} onItemClick={goToSpring} />}
               {storyItems.length > 0 && <TVContentRail title="Stories" items={storyItems} />}
               {highlightItems.length > 0 && <TVContentRail title="Video Highlights" items={highlightItems} />}
               {replayItems.length > 0 && <TVContentRail title="Game Replays" items={replayItems} />}

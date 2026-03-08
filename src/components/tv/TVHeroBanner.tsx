@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { Play, Radio, Info } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import ClapprPlayer from "@/components/ClapprPlayer";
+
 
 interface TVHeroBannerProps {
   title: string;
@@ -13,15 +13,7 @@ interface TVHeroBannerProps {
 }
 
 export function TVHeroBanner({ title, description, thumbnail, streamUrl, isLive }: TVHeroBannerProps) {
-  const [playing, setPlaying] = useState(false);
-
-  if (playing) {
-    return (
-      <div className="relative w-full aspect-video max-h-[320px]">
-        <ClapprPlayer source={streamUrl} />
-      </div>
-    );
-  }
+  const navigate = useNavigate();
 
   return (
     <div className="relative w-full aspect-video max-h-[320px] overflow-hidden">
@@ -58,7 +50,7 @@ export function TVHeroBanner({ title, description, thumbnail, streamUrl, isLive 
 
         <div className="flex items-center gap-2">
           <Button
-            onClick={() => setPlaying(true)}
+            onClick={() => navigate("/metsxmfanzone")}
             className="h-8 px-4 text-xs font-semibold gap-1.5 bg-white text-black hover:bg-white/90 rounded-sm"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
