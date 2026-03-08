@@ -157,6 +157,75 @@ export default function LiveStreamManagement() {
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [mediaItems, setMediaItems] = useState<{ id: string; file_url: string; file_name: string; file_type: string | null }[]>([]);
   const [mediaLoading, setMediaLoading] = useState(false);
+  
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkEditOpen, setBulkEditOpen] = useState(false);
+  const [bulkData, setBulkData] = useState({
+    status: "" as "" | "live" | "scheduled" | "ended",
+    published: "" as "" | "true" | "false",
+    assigned_pages: [] as string[],
+    applyPages: false,
+  });
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    if (selectedIds.size === streams.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(streams.map(s => s.id)));
+    }
+  };
+
+  const handleBulkEdit = async () => {
+    const updates: Record<string, any> = {};
+    if (bulkData.status) updates.status = bulkData.status;
+    if (bulkData.published) updates.published = bulkData.published === "true";
+    if (bulkData.applyPages) updates.assigned_pages = bulkData.assigned_pages;
+
+    if (Object.keys(updates).length === 0) {
+      toast({ title: "No changes", description: "Select at least one field to update", variant: "destructive" });
+      return;
+    }
+
+    try {
+      for (const id of selectedIds) {
+        const { error } = await supabase.from("live_streams").update(updates).eq("id", id);
+        if (error) throw error;
+      }
+      toast({ title: "Bulk update complete", description: `Updated ${selectedIds.size} streams` });
+      setSelectedIds(new Set());
+      setBulkEditOpen(false);
+      setBulkData({ status: "", published: "", assigned_pages: [], applyPages: false });
+      fetchStreams();
+    } catch (err) {
+      console.error("Bulk update error:", err);
+      toast({ title: "Bulk update failed", variant: "destructive" });
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Delete ${selectedIds.size} streams? This cannot be undone.`)) return;
+    try {
+      for (const id of selectedIds) {
+        const { error } = await supabase.from("live_streams").delete().eq("id", id);
+        if (error) throw error;
+      }
+      toast({ title: "Deleted", description: `${selectedIds.size} streams removed` });
+      setSelectedIds(new Set());
+      fetchStreams();
+    } catch (err) {
+      toast({ title: "Delete failed", variant: "destructive" });
+    }
+  };
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
