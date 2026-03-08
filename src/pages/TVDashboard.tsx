@@ -111,7 +111,7 @@ const TVDashboard = () => {
         .from("stories")
         .select("*")
         .eq("published", true)
-        .order("display_order", { ascending: true })
+        .order("created_at", { ascending: false })
         .limit(12);
       if (error) throw error;
       return data;
