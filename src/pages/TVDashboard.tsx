@@ -68,7 +68,7 @@ const TVDashboard = () => {
     },
   });
 
-  const isLoading = streamsLoading || podcastsLoading || replaysLoading || heroLoading;
+  const isLoading = streamsLoading || highlightsLoading || replaysLoading || heroLoading;
 
   const liveItems = useMemo(() =>
     liveStreams.map((s) => ({
