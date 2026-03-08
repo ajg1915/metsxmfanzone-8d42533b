@@ -54,21 +54,35 @@ const TVDashboard = () => {
     },
   });
 
-  const { data: heroSlides = [], isLoading: heroLoading } = useQuery({
-    queryKey: ["tv-hero-slides"],
+  const { data: springGames = [], isLoading: springLoading } = useQuery({
+    queryKey: ["tv-spring-training"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("hero_slides")
+        .from("spring_training_games")
         .select("*")
         .eq("published", true)
-        .order("display_order", { ascending: true })
-        .limit(8);
+        .order("game_date", { ascending: true })
+        .limit(12);
       if (error) throw error;
       return data;
     },
   });
 
-  const isLoading = streamsLoading || highlightsLoading || replaysLoading || heroLoading;
+  const { data: stories = [], isLoading: storiesLoading } = useQuery({
+    queryKey: ["tv-stories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("stories")
+        .select("*")
+        .eq("published", true)
+        .order("display_order", { ascending: true })
+        .limit(12);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isLoading = streamsLoading || highlightsLoading || replaysLoading || springLoading || storiesLoading;
 
   const liveItems = useMemo(() =>
     liveStreams.map((s) => ({
@@ -103,15 +117,25 @@ const TVDashboard = () => {
     [replays]
   );
 
-  const featuredItems = useMemo(() =>
-    heroSlides.map((h) => ({
-      id: h.id,
-      title: h.title,
-      thumbnail: h.image_url || "/placeholder.svg",
-      subtitle: h.description?.slice(0, 80) || "",
-      badge: h.is_for_members ? "Members" : undefined,
+  const springItems = useMemo(() =>
+    springGames.map((g) => ({
+      id: g.id,
+      title: `Mets ${g.is_home_game ? 'vs' : '@'} ${g.opponent}`,
+      thumbnail: g.preview_image_url || "/placeholder.svg",
+      subtitle: `${g.game_date} • ${g.game_time || 'TBD'} • ${g.location || ''}`,
+      badge: g.game_status === 'live' ? "LIVE" : g.game_status === 'final' ? "Final" : undefined,
     })),
-    [heroSlides]
+    [springGames]
+  );
+
+  const storyItems = useMemo(() =>
+    stories.map((s) => ({
+      id: s.id,
+      title: s.title,
+      thumbnail: s.thumbnail_url || s.media_url || "/placeholder.svg",
+      subtitle: s.media_type === 'video' ? 'Video Story' : 'Photo Story',
+    })),
+    [stories]
   );
 
   // Pick hero stream for banner
@@ -151,7 +175,8 @@ const TVDashboard = () => {
             )}
             <div className="space-y-1 px-6 pb-6 -mt-8 relative z-10">
               {liveItems.length > 0 && <TVContentRail title="Live Now" items={liveItems} accent />}
-              {featuredItems.length > 0 && <TVContentRail title="Featured" items={featuredItems} />}
+              {springItems.length > 0 && <TVContentRail title="Spring Training" items={springItems} />}
+              {storyItems.length > 0 && <TVContentRail title="Stories" items={storyItems} />}
               {highlightItems.length > 0 && <TVContentRail title="Video Highlights" items={highlightItems} />}
               {replayItems.length > 0 && <TVContentRail title="Game Replays" items={replayItems} />}
             </div>
