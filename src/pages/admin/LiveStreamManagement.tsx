@@ -869,6 +869,67 @@ export default function LiveStreamManagement() {
           </SortableContext>
         </DndContext>
       )}
+
+      {/* Bulk Edit Dialog */}
+      <Dialog open={bulkEditOpen} onOpenChange={setBulkEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Bulk Edit {selectedIds.size} Streams</DialogTitle>
+            <DialogDescription>Only filled fields will be updated</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Status</Label>
+              <Select value={bulkData.status} onValueChange={(v: "" | "live" | "scheduled" | "ended") => setBulkData({ ...bulkData, status: v })}>
+                <SelectTrigger><SelectValue placeholder="No change" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                  <SelectItem value="live">Live Now</SelectItem>
+                  <SelectItem value="ended">Ended</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Published</Label>
+              <Select value={bulkData.published} onValueChange={(v) => setBulkData({ ...bulkData, published: v })}>
+                <SelectTrigger><SelectValue placeholder="No change" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Published</SelectItem>
+                  <SelectItem value="false">Draft</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Checkbox checked={bulkData.applyPages} onCheckedChange={(c) => setBulkData({ ...bulkData, applyPages: !!c })} />
+                <Label>Update Assigned Pages</Label>
+              </div>
+              {bulkData.applyPages && (
+                <div className="space-y-2 pl-6">
+                  {Object.entries(PAGE_LABELS).map(([key, label]) => (
+                    <div key={key} className="flex items-center gap-2">
+                      <Checkbox
+                        checked={bulkData.assigned_pages.includes(key)}
+                        onCheckedChange={(c) => {
+                          const pages = c
+                            ? [...bulkData.assigned_pages, key]
+                            : bulkData.assigned_pages.filter(p => p !== key);
+                          setBulkData({ ...bulkData, assigned_pages: pages });
+                        }}
+                      />
+                      <Label className="font-normal">{label}</Label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setBulkEditOpen(false)}>Cancel</Button>
+              <Button onClick={handleBulkEdit}>Apply to {selectedIds.size} Streams</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
