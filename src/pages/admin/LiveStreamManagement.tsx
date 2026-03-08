@@ -86,11 +86,15 @@ interface LiveStream {
   display_order: number;
 }
 
-function SortableStreamCard({ stream, onEdit, onDelete, getStatusBadge }: {
+const PAGE_LABELS: Record<string, string> = { guide: 'Guide Page', live: 'Live Page', metsxmfanzone: 'MetsXMFanZone TV', 'mlb-network': 'MLB Network', 'espn-network': 'ESPN Network', 'pix11-network': 'PIX11 Network', 'spring-training-live': 'Spring Training Live', 'spring-training-games': 'Spring Training Games', 'replay-games': 'Replay Games' };
+
+function SortableStreamCard({ stream, onEdit, onDelete, getStatusBadge, selected, onToggleSelect }: {
   stream: LiveStream;
   onEdit: (s: LiveStream) => void;
   onDelete: (id: string) => void;
   getStatusBadge: (status: string) => string;
+  selected: boolean;
+  onToggleSelect: (id: string) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stream.id });
   const style = {
@@ -98,14 +102,16 @@ function SortableStreamCard({ stream, onEdit, onDelete, getStatusBadge }: {
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
-  const pageLabels: Record<string, string> = { guide: 'Guide Page', live: 'Live Page', metsxmfanzone: 'MetsXMFanZone TV', 'mlb-network': 'MLB Network', 'espn-network': 'ESPN Network', 'pix11-network': 'PIX11 Network', 'spring-training-live': 'Spring Training Live', 'spring-training-games': 'Spring Training Games', 'replay-games': 'Replay Games' };
 
   return (
-    <Card ref={setNodeRef} style={style} className="relative">
+    <Card ref={setNodeRef} style={style} className={`relative transition-colors ${selected ? 'ring-2 ring-primary' : ''}`}>
+      <div className="absolute top-2 right-2 z-10">
+        <Checkbox checked={selected} onCheckedChange={() => onToggleSelect(stream.id)} />
+      </div>
       <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 cursor-grab active:cursor-grabbing p-1 rounded bg-background/80 backdrop-blur-sm">
         <GripVertical className="w-4 h-4 text-muted-foreground" />
       </div>
-      <CardHeader className="pb-3 pl-10">
+      <CardHeader className="pb-3 pl-10 pr-10">
         {stream.thumbnail_url && (
           <div className="aspect-video overflow-hidden rounded-md mb-2 bg-muted">
             <img src={stream.thumbnail_url} alt={stream.title} className="w-full h-full object-cover" />
@@ -122,7 +128,7 @@ function SortableStreamCard({ stream, onEdit, onDelete, getStatusBadge }: {
       </CardHeader>
       <CardContent className="pt-0">
         <div className="space-y-1.5 text-xs text-muted-foreground mb-3">
-          <p>Assigned to: {stream.assigned_pages?.length > 0 ? stream.assigned_pages.map(p => pageLabels[p] || p).join(', ') : 'None'}</p>
+          <p>Assigned to: {stream.assigned_pages?.length > 0 ? stream.assigned_pages.map(p => PAGE_LABELS[p] || p).join(', ') : 'None'}</p>
           {stream.scheduled_start && <p>Starts: {new Date(stream.scheduled_start).toLocaleString()}</p>}
           <p>Viewers: {stream.viewers_count}</p>
         </div>
