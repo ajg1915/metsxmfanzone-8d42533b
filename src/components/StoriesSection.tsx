@@ -353,7 +353,18 @@ const StoriesSection = () => {
               <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
                 MetsXMFanZone Stories
               </h2>
-              <RefreshCw className="h-4 w-4 sm:h-5 sm:w-5 text-primary cursor-pointer hover:text-primary/80 transition-colors" onClick={() => window.location.reload()} />
+              <RefreshCw className="h-4 w-4 sm:h-5 sm:w-5 text-primary cursor-pointer hover:text-primary/80 transition-colors" onClick={async () => {
+                // Clear all caches and service workers
+                if ('caches' in window) {
+                  const names = await caches.keys();
+                  await Promise.all(names.map(name => caches.delete(name)));
+                }
+                if ('serviceWorker' in navigator) {
+                  const registrations = await navigator.serviceWorker.getRegistrations();
+                  await Promise.all(registrations.map(r => r.unregister()));
+                }
+                window.location.reload();
+              }} />
             </div>
             <Link 
               to="/mets-scores" 
