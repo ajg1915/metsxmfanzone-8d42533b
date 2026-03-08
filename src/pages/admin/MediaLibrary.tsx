@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Upload, Download, Copy, Trash2, Search, Image as ImageIcon,
-  FileText, Film, Music, File, Grid3X3, List, FolderOpen
+  FileText, Film, Music, File, Grid3X3, List, FolderOpen, Pencil, Check, X
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose
@@ -48,6 +48,8 @@ export default function MediaLibrary() {
   const [folder, setFolder] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [uploading, setUploading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { data: media, isLoading } = useQuery({
@@ -62,6 +64,19 @@ export default function MediaLibrary() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const renameMutation = useMutation({
+    mutationFn: async ({ id, newName }: { id: string; newName: string }) => {
+      const { error } = await supabase.from("media_library").update({ file_name: newName }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["media-library"] });
+      toast.success("File renamed");
+      setEditingId(null);
+    },
+    onError: () => toast.error("Failed to rename file"),
   });
 
   const deleteMutation = useMutation({
@@ -291,7 +306,33 @@ export default function MediaLibrary() {
                   </AlertDialog>
                 </div>
                 <div className="p-2">
-                  <p className="text-xs truncate font-medium">{item.file_name}</p>
+                  {editingId === item.id ? (
+                    <div className="flex items-center gap-1">
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="h-6 text-xs px-1"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") renameMutation.mutate({ id: item.id, newName: editName });
+                          if (e.key === "Escape") setEditingId(null);
+                        }}
+                      />
+                      <Button size="icon" variant="ghost" className="h-5 w-5" onClick={() => renameMutation.mutate({ id: item.id, newName: editName })}>
+                        <Check className="h-3 w-3" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-5 w-5" onClick={() => setEditingId(null)}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <p className="text-xs truncate font-medium flex-1">{item.file_name}</p>
+                      <Button size="icon" variant="ghost" className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => { setEditingId(item.id); setEditName(item.file_name); }}>
+                        <Pencil className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mt-1">
                     <Badge variant="outline" className="text-[10px] capitalize">{item.folder}</Badge>
                     <span className="text-[10px] text-muted-foreground">{formatFileSize(item.file_size)}</span>
@@ -316,7 +357,33 @@ export default function MediaLibrary() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{item.file_name}</p>
+                  {editingId === item.id ? (
+                    <div className="flex items-center gap-1">
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="h-7 text-sm px-2"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") renameMutation.mutate({ id: item.id, newName: editName });
+                          if (e.key === "Escape") setEditingId(null);
+                        }}
+                      />
+                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => renameMutation.mutate({ id: item.id, newName: editName })}>
+                        <Check className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setEditingId(null)}>
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <p className="text-sm font-medium truncate">{item.file_name}</p>
+                      <Button size="icon" variant="ghost" className="h-6 w-6 flex-shrink-0" onClick={() => { setEditingId(item.id); setEditName(item.file_name); }}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 mt-0.5">
                     <Badge variant="outline" className="text-[10px] capitalize">{item.folder}</Badge>
                     <span className="text-xs text-muted-foreground">{formatFileSize(item.file_size)}</span>
