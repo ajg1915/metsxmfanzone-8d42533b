@@ -190,11 +190,23 @@ const TVDashboard = () => {
   );
 
   const [selectedStory, setSelectedStory] = useState<any>(null);
+  const [selectedHighlight, setSelectedHighlight] = useState<any>(null);
+  const [selectedReplay, setSelectedReplay] = useState<any>(null);
 
   const handleStoryClick = useCallback((item: any) => {
     const story = resolvedStories.find((s) => s.id === item.id);
     if (story) setSelectedStory(story);
   }, [resolvedStories]);
+
+  const handleHighlightClick = useCallback((item: any) => {
+    const video = highlights.find((v: any) => v.id === item.id);
+    if (video) setSelectedHighlight(video);
+  }, [highlights]);
+
+  const handleReplayClick = useCallback((item: any) => {
+    const replay = replays.find((r) => r.id === item.id);
+    if (replay) setSelectedReplay(replay);
+  }, [replays]);
 
   const heroStream = liveStreams.find((s) => s.status === "live") || liveStreams[0];
 
