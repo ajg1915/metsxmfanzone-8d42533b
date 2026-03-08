@@ -66,6 +66,19 @@ export default function MediaLibrary() {
     },
   });
 
+  const renameMutation = useMutation({
+    mutationFn: async ({ id, newName }: { id: string; newName: string }) => {
+      const { error } = await supabase.from("media_library").update({ file_name: newName }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["media-library"] });
+      toast.success("File renamed");
+      setEditingId(null);
+    },
+    onError: () => toast.error("Failed to rename file"),
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (item: { id: string; file_name: string; folder: string }) => {
       const storagePath = `${item.folder}/${item.file_name}`;
