@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Tv, Radio, Film, RotateCcw, Calendar, Users, Home } from "lucide-react";
+import { Tv, Radio, Film, RotateCcw, Home } from "lucide-react";
 import type { TVCategory } from "@/pages/TVDashboard";
 
 interface TVSidebarProps {
