@@ -306,7 +306,33 @@ export default function MediaLibrary() {
                   </AlertDialog>
                 </div>
                 <div className="p-2">
-                  <p className="text-xs truncate font-medium">{item.file_name}</p>
+                  {editingId === item.id ? (
+                    <div className="flex items-center gap-1">
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="h-6 text-xs px-1"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") renameMutation.mutate({ id: item.id, newName: editName });
+                          if (e.key === "Escape") setEditingId(null);
+                        }}
+                      />
+                      <Button size="icon" variant="ghost" className="h-5 w-5" onClick={() => renameMutation.mutate({ id: item.id, newName: editName })}>
+                        <Check className="h-3 w-3" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-5 w-5" onClick={() => setEditingId(null)}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <p className="text-xs truncate font-medium flex-1">{item.file_name}</p>
+                      <Button size="icon" variant="ghost" className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => { setEditingId(item.id); setEditName(item.file_name); }}>
+                        <Pencil className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between mt-1">
                     <Badge variant="outline" className="text-[10px] capitalize">{item.folder}</Badge>
                     <span className="text-[10px] text-muted-foreground">{formatFileSize(item.file_size)}</span>
