@@ -54,7 +54,8 @@ const TVDashboard = () => {
         .from("live_streams")
         .select("*")
         .eq("published", true)
-        .order("display_order", { ascending: true })
+        .eq("status", "live")
+        .order("created_at", { ascending: false })
         .limit(12);
       if (error) throw error;
       return data;
