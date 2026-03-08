@@ -151,7 +151,16 @@ const TVDashboard = () => {
     [stories]
   );
 
-  // Pick hero stream for banner
+  const fanArtItems = useMemo(() => [
+    { id: "fa-1", title: "Mets General", thumbnail: fanartGeneral, subtitle: "Fan Art" },
+    { id: "fa-2", title: "Mets Home", thumbnail: fanartHome, subtitle: "Fan Art" },
+    { id: "fa-3", title: "Mets Away", thumbnail: fanartAway, subtitle: "Fan Art" },
+    { id: "fa-4", title: "Mets vs Braves", thumbnail: fanartBraves, subtitle: "Fan Art" },
+    { id: "fa-5", title: "Mets vs Dodgers", thumbnail: fanartDodgers, subtitle: "Fan Art" },
+    { id: "fa-6", title: "Mets vs Phillies", thumbnail: fanartPhillies, subtitle: "Fan Art" },
+    { id: "fa-7", title: "Spring Training", thumbnail: fanartSpring, subtitle: "Fan Art" },
+    { id: "fa-8", title: "Mets vs Yankees", thumbnail: fanartYankees, subtitle: "Fan Art" },
+  ], []);
   const heroStream = liveStreams.find((s) => s.status === "live") || liveStreams[0];
 
   const renderContent = () => {
