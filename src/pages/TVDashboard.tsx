@@ -54,7 +54,8 @@ const TVDashboard = () => {
         .from("live_streams")
         .select("*")
         .eq("published", true)
-        .order("display_order", { ascending: true })
+        .eq("status", "live")
+        .order("created_at", { ascending: false })
         .limit(12);
       if (error) throw error;
       return data;
@@ -96,7 +97,7 @@ const TVDashboard = () => {
         .from("spring_training_games")
         .select("*")
         .eq("published", true)
-        .order("game_date", { ascending: true })
+        .order("game_date", { ascending: false })
         .limit(12);
       if (error) throw error;
       return data;
@@ -110,7 +111,7 @@ const TVDashboard = () => {
         .from("stories")
         .select("*")
         .eq("published", true)
-        .order("display_order", { ascending: true })
+        .order("created_at", { ascending: false })
         .limit(12);
       if (error) throw error;
       return data;
