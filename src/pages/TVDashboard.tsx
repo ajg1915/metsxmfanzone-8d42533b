@@ -1,12 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
-import fanartGeneral from "@/assets/fanart-mets-general.jpg";
-import fanartHome from "@/assets/fanart-mets-home.jpg";
-import fanartAway from "@/assets/fanart-mets-away.jpg";
-import fanartBraves from "@/assets/fanart-mets-braves.jpg";
-import fanartDodgers from "@/assets/fanart-mets-dodgers.jpg";
-import fanartPhillies from "@/assets/fanart-mets-phillies.jpg";
-import fanartSpring from "@/assets/fanart-mets-spring.jpg";
-import fanartYankees from "@/assets/fanart-mets-yankees.jpg";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
