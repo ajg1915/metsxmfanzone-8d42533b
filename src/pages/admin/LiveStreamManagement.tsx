@@ -192,6 +192,7 @@ export default function LiveStreamManagement() {
     if (bulkData.status) updates.status = bulkData.status;
     if (bulkData.published) updates.published = bulkData.published === "true";
     if (bulkData.applyPages) updates.assigned_pages = bulkData.assigned_pages;
+    if (bulkData.applyThumbnail) updates.thumbnail_url = bulkData.thumbnail_url || null;
 
     if (Object.keys(updates).length === 0) {
       toast({ title: "No changes", description: "Select at least one field to update", variant: "destructive" });
