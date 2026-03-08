@@ -7,10 +7,12 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { generateDeviceFingerprint, getDeviceName } from "@/utils/deviceFingerprint";
 import { trackFailedLogin, trackSuspiciousActivity } from "@/utils/securityAlerts";
+import { useDevice } from "@/hooks/use-device";
 
 export default function AdminPortal() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isTV } = useDevice();
   const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkingLockout, setCheckingLockout] = useState(true);
@@ -126,7 +128,7 @@ export default function AdminPortal() {
           title: "Welcome, Admin",
           description: data.isNewDevice ? "New device registered and trusted" : "Successfully authenticated",
         });
-        setTimeout(() => navigate("/admin"), 500);
+        setTimeout(() => navigate(isTV ? "/tv" : "/admin"), 500);
       }
     } catch (err) {
       console.error('Login error:', err);
