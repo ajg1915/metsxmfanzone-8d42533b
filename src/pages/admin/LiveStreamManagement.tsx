@@ -927,6 +927,51 @@ export default function LiveStreamManagement() {
                 </div>
               )}
             </div>
+            {/* Bulk Thumbnail */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Checkbox checked={bulkData.applyThumbnail} onCheckedChange={(c) => setBulkData({ ...bulkData, applyThumbnail: !!c })} />
+                <Label>Update Thumbnail</Label>
+              </div>
+              {bulkData.applyThumbnail && (
+                <div className="space-y-2 pl-6">
+                  {bulkData.thumbnail_url && (
+                    <div className="relative w-full aspect-video rounded-md overflow-hidden bg-muted max-w-[200px]">
+                      <img src={bulkData.thumbnail_url} alt="Bulk thumbnail" className="w-full h-full object-cover" />
+                      <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={() => setBulkData({ ...bulkData, thumbnail_url: "" })}>
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
+                  <Label className="text-xs text-muted-foreground block">Team Presets</Label>
+                  <div className="grid grid-cols-5 gap-1 max-h-[120px] overflow-y-auto rounded border border-border/50 p-1">
+                    {TEAM_PRESET_IMAGES.map((preset) => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => setBulkData({ ...bulkData, thumbnail_url: preset.src })}
+                        className={`aspect-video rounded overflow-hidden border-2 transition-colors ${bulkData.thumbnail_url === preset.src ? 'border-primary ring-1 ring-primary' : 'border-transparent hover:border-primary/50'}`}
+                        title={preset.label}
+                      >
+                        <img src={preset.src} alt={preset.label} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" size="sm" className="flex-1" onClick={() => { fetchMediaLibrary(); setBulkMediaPickerOpen(true); }}>
+                      <Image className="w-3.5 h-3.5 mr-1" /> Media Library
+                    </Button>
+                  </div>
+                  <Input
+                    type="url"
+                    value={bulkData.thumbnail_url}
+                    onChange={(e) => setBulkData({ ...bulkData, thumbnail_url: e.target.value })}
+                    placeholder="Or paste URL..."
+                    className="text-xs"
+                  />
+                </div>
+              )}
+            </div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setBulkEditOpen(false)}>Cancel</Button>
               <Button onClick={handleBulkEdit}>Apply to {selectedIds.size} Streams</Button>
