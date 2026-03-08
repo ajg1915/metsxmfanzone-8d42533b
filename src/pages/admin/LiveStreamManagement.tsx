@@ -1,5 +1,38 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+
+// Team matchup preset images
+import fanartMetsAway from "@/assets/fanart-mets-away.jpg";
+import fanartMetsBraves from "@/assets/fanart-mets-braves.jpg";
+import fanartMetsDodgers from "@/assets/fanart-mets-dodgers.jpg";
+import fanartMetsGeneral from "@/assets/fanart-mets-general.jpg";
+import fanartMetsHome from "@/assets/fanart-mets-home.jpg";
+import fanartMetsPhillies from "@/assets/fanart-mets-phillies.jpg";
+import fanartMetsSpring from "@/assets/fanart-mets-spring.jpg";
+import fanartMetsYankees from "@/assets/fanart-mets-yankees.jpg";
+import springMetsAstros from "@/assets/spring-mets-astros.jpg";
+import springMetsBraves from "@/assets/spring-mets-braves.jpg";
+import springMetsCards from "@/assets/spring-mets-cards.jpg";
+import springMetsNats from "@/assets/spring-mets-nats.jpg";
+import springMetsRedsox from "@/assets/spring-mets-redsox.jpg";
+import springMetsYankees from "@/assets/spring-mets-yankees.jpg";
+
+const TEAM_PRESET_IMAGES = [
+  { label: "Mets Home", src: fanartMetsHome },
+  { label: "Mets Away", src: fanartMetsAway },
+  { label: "Mets General", src: fanartMetsGeneral },
+  { label: "vs Braves", src: fanartMetsBraves },
+  { label: "vs Dodgers", src: fanartMetsDodgers },
+  { label: "vs Phillies", src: fanartMetsPhillies },
+  { label: "vs Yankees", src: fanartMetsYankees },
+  { label: "Spring Training", src: fanartMetsSpring },
+  { label: "ST vs Astros", src: springMetsAstros },
+  { label: "ST vs Braves", src: springMetsBraves },
+  { label: "ST vs Cardinals", src: springMetsCards },
+  { label: "ST vs Nationals", src: springMetsNats },
+  { label: "ST vs Red Sox", src: springMetsRedsox },
+  { label: "ST vs Yankees", src: springMetsYankees },
+];
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -548,6 +581,29 @@ export default function LiveStreamManagement() {
                       Media Library
                     </Button>
                   </div>
+                  {/* Team Matchup Presets */}
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1.5 block">Team Matchup Presets</Label>
+                    <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 max-h-[160px] overflow-y-auto rounded-md border border-border/50 p-1.5">
+                      {TEAM_PRESET_IMAGES.map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, thumbnail_url: preset.src });
+                            toast({ title: "Image selected", description: preset.label });
+                          }}
+                          className={`aspect-video rounded overflow-hidden border-2 transition-colors ${
+                            formData.thumbnail_url === preset.src ? 'border-primary ring-1 ring-primary' : 'border-transparent hover:border-primary/50'
+                          }`}
+                          title={preset.label}
+                        >
+                          <img src={preset.src} alt={preset.label} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">or URL:</span>
                     <Input
