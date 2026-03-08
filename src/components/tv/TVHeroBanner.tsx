@@ -13,15 +13,7 @@ interface TVHeroBannerProps {
 }
 
 export function TVHeroBanner({ title, description, thumbnail, streamUrl, isLive }: TVHeroBannerProps) {
-  const [playing, setPlaying] = useState(false);
-
-  if (playing) {
-    return (
-      <div className="relative w-full aspect-video max-h-[320px]">
-        <ClapprPlayer source={streamUrl} />
-      </div>
-    );
-  }
+  const navigate = useNavigate();
 
   return (
     <div className="relative w-full aspect-video max-h-[320px] overflow-hidden">
