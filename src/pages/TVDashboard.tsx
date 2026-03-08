@@ -199,6 +199,7 @@ const TVDashboard = () => {
               {liveItems.length > 0 && <TVContentRail title="Live Now" items={liveItems} accent onItemClick={goToMetsTV} />}
               {springItems.length > 0 && <TVContentRail title="Spring Training" items={springItems} onItemClick={goToSpring} />}
               {storyItems.length > 0 && <TVContentRail title="Stories" items={storyItems} />}
+              <TVContentRail title="Fan Art" items={fanArtItems} />
               {highlightItems.length > 0 && <TVContentRail title="Video Highlights" items={highlightItems} />}
               {replayItems.length > 0 && <TVContentRail title="Game Replays" items={replayItems} />}
             </div>
