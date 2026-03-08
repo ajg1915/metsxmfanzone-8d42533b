@@ -8,6 +8,7 @@ import SEOHead from "@/components/SEOHead";
 import { TVHeroBanner } from "@/components/tv/TVHeroBanner";
 import { TVNavBar } from "@/components/tv/TVNavBar";
 import { TVContentRail } from "@/components/tv/TVContentRail";
+import GamecastBanner from "@/components/GamecastBanner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/hooks/useAuth";
