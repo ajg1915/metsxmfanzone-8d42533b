@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { generateDeviceFingerprint, getDeviceName } from "@/utils/deviceFingerprint";
 import { trackFailedLogin, trackSuspiciousActivity } from "@/utils/securityAlerts";
+import { useDevice } from "@/hooks/use-device";
 
 export default function AdminPortal() {
   const navigate = useNavigate();
