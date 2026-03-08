@@ -352,6 +352,62 @@ const TVDashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Highlight Video Player Dialog */}
+      <Dialog open={!!selectedHighlight} onOpenChange={(open) => !open && setSelectedHighlight(null)}>
+        <DialogContent className="max-w-2xl p-0 bg-card border-border overflow-hidden">
+          <button
+            onClick={() => setSelectedHighlight(null)}
+            className="absolute top-3 right-3 z-50 text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          {selectedHighlight && (
+            <div className="flex flex-col">
+              <video
+                src={selectedHighlight.video_url}
+                controls
+                autoPlay
+                className="w-full aspect-video object-contain bg-black"
+              />
+              <div className="p-4">
+                <h3 className="text-foreground font-semibold text-sm">{selectedHighlight.title}</h3>
+                {selectedHighlight.description && (
+                  <p className="text-muted-foreground text-xs mt-1 line-clamp-2">{selectedHighlight.description}</p>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Replay Player Dialog */}
+      <Dialog open={!!selectedReplay} onOpenChange={(open) => !open && setSelectedReplay(null)}>
+        <DialogContent className="max-w-2xl p-0 bg-card border-border overflow-hidden">
+          <button
+            onClick={() => setSelectedReplay(null)}
+            className="absolute top-3 right-3 z-50 text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          {selectedReplay && (
+            <div className="flex flex-col">
+              <iframe
+                src={selectedReplay.embed_url}
+                title={selectedReplay.title}
+                className="w-full aspect-video bg-black"
+                allowFullScreen
+              />
+              <div className="p-4">
+                <h3 className="text-foreground font-semibold text-sm">{selectedReplay.title}</h3>
+                {selectedReplay.description && (
+                  <p className="text-muted-foreground text-xs mt-1 line-clamp-2">{selectedReplay.description}</p>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
