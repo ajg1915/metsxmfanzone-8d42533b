@@ -81,15 +81,14 @@ const TVDashboard = () => {
     [liveStreams]
   );
 
-  const podcastItems = useMemo(() =>
-    podcasts.map((p) => ({
-      id: p.id,
-      title: p.title,
-      thumbnail: p.thumbnail_url || "/placeholder.svg",
-      badge: p.is_live ? "LIVE" : p.is_featured ? "Featured" : undefined,
-      subtitle: p.description?.slice(0, 60) || "",
+  const highlightItems = useMemo(() =>
+    highlights.map((v: any) => ({
+      id: v.id,
+      title: v.title,
+      thumbnail: v.thumbnail_url || "/placeholder.svg",
+      subtitle: v.description?.slice(0, 60) || "",
     })),
-    [podcasts]
+    [highlights]
   );
 
   const replayItems = useMemo(() =>
