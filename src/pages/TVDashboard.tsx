@@ -97,7 +97,7 @@ const TVDashboard = () => {
         .from("spring_training_games")
         .select("*")
         .eq("published", true)
-        .order("game_date", { ascending: true })
+        .order("game_date", { ascending: false })
         .limit(12);
       if (error) throw error;
       return data;
