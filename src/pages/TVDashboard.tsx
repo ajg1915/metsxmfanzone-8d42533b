@@ -1,12 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
-import fanartGeneral from "@/assets/fanart-mets-general.jpg";
-import fanartHome from "@/assets/fanart-mets-home.jpg";
-import fanartAway from "@/assets/fanart-mets-away.jpg";
-import fanartBraves from "@/assets/fanart-mets-braves.jpg";
-import fanartDodgers from "@/assets/fanart-mets-dodgers.jpg";
-import fanartPhillies from "@/assets/fanart-mets-phillies.jpg";
-import fanartSpring from "@/assets/fanart-mets-spring.jpg";
-import fanartYankees from "@/assets/fanart-mets-yankees.jpg";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -151,16 +145,13 @@ const TVDashboard = () => {
     [stories]
   );
 
-  const fanArtItems = useMemo(() => [
-    { id: "fa-1", title: "Mets General", thumbnail: fanartGeneral, subtitle: "Fan Art" },
-    { id: "fa-2", title: "Mets Home", thumbnail: fanartHome, subtitle: "Fan Art" },
-    { id: "fa-3", title: "Mets Away", thumbnail: fanartAway, subtitle: "Fan Art" },
-    { id: "fa-4", title: "Mets vs Braves", thumbnail: fanartBraves, subtitle: "Fan Art" },
-    { id: "fa-5", title: "Mets vs Dodgers", thumbnail: fanartDodgers, subtitle: "Fan Art" },
-    { id: "fa-6", title: "Mets vs Phillies", thumbnail: fanartPhillies, subtitle: "Fan Art" },
-    { id: "fa-7", title: "Spring Training", thumbnail: fanartSpring, subtitle: "Fan Art" },
-    { id: "fa-8", title: "Mets vs Yankees", thumbnail: fanartYankees, subtitle: "Fan Art" },
-  ], []);
+  const [selectedStory, setSelectedStory] = useState<any>(null);
+
+  const handleStoryClick = useCallback((item: any) => {
+    const story = stories.find((s) => s.id === item.id);
+    if (story) setSelectedStory(story);
+  }, [stories]);
+
   const heroStream = liveStreams.find((s) => s.status === "live") || liveStreams[0];
 
   const renderContent = () => {
@@ -198,8 +189,7 @@ const TVDashboard = () => {
             <div className="space-y-1 px-6 pb-6 -mt-8 relative z-10">
               {liveItems.length > 0 && <TVContentRail title="Live Now" items={liveItems} accent onItemClick={goToMetsTV} />}
               {springItems.length > 0 && <TVContentRail title="Spring Training" items={springItems} onItemClick={goToSpring} />}
-              {storyItems.length > 0 && <TVContentRail title="Stories" items={storyItems} />}
-              <TVContentRail title="Fan Art" items={fanArtItems} />
+              {storyItems.length > 0 && <TVContentRail title="Stories" items={storyItems} onItemClick={handleStoryClick} />}
               {highlightItems.length > 0 && <TVContentRail title="Video Highlights" items={highlightItems} />}
               {replayItems.length > 0 && <TVContentRail title="Game Replays" items={replayItems} />}
             </div>
@@ -245,6 +235,42 @@ const TVDashboard = () => {
       <main className="flex-1 overflow-y-auto overflow-x-hidden">
         {renderContent()}
       </main>
+
+      {/* Story Viewer Dialog */}
+      <Dialog open={!!selectedStory} onOpenChange={(open) => !open && setSelectedStory(null)}>
+        <DialogContent className="max-w-lg p-0 bg-black border-white/10 overflow-hidden">
+          <button
+            onClick={() => setSelectedStory(null)}
+            className="absolute top-3 right-3 z-50 text-white/70 hover:text-white"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          {selectedStory && (
+            <div className="flex flex-col">
+              {selectedStory.media_type === "video" ? (
+                <video
+                  src={selectedStory.media_url}
+                  controls
+                  autoPlay
+                  className="w-full aspect-video object-contain bg-black"
+                />
+              ) : (
+                <img
+                  src={selectedStory.media_url}
+                  alt={selectedStory.title}
+                  className="w-full aspect-video object-contain bg-black"
+                />
+              )}
+              <div className="p-4">
+                <h3 className="text-white font-semibold text-sm">{selectedStory.title}</h3>
+                <p className="text-white/50 text-xs mt-1">
+                  {selectedStory.media_type === "video" ? "Video Story" : "Photo Story"}
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
