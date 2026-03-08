@@ -1,5 +1,38 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+
+// Team matchup preset images
+import fanartMetsAway from "@/assets/fanart-mets-away.jpg";
+import fanartMetsBraves from "@/assets/fanart-mets-braves.jpg";
+import fanartMetsDodgers from "@/assets/fanart-mets-dodgers.jpg";
+import fanartMetsGeneral from "@/assets/fanart-mets-general.jpg";
+import fanartMetsHome from "@/assets/fanart-mets-home.jpg";
+import fanartMetsPhillies from "@/assets/fanart-mets-phillies.jpg";
+import fanartMetsSpring from "@/assets/fanart-mets-spring.jpg";
+import fanartMetsYankees from "@/assets/fanart-mets-yankees.jpg";
+import springMetsAstros from "@/assets/spring-mets-astros.jpg";
+import springMetsBraves from "@/assets/spring-mets-braves.jpg";
+import springMetsCards from "@/assets/spring-mets-cards.jpg";
+import springMetsNats from "@/assets/spring-mets-nats.jpg";
+import springMetsRedsox from "@/assets/spring-mets-redsox.jpg";
+import springMetsYankees from "@/assets/spring-mets-yankees.jpg";
+
+const TEAM_PRESET_IMAGES = [
+  { label: "Mets Home", src: fanartMetsHome },
+  { label: "Mets Away", src: fanartMetsAway },
+  { label: "Mets General", src: fanartMetsGeneral },
+  { label: "vs Braves", src: fanartMetsBraves },
+  { label: "vs Dodgers", src: fanartMetsDodgers },
+  { label: "vs Phillies", src: fanartMetsPhillies },
+  { label: "vs Yankees", src: fanartMetsYankees },
+  { label: "Spring Training", src: fanartMetsSpring },
+  { label: "ST vs Astros", src: springMetsAstros },
+  { label: "ST vs Braves", src: springMetsBraves },
+  { label: "ST vs Cardinals", src: springMetsCards },
+  { label: "ST vs Nationals", src: springMetsNats },
+  { label: "ST vs Red Sox", src: springMetsRedsox },
+  { label: "ST vs Yankees", src: springMetsYankees },
+];
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
