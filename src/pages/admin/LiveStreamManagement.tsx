@@ -42,7 +42,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Edit, Radio, Upload, X, Loader2, RotateCcw, GripVertical, Image } from "lucide-react";
+import { Trash2, Plus, Edit, Radio, Upload, X, Loader2, RotateCcw, GripVertical, Image, CheckSquare } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DndContext,
   closestCenter,
@@ -86,11 +87,15 @@ interface LiveStream {
   display_order: number;
 }
 
-function SortableStreamCard({ stream, onEdit, onDelete, getStatusBadge }: {
+const PAGE_LABELS: Record<string, string> = { guide: 'Guide Page', live: 'Live Page', metsxmfanzone: 'MetsXMFanZone TV', 'mlb-network': 'MLB Network', 'espn-network': 'ESPN Network', 'pix11-network': 'PIX11 Network', 'spring-training-live': 'Spring Training Live', 'spring-training-games': 'Spring Training Games', 'replay-games': 'Replay Games' };
+
+function SortableStreamCard({ stream, onEdit, onDelete, getStatusBadge, selected, onToggleSelect }: {
   stream: LiveStream;
   onEdit: (s: LiveStream) => void;
   onDelete: (id: string) => void;
   getStatusBadge: (status: string) => string;
+  selected: boolean;
+  onToggleSelect: (id: string) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: stream.id });
   const style = {
@@ -98,14 +103,16 @@ function SortableStreamCard({ stream, onEdit, onDelete, getStatusBadge }: {
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
-  const pageLabels: Record<string, string> = { guide: 'Guide Page', live: 'Live Page', metsxmfanzone: 'MetsXMFanZone TV', 'mlb-network': 'MLB Network', 'espn-network': 'ESPN Network', 'pix11-network': 'PIX11 Network', 'spring-training-live': 'Spring Training Live', 'spring-training-games': 'Spring Training Games', 'replay-games': 'Replay Games' };
 
   return (
-    <Card ref={setNodeRef} style={style} className="relative">
+    <Card ref={setNodeRef} style={style} className={`relative transition-colors ${selected ? 'ring-2 ring-primary' : ''}`}>
+      <div className="absolute top-2 right-2 z-10">
+        <Checkbox checked={selected} onCheckedChange={() => onToggleSelect(stream.id)} />
+      </div>
       <div {...attributes} {...listeners} className="absolute top-2 left-2 z-10 cursor-grab active:cursor-grabbing p-1 rounded bg-background/80 backdrop-blur-sm">
         <GripVertical className="w-4 h-4 text-muted-foreground" />
       </div>
-      <CardHeader className="pb-3 pl-10">
+      <CardHeader className="pb-3 pl-10 pr-10">
         {stream.thumbnail_url && (
           <div className="aspect-video overflow-hidden rounded-md mb-2 bg-muted">
             <img src={stream.thumbnail_url} alt={stream.title} className="w-full h-full object-cover" />
@@ -122,7 +129,7 @@ function SortableStreamCard({ stream, onEdit, onDelete, getStatusBadge }: {
       </CardHeader>
       <CardContent className="pt-0">
         <div className="space-y-1.5 text-xs text-muted-foreground mb-3">
-          <p>Assigned to: {stream.assigned_pages?.length > 0 ? stream.assigned_pages.map(p => pageLabels[p] || p).join(', ') : 'None'}</p>
+          <p>Assigned to: {stream.assigned_pages?.length > 0 ? stream.assigned_pages.map(p => PAGE_LABELS[p] || p).join(', ') : 'None'}</p>
           {stream.scheduled_start && <p>Starts: {new Date(stream.scheduled_start).toLocaleString()}</p>}
           <p>Viewers: {stream.viewers_count}</p>
         </div>
@@ -150,6 +157,75 @@ export default function LiveStreamManagement() {
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [mediaItems, setMediaItems] = useState<{ id: string; file_url: string; file_name: string; file_type: string | null }[]>([]);
   const [mediaLoading, setMediaLoading] = useState(false);
+  
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkEditOpen, setBulkEditOpen] = useState(false);
+  const [bulkData, setBulkData] = useState({
+    status: "" as "" | "live" | "scheduled" | "ended",
+    published: "" as "" | "true" | "false",
+    assigned_pages: [] as string[],
+    applyPages: false,
+  });
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    if (selectedIds.size === streams.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(streams.map(s => s.id)));
+    }
+  };
+
+  const handleBulkEdit = async () => {
+    const updates: Record<string, any> = {};
+    if (bulkData.status) updates.status = bulkData.status;
+    if (bulkData.published) updates.published = bulkData.published === "true";
+    if (bulkData.applyPages) updates.assigned_pages = bulkData.assigned_pages;
+
+    if (Object.keys(updates).length === 0) {
+      toast({ title: "No changes", description: "Select at least one field to update", variant: "destructive" });
+      return;
+    }
+
+    try {
+      for (const id of selectedIds) {
+        const { error } = await supabase.from("live_streams").update(updates).eq("id", id);
+        if (error) throw error;
+      }
+      toast({ title: "Bulk update complete", description: `Updated ${selectedIds.size} streams` });
+      setSelectedIds(new Set());
+      setBulkEditOpen(false);
+      setBulkData({ status: "", published: "", assigned_pages: [], applyPages: false });
+      fetchStreams();
+    } catch (err) {
+      console.error("Bulk update error:", err);
+      toast({ title: "Bulk update failed", variant: "destructive" });
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Delete ${selectedIds.size} streams? This cannot be undone.`)) return;
+    try {
+      for (const id of selectedIds) {
+        const { error } = await supabase.from("live_streams").delete().eq("id", id);
+        if (error) throw error;
+      }
+      toast({ title: "Deleted", description: `${selectedIds.size} streams removed` });
+      setSelectedIds(new Set());
+      fetchStreams();
+    } catch (err) {
+      toast({ title: "Delete failed", variant: "destructive" });
+    }
+  };
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -447,6 +523,24 @@ export default function LiveStreamManagement() {
       <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
         <h1 className="text-lg font-bold">Live Stream Management</h1>
         <div className="flex items-center gap-2">
+          {streams.length > 0 && (
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={selectAll}>
+              <CheckSquare className="w-3.5 h-3.5 mr-1" />
+              {selectedIds.size === streams.length ? "Deselect All" : "Select All"}
+            </Button>
+          )}
+          {selectedIds.size > 0 && (
+            <>
+              <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setBulkEditOpen(true)}>
+                <Edit className="w-3.5 h-3.5 mr-1" />
+                Bulk Edit ({selectedIds.size})
+              </Button>
+              <Button size="sm" variant="destructive" className="h-8 text-xs" onClick={handleBulkDelete}>
+                <Trash2 className="w-3.5 h-3.5 mr-1" />
+                Delete ({selectedIds.size})
+              </Button>
+            </>
+          )}
           <Button
             size="sm"
             variant="outline"
@@ -767,12 +861,75 @@ export default function LiveStreamManagement() {
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                   getStatusBadge={getStatusBadge}
+                  selected={selectedIds.has(stream.id)}
+                  onToggleSelect={toggleSelect}
                 />
               ))}
             </div>
           </SortableContext>
         </DndContext>
       )}
+
+      {/* Bulk Edit Dialog */}
+      <Dialog open={bulkEditOpen} onOpenChange={setBulkEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Bulk Edit {selectedIds.size} Streams</DialogTitle>
+            <DialogDescription>Only filled fields will be updated</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Status</Label>
+              <Select value={bulkData.status} onValueChange={(v: "" | "live" | "scheduled" | "ended") => setBulkData({ ...bulkData, status: v })}>
+                <SelectTrigger><SelectValue placeholder="No change" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                  <SelectItem value="live">Live Now</SelectItem>
+                  <SelectItem value="ended">Ended</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Published</Label>
+              <Select value={bulkData.published} onValueChange={(v) => setBulkData({ ...bulkData, published: v as "" | "true" | "false" })}>
+                <SelectTrigger><SelectValue placeholder="No change" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Published</SelectItem>
+                  <SelectItem value="false">Draft</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Checkbox checked={bulkData.applyPages} onCheckedChange={(c) => setBulkData({ ...bulkData, applyPages: !!c })} />
+                <Label>Update Assigned Pages</Label>
+              </div>
+              {bulkData.applyPages && (
+                <div className="space-y-2 pl-6">
+                  {Object.entries(PAGE_LABELS).map(([key, label]) => (
+                    <div key={key} className="flex items-center gap-2">
+                      <Checkbox
+                        checked={bulkData.assigned_pages.includes(key)}
+                        onCheckedChange={(c) => {
+                          const pages = c
+                            ? [...bulkData.assigned_pages, key]
+                            : bulkData.assigned_pages.filter(p => p !== key);
+                          setBulkData({ ...bulkData, assigned_pages: pages });
+                        }}
+                      />
+                      <Label className="font-normal">{label}</Label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setBulkEditOpen(false)}>Cancel</Button>
+              <Button onClick={handleBulkEdit}>Apply to {selectedIds.size} Streams</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
