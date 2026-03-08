@@ -48,6 +48,8 @@ export default function MediaLibrary() {
   const [folder, setFolder] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [uploading, setUploading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { data: media, isLoading } = useQuery({
