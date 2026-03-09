@@ -531,9 +531,55 @@ const Community = () => {
                     onChange={(e) => setNewPost(e.target.value)}
                     className="min-h-[100px]"
                   />
+
+                  {/* Media previews */}
+                  {selectedImage && (
+                    <div className="relative inline-block">
+                      <div className="bg-muted rounded-md px-3 py-2 flex items-center gap-2 text-sm">
+                        <ImageIcon className="w-4 h-4 text-primary" />
+                        <span className="truncate max-w-[200px]">{selectedImage.name}</span>
+                      </div>
+                      <button
+                        onClick={() => setSelectedImage(null)}
+                        className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                  {selectedPostGif && (
+                    <div className="relative inline-block">
+                      <img
+                        src={selectedPostGif}
+                        alt="Selected GIF"
+                        className="rounded-md max-w-[200px] max-h-[120px] object-contain"
+                      />
+                      <button
+                        onClick={() => setSelectedPostGif(null)}
+                        className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                  {selectedPostVideo && (
+                    <div className="relative inline-block">
+                      <div className="bg-muted rounded-md px-3 py-2 flex items-center gap-2 text-sm">
+                        <Film className="w-4 h-4 text-primary" />
+                        <span className="truncate max-w-[200px]">{selectedPostVideo.name}</span>
+                      </div>
+                      <button
+                        onClick={() => setSelectedPostVideo(null)}
+                        className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
+                      {/* Photo upload */}
                       <Input
                         type="file"
                         accept="image/*"
@@ -544,26 +590,55 @@ const Community = () => {
                       <label htmlFor="image-upload">
                         <Button variant="outline" size="sm" asChild>
                           <span className="cursor-pointer">
-                            <ImageIcon className="w-4 h-4 mr-2" />
-                            Add Photo
+                            <ImageIcon className="w-4 h-4 mr-1" />
+                            Photo
                           </span>
                         </Button>
                       </label>
-                      {selectedImage && (
-                        <span className="text-sm text-muted-foreground">
-                          {selectedImage.name}
-                        </span>
+
+                      {/* GIF button - available to all logged-in users */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowPostGifPicker(!showPostGifPicker)}
+                      >
+                        <span className="text-sm font-bold mr-1">GIF</span>
+                      </Button>
+
+                      {/* Video button - admin only */}
+                      {isCurrentUserAdmin && (
+                        <>
+                          <Input
+                            type="file"
+                            accept="video/mp4,video/webm,video/quicktime"
+                            onChange={handlePostVideoSelect}
+                            className="hidden"
+                            id="post-video-upload"
+                          />
+                          <label htmlFor="post-video-upload">
+                            <Button variant="outline" size="sm" asChild>
+                              <span className="cursor-pointer">
+                                <Film className="w-4 h-4 mr-1" />
+                                Video
+                              </span>
+                            </Button>
+                          </label>
+                        </>
                       )}
                     </div>
                     
                     <Button
                       onClick={handleSubmitPost}
-                      disabled={(!newPost.trim() && !selectedImage) || uploading}
+                      disabled={(!newPost.trim() && !selectedImage && !selectedPostGif && !selectedPostVideo) || uploading}
                     >
                       <Send className="w-4 h-4 mr-2" />
                       {uploading ? "Posting..." : "Post"}
                     </Button>
                   </div>
+
+                  {showPostGifPicker && (
+                    <GifPicker onSelect={handlePostGifSelect} onClose={() => setShowPostGifPicker(false)} />
+                  )}
                 </>
               )}
             </CardContent>
