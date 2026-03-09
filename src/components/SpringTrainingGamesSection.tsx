@@ -2,10 +2,22 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { Radio, Users, Play, ChevronRight, ChevronLeft } from "lucide-react";
+import { Radio, Users, Play, ChevronRight, ChevronLeft, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+
+const getMatchupRoute = (title: string): string | null => {
+  const t = title.toLowerCase();
+  if (t.includes("astros") || t.includes("houston")) return "/matchup/astros";
+  if (t.includes("braves") || t.includes("atlanta")) return "/matchup/braves";
+  if (t.includes("cardinals") || t.includes("st. louis") || t.includes("stl")) return "/matchup/cardinals";
+  if (t.includes("nationals") || t.includes("washington")) return "/matchup/nationals";
+  if (t.includes("red sox") || t.includes("boston")) return "/matchup/redsox";
+  if (t.includes("yankees")) return "/matchup/yankees";
+  if (t.includes("blue jays") || t.includes("toronto")) return "/matchup/bluejays";
+  return null;
+};
 
 interface LiveStream {
   id: string;
