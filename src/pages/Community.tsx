@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import StoriesSection from "@/components/StoriesSection";
+import PostComments from "@/components/community/PostComments";
 import BusinessAdsSection from "@/components/BusinessAdsSection";
 import Events from "./Events";
 import { CommunityAIChat } from "@/components/CommunityAIChat";
