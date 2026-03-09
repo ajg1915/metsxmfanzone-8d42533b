@@ -74,12 +74,28 @@ const SpringTrainingGamesSection = () => {
     }
   };
 
+  const getConfidenceGrade = (stream: LiveStream): { grade: string; color: string; percent: number } => {
+    const isLive = stream.status === 'live';
+    const hasViewers = stream.viewers_count > 0;
+    const hasThumb = !!stream.thumbnail_url;
+    let score = 50;
+    if (isLive) score += 30;
+    if (hasViewers) score += Math.min(stream.viewers_count * 2, 15);
+    if (hasThumb) score += 5;
+    score = Math.min(score, 99);
+    if (score >= 90) return { grade: 'A+', color: 'text-emerald-400', percent: score };
+    if (score >= 80) return { grade: 'A', color: 'text-emerald-400', percent: score };
+    if (score >= 70) return { grade: 'B+', color: 'text-green-400', percent: score };
+    if (score >= 60) return { grade: 'B', color: 'text-yellow-400', percent: score };
+    return { grade: 'C', color: 'text-orange-400', percent: score };
+  };
+
   const handleStreamClick = (stream: LiveStream) => {
     if (!user) {
       navigate("/auth");
       return;
     }
-    navigate("/spring-training-live");
+    navigate("/metsxmfanzone");
   };
 
   const scroll = (direction: 'left' | 'right') => {
@@ -137,7 +153,7 @@ const SpringTrainingGamesSection = () => {
                 navigate("/auth");
                 return;
               }
-              navigate("/spring-training-live");
+              navigate("/metsxmfanzone");
             }}
             className="flex items-center gap-1 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
@@ -231,6 +247,23 @@ const SpringTrainingGamesSection = () => {
                   )}
                 </div>
               </div>
+              {/* Confidence Grade */}
+              {(() => {
+                const conf = getConfidenceGrade(stream);
+                return (
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-primary to-green-400 transition-all duration-500"
+                        style={{ width: `${conf.percent}%` }}
+                      />
+                    </div>
+                    <span className={cn("text-[10px] sm:text-xs font-bold", conf.color)}>
+                      {conf.grade}
+                    </span>
+                  </div>
+                );
+              })()}
             </motion.div>
           ))}
 
