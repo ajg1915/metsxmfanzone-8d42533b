@@ -153,7 +153,7 @@ const PlayerOfTheMonthSection = () => {
             <div className="flex flex-col md:flex-row gap-4 sm:gap-6 p-4 sm:p-6">
               {/* Player Image */}
               {entry.player_image_url && (
-                <div className="flex-shrink-0 w-full md:w-48 lg:w-56">
+                <div className="flex-shrink-0 w-40 mx-auto md:mx-0 md:w-48 lg:w-56">
                   <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-muted">
                     <img
                       src={entry.player_image_url}
