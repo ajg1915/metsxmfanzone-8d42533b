@@ -112,11 +112,11 @@ const SpringTrainingLive = () => {
                     </Badge>
                   </div>
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-2">
-                    Spring Training <span className="text-primary">Live</span>
+                    Regular Season <span className="text-primary">Live</span>
                   </h1>
                   <p className="text-white/70 text-sm sm:text-base max-w-xl">
-                    Live coverage from Clover Park in Port St. Lucie, Florida. 
-                    Watch the Mets prepare for the 2026 season with exclusive spring training content.
+                    Live coverage of Mets 2026 regular season games. 
+                    Watch every game with exclusive coverage and real-time stats.
                   </p>
                 </div>
                 
