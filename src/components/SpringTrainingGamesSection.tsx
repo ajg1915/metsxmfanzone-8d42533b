@@ -74,12 +74,28 @@ const SpringTrainingGamesSection = () => {
     }
   };
 
+  const getConfidenceGrade = (stream: LiveStream): { grade: string; color: string; percent: number } => {
+    const isLive = stream.status === 'live';
+    const hasViewers = stream.viewers_count > 0;
+    const hasThumb = !!stream.thumbnail_url;
+    let score = 50;
+    if (isLive) score += 30;
+    if (hasViewers) score += Math.min(stream.viewers_count * 2, 15);
+    if (hasThumb) score += 5;
+    score = Math.min(score, 99);
+    if (score >= 90) return { grade: 'A+', color: 'text-emerald-400', percent: score };
+    if (score >= 80) return { grade: 'A', color: 'text-emerald-400', percent: score };
+    if (score >= 70) return { grade: 'B+', color: 'text-green-400', percent: score };
+    if (score >= 60) return { grade: 'B', color: 'text-yellow-400', percent: score };
+    return { grade: 'C', color: 'text-orange-400', percent: score };
+  };
+
   const handleStreamClick = (stream: LiveStream) => {
     if (!user) {
       navigate("/auth");
       return;
     }
-    navigate("/spring-training-live");
+    navigate("/metsxmfanzone");
   };
 
   const scroll = (direction: 'left' | 'right') => {
