@@ -359,7 +359,7 @@ const AppContent = () => {
               <Route path="writer-applications" element={<WriterApplications />} />
               <Route path="realtime-analytics" element={<RealtimeAnalytics />} />
               <Route path="stream-health" element={<StreamHealthDashboard />} />
-              <Route path="stream-tester" element={<StreamTester />} />
+              
               <Route path="seo" element={<SEOManagement />} />
               <Route path="game-notifications" element={<GameNotifications />} />
               <Route path="game-alerts" element={<GameAlertsManagement />} />
