@@ -94,19 +94,22 @@ const GameAlertsBanner = () => {
 
   const playAlertSound = (soundKey: string | null) => {
     if (soundMuted) return;
-    try {
-      const soundUrl = soundKey && soundKey.startsWith("http")
-        ? soundKey // Custom uploaded sound
-        : ALERT_SOUNDS[soundKey || "default"] || ALERT_SOUNDS.default;
-      
-      const audio = new Audio(soundUrl);
-      audio.volume = 0.5;
-      audio.play().catch(() => {
-        // Autoplay blocked - ignore
-      });
-    } catch {
-      // Sound playback failed - ignore
+    const key = soundKey || "default";
+    
+    // Custom uploaded sound (URL)
+    if (key.startsWith("http")) {
+      try {
+        const audio = new Audio(key);
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+      } catch {}
+      return;
     }
+
+    // Use Web Audio API for built-in sounds (no MP3 files needed)
+    const validTypes = ['default', 'chime', 'urgent', 'horn', 'bell'] as const;
+    const soundType = validTypes.includes(key as any) ? key as typeof validTypes[number] : 'default';
+    generateAlertSound(soundType, 0.5);
   };
 
   const toggleMute = () => {
