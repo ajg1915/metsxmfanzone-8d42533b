@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, ArrowRight, Users, Flame, Sparkles } from "lucide-react";
+import { MessageSquare, ArrowRight, Users, Flame, Sparkles, Pin } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "@/assets/metsxmfanzone-logo.png";
 
@@ -15,6 +15,8 @@ interface Post {
   content: string;
   image_url: string | null;
   created_at: string;
+  is_pinned: boolean | null;
+  pinned_at: string | null;
   profiles: {
     full_name: string | null;
     email: string | null;
@@ -60,9 +62,9 @@ const CommunityPreviewSection = () => {
 
       const { data: postsData } = await supabase.
       from("posts").
-      select(`id, user_id, content, image_url, created_at, profiles (full_name, email)`).
+      select(`id, user_id, content, image_url, created_at, is_pinned, pinned_at, profiles (full_name, email)`).
       order("created_at", { ascending: false }).
-      limit(5);
+      limit(10);
 
       const { count: postsCount } = await supabase.
       from("posts").
@@ -93,10 +95,21 @@ const CommunityPreviewSection = () => {
       const postsWithSignedUrls = (postsData || []).map((post) => ({
         ...post,
         image_url: signedUrlMap[post.id] || post.image_url,
-        isAdmin: adminUserIds.has(post.user_id)
+        isAdmin: adminUserIds.has(post.user_id),
+        is_pinned: post.is_pinned ?? false,
+        pinned_at: post.pinned_at ?? null,
       }));
 
-      setPosts(postsWithSignedUrls);
+      // Sort: pinned posts first, then by date
+      postsWithSignedUrls.sort((a, b) => {
+        const aPinned = a.is_pinned ? 1 : 0;
+        const bPinned = b.is_pinned ? 1 : 0;
+        if (aPinned !== bPinned) return bPinned - aPinned;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+
+      // Take top 5
+      setPosts(postsWithSignedUrls.slice(0, 5));
       setStats({
         postsCount: postsCount || 0,
         membersCount: membersCount || 0
@@ -255,8 +268,11 @@ const CommunityPreviewSection = () => {
                   }
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-card/20" />
                     <Badge className="absolute top-3 left-3 text-[10px] px-2.5 py-1 bg-primary text-primary-foreground border-0 shadow-lg font-semibold uppercase tracking-wider">
-                      <Flame className="w-3 h-3 mr-1" />
-                      Featured
+                      {posts[0].is_pinned ? (
+                        <><Pin className="w-3 h-3 mr-1" /> Featured Post</>
+                      ) : (
+                        <><Flame className="w-3 h-3 mr-1" /> Trending</>
+                      )}
                     </Badge>
                   </div>
 
