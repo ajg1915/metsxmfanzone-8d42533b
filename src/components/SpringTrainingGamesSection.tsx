@@ -111,7 +111,7 @@ const SpringTrainingGamesSection = () => {
           <div className="flex items-center gap-1.5 sm:gap-2">
             <span className="text-sm sm:text-xl md:text-2xl">⚾</span>
             <h2 className="text-xs sm:text-xl md:text-2xl font-bold text-foreground">
-              Spring Training Live Games
+              Regular Season Live Games
             </h2>
             <Badge className="text-[8px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 font-semibold bg-green-600/90 text-white">
               FREE
