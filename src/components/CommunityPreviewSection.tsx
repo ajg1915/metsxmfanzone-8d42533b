@@ -95,10 +95,21 @@ const CommunityPreviewSection = () => {
       const postsWithSignedUrls = (postsData || []).map((post) => ({
         ...post,
         image_url: signedUrlMap[post.id] || post.image_url,
-        isAdmin: adminUserIds.has(post.user_id)
+        isAdmin: adminUserIds.has(post.user_id),
+        is_pinned: post.is_pinned ?? false,
+        pinned_at: post.pinned_at ?? null,
       }));
 
-      setPosts(postsWithSignedUrls);
+      // Sort: pinned posts first, then by date
+      postsWithSignedUrls.sort((a, b) => {
+        const aPinned = a.is_pinned ? 1 : 0;
+        const bPinned = b.is_pinned ? 1 : 0;
+        if (aPinned !== bPinned) return bPinned - aPinned;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+
+      // Take top 5
+      setPosts(postsWithSignedUrls.slice(0, 5));
       setStats({
         postsCount: postsCount || 0,
         membersCount: membersCount || 0
