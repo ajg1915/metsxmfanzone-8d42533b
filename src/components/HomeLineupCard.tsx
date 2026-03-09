@@ -549,16 +549,34 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
             <div className="rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-lg">
               <div className="relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary/70" />
-                <div className="relative p-3 text-primary-foreground flex items-center justify-between">
+                <div className="relative p-2.5 sm:p-3 text-primary-foreground flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4" />
-                    <span className="font-black text-sm">Team Leaders</span>
+                    <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span className="font-black text-xs sm:text-sm">Team Leaders</span>
                   </div>
-                  <span className="text-[9px] bg-white/15 px-2 py-0.5 rounded-md font-bold">2025</span>
+                  <span className="text-[8px] sm:text-[9px] bg-white/15 px-1.5 sm:px-2 py-0.5 rounded-md font-bold">2025</span>
                 </div>
               </div>
-              <div className="p-3">
-                <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-2 sm:p-3">
+                {/* Mobile: horizontal scroll row */}
+                <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 sm:hidden hide-scrollbar">
+                  {[
+                    teamLeaders?.AVG && { label: "AVG", ...teamLeaders.AVG },
+                    teamLeaders?.HR && { label: "HR", ...teamLeaders.HR },
+                    teamLeaders?.RBI && { label: "RBI", ...teamLeaders.RBI },
+                    teamLeaders?.ERA && { label: "ERA", ...teamLeaders.ERA },
+                    teamLeaders?.W && { label: "W", ...teamLeaders.W },
+                    teamLeaders?.SO && { label: "K", ...teamLeaders.SO },
+                  ].filter(Boolean).map((stat: any) => (
+                    <div key={stat.label} className="snap-start shrink-0 w-[72px] rounded-xl bg-muted/15 p-1.5 border border-border/10 text-center">
+                      <p className="text-[7px] text-muted-foreground uppercase font-bold tracking-wider">{stat.label}</p>
+                      <p className="font-black text-xs text-primary">{stat.value}</p>
+                      <p className="text-[8px] truncate text-muted-foreground">{stat.name.split(" ").pop()}</p>
+                    </div>
+                  ))}
+                </div>
+                {/* Tablet+: grid layout */}
+                <div className="hidden sm:grid grid-cols-3 gap-2 text-center">
                   {teamLeaders?.AVG && (
                     <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
                       <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">AVG</p>
@@ -581,7 +599,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                     </div>
                   )}
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-center mt-2 pt-2 border-t border-border/15">
+                <div className="hidden sm:grid grid-cols-3 gap-2 text-center mt-2 pt-2 border-t border-border/15">
                   {teamLeaders?.ERA && (
                     <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
                       <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">ERA</p>
@@ -609,7 +627,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
