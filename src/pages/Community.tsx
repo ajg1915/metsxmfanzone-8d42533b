@@ -83,6 +83,9 @@ const Community = () => {
   const [newPost, setNewPost] = useState("");
   const [uploading, setUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedPostGif, setSelectedPostGif] = useState<string | null>(null);
+  const [selectedPostVideo, setSelectedPostVideo] = useState<File | null>(null);
+  const [showPostGifPicker, setShowPostGifPicker] = useState(false);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
