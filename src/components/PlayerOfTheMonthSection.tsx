@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown, Trophy, Star } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Star } from "lucide-react";
+import metsxmfanzoneLogo from "@/assets/metsxmfanzone-logo.png";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -139,7 +140,7 @@ const PlayerOfTheMonthSection = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="flex items-center gap-2 mb-4">
-            <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+            <img src={metsxmfanzoneLogo} alt="MetsXMFanZone" className="w-5 h-5 sm:w-6 sm:h-6 rounded" />
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
               Player of the Month
             </h2>
@@ -177,7 +178,7 @@ const PlayerOfTheMonthSection = () => {
 
                 <div className="bg-muted/50 rounded-lg p-3 sm:p-4">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                    Admin's Take
+                    Anthony's Take
                   </p>
                   <p className="text-sm sm:text-base text-foreground leading-relaxed whitespace-pre-line">
                     {entry.admin_opinion}
