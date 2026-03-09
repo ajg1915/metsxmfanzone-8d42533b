@@ -274,7 +274,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
               </div>
             </div>
 
-            <div className="p-3 sm:p-4 lg:p-6">
+            <div className="p-2 sm:p-4 lg:p-6">
               {hasLineup ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4 lg:gap-6">
                   {/* Batting Order */}
