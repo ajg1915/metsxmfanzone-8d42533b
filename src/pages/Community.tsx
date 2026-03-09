@@ -829,14 +829,23 @@ const Community = () => {
                           </>
                         )}
                       </div>
-                      {/* Full-width image */}
+                      {/* Full-width media (image/gif/video) */}
                       {item.image_url && (
                         <div className="relative w-full rounded-lg overflow-hidden bg-muted">
-                          <img
-                            src={item.image_url}
-                            alt="Post"
-                            className="w-full h-auto object-contain rounded-lg"
-                          />
+                          {item.image_url.includes('.mp4') || item.image_url.includes('.webm') || item.image_url.includes('.mov') ? (
+                            <video
+                              src={item.image_url}
+                              controls
+                              className="w-full h-auto rounded-lg max-h-[400px]"
+                              preload="metadata"
+                            />
+                          ) : (
+                            <img
+                              src={item.image_url}
+                              alt="Post"
+                              className="w-full h-auto object-contain rounded-lg"
+                            />
+                          )}
                         </div>
                       )}
                     </div>
