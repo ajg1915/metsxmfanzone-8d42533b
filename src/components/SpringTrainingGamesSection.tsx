@@ -247,6 +247,23 @@ const SpringTrainingGamesSection = () => {
                   )}
                 </div>
               </div>
+              {/* Confidence Grade */}
+              {(() => {
+                const conf = getConfidenceGrade(stream);
+                return (
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-primary to-green-400 transition-all duration-500"
+                        style={{ width: `${conf.percent}%` }}
+                      />
+                    </div>
+                    <span className={cn("text-[10px] sm:text-xs font-bold", conf.color)}>
+                      {conf.grade}
+                    </span>
+                  </div>
+                );
+              })()}
             </motion.div>
           ))}
 
