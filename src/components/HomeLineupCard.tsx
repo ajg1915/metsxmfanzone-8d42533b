@@ -8,23 +8,8 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import logoImage from "@/assets/metsxmfanzone-logo.png";
 
-import springAstros from "@/assets/spring-mets-astros.jpg";
-import springBraves from "@/assets/spring-mets-braves.jpg";
-import springCards from "@/assets/spring-mets-cards.jpg";
-import springNats from "@/assets/spring-mets-nats.jpg";
-import springRedsox from "@/assets/spring-mets-redsox.jpg";
-import springYankees from "@/assets/spring-mets-yankees.jpg";
-import springDefault from "@/assets/spring-training.jpg";
-
 const getSpringFallback = (opponent: string): string => {
-  const name = opponent.toLowerCase();
-  if (name.includes("astros") || name.includes("houston")) return springAstros;
-  if (name.includes("braves") || name.includes("atlanta")) return springBraves;
-  if (name.includes("cardinal") || name.includes("stl")) return springCards;
-  if (name.includes("national") || name.includes("washington")) return springNats;
-  if (name.includes("red sox") || name.includes("boston")) return springRedsox;
-  if (name.includes("yankee") || name.includes("new york")) return springYankees;
-  return springDefault;
+  return "";
 };
 
 interface LineupPlayer {
