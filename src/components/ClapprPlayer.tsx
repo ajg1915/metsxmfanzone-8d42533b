@@ -247,7 +247,7 @@ export function ClapprPlayer({
           </div>
         )}
 
-        <div className="relative w-full rounded-lg overflow-hidden bg-black" style={{ aspectRatio: "16/9" }}>
+        <div className="relative w-full rounded-lg overflow-hidden bg-black aspect-video landscape:max-h-[80vh] landscape:mx-auto landscape:w-full">
           <video
             ref={videoRef}
             className="video-js vjs-big-play-centered vjs-theme-fantasy"
