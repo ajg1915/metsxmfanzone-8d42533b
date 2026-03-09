@@ -283,31 +283,6 @@ const LiveStreamsSection = () => {
                     </p>
                   </div>
                 </div>
-                {/* Confidence Grade */}
-                {(() => {
-                  const isLive = stream.status === 'live';
-                  const hasViewers = stream.viewers_count > 0;
-                  let score = 50;
-                  if (isLive) score += 30;
-                  if (hasViewers) score += Math.min(stream.viewers_count * 2, 15);
-                  if (stream.thumbnail_url) score += 5;
-                  score = Math.min(score, 99);
-                  const grade = score >= 90 ? 'A+' : score >= 80 ? 'A' : score >= 70 ? 'B+' : score >= 60 ? 'B' : 'C';
-                  const color = score >= 80 ? 'text-emerald-400' : score >= 70 ? 'text-green-400' : score >= 60 ? 'text-yellow-400' : 'text-orange-400';
-                  return (
-                    <div className="mt-1.5 flex items-center gap-2">
-                      <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-primary to-green-400 transition-all duration-500"
-                          style={{ width: `${score}%` }}
-                        />
-                      </div>
-                      <span className={cn("text-[10px] sm:text-xs font-bold", color)}>
-                        {grade}
-                      </span>
-                    </div>
-                  );
-                })()}
               </div>
             ))}
             

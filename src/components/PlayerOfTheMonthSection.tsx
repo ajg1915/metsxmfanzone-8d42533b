@@ -178,7 +178,7 @@ const PlayerOfTheMonthSection = () => {
 
                 <div className="bg-muted/50 rounded-lg p-3 sm:p-4">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                    Admin's Take
+                    Anthony's Take
                   </p>
                   <p className="text-sm sm:text-base text-foreground leading-relaxed whitespace-pre-line">
                     {entry.admin_opinion}
