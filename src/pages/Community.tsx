@@ -10,12 +10,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone, FileText, Pencil, X, Check, Pin, PinOff } from "lucide-react";
+import { Image as ImageIcon, Send, Trash2, Heart, Lock, Megaphone, FileText, Pencil, X, Check, Pin, PinOff, Film } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import SocialShareButtons from "@/components/SocialShareButtons";
 import StoriesSection from "@/components/StoriesSection";
 import PostComments from "@/components/community/PostComments";
+import GifPicker from "@/components/community/GifPicker";
 import BusinessAdsSection from "@/components/BusinessAdsSection";
 import Events from "./Events";
 import { CommunityAIChat } from "@/components/CommunityAIChat";
@@ -82,6 +83,9 @@ const Community = () => {
   const [newPost, setNewPost] = useState("");
   const [uploading, setUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedPostGif, setSelectedPostGif] = useState<string | null>(null);
+  const [selectedPostVideo, setSelectedPostVideo] = useState<File | null>(null);
+  const [showPostGifPicker, setShowPostGifPicker] = useState(false);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
@@ -214,14 +218,44 @@ const Community = () => {
       try {
         validateImage(file);
         setSelectedImage(file);
+        setSelectedPostGif(null);
+        setSelectedPostVideo(null);
       } catch (error: any) {
         toast({
           title: "Invalid Image",
           description: error.message,
           variant: "destructive",
         });
-        e.target.value = ''; // Reset file input
+        e.target.value = '';
       }
+    }
+  };
+
+  const handlePostGifSelect = (gifUrl: string) => {
+    setSelectedPostGif(gifUrl);
+    setSelectedImage(null);
+    setSelectedPostVideo(null);
+    setShowPostGifPicker(false);
+  };
+
+  const handlePostVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const maxSize = 25 * 1024 * 1024;
+      const allowedTypes = ["video/mp4", "video/webm", "video/quicktime"];
+
+      if (file.size > maxSize) {
+        toast({ title: "Error", description: "Video must be less than 25MB", variant: "destructive" });
+        return;
+      }
+      if (!allowedTypes.includes(file.type)) {
+        toast({ title: "Error", description: "Only MP4, WebM, and MOV videos are allowed", variant: "destructive" });
+        return;
+      }
+
+      setSelectedPostVideo(file);
+      setSelectedImage(null);
+      setSelectedPostGif(null);
     }
   };
 
@@ -250,10 +284,10 @@ const Community = () => {
           return;
         }
       }
-    } else if (!selectedImage) {
+    } else if (!selectedImage && !selectedPostGif && !selectedPostVideo) {
       toast({
         title: "Validation Error",
-        description: "Please add some content or an image",
+        description: "Please add some content, an image, GIF, or video",
         variant: "destructive",
       });
       return;
@@ -273,9 +307,25 @@ const Community = () => {
           .upload(fileName, selectedImage);
 
         if (uploadError) throw uploadError;
-
-        // Store the file path, not the URL (we'll generate signed URLs on fetch)
         imageUrl = fileName;
+      } else if (selectedPostGif) {
+        // Store GIF URL directly as image_url (external URL)
+        imageUrl = selectedPostGif;
+      } else if (selectedPostVideo) {
+        const fileExt = selectedPostVideo.name.split(".").pop();
+        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("community_images")
+          .upload(fileName, selectedPostVideo);
+
+        if (uploadError) throw uploadError;
+
+        const { data: signedData } = await supabase.storage
+          .from("community_images")
+          .createSignedUrl(fileName, 60 * 60 * 24 * 365);
+
+        imageUrl = signedData?.signedUrl || fileName;
       }
 
       const { error } = await supabase.from("posts").insert({
@@ -288,6 +338,8 @@ const Community = () => {
 
       setNewPost("");
       setSelectedImage(null);
+      setSelectedPostGif(null);
+      setSelectedPostVideo(null);
       fetchFeed();
 
       toast({
@@ -479,9 +531,55 @@ const Community = () => {
                     onChange={(e) => setNewPost(e.target.value)}
                     className="min-h-[100px]"
                   />
+
+                  {/* Media previews */}
+                  {selectedImage && (
+                    <div className="relative inline-block">
+                      <div className="bg-muted rounded-md px-3 py-2 flex items-center gap-2 text-sm">
+                        <ImageIcon className="w-4 h-4 text-primary" />
+                        <span className="truncate max-w-[200px]">{selectedImage.name}</span>
+                      </div>
+                      <button
+                        onClick={() => setSelectedImage(null)}
+                        className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                  {selectedPostGif && (
+                    <div className="relative inline-block">
+                      <img
+                        src={selectedPostGif}
+                        alt="Selected GIF"
+                        className="rounded-md max-w-[200px] max-h-[120px] object-contain"
+                      />
+                      <button
+                        onClick={() => setSelectedPostGif(null)}
+                        className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                  {selectedPostVideo && (
+                    <div className="relative inline-block">
+                      <div className="bg-muted rounded-md px-3 py-2 flex items-center gap-2 text-sm">
+                        <Film className="w-4 h-4 text-primary" />
+                        <span className="truncate max-w-[200px]">{selectedPostVideo.name}</span>
+                      </div>
+                      <button
+                        onClick={() => setSelectedPostVideo(null)}
+                        className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
+                      {/* Photo upload */}
                       <Input
                         type="file"
                         accept="image/*"
@@ -492,26 +590,55 @@ const Community = () => {
                       <label htmlFor="image-upload">
                         <Button variant="outline" size="sm" asChild>
                           <span className="cursor-pointer">
-                            <ImageIcon className="w-4 h-4 mr-2" />
-                            Add Photo
+                            <ImageIcon className="w-4 h-4 mr-1" />
+                            Photo
                           </span>
                         </Button>
                       </label>
-                      {selectedImage && (
-                        <span className="text-sm text-muted-foreground">
-                          {selectedImage.name}
-                        </span>
+
+                      {/* GIF button - available to all logged-in users */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowPostGifPicker(!showPostGifPicker)}
+                      >
+                        <span className="text-sm font-bold mr-1">GIF</span>
+                      </Button>
+
+                      {/* Video button - admin only */}
+                      {isCurrentUserAdmin && (
+                        <>
+                          <Input
+                            type="file"
+                            accept="video/mp4,video/webm,video/quicktime"
+                            onChange={handlePostVideoSelect}
+                            className="hidden"
+                            id="post-video-upload"
+                          />
+                          <label htmlFor="post-video-upload">
+                            <Button variant="outline" size="sm" asChild>
+                              <span className="cursor-pointer">
+                                <Film className="w-4 h-4 mr-1" />
+                                Video
+                              </span>
+                            </Button>
+                          </label>
+                        </>
                       )}
                     </div>
                     
                     <Button
                       onClick={handleSubmitPost}
-                      disabled={(!newPost.trim() && !selectedImage) || uploading}
+                      disabled={(!newPost.trim() && !selectedImage && !selectedPostGif && !selectedPostVideo) || uploading}
                     >
                       <Send className="w-4 h-4 mr-2" />
                       {uploading ? "Posting..." : "Post"}
                     </Button>
                   </div>
+
+                  {showPostGifPicker && (
+                    <GifPicker onSelect={handlePostGifSelect} onClose={() => setShowPostGifPicker(false)} />
+                  )}
                 </>
               )}
             </CardContent>
@@ -702,14 +829,23 @@ const Community = () => {
                           </>
                         )}
                       </div>
-                      {/* Full-width image */}
+                      {/* Full-width media (image/gif/video) */}
                       {item.image_url && (
                         <div className="relative w-full rounded-lg overflow-hidden bg-muted">
-                          <img
-                            src={item.image_url}
-                            alt="Post"
-                            className="w-full h-auto object-contain rounded-lg"
-                          />
+                          {item.image_url.includes('.mp4') || item.image_url.includes('.webm') || item.image_url.includes('.mov') ? (
+                            <video
+                              src={item.image_url}
+                              controls
+                              className="w-full h-auto rounded-lg max-h-[400px]"
+                              preload="metadata"
+                            />
+                          ) : (
+                            <img
+                              src={item.image_url}
+                              alt="Post"
+                              className="w-full h-auto object-contain rounded-lg"
+                            />
+                          )}
                         </div>
                       )}
                     </div>

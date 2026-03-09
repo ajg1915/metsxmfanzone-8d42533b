@@ -7,46 +7,40 @@ interface GifPickerProps {
   onClose: () => void;
 }
 
-// Using Tenor's public GIF search (no API key required for basic use)
-// Fallback to a curated set of popular reaction GIFs
-const TRENDING_GIFS = [
-  "https://media.tenor.com/images/a4905d9a4172c53aae2e58e7e7bca426/tenor.gif",
-  "https://media.tenor.com/images/1f7b14c9a850368b202bbe06dbdd6cfc/tenor.gif",
-  "https://media.tenor.com/images/eb5c9e3e46ee42e89ac7f4cddaef9a7c/tenor.gif",
-  "https://media.tenor.com/images/2a51a40f7e979b2e3eea42c73d0a8e6a/tenor.gif",
-];
-
-// Popular baseball/Mets reaction GIFs with stable URLs
-const BASEBALL_GIFS = [
-  { url: "https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif", label: "Let's Go Mets" },
-  { url: "https://media.giphy.com/media/3o7TKF5DnsSLv4zVBu/giphy.gif", label: "Home Run" },
-  { url: "https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif", label: "Celebrate" },
-  { url: "https://media.giphy.com/media/xT9IgG50Fb7Mi0prBC/giphy.gif", label: "Excited" },
-  { url: "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif", label: "Clapping" },
-  { url: "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif", label: "Fire" },
-  { url: "https://media.giphy.com/media/3ohzdIuqJoo8QdKlnW/giphy.gif", label: "Thumbs Up" },
-  { url: "https://media.giphy.com/media/l4q8cJzGdR9J8w3hS/giphy.gif", label: "Mind Blown" },
-  { url: "https://media.giphy.com/media/3o6Zt6KHxJTbXCnSvu/giphy.gif", label: "Wow" },
-  { url: "https://media.giphy.com/media/26BRBKqUiq586bRVm/giphy.gif", label: "Cheer" },
-  { url: "https://media.giphy.com/media/l0HlvtIPdijJT1n0c/giphy.gif", label: "Victory" },
-  { url: "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif", label: "LOL" },
-];
-
+// Curated popular reaction GIFs (fallback + default browsing)
 const REACTION_CATEGORIES = [
   {
     label: "🔥 Reactions",
     gifs: [
-      "https://media.giphy.com/media/artj92V8o75VPL7AeQ/giphy.gif",
-      "https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif",
-      "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
-      "https://media.giphy.com/media/3ohzdIuqJoo8QdKlnW/giphy.gif",
-      "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif",
-      "https://media.giphy.com/media/l4q8cJzGdR9J8w3hS/giphy.gif",
+      "https://media1.tenor.com/m/ihqN6a3iiYEAAAAC/thumbs-up-okay.gif",
+      "https://media1.tenor.com/m/dBTJCYKnKKMAAAAC/clapping-clap.gif",
+      "https://media1.tenor.com/m/nAG6jFBfmgUAAAAC/lol-laughing.gif",
+      "https://media1.tenor.com/m/ODrXzJXEF_wAAAAC/fire-lit.gif",
+      "https://media1.tenor.com/m/MchhLEi7eYYAAAAC/mind-blown-explosion.gif",
+      "https://media1.tenor.com/m/pUBVlSMBGaUAAAAC/wow-omg.gif",
     ],
   },
   {
     label: "⚾ Baseball",
-    gifs: BASEBALL_GIFS.map((g) => g.url),
+    gifs: [
+      "https://media1.tenor.com/m/3c4FcGaFNVMAAAAC/baseball-home-run.gif",
+      "https://media1.tenor.com/m/lXwwJgWyeloAAAAC/mets-new-york-mets.gif",
+      "https://media1.tenor.com/m/IVhLEF-WvSwAAAAC/baseball-bat.gif",
+      "https://media1.tenor.com/m/GKHTGR47m_kAAAAC/baseball-catch.gif",
+      "https://media1.tenor.com/m/Cs9V-OIBLM4AAAAC/celebration-baseball.gif",
+      "https://media1.tenor.com/m/1oRtl5SNUYIAAAAC/celebrate-win.gif",
+    ],
+  },
+  {
+    label: "🎉 Celebrate",
+    gifs: [
+      "https://media1.tenor.com/m/S_8E1GCdP3IAAAAC/party-celebrate.gif",
+      "https://media1.tenor.com/m/epGJNeYo40IAAAAC/lets-go-yes.gif",
+      "https://media1.tenor.com/m/RQCxgaI8XBIAAAAC/dance-happy.gif",
+      "https://media1.tenor.com/m/-6_VK9zPfMwAAAAC/cheer-cheering.gif",
+      "https://media1.tenor.com/m/t7_ATwG-dp0AAAAC/victory-winner.gif",
+      "https://media1.tenor.com/m/sAfxOyYLYOUAAAAC/yay-hooray.gif",
+    ],
   },
 ];
 
@@ -55,7 +49,6 @@ const GifPicker = ({ onSelect, onClose }: GifPickerProps) => {
   const [searchResults, setSearchResults] = useState<string[]>([]);
   const [searching, setSearching] = useState(false);
 
-  // Simple GIPHY search using public beta key
   const searchGifs = async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -64,18 +57,17 @@ const GifPicker = ({ onSelect, onClose }: GifPickerProps) => {
 
     setSearching(true);
     try {
-      // Using GIPHY's public beta API key (rate limited but free)
+      // Tenor v2 API with free public key
       const res = await fetch(
-        `https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=${encodeURIComponent(query)}&limit=12&rating=pg`
+        `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query)}&key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ&client_key=metsxmfanzone&limit=12&media_filter=gif`
       );
       const data = await res.json();
-      const urls = (data.data || []).map(
-        (gif: any) => gif.images?.fixed_height?.url || gif.images?.original?.url
-      ).filter(Boolean);
+      const urls = (data.results || [])
+        .map((item: any) => item.media_formats?.gif?.url || item.media_formats?.mediumgif?.url)
+        .filter(Boolean);
       setSearchResults(urls);
     } catch (error) {
       console.error("GIF search error:", error);
-      // Fallback: show default GIFs
       setSearchResults([]);
     } finally {
       setSearching(false);
@@ -89,12 +81,8 @@ const GifPicker = ({ onSelect, onClose }: GifPickerProps) => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const displayGifs = search.trim()
-    ? searchResults
-    : REACTION_CATEGORIES;
-
   return (
-    <div className="border border-border rounded-lg bg-card p-3 max-h-[300px] overflow-y-auto">
+    <div className="border border-border rounded-lg bg-card p-3 max-h-[320px] overflow-y-auto">
       <div className="flex items-center justify-between mb-2">
         <p className="text-xs font-semibold text-foreground">Choose a GIF</p>
         <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
@@ -166,7 +154,7 @@ const GifPicker = ({ onSelect, onClose }: GifPickerProps) => {
         </div>
       )}
 
-      <p className="text-[9px] text-muted-foreground text-center mt-2">Powered by GIPHY</p>
+      <p className="text-[9px] text-muted-foreground text-center mt-2">Powered by Tenor</p>
     </div>
   );
 };
