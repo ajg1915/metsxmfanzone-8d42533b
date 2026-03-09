@@ -75,8 +75,8 @@ const SpringTrainingLive = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEOHead
-        title="Mets 2026 Spring Training Live - Exclusive Coverage | MetsXMFanZone"
-        description="Watch Mets 2026 Spring Training live streams, get game stats, latest news and exclusive coverage from Port St. Lucie, Florida."
+        title="Mets 2026 Regular Season Live - Exclusive Coverage | MetsXMFanZone"
+        description="Watch Mets 2026 regular season live streams, get game stats, latest news and exclusive coverage."
         canonical="https://www.metsxmfanzone.com/spring-training-live"
         keywords="Mets spring training 2026, spring training live, Mets preseason, Port St. Lucie, Mets training camp, Mets news"
         ogType="video.other"

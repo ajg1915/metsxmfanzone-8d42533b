@@ -217,6 +217,18 @@ const SpringTrainingGamesSection = () => {
                   <p className="text-foreground text-xs sm:text-sm font-semibold line-clamp-2">
                     {stream.title}
                   </p>
+                  {getMatchupRoute(stream.title) && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(getMatchupRoute(stream.title)!);
+                      }}
+                      className="flex items-center gap-1 mt-1 text-[9px] sm:text-[10px] text-primary hover:text-primary/80 font-bold transition-colors"
+                    >
+                      <BarChart3 className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                      View Matchup Breakdown
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
