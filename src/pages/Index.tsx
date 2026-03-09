@@ -17,8 +17,7 @@ const LiveStreamsSection = lazy(() => import("@/components/LiveStreamsSection"))
 const SpringTrainingGamesSection = lazy(() => import("@/components/SpringTrainingGamesSection"));
 const GameHighlightsSection = lazy(() => import("@/components/GameHighlightsSection"));
 const ReplayGamesSection = lazy(() => import("@/components/ReplayGamesSection"));
-// Spring Training 2026 - TODO: Remove this section once the 2026 spring training season concludes
-const SpringTraining = lazy(() => import("@/components/SpringTraining"));
+const PlayerOfTheMonthSection = lazy(() => import("@/components/PlayerOfTheMonthSection"));
 const PlayersToWatch = lazy(() => import("@/components/PlayersToWatch"));
 
 
@@ -255,7 +254,7 @@ const Index = () => {
 
         <LazySection fallback={<SectionSkeleton />}>
           <Suspense fallback={<SectionSkeleton />}>
-            <SpringTraining />
+            <PlayerOfTheMonthSection />
           </Suspense>
         </LazySection>
 

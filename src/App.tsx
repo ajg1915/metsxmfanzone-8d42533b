@@ -139,6 +139,7 @@ const PodcasterApplicationsManagement = lazy(() => import("./pages/admin/Podcast
 const DailyReports = lazy(() => import("./pages/admin/DailyReports"));
 const PredictionsManagement = lazy(() => import("./pages/admin/PredictionsManagement"));
 const PollManagement = lazy(() => import("./pages/admin/PollManagement"));
+const PlayerOfTheMonthManagement = lazy(() => import("./pages/admin/PlayerOfTheMonthManagement"));
 const SocialMediaSettings = lazy(() => import("./pages/admin/SocialMediaSettings"));
 const MediaLibrary = lazy(() => import("./pages/admin/MediaLibrary"));
 const ToastPromptManagement = lazy(() => import("./pages/admin/ToastPromptManagement"));
@@ -373,6 +374,7 @@ const AppContent = () => {
               <Route path="media-library" element={<MediaLibrary />} />
               <Route path="toast-prompts" element={<ToastPromptManagement />} />
               <Route path="shop" element={<ShopManagement />} />
+              <Route path="player-of-the-month" element={<PlayerOfTheMonthManagement />} />
             </Route>
             {/* Writer Portal Routes */}
             <Route path="/writer" element={<WriterDashboard />} />
