@@ -19,14 +19,6 @@ interface GameAlert {
   expires_at: string | null;
 }
 
-const ALERT_SOUNDS: Record<string, string> = {
-  default: "/sounds/alert-default.mp3",
-  chime: "/sounds/alert-chime.mp3",
-  urgent: "/sounds/alert-urgent.mp3",
-  horn: "/sounds/alert-horn.mp3",
-  bell: "/sounds/alert-bell.mp3",
-};
-
 const severityConfig = {
   info: {
     bg: "bg-primary/90",
