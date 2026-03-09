@@ -186,6 +186,30 @@ export function AdminSidebar() {
         {/* Analytics & SEO */}
         {renderCollapsibleSection("Analytics", TrendingUp, analyticsItems, analyticsOpen, setAnalyticsOpen)}
 
+        {/* Hard Refresh */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  tooltip="Hard Refresh"
+                  onClick={() => {
+                    if ('caches' in window) {
+                      caches.keys().then(names => names.forEach(name => caches.delete(name)));
+                    }
+                    navigator.serviceWorker?.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+                    window.location.reload();
+                  }}
+                  className="hover:bg-destructive/10 text-destructive cursor-pointer"
+                >
+                  <RefreshCw className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-xs font-medium">Hard Refresh</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
       </SidebarContent>
     </Sidebar>
   );
