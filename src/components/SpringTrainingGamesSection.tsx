@@ -153,7 +153,7 @@ const SpringTrainingGamesSection = () => {
                 navigate("/auth");
                 return;
               }
-              navigate("/spring-training-live");
+              navigate("/metsxmfanzone");
             }}
             className="flex items-center gap-1 text-xs sm:text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
