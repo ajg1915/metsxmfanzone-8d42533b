@@ -490,10 +490,16 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column - Standings & Leaders */}
-          <div className="space-y-4">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4"
+          >
 
             {/* NL East Standings */}
             <div className="rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-lg">
