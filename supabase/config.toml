@@ -1,166 +1,115 @@
 project_id = "clwghkbtkofacsjeyrtk"
 
-[functions.update-standings]
-verify_jwt = false
-
-[functions.blog-og-meta]
-verify_jwt = false
-
-[functions.generate-blog-image]
-verify_jwt = true
-
-[functions.create-paypal-order]
-verify_jwt = true
-
-[functions.verify-paypal-payment]
-verify_jwt = true
-
-[functions.create-helcim-checkout]
-verify_jwt = true
-
-[functions.verify-helcim-payment]
-verify_jwt = true
-
-[functions.paypal-webhook]
-verify_jwt = false
-
-[functions.generate-podcast-audio]
-verify_jwt = true
-
-[functions.generate-story-image]
-verify_jwt = true
-
-[functions.generate-newsletter]
-verify_jwt = true
-
-[functions.send-newsletter]
-verify_jwt = true
-
-[functions.send-sms-notification]
-verify_jwt = true
-
-[functions.elevenlabs-tts]
-verify_jwt = true
-
-[functions.send-otp-email]
-verify_jwt = false
-
-[functions.send-email-confirmation]
-verify_jwt = false
-
-[functions.verify-email-confirmation]
-verify_jwt = false
-
-[functions.security-alerts]
-verify_jwt = false
-
-[functions.secure-data-vault]
-verify_jwt = true
-
-[functions.check-ai-content]
-verify_jwt = true
-
-[functions.send-writer-revoked-email]
-verify_jwt = true
-
-[functions.stream-health-report]
-verify_jwt = false
-
-[functions.webauthn-register-options]
-verify_jwt = true
-
-[functions.webauthn-register-verify]
-verify_jwt = true
-
-[functions.webauthn-login-options]
-verify_jwt = false
-
-[functions.webauthn-login-verify]
-verify_jwt = false
-
-[functions.fetch-mets-lineup]
-verify_jwt = false
-
-[functions.fetch-mets-news]
-verify_jwt = false
-
-[functions.admin-pin-login]
-verify_jwt = false
-
-[functions.generate-daily-predictions]
-verify_jwt = false
-
-[functions.generate-excerpt]
-verify_jwt = true
-
-[functions.generate-video-gif]
-verify_jwt = false
-
-[functions.fetch-mets-highlights]
-verify_jwt = false
-
-[functions.post-to-facebook]
-verify_jwt = false
-
-[functions.post-to-instagram]
-verify_jwt = false
-
-[functions.post-to-twitter]
-verify_jwt = false
-
-[functions.post-to-tiktok]
-verify_jwt = false
-
-[functions.social-media-oauth-callback]
-verify_jwt = false
-
-[functions.fetch-player-stats]
-verify_jwt = false
-
-[functions.generate-fan-feedback]
-verify_jwt = false
-
-[functions.generate-weekly-podcast-shows]
-verify_jwt = false
-
-[functions.generate-daily-fanart]
-verify_jwt = true
-
-[functions.generate-ai-image]
-verify_jwt = true
-
-[functions.edit-ai-image]
-verify_jwt = true
-
-[functions.generate-ai-video]
-verify_jwt = true
-
-[functions.subscription-expiry-notifications]
-verify_jwt = false
-
-[functions.create-square-checkout]
-verify_jwt = true
-
-[functions.verify-square-payment]
-verify_jwt = false
-
-[functions.scrape-replay-games]
-verify_jwt = true
-
-[functions.payment-enforcement]
-verify_jwt = false
-
-[functions.ai-user-management]
-verify_jwt = false
-
-[functions.fetch-live-game]
-verify_jwt = false
-
-[functions.generate-ai-hero-slides]
-verify_jwt = true
-
-[functions.create-shop-order]
-verify_jwt = false
-
-[functions.capture-shop-order]
-verify_jwt = false
+[functions]
+  [functions.admin-pin-login]
+    verify_jwt = false
+  [functions.ai-user-management]
+    verify_jwt = false
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.blog-og-meta]
+    verify_jwt = false
+  [functions.capture-shop-order]
+    verify_jwt = false
+  [functions.check-ai-content]
+    verify_jwt = true
+  [functions.create-helcim-checkout]
+    verify_jwt = true
+  [functions.create-paypal-order]
+    verify_jwt = true
+  [functions.create-shop-order]
+    verify_jwt = false
+  [functions.create-square-checkout]
+    verify_jwt = true
+  [functions.edit-ai-image]
+    verify_jwt = true
+  [functions.elevenlabs-tts]
+    verify_jwt = true
+  [functions.fetch-live-game]
+    verify_jwt = false
+  [functions.fetch-mets-highlights]
+    verify_jwt = false
+  [functions.fetch-mets-lineup]
+    verify_jwt = false
+  [functions.fetch-mets-news]
+    verify_jwt = false
+  [functions.fetch-player-stats]
+    verify_jwt = false
+  [functions.generate-ai-hero-slides]
+    verify_jwt = true
+  [functions.generate-ai-image]
+    verify_jwt = true
+  [functions.generate-ai-video]
+    verify_jwt = true
+  [functions.generate-blog-image]
+    verify_jwt = true
+  [functions.generate-daily-fanart]
+    verify_jwt = true
+  [functions.generate-daily-predictions]
+    verify_jwt = false
+  [functions.generate-excerpt]
+    verify_jwt = true
+  [functions.generate-fan-feedback]
+    verify_jwt = false
+  [functions.generate-newsletter]
+    verify_jwt = true
+  [functions.generate-podcast-audio]
+    verify_jwt = true
+  [functions.generate-story-image]
+    verify_jwt = true
+  [functions.generate-video-gif]
+    verify_jwt = false
+  [functions.generate-weekly-podcast-shows]
+    verify_jwt = false
+  [functions.payment-enforcement]
+    verify_jwt = false
+  [functions.paypal-webhook]
+    verify_jwt = false
+  [functions.post-to-facebook]
+    verify_jwt = false
+  [functions.post-to-instagram]
+    verify_jwt = false
+  [functions.post-to-tiktok]
+    verify_jwt = false
+  [functions.post-to-twitter]
+    verify_jwt = false
+  [functions.scrape-replay-games]
+    verify_jwt = true
+  [functions.secure-data-vault]
+    verify_jwt = true
+  [functions.security-alerts]
+    verify_jwt = false
+  [functions.send-email-confirmation]
+    verify_jwt = false
+  [functions.send-newsletter]
+    verify_jwt = true
+  [functions.send-otp-email]
+    verify_jwt = false
+  [functions.send-sms-notification]
+    verify_jwt = true
+  [functions.send-writer-revoked-email]
+    verify_jwt = true
+  [functions.social-media-oauth-callback]
+    verify_jwt = false
+  [functions.stream-health-report]
+    verify_jwt = false
+  [functions.subscription-expiry-notifications]
+    verify_jwt = false
+  [functions.update-standings]
+    verify_jwt = false
+  [functions.verify-email-confirmation]
+    verify_jwt = false
+  [functions.verify-helcim-payment]
+    verify_jwt = true
+  [functions.verify-paypal-payment]
+    verify_jwt = true
+  [functions.verify-square-payment]
+    verify_jwt = false
+  [functions.webauthn-login-options]
+    verify_jwt = false
+  [functions.webauthn-login-verify]
+    verify_jwt = false
+  [functions.webauthn-register-options]
+    verify_jwt = true
+  [functions.webauthn-register-verify]
+    verify_jwt = true
