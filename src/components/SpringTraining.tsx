@@ -54,14 +54,14 @@ export default function SpringTraining({ className }: SpringTrainingProps) {
         <div className="flex flex-col gap-2 mb-4 sm:mb-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <h2 className="font-bold text-sm sm:text-base md:text-lg lg:text-xl text-foreground whitespace-nowrap">
-                Spring Training 2026
+            <h2 className="font-bold text-sm sm:text-base md:text-lg lg:text-xl text-foreground whitespace-nowrap">
+                Regular Season Games
               </h2>
               {!isPremium && <PremiumBadge size="sm" noGlow />}
             </div>
           </div>
           <p className="text-muted-foreground text-[10px] sm:text-xs">
-            Get ready for spring training
+            Watch the 2026 Mets regular season
           </p>
         </div>
 

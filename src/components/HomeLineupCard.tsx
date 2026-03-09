@@ -121,9 +121,9 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
     queryFn: async (): Promise<UpcomingGame[]> => {
       const today = new Date();
       const startDate = today.toISOString().split("T")[0];
-      const endDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+      const endDate = new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
       const response = await fetch(
-        `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=121&startDate=${startDate}&endDate=${endDate}&hydrate=probablePitcher,team`
+        `https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=121&startDate=${startDate}&endDate=${endDate}&gameType=R&hydrate=probablePitcher,team`
       );
       const data = await response.json();
       if (!data.dates || data.dates.length === 0) return [];
@@ -150,8 +150,8 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
       }
       return games.slice(0, 5);
     },
-    staleTime: 10 * 60 * 1000,
-    refetchInterval: 10 * 60 * 1000,
+    staleTime: 3 * 60 * 1000,
+    refetchInterval: 3 * 60 * 1000,
   });
 
   const { data: standings } = useQuery({
