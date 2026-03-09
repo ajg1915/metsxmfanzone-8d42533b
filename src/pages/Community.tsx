@@ -582,7 +582,7 @@ const Community = () => {
                       {/* Photo upload */}
                       <Input
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
                         onChange={handleImageSelect}
                         className="hidden"
                         id="image-upload"
