@@ -284,10 +284,10 @@ const Community = () => {
           return;
         }
       }
-    } else if (!selectedImage) {
+    } else if (!selectedImage && !selectedPostGif && !selectedPostVideo) {
       toast({
         title: "Validation Error",
-        description: "Please add some content or an image",
+        description: "Please add some content, an image, GIF, or video",
         variant: "destructive",
       });
       return;
@@ -307,9 +307,25 @@ const Community = () => {
           .upload(fileName, selectedImage);
 
         if (uploadError) throw uploadError;
-
-        // Store the file path, not the URL (we'll generate signed URLs on fetch)
         imageUrl = fileName;
+      } else if (selectedPostGif) {
+        // Store GIF URL directly as image_url (external URL)
+        imageUrl = selectedPostGif;
+      } else if (selectedPostVideo) {
+        const fileExt = selectedPostVideo.name.split(".").pop();
+        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("community_images")
+          .upload(fileName, selectedPostVideo);
+
+        if (uploadError) throw uploadError;
+
+        const { data: signedData } = await supabase.storage
+          .from("community_images")
+          .createSignedUrl(fileName, 60 * 60 * 24 * 365);
+
+        imageUrl = signedData?.signedUrl || fileName;
       }
 
       const { error } = await supabase.from("posts").insert({
@@ -322,6 +338,8 @@ const Community = () => {
 
       setNewPost("");
       setSelectedImage(null);
+      setSelectedPostGif(null);
+      setSelectedPostVideo(null);
       fetchFeed();
 
       toast({
