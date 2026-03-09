@@ -192,15 +192,21 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
   }, [lineupCard, onLineupLoaded, lineupFetched]);
 
   return (
-    <section className="py-6 sm:py-10 sm:py-14 relative overflow-hidden">
+    <section className="py-4 sm:py-10 lg:py-14 relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none" style={{
         background: "radial-gradient(ellipse 80% 50% at 50% 50%, hsl(var(--primary) / 0.06), transparent 70%)",
       }} />
 
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+      <div className="container mx-auto px-2 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         {/* Modern Header */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="flex items-center justify-between mb-3 sm:mb-6"
+        >
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-primary/20 shadow-lg shrink-0">
               <img src={logoImage} alt="MetsXMFanZone" className="w-full h-full object-cover" />
@@ -228,7 +234,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
               <span className="hidden sm:inline">Videos</span>
             </Link>
           </div>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-5">
           {/* Main Lineup Card */}
