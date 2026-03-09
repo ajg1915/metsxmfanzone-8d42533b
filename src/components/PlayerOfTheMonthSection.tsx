@@ -140,7 +140,7 @@ const PlayerOfTheMonthSection = () => {
           transition={{ duration: 0.5 }}
         >
           <div className="flex items-center gap-2 mb-4">
-            <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+            <img src={metsxmfanzoneLogo} alt="MetsXMFanZone" className="w-5 h-5 sm:w-6 sm:h-6 rounded" />
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
               Player of the Month
             </h2>
