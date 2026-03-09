@@ -15,6 +15,8 @@ interface Post {
   content: string;
   image_url: string | null;
   created_at: string;
+  is_pinned: boolean | null;
+  pinned_at: string | null;
   profiles: {
     full_name: string | null;
     email: string | null;
