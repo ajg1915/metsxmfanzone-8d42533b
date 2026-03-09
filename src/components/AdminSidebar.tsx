@@ -77,6 +77,7 @@ const communityItems = [
   { title: "Business Ads", url: "/admin/business-ads", icon: Megaphone },
   { title: "Shop", url: "/admin/shop", icon: ShoppingBag },
   { title: "Polls", url: "/admin/polls", icon: BarChart3 },
+  { title: "Player of the Month", url: "/admin/player-of-the-month", icon: Trophy },
 ];
 
 // Analytics & SEO

@@ -254,7 +254,7 @@ const Index = () => {
 
         <LazySection fallback={<SectionSkeleton />}>
           <Suspense fallback={<SectionSkeleton />}>
-            <SpringTraining />
+            <PlayerOfTheMonthSection />
           </Suspense>
         </LazySection>
 

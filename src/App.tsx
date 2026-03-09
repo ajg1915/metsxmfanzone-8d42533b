@@ -374,6 +374,7 @@ const AppContent = () => {
               <Route path="media-library" element={<MediaLibrary />} />
               <Route path="toast-prompts" element={<ToastPromptManagement />} />
               <Route path="shop" element={<ShopManagement />} />
+              <Route path="player-of-the-month" element={<PlayerOfTheMonthManagement />} />
             </Route>
             {/* Writer Portal Routes */}
             <Route path="/writer" element={<WriterDashboard />} />
