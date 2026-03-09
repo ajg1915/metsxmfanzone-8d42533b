@@ -6,6 +6,7 @@ import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, RefreshCw, User, Za
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 import logoImage from "@/assets/metsxmfanzone-logo.png";
 
 const getSpringFallback = (opponent: string): string => {
