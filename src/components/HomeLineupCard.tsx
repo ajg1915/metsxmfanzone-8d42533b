@@ -238,7 +238,13 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-5">
           {/* Main Lineup Card */}
-          <div className="lg:col-span-2 rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="lg:col-span-2 rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-xl"
+          >
             {/* Top Bar */}
             <div className="relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary/70" />
