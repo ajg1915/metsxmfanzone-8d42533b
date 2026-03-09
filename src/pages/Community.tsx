@@ -64,14 +64,14 @@ const postSchema = z.object({
 });
 
 const validateImage = (file: File) => {
-  const maxSize = 5 * 1024 * 1024; // 5MB
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
   
   if (file.size > maxSize) {
-    throw new Error('Image must be less than 5MB');
+    throw new Error('File must be less than 10MB');
   }
   if (!allowedTypes.includes(file.type.toLowerCase())) {
-    throw new Error('Only JPG, PNG, and WebP images are allowed');
+    throw new Error('Only JPG, PNG, WebP, and GIF files are allowed');
   }
 };
 
