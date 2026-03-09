@@ -62,9 +62,9 @@ const CommunityPreviewSection = () => {
 
       const { data: postsData } = await supabase.
       from("posts").
-      select(`id, user_id, content, image_url, created_at, profiles (full_name, email)`).
+      select(`id, user_id, content, image_url, created_at, is_pinned, pinned_at, profiles (full_name, email)`).
       order("created_at", { ascending: false }).
-      limit(5);
+      limit(10);
 
       const { count: postsCount } = await supabase.
       from("posts").
