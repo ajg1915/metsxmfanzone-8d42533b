@@ -268,8 +268,11 @@ const CommunityPreviewSection = () => {
                   }
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent sm:bg-gradient-to-r sm:from-transparent sm:to-card/20" />
                     <Badge className="absolute top-3 left-3 text-[10px] px-2.5 py-1 bg-primary text-primary-foreground border-0 shadow-lg font-semibold uppercase tracking-wider">
-                      <Flame className="w-3 h-3 mr-1" />
-                      Featured
+                      {posts[0].is_pinned ? (
+                        <><Pin className="w-3 h-3 mr-1" /> Featured Post</>
+                      ) : (
+                        <><Flame className="w-3 h-3 mr-1" /> Trending</>
+                      )}
                     </Badge>
                   </div>
 
