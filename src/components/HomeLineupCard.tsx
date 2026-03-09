@@ -6,6 +6,7 @@ import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, RefreshCw, User, Za
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 import logoImage from "@/assets/metsxmfanzone-logo.png";
 
 const getSpringFallback = (opponent: string): string => {
@@ -191,15 +192,21 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
   }, [lineupCard, onLineupLoaded, lineupFetched]);
 
   return (
-    <section className="py-6 sm:py-10 sm:py-14 relative overflow-hidden">
+    <section className="py-4 sm:py-10 lg:py-14 relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none" style={{
         background: "radial-gradient(ellipse 80% 50% at 50% 50%, hsl(var(--primary) / 0.06), transparent 70%)",
       }} />
 
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl relative z-10">
+      <div className="container mx-auto px-2 sm:px-6 lg:px-8 max-w-7xl relative z-10">
         {/* Modern Header */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="flex items-center justify-between mb-3 sm:mb-6"
+        >
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-primary/20 shadow-lg shrink-0">
               <img src={logoImage} alt="MetsXMFanZone" className="w-full h-full object-cover" />
@@ -227,11 +234,17 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
               <span className="hidden sm:inline">Videos</span>
             </Link>
           </div>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-5">
           {/* Main Lineup Card */}
-          <div className="lg:col-span-2 rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="lg:col-span-2 rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-xl"
+          >
             {/* Top Bar */}
             <div className="relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary/70" />
@@ -261,7 +274,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
               </div>
             </div>
 
-            <div className="p-3 sm:p-4 lg:p-6">
+            <div className="p-2 sm:p-4 lg:p-6">
               {hasLineup ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4 lg:gap-6">
                   {/* Batting Order */}
@@ -477,10 +490,16 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column - Standings & Leaders */}
-          <div className="space-y-4">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4"
+          >
 
             {/* NL East Standings */}
             <div className="rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-lg">
@@ -530,16 +549,34 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
             <div className="rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-lg">
               <div className="relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary/70" />
-                <div className="relative p-3 text-primary-foreground flex items-center justify-between">
+                <div className="relative p-2.5 sm:p-3 text-primary-foreground flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4" />
-                    <span className="font-black text-sm">Team Leaders</span>
+                    <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span className="font-black text-xs sm:text-sm">Team Leaders</span>
                   </div>
-                  <span className="text-[9px] bg-white/15 px-2 py-0.5 rounded-md font-bold">2025</span>
+                  <span className="text-[8px] sm:text-[9px] bg-white/15 px-1.5 sm:px-2 py-0.5 rounded-md font-bold">2025</span>
                 </div>
               </div>
-              <div className="p-3">
-                <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-2 sm:p-3">
+                {/* Mobile: horizontal scroll row */}
+                <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 sm:hidden hide-scrollbar">
+                  {[
+                    teamLeaders?.AVG && { label: "AVG", ...teamLeaders.AVG },
+                    teamLeaders?.HR && { label: "HR", ...teamLeaders.HR },
+                    teamLeaders?.RBI && { label: "RBI", ...teamLeaders.RBI },
+                    teamLeaders?.ERA && { label: "ERA", ...teamLeaders.ERA },
+                    teamLeaders?.W && { label: "W", ...teamLeaders.W },
+                    teamLeaders?.SO && { label: "K", ...teamLeaders.SO },
+                  ].filter(Boolean).map((stat: any) => (
+                    <div key={stat.label} className="snap-start shrink-0 w-[72px] rounded-xl bg-muted/15 p-1.5 border border-border/10 text-center">
+                      <p className="text-[7px] text-muted-foreground uppercase font-bold tracking-wider">{stat.label}</p>
+                      <p className="font-black text-xs text-primary">{stat.value}</p>
+                      <p className="text-[8px] truncate text-muted-foreground">{stat.name.split(" ").pop()}</p>
+                    </div>
+                  ))}
+                </div>
+                {/* Tablet+: grid layout */}
+                <div className="hidden sm:grid grid-cols-3 gap-2 text-center">
                   {teamLeaders?.AVG && (
                     <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
                       <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">AVG</p>
@@ -562,7 +599,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                     </div>
                   )}
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-center mt-2 pt-2 border-t border-border/15">
+                <div className="hidden sm:grid grid-cols-3 gap-2 text-center mt-2 pt-2 border-t border-border/15">
                   {teamLeaders?.ERA && (
                     <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
                       <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">ERA</p>
@@ -590,7 +627,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
