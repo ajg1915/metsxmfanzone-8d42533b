@@ -118,23 +118,20 @@ const GameAlertsManagement = () => {
   };
 
   const previewSound = (soundValue: string) => {
-    try {
-      let url = soundValue;
-      if (!soundValue.startsWith("http")) {
-        const soundMap: Record<string, string> = {
-          default: "/sounds/alert-default.mp3",
-          chime: "/sounds/alert-chime.mp3",
-          urgent: "/sounds/alert-urgent.mp3",
-          horn: "/sounds/alert-horn.mp3",
-          bell: "/sounds/alert-bell.mp3",
-        };
-        url = soundMap[soundValue] || soundMap.default;
-      }
-      if (soundValue === "none") return;
-      const audio = new Audio(url);
-      audio.volume = 0.5;
-      audio.play().catch(() => {});
-    } catch {}
+    if (soundValue === "none") return;
+    
+    if (soundValue.startsWith("http")) {
+      try {
+        const audio = new Audio(soundValue);
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+      } catch {}
+      return;
+    }
+
+    const validTypes = ['default', 'chime', 'urgent', 'horn', 'bell'] as const;
+    const soundType = validTypes.includes(soundValue as any) ? soundValue as typeof validTypes[number] : 'default';
+    generateAlertSound(soundType, 0.5);
   };
 
   const createAlert = async () => {
