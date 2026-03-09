@@ -11,7 +11,19 @@ import SEOHead from "@/components/SEOHead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Radio, Tv, Clock, MapPin, Users, Sun, Calendar, TrendingUp, Facebook } from "lucide-react";
+import { Radio, Tv, Clock, MapPin, Users, Sun, Calendar, TrendingUp, Facebook, BarChart3 } from "lucide-react";
+
+const getMatchupRoute = (title: string): string | null => {
+  const t = title.toLowerCase();
+  if (t.includes("astros") || t.includes("houston")) return "/matchup/astros";
+  if (t.includes("braves") || t.includes("atlanta")) return "/matchup/braves";
+  if (t.includes("cardinals") || t.includes("st. louis") || t.includes("stl")) return "/matchup/cardinals";
+  if (t.includes("nationals") || t.includes("washington")) return "/matchup/nationals";
+  if (t.includes("red sox") || t.includes("boston")) return "/matchup/redsox";
+  if (t.includes("yankees")) return "/matchup/yankees";
+  if (t.includes("blue jays") || t.includes("toronto")) return "/matchup/bluejays";
+  return null;
+};
 import logo from "@/assets/metsxmfanzone-logo.png";
 
 interface BlogPost {
@@ -63,8 +75,8 @@ const SpringTrainingLive = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEOHead
-        title="Mets 2026 Spring Training Live - Exclusive Coverage | MetsXMFanZone"
-        description="Watch Mets 2026 Spring Training live streams, get game stats, latest news and exclusive coverage from Port St. Lucie, Florida."
+        title="Mets 2026 Regular Season Live - Exclusive Coverage | MetsXMFanZone"
+        description="Watch Mets 2026 regular season live streams, get game stats, latest news and exclusive coverage."
         canonical="https://www.metsxmfanzone.com/spring-training-live"
         keywords="Mets spring training 2026, spring training live, Mets preseason, Port St. Lucie, Mets training camp, Mets news"
         ogType="video.other"
@@ -90,9 +102,9 @@ const SpringTrainingLive = () => {
               <div className="flex-1">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="secondary" className="bg-[#FFD700]/20 text-[#FFD700] border-[#FFD700]/30">
+                  <Badge variant="secondary" className="bg-[#FFD700]/20 text-[#FFD700] border-[#FFD700]/30">
                       <Sun className="w-3 h-3 mr-1" />
-                      Spring 2026
+                      2026 Season
                     </Badge>
                     <Badge variant="outline" className="border-white/30 text-white">
                       <Tv className="w-3 h-3 mr-1" />
@@ -100,11 +112,11 @@ const SpringTrainingLive = () => {
                     </Badge>
                   </div>
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-2">
-                    Spring Training <span className="text-primary">Live</span>
+                    Regular Season <span className="text-primary">Live</span>
                   </h1>
                   <p className="text-white/70 text-sm sm:text-base max-w-xl">
-                    Live coverage from Clover Park in Port St. Lucie, Florida. 
-                    Watch the Mets prepare for the 2026 season with exclusive spring training content.
+                    Live coverage of Mets 2026 regular season games. 
+                    Watch every game with exclusive coverage and real-time stats.
                   </p>
                 </div>
                 
@@ -148,8 +160,8 @@ const SpringTrainingLive = () => {
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="max-w-6xl mx-auto">
             <ClapprPlayer
-              pageTitle="Spring Training Live Stream"
-              pageDescription="Live coverage from Clover Park"
+              pageTitle="Regular Season Live Stream"
+              pageDescription="Live coverage of Mets games"
             />
             
             {/* Channel Info Cards */}

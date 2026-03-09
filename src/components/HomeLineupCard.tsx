@@ -8,23 +8,8 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import logoImage from "@/assets/metsxmfanzone-logo.png";
 
-import springAstros from "@/assets/spring-mets-astros.jpg";
-import springBraves from "@/assets/spring-mets-braves.jpg";
-import springCards from "@/assets/spring-mets-cards.jpg";
-import springNats from "@/assets/spring-mets-nats.jpg";
-import springRedsox from "@/assets/spring-mets-redsox.jpg";
-import springYankees from "@/assets/spring-mets-yankees.jpg";
-import springDefault from "@/assets/spring-training.jpg";
-
 const getSpringFallback = (opponent: string): string => {
-  const name = opponent.toLowerCase();
-  if (name.includes("astros") || name.includes("houston")) return springAstros;
-  if (name.includes("braves") || name.includes("atlanta")) return springBraves;
-  if (name.includes("cardinal") || name.includes("stl")) return springCards;
-  if (name.includes("national") || name.includes("washington")) return springNats;
-  if (name.includes("red sox") || name.includes("boston")) return springRedsox;
-  if (name.includes("yankee") || name.includes("new york")) return springYankees;
-  return springDefault;
+  return "";
 };
 
 interface LineupPlayer {
@@ -102,19 +87,6 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
     },
   });
 
-  const { data: springGames } = useQuery({
-    queryKey: ["spring-training-preview"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("spring_training_games")
-        .select("*")
-        .eq("published", true)
-        .order("display_order", { ascending: true })
-        .limit(3);
-      if (error) throw error;
-      return data;
-    },
-  });
 
   const { data: upcomingGames } = useQuery({
     queryKey: ["mlb-mets-upcoming-games"],
@@ -509,37 +481,6 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
 
           {/* Right Column - Standings & Leaders */}
           <div className="space-y-4">
-            {/* Spring Training Preview */}
-            <div className="rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-lg">
-              <div className="relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-primary/70" />
-                <div className="relative p-3 text-primary-foreground flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span className="font-black text-sm">Spring Training 2026</span>
-                </div>
-              </div>
-              <div className="p-3">
-                {springGames && springGames.length > 0 ? (
-                  <div className="space-y-2">
-                    {springGames.map((game) => (
-                      <Link key={game.id} to="/spring-training-live" className="flex items-center gap-2.5 p-2 rounded-xl bg-muted/15 hover:bg-muted/30 transition-all border border-transparent hover:border-primary/10 group">
-                        <img src={game.preview_image_url || getSpringFallback(game.opponent)} alt={game.opponent} className="w-10 h-10 rounded-lg object-cover border border-border/20" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-xs truncate group-hover:text-primary transition-colors">vs {game.opponent}</p>
-                          <p className="text-[10px] text-muted-foreground">{format(new Date(game.game_date), "MMM d")}</p>
-                        </div>
-                        <ArrowRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary transition-colors" />
-                      </Link>
-                    ))}
-                    <Link to="/spring-training-live" className="flex items-center justify-center gap-1 text-[10px] text-primary hover:text-primary/80 font-bold pt-1">
-                      View All <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  </div>
-                ) : (
-                  <p className="text-xs text-muted-foreground text-center py-3">No spring games scheduled</p>
-                )}
-              </div>
-            </div>
 
             {/* NL East Standings */}
             <div className="rounded-2xl overflow-hidden border border-border/30 backdrop-blur-xl bg-card/60 shadow-lg">
