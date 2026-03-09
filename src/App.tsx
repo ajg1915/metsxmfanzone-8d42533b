@@ -104,7 +104,7 @@ const ActivityDashboard = lazy(() => import("./pages/admin/ActivityDashboard"));
 const WriterApplications = lazy(() => import("./pages/admin/WriterApplications"));
 const RealtimeAnalytics = lazy(() => import("./pages/admin/RealtimeAnalytics"));
 const StreamHealthDashboard = lazy(() => import("./pages/admin/StreamHealthDashboard"));
-const StreamTester = lazy(() => import("./pages/admin/StreamTester"));
+
 const SEOManagement = lazy(() => import("./pages/admin/SEOManagement"));
 const HeroManagement = lazy(() => import("./pages/admin/HeroManagement"));
 
