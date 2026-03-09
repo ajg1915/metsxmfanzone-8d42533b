@@ -11,7 +11,19 @@ import SEOHead from "@/components/SEOHead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Radio, Tv, Clock, MapPin, Users, Sun, Calendar, TrendingUp, Facebook } from "lucide-react";
+import { Radio, Tv, Clock, MapPin, Users, Sun, Calendar, TrendingUp, Facebook, BarChart3 } from "lucide-react";
+
+const getMatchupRoute = (title: string): string | null => {
+  const t = title.toLowerCase();
+  if (t.includes("astros") || t.includes("houston")) return "/matchup/astros";
+  if (t.includes("braves") || t.includes("atlanta")) return "/matchup/braves";
+  if (t.includes("cardinals") || t.includes("st. louis") || t.includes("stl")) return "/matchup/cardinals";
+  if (t.includes("nationals") || t.includes("washington")) return "/matchup/nationals";
+  if (t.includes("red sox") || t.includes("boston")) return "/matchup/redsox";
+  if (t.includes("yankees")) return "/matchup/yankees";
+  if (t.includes("blue jays") || t.includes("toronto")) return "/matchup/bluejays";
+  return null;
+};
 import logo from "@/assets/metsxmfanzone-logo.png";
 
 interface BlogPost {
