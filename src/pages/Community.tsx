@@ -218,14 +218,44 @@ const Community = () => {
       try {
         validateImage(file);
         setSelectedImage(file);
+        setSelectedPostGif(null);
+        setSelectedPostVideo(null);
       } catch (error: any) {
         toast({
           title: "Invalid Image",
           description: error.message,
           variant: "destructive",
         });
-        e.target.value = ''; // Reset file input
+        e.target.value = '';
       }
+    }
+  };
+
+  const handlePostGifSelect = (gifUrl: string) => {
+    setSelectedPostGif(gifUrl);
+    setSelectedImage(null);
+    setSelectedPostVideo(null);
+    setShowPostGifPicker(false);
+  };
+
+  const handlePostVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const maxSize = 25 * 1024 * 1024;
+      const allowedTypes = ["video/mp4", "video/webm", "video/quicktime"];
+
+      if (file.size > maxSize) {
+        toast({ title: "Error", description: "Video must be less than 25MB", variant: "destructive" });
+        return;
+      }
+      if (!allowedTypes.includes(file.type)) {
+        toast({ title: "Error", description: "Only MP4, WebM, and MOV videos are allowed", variant: "destructive" });
+        return;
+      }
+
+      setSelectedPostVideo(file);
+      setSelectedImage(null);
+      setSelectedPostGif(null);
     }
   };
 
