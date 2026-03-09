@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, ArrowRight, Users, Flame, Sparkles } from "lucide-react";
+import { MessageSquare, ArrowRight, Users, Flame, Sparkles, Pin } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "@/assets/metsxmfanzone-logo.png";
 
