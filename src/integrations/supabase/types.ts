@@ -560,6 +560,7 @@ export type Database = {
       }
       game_alerts: {
         Row: {
+          alert_sound: string | null
           alert_type: string
           created_at: string
           created_by: string | null
@@ -575,6 +576,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          alert_sound?: string | null
           alert_type?: string
           created_at?: string
           created_by?: string | null
@@ -590,6 +592,7 @@ export type Database = {
           title: string
         }
         Update: {
+          alert_sound?: string | null
           alert_type?: string
           created_at?: string
           created_by?: string | null
