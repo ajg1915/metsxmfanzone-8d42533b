@@ -254,7 +254,7 @@ export function ClapprPlayer({
             playsInline
             // @ts-ignore - webkit AirPlay attribute
             x-webkit-airplay="allow"
-            style={{ width: "100%", height: "100%" }}
+            style={{ width: "100%", height: "100%", objectFit: "contain" }}
           />
         </div>
 
