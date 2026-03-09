@@ -10,13 +10,13 @@ const Footer = () => {
   };
 
   return (
-    <motion.footer 
+    <motion.footer
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="relative glass-nav border-t border-primary/30 bg-card/80 backdrop-blur-md"
-    >
+      className="relative glass-nav border-t border-primary/30 bg-card/80 backdrop-blur-md">
+      
       <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-5 pb-20 md:pb-5 max-w-7xl">
         <div>
           <div className="flex flex-col items-center gap-1.5 mb-2">
@@ -44,22 +44,22 @@ const Footer = () => {
             </div>
           </div>
           <p className="text-[10px] text-center text-muted-foreground/60 mb-2">
-            Your data is protected with enterprise-grade VPN security and end-to-end AES-256 encryption.
+            Your data is protected. VPN security and end-to-end AES-256 encryption.
           </p>
 
           <div className="border-t border-border/40 pt-2 text-center space-y-0.5">
-            <p 
+            <p
               onClick={handleSecretClick}
               className="text-[10px] sm:text-xs text-foreground/50 cursor-pointer select-none hover:text-foreground/70 transition-colors"
-              aria-hidden="true"
-            >
+              aria-hidden="true">
+              
               © 2025 MetsXMFanZone.com. All rights reserved.
             </p>
           </div>
         </div>
       </div>
-    </motion.footer>
-  );
+    </motion.footer>);
+
 };
 
 export default Footer;
