@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Bell, X, AlertTriangle, Info, Siren, ChevronRight, Volume2, VolumeX } from "lucide-react";
+import { X, AlertTriangle, Info, Siren, ChevronRight, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { generateAlertSound } from "@/utils/alertSounds";
 import { useNavigate } from "react-router-dom";
