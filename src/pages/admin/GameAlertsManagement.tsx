@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Bell, Send, Trash2, AlertTriangle, Info, Siren, Plus, ImagePlus, X, Loader2, Smartphone, Volume2, Upload } from "lucide-react";
 import { motion } from "framer-motion";
 import { validateFile, generateSafeFilename } from "@/utils/fileValidation";
+import { generateAlertSound } from "@/utils/alertSounds";
 
 interface GameAlert {
   id: string;
