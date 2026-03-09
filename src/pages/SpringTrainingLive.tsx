@@ -160,8 +160,8 @@ const SpringTrainingLive = () => {
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="max-w-6xl mx-auto">
             <ClapprPlayer
-              pageTitle="Spring Training Live Stream"
-              pageDescription="Live coverage from Clover Park"
+              pageTitle="Regular Season Live Stream"
+              pageDescription="Live coverage of Mets games"
             />
             
             {/* Channel Info Cards */}

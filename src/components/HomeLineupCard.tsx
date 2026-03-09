@@ -102,19 +102,6 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
     },
   });
 
-  const { data: springGames } = useQuery({
-    queryKey: ["spring-training-preview"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("spring_training_games")
-        .select("*")
-        .eq("published", true)
-        .order("display_order", { ascending: true })
-        .limit(3);
-      if (error) throw error;
-      return data;
-    },
-  });
 
   const { data: upcomingGames } = useQuery({
     queryKey: ["mlb-mets-upcoming-games"],
