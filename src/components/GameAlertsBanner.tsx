@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { Bell, X, AlertTriangle, Info, Siren, ChevronRight } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { X, AlertTriangle, Info, Siren, ChevronRight, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { generateAlertSound } from "@/utils/alertSounds";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/metsxmfanzone-logo.png";
@@ -13,6 +14,7 @@ interface GameAlert {
   severity: string;
   link_url: string | null;
   image_url: string | null;
+  alert_sound: string | null;
   created_at: string;
   expires_at: string | null;
 }
@@ -38,6 +40,10 @@ const severityConfig = {
 const GameAlertsBanner = () => {
   const [alerts, setAlerts] = useState<GameAlert[]>([]);
   const [dismissedIds, setDismissedIds] = useState<string[]>([]);
+  const [soundMuted, setSoundMuted] = useState(() => {
+    return localStorage.getItem("alertSoundMuted") === "true";
+  });
+  const playedAlertIds = useRef<Set<string>>(new Set());
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,7 +51,6 @@ const GameAlertsBanner = () => {
     setDismissedIds(dismissed);
     fetchAlerts();
 
-    // Subscribe to realtime alerts
     const channel = supabase
       .channel("game-alerts-realtime")
       .on(
@@ -67,8 +72,42 @@ const GameAlertsBanner = () => {
       .limit(3);
 
     if (!error && data) {
-      setAlerts(data as GameAlert[]);
+      const newAlerts = data as GameAlert[];
+      // Play sound for new alerts
+      newAlerts.forEach((alert) => {
+        if (!playedAlertIds.current.has(alert.id)) {
+          playedAlertIds.current.add(alert.id);
+          playAlertSound(alert.alert_sound);
+        }
+      });
+      setAlerts(newAlerts);
     }
+  };
+
+  const playAlertSound = (soundKey: string | null) => {
+    if (soundMuted) return;
+    const key = soundKey || "default";
+    
+    // Custom uploaded sound (URL)
+    if (key.startsWith("http")) {
+      try {
+        const audio = new Audio(key);
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+      } catch {}
+      return;
+    }
+
+    // Use Web Audio API for built-in sounds (no MP3 files needed)
+    const validTypes = ['default', 'chime', 'urgent', 'horn', 'bell'] as const;
+    const soundType = validTypes.includes(key as any) ? key as typeof validTypes[number] : 'default';
+    generateAlertSound(soundType, 0.5);
+  };
+
+  const toggleMute = () => {
+    const newMuted = !soundMuted;
+    setSoundMuted(newMuted);
+    localStorage.setItem("alertSoundMuted", String(newMuted));
   };
 
   const handleDismiss = (id: string) => {
@@ -82,7 +121,7 @@ const GameAlertsBanner = () => {
   if (visibleAlerts.length === 0) return null;
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-0.5">
       <AnimatePresence>
         {visibleAlerts.map((alert) => {
           const config = severityConfig[alert.severity as keyof typeof severityConfig] || severityConfig.info;
@@ -97,44 +136,54 @@ const GameAlertsBanner = () => {
               transition={{ duration: 0.3 }}
               className={`${config.bg} text-white relative overflow-hidden`}
             >
-              <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-2.5">
-                <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <img src={logo} alt="" className="w-5 h-5" />
-                    {alert.severity === "urgent" && (
-                      <Icon className="w-4 h-4 animate-pulse" />
-                    )}
-                    {alert.severity !== "urgent" && <Icon className="w-4 h-4" />}
-                  </div>
-                  <div className="min-w-0 flex-1 flex items-center gap-2">
-                    <div className="min-w-0 flex-1">
-                      <span className="text-xs sm:text-sm font-semibold mr-1.5">
-                        {alert.title}
-                      </span>
-                      <span className="text-xs sm:text-sm opacity-90 hidden sm:inline">
-                        {alert.message}
-                      </span>
-                    </div>
-                    {alert.image_url && (
-                      <img src={alert.image_url} alt="" className="h-8 w-8 sm:h-10 sm:w-10 rounded object-cover flex-shrink-0" />
+              <div className="container mx-auto flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-2.5">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <img src={logo} alt="" className="w-4 h-4 sm:w-5 sm:h-5" />
+                    {alert.severity === "urgent" ? (
+                      <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse" />
+                    ) : (
+                      <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     )}
                   </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[11px] sm:text-sm font-semibold mr-1">
+                      {alert.title}
+                    </span>
+                    <span className="text-[10px] sm:text-sm opacity-90 hidden sm:inline">
+                      {alert.message}
+                    </span>
+                    {/* Show message on mobile below title */}
+                    <p className="text-[10px] opacity-80 line-clamp-1 sm:hidden">
+                      {alert.message}
+                    </p>
+                  </div>
+                  {alert.image_url && (
+                    <img src={alert.image_url} alt="" className="h-7 w-7 sm:h-10 sm:w-10 rounded object-cover flex-shrink-0" />
+                  )}
                 </div>
-                <div className="flex items-center gap-1.5 flex-shrink-0">
+                <div className="flex items-center gap-1 flex-shrink-0">
                   {alert.link_url && (
                     <button
                       onClick={() => navigate(alert.link_url!)}
-                      className="text-xs bg-white/20 hover:bg-white/30 rounded px-2.5 py-1 transition-colors flex items-center gap-1"
+                      className="text-[10px] sm:text-xs bg-white/20 hover:bg-white/30 rounded px-1.5 sm:px-2.5 py-0.5 sm:py-1 transition-colors flex items-center gap-0.5"
                     >
-                      View <ChevronRight className="w-3 h-3" />
+                      View <ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                     </button>
                   )}
+                  <button
+                    onClick={toggleMute}
+                    className="hover:bg-white/20 rounded p-0.5 transition-colors"
+                    aria-label={soundMuted ? "Unmute alerts" : "Mute alerts"}
+                  >
+                    {soundMuted ? <VolumeX className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> : <Volume2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
+                  </button>
                   <button
                     onClick={() => handleDismiss(alert.id)}
                     className="hover:bg-white/20 rounded p-0.5 transition-colors"
                     aria-label="Dismiss alert"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </button>
                 </div>
               </div>
