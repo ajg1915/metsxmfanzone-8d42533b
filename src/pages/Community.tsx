@@ -719,6 +719,9 @@ const Community = () => {
                       <Heart className="w-4 h-4 mr-2" />
                       Like
                     </Button>
+                    {item.type === 'post' && (
+                      <PostComments postId={item.id} isCurrentUserAdmin={isCurrentUserAdmin} />
+                    )}
                   </div>
                 </CardContent>
               </Card>
