@@ -243,18 +243,18 @@ const Index = () => {
         <div className="section-divider my-1" />
 
         <div id="social">
-          <LazySection fallback={<SectionSkeleton />}>
-            <Suspense fallback={<SectionSkeleton />}>
-              <CommunityPreviewSection />
-            </Suspense>
-          </LazySection>
+        <LazySection fallback={<SectionSkeleton />}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <PlayerOfTheMonthSection />
+          </Suspense>
+        </LazySection>
         </div>
 
         <div className="section-divider my-1" />
 
         <LazySection fallback={<SectionSkeleton />}>
           <Suspense fallback={<SectionSkeleton />}>
-            <PlayerOfTheMonthSection />
+            <CommunityPreviewSection />
           </Suspense>
         </LazySection>
 
