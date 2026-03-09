@@ -102,9 +102,9 @@ const SpringTrainingLive = () => {
               <div className="flex-1">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="secondary" className="bg-[#FFD700]/20 text-[#FFD700] border-[#FFD700]/30">
+                  <Badge variant="secondary" className="bg-[#FFD700]/20 text-[#FFD700] border-[#FFD700]/30">
                       <Sun className="w-3 h-3 mr-1" />
-                      Spring 2026
+                      2026 Season
                     </Badge>
                     <Badge variant="outline" className="border-white/30 text-white">
                       <Tv className="w-3 h-3 mr-1" />
