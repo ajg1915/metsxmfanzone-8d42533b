@@ -1057,6 +1057,77 @@ export type Database = {
         }
         Relationships: []
       }
+      player_of_the_month: {
+        Row: {
+          admin_opinion: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          month: string
+          player_image_url: string | null
+          player_name: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          admin_opinion: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          month: string
+          player_image_url?: string | null
+          player_name: string
+          updated_at?: string
+          year?: number
+        }
+        Update: {
+          admin_opinion?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          month?: string
+          player_image_url?: string | null
+          player_name?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      player_of_the_month_votes: {
+        Row: {
+          created_at: string
+          id: string
+          player_of_the_month_id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          player_of_the_month_id: string
+          user_id: string
+          vote_type?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          player_of_the_month_id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_of_the_month_votes_player_of_the_month_id_fkey"
+            columns: ["player_of_the_month_id"]
+            isOneToOne: false
+            referencedRelation: "player_of_the_month"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       podcast_live_stream: {
         Row: {
           created_at: string
