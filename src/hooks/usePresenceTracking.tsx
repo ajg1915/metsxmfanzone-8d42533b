@@ -41,7 +41,7 @@ const getReferrerSource = (): string => {
 export const usePresenceTracking = () => {
   const location = useLocation();
   const sessionId = useRef(getSessionId());
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const userRef = useRef<string | null>(null);
   const checkedAuth = useRef(false);
 
