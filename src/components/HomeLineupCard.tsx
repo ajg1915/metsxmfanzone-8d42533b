@@ -149,35 +149,33 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
   const { data: teamLeaders } = useQuery({
     queryKey: ["mlb-mets-leaders-2026"],
     queryFn: async () => {
-      const now = new Date();
-      const currentSeason = now.getFullYear();
-      const primarySeason = now.getMonth() < 3 ? currentSeason - 1 : currentSeason;
-      const fallbackSeason = primarySeason - 1;
+      const season = 2026;
       const fetchLeaderCategory = async (category: string) => {
-        const buildUrl = (season: number) =>
-          `https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=${category}&season=${season}&limit=1`;
-        const primaryRes = await fetch(buildUrl(primarySeason));
-        const response = primaryRes.ok ? primaryRes : await fetch(buildUrl(fallbackSeason));
-        if (!response.ok) return null;
-        const data = await response.json();
+        const url = `https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=${category}&season=${season}&limit=1`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const data = await res.json();
         const leaders = data.teamLeaders?.[0]?.leaders;
         if (leaders && leaders.length > 0) {
           return { name: leaders[0].person.fullName, value: leaders[0].value };
         }
         return null;
       };
-      const [AVG, HR, RBI, ERA, W, SO] = await Promise.all([
+      const [AVG, HR, RBI, ERA, W, SO, SV, SB, OBP] = await Promise.all([
         fetchLeaderCategory("battingAverage"),
         fetchLeaderCategory("homeRuns"),
         fetchLeaderCategory("runsBattedIn"),
         fetchLeaderCategory("earnedRunAverage"),
         fetchLeaderCategory("wins"),
         fetchLeaderCategory("strikeouts"),
+        fetchLeaderCategory("saves"),
+        fetchLeaderCategory("stolenBases"),
+        fetchLeaderCategory("onBasePercentage"),
       ]);
-      return { AVG, HR, RBI, ERA, W, SO };
+      return { AVG, HR, RBI, ERA, W, SO, SV, SB, OBP };
     },
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000,
+    staleTime: 3 * 60 * 1000,
+    refetchInterval: 3 * 60 * 1000,
   });
 
   const lineup = lineupCard?.lineup_data as unknown as LineupPlayer[] | undefined;
