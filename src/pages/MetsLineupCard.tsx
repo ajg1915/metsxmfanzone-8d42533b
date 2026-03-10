@@ -239,8 +239,7 @@ export default function MetsLineupCard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Auto-fetch lineup data from MLB API
-  useAutoLineupFetch();
+  // Auto lineup fetch removed to reduce Cloud load — triggered by admin instead
 
   const fetchUpcomingLineups = async () => {
     try {
