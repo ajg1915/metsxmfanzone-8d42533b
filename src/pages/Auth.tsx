@@ -229,6 +229,30 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast({
+          title: "Google Sign-In Failed",
+          description: result.error.message || "Could not sign in with Google.",
+          variant: "destructive",
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: "Google Sign-In Error",
+        description: err.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   // Check for remembered user on mount and biometric support
   useEffect(() => {
     // Check biometric support
