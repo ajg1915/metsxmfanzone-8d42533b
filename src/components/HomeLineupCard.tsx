@@ -149,33 +149,35 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
   const { data: teamLeaders } = useQuery({
     queryKey: ["mlb-mets-leaders-2026"],
     queryFn: async () => {
-      const season = 2026;
+      const now = new Date();
+      const currentSeason = now.getFullYear();
+      const primarySeason = now.getMonth() < 3 ? currentSeason - 1 : currentSeason;
+      const fallbackSeason = primarySeason - 1;
       const fetchLeaderCategory = async (category: string) => {
-        const url = `https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=${category}&season=${season}&limit=1`;
-        const res = await fetch(url);
-        if (!res.ok) return null;
-        const data = await res.json();
+        const buildUrl = (season: number) =>
+          `https://statsapi.mlb.com/api/v1/teams/121/leaders?leaderCategories=${category}&season=${season}&limit=1`;
+        const primaryRes = await fetch(buildUrl(primarySeason));
+        const response = primaryRes.ok ? primaryRes : await fetch(buildUrl(fallbackSeason));
+        if (!response.ok) return null;
+        const data = await response.json();
         const leaders = data.teamLeaders?.[0]?.leaders;
         if (leaders && leaders.length > 0) {
           return { name: leaders[0].person.fullName, value: leaders[0].value };
         }
         return null;
       };
-      const [AVG, HR, RBI, ERA, W, SO, SV, SB, OBP] = await Promise.all([
+      const [AVG, HR, RBI, ERA, W, SO] = await Promise.all([
         fetchLeaderCategory("battingAverage"),
         fetchLeaderCategory("homeRuns"),
         fetchLeaderCategory("runsBattedIn"),
         fetchLeaderCategory("earnedRunAverage"),
         fetchLeaderCategory("wins"),
         fetchLeaderCategory("strikeouts"),
-        fetchLeaderCategory("saves"),
-        fetchLeaderCategory("stolenBases"),
-        fetchLeaderCategory("onBasePercentage"),
       ]);
-      return { AVG, HR, RBI, ERA, W, SO, SV, SB, OBP };
+      return { AVG, HR, RBI, ERA, W, SO };
     },
-    staleTime: 3 * 60 * 1000,
-    refetchInterval: 3 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
   });
 
   const lineup = lineupCard?.lineup_data as unknown as LineupPlayer[] | undefined;
@@ -552,7 +554,7 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                     <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span className="font-black text-xs sm:text-sm">Team Leaders</span>
                   </div>
-                  <span className="text-[8px] sm:text-[9px] bg-white/15 px-1.5 sm:px-2 py-0.5 rounded-md font-bold">2026</span>
+                  <span className="text-[8px] sm:text-[9px] bg-white/15 px-1.5 sm:px-2 py-0.5 rounded-md font-bold">2025</span>
                 </div>
               </div>
               <div className="p-2 sm:p-3">
@@ -562,12 +564,9 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                     teamLeaders?.AVG && { label: "AVG", ...teamLeaders.AVG },
                     teamLeaders?.HR && { label: "HR", ...teamLeaders.HR },
                     teamLeaders?.RBI && { label: "RBI", ...teamLeaders.RBI },
-                    teamLeaders?.OBP && { label: "OBP", ...teamLeaders.OBP },
-                    teamLeaders?.SB && { label: "SB", ...teamLeaders.SB },
                     teamLeaders?.ERA && { label: "ERA", ...teamLeaders.ERA },
                     teamLeaders?.W && { label: "W", ...teamLeaders.W },
                     teamLeaders?.SO && { label: "K", ...teamLeaders.SO },
-                    teamLeaders?.SV && { label: "SV", ...teamLeaders.SV },
                   ].filter(Boolean).map((stat: any) => (
                     <div key={stat.label} className="snap-start shrink-0 w-[72px] rounded-xl bg-muted/15 p-1.5 border border-border/10 text-center">
                       <p className="text-[7px] text-muted-foreground uppercase font-bold tracking-wider">{stat.label}</p>
@@ -576,42 +575,52 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                     </div>
                   ))}
                 </div>
-                {/* Tablet+: grid layout - Hitting */}
-                <div className="hidden sm:block">
-                  <p className="text-[7px] uppercase tracking-wider text-muted-foreground/60 font-bold mb-1.5">Hitting</p>
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    {[
-                      teamLeaders?.AVG && { label: "AVG", ...teamLeaders.AVG },
-                      teamLeaders?.HR && { label: "HR", ...teamLeaders.HR },
-                      teamLeaders?.RBI && { label: "RBI", ...teamLeaders.RBI },
-                      teamLeaders?.OBP && { label: "OBP", ...teamLeaders.OBP },
-                      teamLeaders?.SB && { label: "SB", ...teamLeaders.SB },
-                    ].filter(Boolean).map((stat: any) => (
-                      <div key={stat.label} className="rounded-xl bg-muted/15 p-2 border border-border/10">
-                        <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">{stat.label}</p>
-                        <p className="font-black text-sm text-primary">{stat.value}</p>
-                        <p className="text-[9px] truncate text-muted-foreground">{stat.name.split(" ").pop()}</p>
-                      </div>
-                    ))}
-                  </div>
+                {/* Tablet+: grid layout */}
+                <div className="hidden sm:grid grid-cols-3 gap-2 text-center">
+                  {teamLeaders?.AVG && (
+                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
+                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">AVG</p>
+                      <p className="font-black text-sm text-primary">{teamLeaders.AVG.value}</p>
+                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.AVG.name.split(" ").pop()}</p>
+                    </div>
+                  )}
+                  {teamLeaders?.HR && (
+                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
+                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">HR</p>
+                      <p className="font-black text-sm text-primary">{teamLeaders.HR.value}</p>
+                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.HR.name.split(" ").pop()}</p>
+                    </div>
+                  )}
+                  {teamLeaders?.RBI && (
+                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
+                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">RBI</p>
+                      <p className="font-black text-sm text-primary">{teamLeaders.RBI.value}</p>
+                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.RBI.name.split(" ").pop()}</p>
+                    </div>
+                  )}
                 </div>
-                {/* Tablet+: grid layout - Pitching */}
-                <div className="hidden sm:block mt-2 pt-2 border-t border-border/15">
-                  <p className="text-[7px] uppercase tracking-wider text-muted-foreground/60 font-bold mb-1.5">Pitching</p>
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    {[
-                      teamLeaders?.ERA && { label: "ERA", ...teamLeaders.ERA },
-                      teamLeaders?.W && { label: "W", ...teamLeaders.W },
-                      teamLeaders?.SO && { label: "K", ...teamLeaders.SO },
-                      teamLeaders?.SV && { label: "SV", ...teamLeaders.SV },
-                    ].filter(Boolean).map((stat: any) => (
-                      <div key={stat.label} className="rounded-xl bg-muted/15 p-2 border border-border/10">
-                        <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">{stat.label}</p>
-                        <p className="font-black text-sm text-primary">{stat.value}</p>
-                        <p className="text-[9px] truncate text-muted-foreground">{stat.name.split(" ").pop()}</p>
-                      </div>
-                    ))}
-                  </div>
+                <div className="hidden sm:grid grid-cols-3 gap-2 text-center mt-2 pt-2 border-t border-border/15">
+                  {teamLeaders?.ERA && (
+                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
+                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">ERA</p>
+                      <p className="font-black text-sm text-primary">{teamLeaders.ERA.value}</p>
+                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.ERA.name.split(" ").pop()}</p>
+                    </div>
+                  )}
+                  {teamLeaders?.W && (
+                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
+                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">W</p>
+                      <p className="font-black text-sm text-primary">{teamLeaders.W.value}</p>
+                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.W.name.split(" ").pop()}</p>
+                    </div>
+                  )}
+                  {teamLeaders?.SO && (
+                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
+                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">K</p>
+                      <p className="font-black text-sm text-primary">{teamLeaders.SO.value}</p>
+                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.SO.name.split(" ").pop()}</p>
+                    </div>
+                  )}
                 </div>
                 {!teamLeaders?.AVG && !teamLeaders?.HR && (
                   <p className="text-xs text-muted-foreground text-center py-3">Season stats coming soon</p>
