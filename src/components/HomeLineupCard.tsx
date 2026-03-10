@@ -558,67 +558,51 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                 </div>
               </div>
               <div className="p-2 sm:p-3">
-                {/* Mobile: horizontal scroll row */}
-                <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 sm:hidden hide-scrollbar">
-                  {[
-                    teamLeaders?.AVG && { label: "AVG", ...teamLeaders.AVG },
-                    teamLeaders?.HR && { label: "HR", ...teamLeaders.HR },
-                    teamLeaders?.RBI && { label: "RBI", ...teamLeaders.RBI },
-                    teamLeaders?.ERA && { label: "ERA", ...teamLeaders.ERA },
-                    teamLeaders?.W && { label: "W", ...teamLeaders.W },
-                    teamLeaders?.SO && { label: "K", ...teamLeaders.SO },
-                  ].filter(Boolean).map((stat: any) => (
-                    <div key={stat.label} className="snap-start shrink-0 w-[72px] rounded-xl bg-muted/15 p-1.5 border border-border/10 text-center">
-                      <p className="text-[7px] text-muted-foreground uppercase font-bold tracking-wider">{stat.label}</p>
-                      <p className="font-black text-xs text-primary">{stat.value}</p>
-                      <p className="text-[8px] truncate text-muted-foreground">{stat.name.split(" ").pop()}</p>
-                    </div>
-                  ))}
-                </div>
-                {/* Tablet+: grid layout */}
-                <div className="hidden sm:grid grid-cols-3 gap-2 text-center">
+                {/* Hitting Leaders */}
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center">
                   {teamLeaders?.AVG && (
-                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
-                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">AVG</p>
-                      <p className="font-black text-sm text-primary">{teamLeaders.AVG.value}</p>
-                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.AVG.name.split(" ").pop()}</p>
+                    <div className="rounded-xl bg-muted/15 p-1.5 sm:p-2 border border-border/10">
+                      <p className="text-[7px] sm:text-[8px] text-muted-foreground uppercase font-bold tracking-wider">AVG</p>
+                      <p className="font-black text-[11px] sm:text-sm text-primary leading-tight">{teamLeaders.AVG.value}</p>
+                      <p className="text-[7px] sm:text-[9px] truncate text-muted-foreground">{teamLeaders.AVG.name.split(" ").pop()}</p>
                     </div>
                   )}
                   {teamLeaders?.HR && (
-                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
-                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">HR</p>
-                      <p className="font-black text-sm text-primary">{teamLeaders.HR.value}</p>
-                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.HR.name.split(" ").pop()}</p>
+                    <div className="rounded-xl bg-muted/15 p-1.5 sm:p-2 border border-border/10">
+                      <p className="text-[7px] sm:text-[8px] text-muted-foreground uppercase font-bold tracking-wider">HR</p>
+                      <p className="font-black text-[11px] sm:text-sm text-primary leading-tight">{teamLeaders.HR.value}</p>
+                      <p className="text-[7px] sm:text-[9px] truncate text-muted-foreground">{teamLeaders.HR.name.split(" ").pop()}</p>
                     </div>
                   )}
                   {teamLeaders?.RBI && (
-                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
-                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">RBI</p>
-                      <p className="font-black text-sm text-primary">{teamLeaders.RBI.value}</p>
-                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.RBI.name.split(" ").pop()}</p>
+                    <div className="rounded-xl bg-muted/15 p-1.5 sm:p-2 border border-border/10">
+                      <p className="text-[7px] sm:text-[8px] text-muted-foreground uppercase font-bold tracking-wider">RBI</p>
+                      <p className="font-black text-[11px] sm:text-sm text-primary leading-tight">{teamLeaders.RBI.value}</p>
+                      <p className="text-[7px] sm:text-[9px] truncate text-muted-foreground">{teamLeaders.RBI.name.split(" ").pop()}</p>
                     </div>
                   )}
                 </div>
-                <div className="hidden sm:grid grid-cols-3 gap-2 text-center mt-2 pt-2 border-t border-border/15">
+                {/* Pitching Leaders */}
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-border/15">
                   {teamLeaders?.ERA && (
-                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
-                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">ERA</p>
-                      <p className="font-black text-sm text-primary">{teamLeaders.ERA.value}</p>
-                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.ERA.name.split(" ").pop()}</p>
+                    <div className="rounded-xl bg-muted/15 p-1.5 sm:p-2 border border-border/10">
+                      <p className="text-[7px] sm:text-[8px] text-muted-foreground uppercase font-bold tracking-wider">ERA</p>
+                      <p className="font-black text-[11px] sm:text-sm text-primary leading-tight">{teamLeaders.ERA.value}</p>
+                      <p className="text-[7px] sm:text-[9px] truncate text-muted-foreground">{teamLeaders.ERA.name.split(" ").pop()}</p>
                     </div>
                   )}
                   {teamLeaders?.W && (
-                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
-                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">W</p>
-                      <p className="font-black text-sm text-primary">{teamLeaders.W.value}</p>
-                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.W.name.split(" ").pop()}</p>
+                    <div className="rounded-xl bg-muted/15 p-1.5 sm:p-2 border border-border/10">
+                      <p className="text-[7px] sm:text-[8px] text-muted-foreground uppercase font-bold tracking-wider">W</p>
+                      <p className="font-black text-[11px] sm:text-sm text-primary leading-tight">{teamLeaders.W.value}</p>
+                      <p className="text-[7px] sm:text-[9px] truncate text-muted-foreground">{teamLeaders.W.name.split(" ").pop()}</p>
                     </div>
                   )}
                   {teamLeaders?.SO && (
-                    <div className="rounded-xl bg-muted/15 p-2 border border-border/10">
-                      <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">K</p>
-                      <p className="font-black text-sm text-primary">{teamLeaders.SO.value}</p>
-                      <p className="text-[9px] truncate text-muted-foreground">{teamLeaders.SO.name.split(" ").pop()}</p>
+                    <div className="rounded-xl bg-muted/15 p-1.5 sm:p-2 border border-border/10">
+                      <p className="text-[7px] sm:text-[8px] text-muted-foreground uppercase font-bold tracking-wider">K</p>
+                      <p className="font-black text-[11px] sm:text-sm text-primary leading-tight">{teamLeaders.SO.value}</p>
+                      <p className="text-[7px] sm:text-[9px] truncate text-muted-foreground">{teamLeaders.SO.name.split(" ").pop()}</p>
                     </div>
                   )}
                 </div>
