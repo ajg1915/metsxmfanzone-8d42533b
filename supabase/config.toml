@@ -113,5 +113,3 @@ project_id = "clwghkbtkofacsjeyrtk"
     verify_jwt = true
   [functions.webauthn-register-verify]
     verify_jwt = true
-  [functions.resend-webhook]
-    verify_jwt = false

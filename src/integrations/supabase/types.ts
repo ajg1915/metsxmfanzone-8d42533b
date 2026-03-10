@@ -486,39 +486,6 @@ export type Database = {
         }
         Relationships: []
       }
-      email_events: {
-        Row: {
-          created_at: string
-          email_from: string | null
-          email_id: string | null
-          email_to: string | null
-          event_data: Json | null
-          event_type: string
-          id: string
-          subject: string | null
-        }
-        Insert: {
-          created_at?: string
-          email_from?: string | null
-          email_id?: string | null
-          email_to?: string | null
-          event_data?: Json | null
-          event_type: string
-          id?: string
-          subject?: string | null
-        }
-        Update: {
-          created_at?: string
-          email_from?: string | null
-          email_id?: string | null
-          email_to?: string | null
-          event_data?: Json | null
-          event_type?: string
-          id?: string
-          subject?: string | null
-        }
-        Relationships: []
-      }
       events: {
         Row: {
           created_at: string | null
