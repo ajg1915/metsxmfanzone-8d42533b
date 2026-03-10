@@ -278,9 +278,8 @@ export default function WriterArticleEditor() {
         tags: tags ? tags.split(",").map(t => t.trim()).filter(Boolean) : [],
         featured_image_url: featuredImageUrl || null,
         user_id: user!.id,
-        approval_status: "approved",
-        published: true,
-        published_at: new Date().toISOString(),
+        approval_status: submitForReview ? "pending" : (isEditing ? undefined : "pending"),
+        published: false, // Writers cannot publish directly
       };
 
       if (isEditing) {
