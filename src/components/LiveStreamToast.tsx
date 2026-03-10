@@ -4,120 +4,39 @@ import { toast } from "@/hooks/use-toast";
 import { Radio } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * LiveStreamToast — checks for currently live streams on mount only.
+ * Realtime notifications are handled by the consolidated notification system.
+ * No additional realtime channels are created here.
+ */
 export const LiveStreamToast = () => {
   const navigate = useNavigate();
-  const shownStreamIds = useRef<Set<string>>(new Set());
-  const shownPodcastLive = useRef<boolean>(false);
+  const hasChecked = useRef(false);
 
   useEffect(() => {
-    // Listen for live_streams going live
-    const liveStreamsChannel = supabase
-      .channel('live-stream-notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'live_streams',
-        },
-        (payload) => {
-          const newStream = payload.new as any;
-          
-          if (
-            newStream?.status === 'live' && 
-            newStream?.published === true &&
-            !shownStreamIds.current.has(newStream.id)
-          ) {
-            shownStreamIds.current.add(newStream.id);
-            
-            toast({
-              title: (
-                <div className="flex items-center gap-2">
-                  <Radio className="h-4 w-4 text-red-500 animate-pulse" />
-                  <span>MetsXMFanZone.TV Live Streaming</span>
-                </div>
-              ) as any,
-              description: newStream.title || "A live stream just started!",
-              action: (
-                <button
-                  onClick={() => navigate('/metsxmfanzone')}
-                  className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
-                >
-                  Watch Now
-                </button>
-              ),
-              duration: 10000,
-            });
-          }
-        }
-      )
-      .subscribe();
+    if (hasChecked.current) return;
+    hasChecked.current = true;
 
-    // Listen for podcast live stream going live
-    const podcastChannel = supabase
-      .channel('podcast-live-notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'podcast_live_stream',
-        },
-        (payload) => {
-          const newPodcast = payload.new as any;
-          
-          if (
-            newPodcast?.is_live === true && 
-            !shownPodcastLive.current
-          ) {
-            shownPodcastLive.current = true;
-            
-            toast({
-              title: (
-                <div className="flex items-center gap-2">
-                  <Radio className="h-4 w-4 text-red-500 animate-pulse" />
-                  <span>Podcast is Live!</span>
-                </div>
-              ) as any,
-              description: newPodcast.title || "The podcast just went live!",
-              action: (
-                <button
-                  onClick={() => navigate('/podcast')}
-                  className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
-                >
-                  Listen Now
-                </button>
-              ),
-              duration: 10000,
-            });
-          } else if (newPodcast?.is_live === false) {
-            shownPodcastLive.current = false;
-          }
-        }
-      )
-      .subscribe();
+    // Defer check to avoid blocking initial render
+    const timer = setTimeout(async () => {
+      try {
+        const { data: liveStreams } = await supabase
+          .from('live_streams')
+          .select('id, title')
+          .eq('status', 'live')
+          .eq('published', true)
+          .limit(1);
 
-    // Check for currently live streams on mount
-    const checkCurrentlyLive = async () => {
-      const { data: liveStreams } = await supabase
-        .from('live_streams')
-        .select('id, title')
-        .eq('status', 'live')
-        .eq('published', true);
-
-      if (liveStreams && liveStreams.length > 0) {
-        const stream = liveStreams[0];
-        if (!shownStreamIds.current.has(stream.id)) {
-          shownStreamIds.current.add(stream.id);
-          
-              toast({
-                title: (
-                  <div className="flex items-center gap-2">
-                    <Radio className="h-4 w-4 text-red-500 animate-pulse" />
-                    <span>MetsXMFanZone.TV Live Streaming</span>
-                  </div>
-                ) as any,
-                description: stream.title || "A live stream is happening now!",
+        if (liveStreams && liveStreams.length > 0) {
+          const stream = liveStreams[0];
+          toast({
+            title: (
+              <div className="flex items-center gap-2">
+                <Radio className="h-4 w-4 text-red-500 animate-pulse" />
+                <span>MetsXMFanZone.TV Live Streaming</span>
+              </div>
+            ) as any,
+            description: stream.title || "A live stream is happening now!",
             action: (
               <button
                 onClick={() => navigate('/metsxmfanzone')}
@@ -129,43 +48,38 @@ export const LiveStreamToast = () => {
             duration: 10000,
           });
         }
+
+        const { data: podcastLive } = await supabase
+          .from('podcast_live_stream')
+          .select('is_live, title')
+          .maybeSingle();
+
+        if (podcastLive?.is_live) {
+          toast({
+            title: (
+              <div className="flex items-center gap-2">
+                <Radio className="h-4 w-4 text-red-500 animate-pulse" />
+                <span>Podcast is Live!</span>
+              </div>
+            ) as any,
+            description: podcastLive.title || "The podcast is live now!",
+            action: (
+              <button
+                onClick={() => navigate('/podcast')}
+                className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
+              >
+                Listen Now
+              </button>
+            ),
+            duration: 10000,
+          });
+        }
+      } catch {
+        // Silent fail
       }
+    }, 5000);
 
-      const { data: podcastLive } = await supabase
-        .from('podcast_live_stream')
-        .select('is_live, title')
-        .single();
-
-      if (podcastLive?.is_live && !shownPodcastLive.current) {
-        shownPodcastLive.current = true;
-        
-        toast({
-          title: (
-            <div className="flex items-center gap-2">
-              <Radio className="h-4 w-4 text-red-500 animate-pulse" />
-              <span>Podcast is Live!</span>
-            </div>
-          ) as any,
-          description: podcastLive.title || "The podcast is live now!",
-          action: (
-            <button
-              onClick={() => navigate('/podcast')}
-              className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
-            >
-              Listen Now
-            </button>
-          ),
-          duration: 10000,
-        });
-      }
-    };
-
-    checkCurrentlyLive();
-
-    return () => {
-      supabase.removeChannel(liveStreamsChannel);
-      supabase.removeChannel(podcastChannel);
-    };
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   return null;

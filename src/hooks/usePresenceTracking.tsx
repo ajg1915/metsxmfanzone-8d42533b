@@ -78,8 +78,8 @@ export const usePresenceTracking = () => {
       };
 
       updatePresence();
-      // Reduced from 30s to 60s
-      intervalRef.current = setInterval(updatePresence, 60000);
+      // Reduced to 120s to minimize Cloud load
+      intervalRef.current = setInterval(updatePresence, 120000);
     }, 3000); // Defer 3s so it doesn't block initial render
 
     return () => {

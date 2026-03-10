@@ -22,24 +22,14 @@ const isCurrentUserAdmin = async (): Promise<boolean> => {
 // Helper to send SMS notifications (admin only - silently skips if not admin)
 const sendSMSNotification = async (message: string) => {
   try {
-    // Only admins can trigger SMS notifications
     const isAdmin = await isCurrentUserAdmin();
-    if (!isAdmin) {
-      console.log('SMS notification skipped - user is not admin');
-      return;
-    }
+    if (!isAdmin) return;
     
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) {
-      console.log('SMS notification skipped - no valid session');
-      return;
-    }
+    if (!session?.access_token) return;
 
     await supabase.functions.invoke('send-sms-notification', {
-      body: {
-        message,
-        sendToAll: true
-      }
+      body: { message, sendToAll: true }
     });
   } catch (error) {
     console.error('Failed to send SMS notification:', error);
@@ -88,13 +78,7 @@ const sendEmailNotification = async (
 ) => {
   try {
     await supabase.functions.invoke('send-game-notification-email', {
-      body: {
-        title,
-        message,
-        notificationType,
-        url,
-        gameInfo
-      }
+      body: { title, message, notificationType, url, gameInfo }
     });
   } catch (error) {
     console.error('Failed to send email notification:', error);
@@ -104,399 +88,219 @@ const sendEmailNotification = async (
 // Show browser notification if permission granted
 const showBrowserNotification = (title: string, body: string, icon: string = '/logo-192.png') => {
   if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification(title, {
-      body,
-      icon,
-      badge: '/logo-192.png',
-    });
+    new Notification(title, { body, icon, badge: '/logo-192.png' });
   }
 };
 
-export const setupNotificationListeners = () => {
-  // Listen for new Mets Live Tracker items
-  const newsChannel = supabase
-    .channel('news-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'mets_news_tracker',
-        filter: 'published=eq.true'
-      },
-      async (payload) => {
-        const news = payload.new as any;
-        const title = '🔥 Breaking Mets News!';
-        
-        await sendPushNotification(title, news.title, '/#news', 'mets-news');
-        await sendSMSNotification(`🔥 Breaking Mets News: ${news.title}`);
-        await sendEmailNotification(title, news.details || news.title, 'news', '/#news');
-        showBrowserNotification(title, news.title);
-      }
-    )
-    .subscribe();
+// Debounce handler to avoid rapid-fire notifications
+let notificationDebounce: ReturnType<typeof setTimeout> | null = null;
+const pendingNotifications: Array<() => Promise<void>> = [];
 
-  // Listen for new live streams
-  const liveStreamChannel = supabase
-    .channel('livestream-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'live_streams',
-        filter: 'published=eq.true'
-      },
-      async (payload) => {
-        const stream = payload.new as any;
-        
-        if (stream.status === 'live') {
+const queueNotification = (handler: () => Promise<void>) => {
+  pendingNotifications.push(handler);
+  if (notificationDebounce) clearTimeout(notificationDebounce);
+  notificationDebounce = setTimeout(async () => {
+    const batch = pendingNotifications.splice(0, pendingNotifications.length);
+    for (const fn of batch) {
+      await fn();
+    }
+  }, 2000);
+};
+
+// Route change events to appropriate handlers
+const handleRealtimeEvent = (table: string, eventType: string, payload: any) => {
+  const newRecord = payload.new as any;
+  const oldRecord = payload.old as any;
+
+  switch (table) {
+    case 'mets_news_tracker':
+      if (eventType === 'INSERT' && newRecord?.published) {
+        queueNotification(async () => {
+          const title = '🔥 Breaking Mets News!';
+          await sendPushNotification(title, newRecord.title, '/#news', 'mets-news');
+          await sendSMSNotification(`🔥 Breaking Mets News: ${newRecord.title}`);
+          await sendEmailNotification(title, newRecord.details || newRecord.title, 'news', '/#news');
+          showBrowserNotification(title, newRecord.title);
+        });
+      }
+      break;
+
+    case 'live_streams':
+      if (eventType === 'INSERT' && newRecord?.published && newRecord?.status === 'live') {
+        queueNotification(async () => {
           const title = '🔴 LIVE NOW!';
-          await sendPushNotification(title, stream.title, '/metsxmfanzone', 'live-stream');
-          await sendSMSNotification(`🔴 LIVE NOW: ${stream.title}`);
-          await sendEmailNotification(title, stream.description || stream.title, 'live_stream', '/metsxmfanzone');
-          showBrowserNotification(title, stream.title);
+          await sendPushNotification(title, newRecord.title, '/metsxmfanzone', 'live-stream');
+          await sendSMSNotification(`🔴 LIVE NOW: ${newRecord.title}`);
+          await sendEmailNotification(title, newRecord.description || newRecord.title, 'live_stream', '/metsxmfanzone');
+          showBrowserNotification(title, newRecord.title);
+        });
+      } else if (eventType === 'UPDATE') {
+        if (oldRecord?.status !== 'live' && newRecord?.status === 'live' && newRecord?.published) {
+          queueNotification(async () => {
+            const title = '🔴 LIVE NOW!';
+            await sendPushNotification(title, newRecord.title, '/metsxmfanzone', 'live-stream');
+            await sendSMSNotification(`🔴 LIVE NOW: ${newRecord.title}`);
+            await sendEmailNotification(title, newRecord.description || newRecord.title, 'live_stream', '/metsxmfanzone');
+            showBrowserNotification(title, newRecord.title);
+          });
+        } else if (oldRecord?.status === 'live' && (newRecord?.status === 'ended' || newRecord?.status === 'offline')) {
+          queueNotification(async () => {
+            const title = '📴 Stream Ended';
+            const message = `${newRecord.title} has ended. Thanks for watching!`;
+            await sendPushNotification(title, message, '/', 'stream-ended');
+            showBrowserNotification(title, message);
+          });
         }
       }
-    )
-    .subscribe();
+      break;
 
-  // Listen for live stream status changes (going live, offline, ended)
-  const liveStreamUpdateChannel = supabase
-    .channel('livestream-update-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'live_streams'
-      },
-      async (payload) => {
-        const oldStream = payload.old as any;
-        const newStream = payload.new as any;
-        
-        // Check if stream just went live
-        if (oldStream.status !== 'live' && newStream.status === 'live' && newStream.published) {
-          const title = '🔴 LIVE NOW!';
-          await sendPushNotification(title, newStream.title, '/metsxmfanzone', 'live-stream');
-          await sendSMSNotification(`🔴 LIVE NOW: ${newStream.title}`);
-          await sendEmailNotification(title, newStream.description || newStream.title, 'live_stream', '/metsxmfanzone');
-          showBrowserNotification(title, newStream.title);
-        }
-        
-        // Check if stream just ended or went offline
-        if (oldStream.status === 'live' && (newStream.status === 'ended' || newStream.status === 'offline')) {
-          const title = '📴 Stream Ended';
-          const message = `${newStream.title} has ended. Thanks for watching!`;
-          await sendPushNotification(title, message, '/', 'stream-ended');
-          showBrowserNotification(title, message);
-        }
-      }
-    )
-    .subscribe();
-
-  // Listen for stream health issues
-  const streamHealthChannel = supabase
-    .channel('stream-health-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'stream_health_reports'
-      },
-      async (payload) => {
-        const report = payload.new as any;
-        
-        // Only notify for high severity issues
-        if (report.severity === 'high' || report.severity === 'critical') {
-          const title = '⚠️ Stream Issue Detected';
-          const message = report.description || 'We are experiencing technical difficulties. Please standby.';
-          await sendPushNotification(title, message, '/metsxmfanzone', 'stream-issue');
-          showBrowserNotification(title, message);
-        }
-      }
-    )
-    .subscribe();
-
-  // Listen for stream alerts (admin-triggered alerts)
-  const streamAlertChannel = supabase
-    .channel('stream-alert-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'stream_alerts'
-      },
-      async (payload) => {
-        const oldAlert = payload.old as any;
-        const newAlert = payload.new as any;
-        
-        // Check if alert just became active
-        if (!oldAlert.is_active && newAlert.is_active) {
+    case 'stream_alerts':
+      if (eventType === 'UPDATE' && !oldRecord?.is_active && newRecord?.is_active) {
+        queueNotification(async () => {
           const title = '⚠️ Stream Alert';
-          await sendPushNotification(title, newAlert.message, '/metsxmfanzone', 'stream-alert');
-          showBrowserNotification(title, newAlert.message);
-        }
+          await sendPushNotification(title, newRecord.message, '/metsxmfanzone', 'stream-alert');
+          showBrowserNotification(title, newRecord.message);
+        });
       }
-    )
-    .subscribe();
+      break;
 
-  // Listen for new blog posts
-  const blogChannel = supabase
-    .channel('blog-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'blog_posts',
-        filter: 'published=eq.true'
-      },
-      async (payload) => {
-        const post = payload.new as any;
-        const title = '📰 New Article Published!';
-        const blogUrl = `/blog/${post.slug}`;
-        const message = `${post.title}\n\n${post.excerpt || 'Check out our latest article!'}\n\nRead it now on MetsXMFanZone Blog!`;
-        
-        await sendPushNotification(title, post.title, blogUrl, 'blog-post');
-        await sendSMSNotification(`📰 New Article: ${post.title} - Read it at metsxmfanzone.com${blogUrl}`);
-        await sendEmailNotification(title, message, 'news', blogUrl);
-        showBrowserNotification(title, post.title);
-      }
-    )
-    .subscribe();
-
-  // Listen for blog post updates (when unpublished becomes published)
-  const blogUpdateChannel = supabase
-    .channel('blog-update-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'blog_posts'
-      },
-      async (payload) => {
-        const oldPost = payload.old as any;
-        const newPost = payload.new as any;
-        
-        // Check if post just became published
-        if (!oldPost.published && newPost.published) {
+    case 'blog_posts':
+      if (eventType === 'INSERT' && newRecord?.published) {
+        queueNotification(async () => {
           const title = '📰 New Article Published!';
-          const blogUrl = `/blog/${newPost.slug}`;
-          const message = `${newPost.title}\n\n${newPost.excerpt || 'Check out our latest article!'}\n\nRead it now on MetsXMFanZone Blog!`;
-          
-          await sendPushNotification(title, newPost.title, blogUrl, 'blog-post');
-          await sendSMSNotification(`📰 New Article: ${newPost.title} - Read it at metsxmfanzone.com${blogUrl}`);
+          const blogUrl = `/blog/${newRecord.slug}`;
+          const message = `${newRecord.title}\n\n${newRecord.excerpt || 'Check out our latest article!'}\n\nRead it now on MetsXMFanZone Blog!`;
+          await sendPushNotification(title, newRecord.title, blogUrl, 'blog-post');
+          await sendSMSNotification(`📰 New Article: ${newRecord.title} - Read it at metsxmfanzone.com${blogUrl}`);
           await sendEmailNotification(title, message, 'news', blogUrl);
-          showBrowserNotification(title, newPost.title);
-        }
+          showBrowserNotification(title, newRecord.title);
+        });
+      } else if (eventType === 'UPDATE' && !oldRecord?.published && newRecord?.published) {
+        queueNotification(async () => {
+          const title = '📰 New Article Published!';
+          const blogUrl = `/blog/${newRecord.slug}`;
+          const message = `${newRecord.title}\n\n${newRecord.excerpt || 'Check out our latest article!'}\n\nRead it now on MetsXMFanZone Blog!`;
+          await sendPushNotification(title, newRecord.title, blogUrl, 'blog-post');
+          await sendSMSNotification(`📰 New Article: ${newRecord.title} - Read it at metsxmfanzone.com${blogUrl}`);
+          await sendEmailNotification(title, message, 'news', blogUrl);
+          showBrowserNotification(title, newRecord.title);
+        });
       }
-    )
-    .subscribe();
+      break;
 
-  // Listen for new events
-  const eventsChannel = supabase
-    .channel('events-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'events',
-        filter: 'published=eq.true'
-      },
-      async (payload) => {
-        const event = payload.new as any;
-        const title = '📅 New Event Added!';
-        
-        await sendPushNotification(title, event.title, '/events', 'event');
-        await sendSMSNotification(`📅 New Event: ${event.title}`);
-        await sendEmailNotification(
-          title, 
-          event.description || event.title, 
-          'event', 
-          '/events',
-          {
-            date: event.event_date,
-            location: event.location
-          }
-        );
-        showBrowserNotification(title, event.title);
+    case 'events':
+      if (eventType === 'INSERT' && newRecord?.published) {
+        queueNotification(async () => {
+          const title = '📅 New Event Added!';
+          await sendPushNotification(title, newRecord.title, '/events', 'event');
+          await sendSMSNotification(`📅 New Event: ${newRecord.title}`);
+          await sendEmailNotification(title, newRecord.description || newRecord.title, 'event', '/events', {
+            date: newRecord.event_date,
+            location: newRecord.location
+          });
+          showBrowserNotification(title, newRecord.title);
+        });
       }
-    )
-    .subscribe();
+      break;
 
-  // Listen for new stories
-  const storiesChannel = supabase
-    .channel('stories-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'stories',
-        filter: 'published=eq.true'
-      },
-      async (payload) => {
-        const story = payload.new as any;
-        const title = '📱 New Story!';
-        
-        await sendPushNotification(title, story.title, '/', 'story');
-        showBrowserNotification(title, story.title);
+    case 'stories':
+      if (eventType === 'INSERT' && newRecord?.published) {
+        queueNotification(async () => {
+          const title = '📱 New Story!';
+          await sendPushNotification(title, newRecord.title, '/', 'story');
+          showBrowserNotification(title, newRecord.title);
+        });
       }
-    )
-    .subscribe();
+      break;
 
-  // Listen for new videos
-  const videosChannel = supabase
-    .channel('videos-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'videos',
-        filter: 'published=eq.true'
-      },
-      async (payload) => {
-        const video = payload.new as any;
-        const title = '🎬 New Video!';
-        
-        await sendPushNotification(title, video.title, '/video-gallery', 'video');
-        await sendSMSNotification(`🎬 New Video: ${video.title}`);
-        await sendEmailNotification(title, video.description || video.title, 'general', '/video-gallery');
-        showBrowserNotification(title, video.title);
+    case 'podcasts':
+      if (eventType === 'INSERT' && newRecord?.published) {
+        queueNotification(async () => {
+          const title = '🎙️ New Podcast Episode!';
+          await sendPushNotification(title, newRecord.title, '/podcast', 'podcast');
+          await sendSMSNotification(`🎙️ New Podcast: ${newRecord.title}`);
+          await sendEmailNotification(title, newRecord.description || newRecord.title, 'general', '/podcast');
+          showBrowserNotification(title, newRecord.title);
+        });
       }
-    )
-    .subscribe();
+      break;
 
-  // Listen for new podcasts
-  const podcastsChannel = supabase
-    .channel('podcasts-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'podcasts',
-        filter: 'published=eq.true'
-      },
-      async (payload) => {
-        const podcast = payload.new as any;
-        const title = '🎙️ New Podcast Episode!';
-        
-        await sendPushNotification(title, podcast.title, '/podcast', 'podcast');
-        await sendSMSNotification(`🎙️ New Podcast: ${podcast.title}`);
-        await sendEmailNotification(title, podcast.description || podcast.title, 'general', '/podcast');
-        showBrowserNotification(title, podcast.title);
-      }
-    )
-    .subscribe();
-
-  // Listen for podcast going live
-  const podcastLiveChannel = supabase
-    .channel('podcast-live-notifications')
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'podcast_live_stream'
-      },
-      async (payload) => {
-        const oldPodcast = payload.old as any;
-        const newPodcast = payload.new as any;
-        
-        // Check if podcast just went live
-        if (!oldPodcast.is_live && newPodcast.is_live) {
+    case 'podcast_live_stream':
+      if (eventType === 'UPDATE' && !oldRecord?.is_live && newRecord?.is_live) {
+        queueNotification(async () => {
           const title = '🎙️ Podcast LIVE NOW!';
-          await sendPushNotification(title, newPodcast.title, '/community-podcast', 'podcast-live');
-          await sendSMSNotification(`🎙️ Podcast LIVE: ${newPodcast.title}`);
-          await sendEmailNotification(title, newPodcast.description || newPodcast.title, 'live_stream', '/community-podcast');
-          showBrowserNotification(title, newPodcast.title);
-        }
+          await sendPushNotification(title, newRecord.title, '/community-podcast', 'podcast-live');
+          await sendSMSNotification(`🎙️ Podcast LIVE: ${newRecord.title}`);
+          await sendEmailNotification(title, newRecord.description || newRecord.title, 'live_stream', '/community-podcast');
+          showBrowserNotification(title, newRecord.title);
+        });
       }
-    )
-    .subscribe();
+      break;
 
-  // Listen for live notification bar updates
-  const liveNotificationChannel = supabase
-    .channel('live-notification-bar')
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'live_notifications'
-      },
-      async (payload) => {
-        const oldNotif = payload.old as any;
-        const newNotif = payload.new as any;
-        
-        // Check if notification just became active
-        if (!oldNotif.is_active && newNotif.is_active) {
+    case 'live_notifications':
+      if (eventType === 'UPDATE' && !oldRecord?.is_active && newRecord?.is_active) {
+        queueNotification(async () => {
           const title = '📢 Important Update!';
-          await sendPushNotification(title, newNotif.message, newNotif.link_url || '/', 'announcement');
-          await sendEmailNotification(title, newNotif.message, 'general', newNotif.link_url || '/');
-          showBrowserNotification(title, newNotif.message);
-        }
+          await sendPushNotification(title, newRecord.message, newRecord.link_url || '/', 'announcement');
+          await sendEmailNotification(title, newRecord.message, 'general', newRecord.link_url || '/');
+          showBrowserNotification(title, newRecord.message);
+        });
       }
-    )
-    .subscribe();
+      break;
 
-  // Listen for new lineup cards (game alerts)
-  const lineupChannel = supabase
-    .channel('lineup-notifications')
-    .on(
+    case 'lineup_cards':
+      if (eventType === 'INSERT' && newRecord?.published) {
+        queueNotification(async () => {
+          const title = '📋 Game Lineup Posted!';
+          const message = `Lineup for ${newRecord.opponent} on ${newRecord.game_date} is now available!`;
+          await sendPushNotification(title, message, '/mets-lineup-card', 'lineup');
+          await sendSMSNotification(`📋 ${message}`);
+          await sendEmailNotification(title, message, 'lineup', '/mets-lineup-card', {
+            opponent: newRecord.opponent,
+            date: newRecord.game_date,
+            time: newRecord.game_time,
+            location: newRecord.location
+          });
+          showBrowserNotification(title, message);
+        });
+      }
+      break;
+  }
+};
+
+/**
+ * Consolidated notification listener — uses ONE realtime channel for all tables.
+ * Previously used 13+ separate channels which caused massive backend load.
+ */
+export const setupNotificationListeners = () => {
+  const tables = [
+    'mets_news_tracker',
+    'live_streams',
+    'stream_alerts',
+    'blog_posts',
+    'events',
+    'stories',
+    'podcasts',
+    'podcast_live_stream',
+    'live_notifications',
+    'lineup_cards',
+  ];
+
+  let channel = supabase.channel('notifications-consolidated');
+
+  tables.forEach(table => {
+    channel = channel.on(
       'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'lineup_cards',
-        filter: 'published=eq.true'
-      },
-      async (payload) => {
-        const lineup = payload.new as any;
-        const title = '📋 Game Lineup Posted!';
-        const message = `Lineup for ${lineup.opponent} on ${lineup.game_date} is now available!`;
-        
-        await sendPushNotification(title, message, '/mets-lineup-card', 'lineup');
-        await sendSMSNotification(`📋 ${message}`);
-        await sendEmailNotification(
-          title, 
-          message, 
-          'lineup', 
-          '/mets-lineup-card',
-          {
-            opponent: lineup.opponent,
-            date: lineup.game_date,
-            time: lineup.game_time,
-            location: lineup.location
-          }
-        );
-        showBrowserNotification(title, message);
-      }
-    )
-    .subscribe();
+      { event: '*', schema: 'public', table },
+      (payload) => handleRealtimeEvent(table, payload.eventType, payload)
+    );
+  });
 
-  // Return cleanup function
+  channel.subscribe((status) => {
+    console.log('[Notifications] Realtime status:', status);
+  });
+
   return () => {
-    supabase.removeChannel(newsChannel);
-    supabase.removeChannel(liveStreamChannel);
-    supabase.removeChannel(liveStreamUpdateChannel);
-    supabase.removeChannel(streamHealthChannel);
-    supabase.removeChannel(streamAlertChannel);
-    supabase.removeChannel(blogChannel);
-    supabase.removeChannel(blogUpdateChannel);
-    supabase.removeChannel(eventsChannel);
-    supabase.removeChannel(storiesChannel);
-    supabase.removeChannel(videosChannel);
-    supabase.removeChannel(podcastsChannel);
-    supabase.removeChannel(podcastLiveChannel);
-    supabase.removeChannel(liveNotificationChannel);
-    supabase.removeChannel(lineupChannel);
+    supabase.removeChannel(channel);
   };
 };

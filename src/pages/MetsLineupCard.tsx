@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { RefreshCw, Calendar, Users, ChevronDown, ChevronUp } from "lucide-react";
-import { useAutoLineupFetch } from "@/hooks/useAutoLineupFetch";
+// Auto lineup fetch removed to reduce Cloud load — triggered by admin instead
 
 interface LineupPlayer {
   position: number;
@@ -239,8 +239,7 @@ export default function MetsLineupCard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Auto-fetch lineup data from MLB API
-  useAutoLineupFetch();
+  // Auto lineup fetch removed to reduce Cloud load — triggered by admin instead
 
   const fetchUpcomingLineups = async () => {
     try {
