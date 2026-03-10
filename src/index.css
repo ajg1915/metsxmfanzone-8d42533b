@@ -672,13 +672,28 @@ All colors MUST be HSL.
      UTILITY CLASSES
      ======================================== */
 
-  .scrollbar-hide {
+  .scrollbar-hide,
+  .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
 
-  .scrollbar-hide::-webkit-scrollbar {
+  .scrollbar-hide::-webkit-scrollbar,
+  .hide-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Hide scrollbars on all horizontal-scroll containers globally on mobile */
+  @media (max-width: 767px) {
+    [class*="overflow-x-auto"],
+    [class*="overflow-x-scroll"] {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    [class*="overflow-x-auto"]::-webkit-scrollbar,
+    [class*="overflow-x-scroll"]::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   /* Mobile touch-friendly tap targets */
