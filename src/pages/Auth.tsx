@@ -739,17 +739,23 @@ const Auth = () => {
           return;
         }
 
-        // Email verified - complete authentication directly (no 2FA)
+        // Email verified - complete authentication directly
         
-        
-        // Save remember me preference
+        // Save remember me preference with longer expiry (30 days)
         if (rememberMe) {
           const expiresAt = Date.now() + REMEMBER_ME_EXPIRY_HOURS * 60 * 60 * 1000;
           const rememberedData: RememberedUser = { email: validated.email, expiresAt };
           localStorage.setItem(REMEMBER_ME_KEY, JSON.stringify(rememberedData));
+          
+          // Show PIN setup prompt after login  
+          setPendingPinCredentials({ email: validated.email, password: validated.password });
+          setShowPinSetup(true);
+          setLoading(false);
+          return;
         }
 
         await completeAuthentication(data.user.id, false);
+
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
