@@ -1157,32 +1157,6 @@ const Auth = () => {
     }
   };
 
-  // Loading screen while sending OTP
-  if (sendingOtp) {
-    return (
-      <AuthLoadingScreen 
-        title="Sending Verification Code"
-        description="Please wait while we send your secure code..."
-        type="otp"
-      />
-    );
-  }
-
-  // 2FA Verification Screen - using new streamlined component
-  if (show2FA) {
-    return (
-      <OTPVerificationForm
-        email={email}
-        otpCode={otpCode}
-        onOtpChange={setOtpCode}
-        onVerify={handleVerifyOtp}
-        onResend={handleResendOtp}
-        onBack={handleBack2FA}
-        loading={loading}
-        resendCooldown={resendCooldown}
-      />
-    );
-  }
 
   // Show remembered user quick login screen
   if (isRememberedLogin && rememberedUser && isLogin && !isForgotPassword && !isResettingPassword) {
