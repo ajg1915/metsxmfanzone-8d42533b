@@ -198,19 +198,17 @@ const Auth = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  // Remembered user state (skip password, go straight to 2FA)
+  // Remembered user state
   const [rememberedUser, setRememberedUser] = useState<RememberedUser | null>(null);
   const [isRememberedLogin, setIsRememberedLogin] = useState(false);
   
-  // 2FA states
-  const [show2FA, setShow2FA] = useState(false);
-  const [sendingOtp, setSendingOtp] = useState(false); // New: smooth loading during OTP send
-  const [otpCode, setOtpCode] = useState("");
-  const [generatedOtp, setGeneratedOtp] = useState("");
-  const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
-  const [pendingUserData, setPendingUserData] = useState<{ userId: string; isSignup: boolean } | null>(null);
-  const [resendCooldown, setResendCooldown] = useState(0);
-  
+  // PIN login state
+  const [showPinSetup, setShowPinSetup] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [pinConfirm, setPinConfirm] = useState("");
+  const [pinLoginMode, setPinLoginMode] = useState(false);
+  const [pendingPinCredentials, setPendingPinCredentials] = useState<{ email: string; password: string } | null>(null);
+
   // Bot detection states
   const [honeypot, setHoneypot] = useState(""); // Should remain empty - bots fill this
   const [formLoadTime] = useState(() => Date.now()); // Track when form loaded
