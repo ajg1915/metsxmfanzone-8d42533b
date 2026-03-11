@@ -339,41 +339,42 @@ const Auth = () => {
         throw new Error(verifyResponse.data.error);
       }
 
-      // Step 4: Biometric verified - now trigger 2FA with loading screen
+      // Step 4: Biometric verified - establish session directly (no 2FA)
       setBiometricLoading(false);
-      setSendingOtp(true); // Show loading screen
       
-      // Generate and send OTP for 2FA
-      const { otp, expiry } = generateOtp();
-      setGeneratedOtp(otp);
-      setOtpExpiry(expiry);
+      // Establish Supabase session using the auth token
+      const authToken = verifyResponse.data.token;
+      const verificationUrl = verifyResponse.data.verificationUrl;
       
-      // Send OTP email
-      const otpSent = await sendOtpEmail(biometricEmail, otp);
-      
-      if (!otpSent) {
-        setSendingOtp(false);
-        toast({
-          title: "Verification issue",
-          description: "Could not send verification code. Please try password login.",
-          variant: "destructive",
-        });
-        return;
+      if (authToken) {
+        try {
+          const { error: sessionError } = await supabase.auth.verifyOtp({
+            token_hash: authToken,
+            type: 'magiclink',
+          });
+          
+          if (sessionError && verificationUrl) {
+            const url = new URL(verificationUrl);
+            const token = url.searchParams.get('token') || url.hash?.match(/token=([^&]+)/)?.[1];
+            if (token) {
+              await supabase.auth.verifyOtp({
+                token_hash: token,
+                type: 'magiclink',
+              });
+            }
+          }
+        } catch (err) {
+          console.error("Error establishing biometric session:", err);
+        }
       }
-
-      // Store user info and auth token for after 2FA
-      setBiometricPendingUserId(userId);
-      setBiometricAuthToken({
-        token: verifyResponse.data.token,
-        verificationUrl: verifyResponse.data.verificationUrl,
-      });
-      setPendingUserData({ userId, isSignup: false });
       
-      // Show 2FA screen - must set show2FA BEFORE clearing sendingOtp to prevent redirect
-      setShow2FA(true);
-      setSendingOtp(false);
+      toast({
+        title: "Welcome back!",
+        description: "Biometric login successful.",
+      });
+      
+      await completeAuthentication(userId, false);
       setShowBiometricEmailInput(false);
-      setResendCooldown(60);
 
     } catch (error: any) {
       console.error("Biometric login error:", error);
@@ -725,7 +726,6 @@ const Auth = () => {
           .eq("id", data.user.id)
           .maybeSingle();
 
-        // If profile lookup fails or profile doesn't exist, that's a different issue
         if (profileError) {
           console.error("Profile lookup error:", profileError);
           toast({
@@ -734,12 +734,11 @@ const Auth = () => {
             variant: "destructive",
           });
           await supabase.auth.signOut();
+          setSendingOtp(false);
           return;
         }
 
-        // Check if email_verified is explicitly true (handles null case)
         if (profile?.email_verified !== true) {
-          // Sign out the user since they haven't confirmed their email
           setSendingOtp(false);
           await supabase.auth.signOut();
           toast({
@@ -751,37 +750,17 @@ const Auth = () => {
           return;
         }
 
-        // CRITICAL: Sign out immediately to prevent session bypass via back navigation
-        // Store credentials so we can re-authenticate after OTP verification
-        const userId = data.user.id;
-        await supabase.auth.signOut();
-        setPendingCredentials({ email: validated.email, password: validated.password });
+        // Email verified - complete authentication directly (no 2FA)
+        setSendingOtp(false);
         
-        // Generate and send OTP for 2FA
-        setLoading(false); // Hide form loading
-        
-        const { otp, expiry } = generateOtp();
-        setGeneratedOtp(otp);
-        setOtpExpiry(expiry);
-        setPendingUserData({ userId, isSignup: false });
-        
-        const emailSent = await sendOtpEmail(validated.email, otp);
-        
-        if (emailSent) {
-          setShow2FA(true); // Must be set BEFORE clearing sendingOtp to prevent redirect race
-          setSendingOtp(false);
-          setResendCooldown(60);
-        } else {
-          // Still show 2FA - user can retry resend. Never bypass 2FA.
-          setShow2FA(true); // Must be set BEFORE clearing sendingOtp to prevent redirect race
-          setSendingOtp(false);
-          setResendCooldown(0);
-          toast({
-            title: "Verification code issue",
-            description: "We had trouble sending your code. Please tap 'Resend Code' to try again.",
-            variant: "destructive",
-          });
+        // Save remember me preference
+        if (rememberMe) {
+          const expiresAt = Date.now() + REMEMBER_ME_EXPIRY_HOURS * 60 * 60 * 1000;
+          const rememberedData: RememberedUser = { email: validated.email, expiresAt };
+          localStorage.setItem(REMEMBER_ME_KEY, JSON.stringify(rememberedData));
         }
+
+        await completeAuthentication(data.user.id, false);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -802,41 +781,11 @@ const Auth = () => {
     }
   };
 
-  // Handle remembered user login (skip password, just 2FA)
+  // Handle remembered user login - just go to password login
   const handleRememberedLogin = async () => {
     if (!rememberedUser) return;
-    
-    setSendingOtp(true); // Show loading screen
-    try {
-      // Generate and send OTP for 2FA
-      const { otp, expiry } = generateOtp();
-      setGeneratedOtp(otp);
-      setOtpExpiry(expiry);
-      // We don't have userId yet, will get it after OTP verification
-      setPendingUserData({ userId: "remembered", isSignup: false });
-      
-      const emailSent = await sendOtpEmail(rememberedUser.email, otp);
-      
-      if (emailSent) {
-        setShow2FA(true); // Must be set BEFORE clearing sendingOtp to prevent redirect race
-        setSendingOtp(false);
-        setResendCooldown(60);
-      } else {
-        toast({
-          title: "Failed to send code",
-          description: "Unable to send verification code. Please try with password.",
-          variant: "destructive",
-        });
-        handleForgetDevice();
-      }
-    } catch (error) {
-      setSendingOtp(false);
-      toast({
-        title: "Error",
-        description: "An error occurred. Please try again.",
-        variant: "destructive",
-      });
-    }
+    // Skip remembered flow, just pre-fill email and show password login
+    setIsRememberedLogin(false);
   };
 
   // Clear remembered user and show normal login
@@ -1208,32 +1157,6 @@ const Auth = () => {
     }
   };
 
-  // Loading screen while sending OTP
-  if (sendingOtp) {
-    return (
-      <AuthLoadingScreen 
-        title="Sending Verification Code"
-        description="Please wait while we send your secure code..."
-        type="otp"
-      />
-    );
-  }
-
-  // 2FA Verification Screen - using new streamlined component
-  if (show2FA) {
-    return (
-      <OTPVerificationForm
-        email={email}
-        otpCode={otpCode}
-        onOtpChange={setOtpCode}
-        onVerify={handleVerifyOtp}
-        onResend={handleResendOtp}
-        onBack={handleBack2FA}
-        loading={loading}
-        resendCooldown={resendCooldown}
-      />
-    );
-  }
 
   // Show remembered user quick login screen
   if (isRememberedLogin && rememberedUser && isLogin && !isForgotPassword && !isResettingPassword) {
@@ -1260,11 +1183,11 @@ const Auth = () => {
               </div>
               <div className="bg-muted/30 border border-muted/30 rounded-xl p-3 text-center">
                 <p className="text-xs text-muted-foreground">
-                  Your device is remembered. Click below to receive a verification code.
+                  Your device is remembered. Click below to continue.
                 </p>
               </div>
               <Button onClick={handleRememberedLogin} className="w-full h-10 rounded-xl text-sm font-semibold" disabled={loading}>
-                {loading ? "Sending code..." : "Send Verification Code"}
+                {loading ? "Loading..." : "Continue to Sign In"}
               </Button>
               <div className="text-center">
                 <button type="button" onClick={handleForgetDevice} className="text-xs text-muted-foreground hover:text-foreground" disabled={loading}>
