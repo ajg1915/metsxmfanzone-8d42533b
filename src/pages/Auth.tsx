@@ -467,7 +467,7 @@ const Auth = () => {
       };
       checkAndRedirect();
     }
-  }, [authUser, authLoading, navigate, show2FA, isRememberedLogin, isResettingPassword, sendingOtp]);
+  }, [authUser, authLoading, navigate, isRememberedLogin, isResettingPassword]);
 
   // Resend cooldown timer
   useEffect(() => {
