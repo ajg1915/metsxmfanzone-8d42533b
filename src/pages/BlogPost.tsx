@@ -305,8 +305,31 @@ export default function BlogPost() {
     url: currentUrl,
   });
 
-      
-      <Navigation />
+  return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
+      <SEOHead
+        title={post.title}
+        description={post.excerpt || post.title}
+        ogType="article"
+        ogImage={post.featured_image_url}
+        ogImageAlt={post.title}
+        twitterCard="summary_large_image"
+        publishedTime={post.published_at}
+        modifiedTime={post.published_at}
+        author="MetsXMFanZone"
+        section={post.category}
+        tags={post.tags}
+        readingTime={readingTime}
+        wordCount={wordCount}
+        structuredData={articleSchema}
+        pageType="article"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Blog", url: "/blog" },
+          { name: post.title, url: `/blog/${post.slug}` },
+        ]}
+      />
+
       
       
       
