@@ -708,7 +708,7 @@ const Auth = () => {
     try {
       const validated = loginSchema.parse({ email, password });
       setLoading(true);
-      setSendingOtp(true); // Prevent redirect race condition before auth completes
+      
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: validated.email,
