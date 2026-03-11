@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,11 +45,12 @@ const MercariShop = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>MetsXMFanZone Mercari Shop - Mets Collectibles & Gear</title>
-        <meta name="description" content="Shop Mets collectibles, jerseys, cards, and memorabilia from our Mercari store. Authentic fan gear at great prices." />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/mercari-shop" />
-      </Helmet>
+      <SEOHead
+        title="MetsXMFanZone Mercari Shop - Collectibles & Gear"
+        description="Shop Mets collectibles, jerseys, cards, and memorabilia from our Mercari store. Authentic fan gear at great prices."
+        keywords="Mets Mercari, Mets collectibles, Mets cards, Mets jerseys, baseball memorabilia"
+        canonical="https://www.metsxmfanzone.com/mercari-shop"
+      />
       <Navigation />
 
       <main className="flex-1 pt-12">

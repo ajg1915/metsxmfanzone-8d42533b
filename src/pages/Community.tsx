@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
@@ -490,12 +490,12 @@ const Community = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>Mets Fan Community - Connect with Fellow Fans | MetsXMFanZone</title>
-        <meta name="description" content="Join the passionate New York Mets fan community. Share posts, photos, and connect with thousands of Mets fans. Discuss games, players, and team news." />
-        <meta name="keywords" content="Mets fan community, Mets fans, New York Mets forum, Mets discussion, baseball community, Mets social" />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/community" />
-      </Helmet>
+      <SEOHead
+        title="Mets Fan Community - Connect with Fellow Fans"
+        description="Join the passionate New York Mets fan community. Share posts, photos, and connect with thousands of Mets fans. Discuss games, players, and team news."
+        keywords="Mets fan community, Mets fans, New York Mets forum, Mets discussion, baseball community, Mets social"
+        canonical="https://www.metsxmfanzone.com/community"
+      />
       <Navigation />
       
       <div className="pt-12">

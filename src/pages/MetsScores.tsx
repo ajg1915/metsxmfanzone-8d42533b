@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEOHead from '@/components/SEOHead';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -578,10 +578,12 @@ const MetsScores = () => {
       </CardContent>
     </Card>;
   return <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Mets Scores - Live & Previous Games | MetsXMFanZone</title>
-        <meta name="description" content="Check the latest New York Mets scores, live game updates, and previous game results. Stay updated with your favorite team." />
-      </Helmet>
+      <SEOHead
+        title="Mets Scores - Live & Previous Games"
+        description="Check the latest New York Mets scores, live game updates, and previous game results. Stay updated with your favorite team."
+        keywords="Mets scores, Mets live score, New York Mets game results, MLB scores, Mets today"
+        canonical="https://www.metsxmfanzone.com/mets-scores"
+      />
 
       <Navigation />
 

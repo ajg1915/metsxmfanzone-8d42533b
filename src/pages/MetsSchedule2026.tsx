@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, MapPin, Home, Plane, Loader2, RefreshCw, Swords } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { format, parseISO } from "date-fns";
 import { motion } from "framer-motion";
@@ -136,10 +136,12 @@ export default function MetsSchedule2026() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>2026 NY Mets Schedule | MetsXMFanZone</title>
-        <meta name="description" content="View the complete 2026 New York Mets schedule including Spring Training and Regular Season games." />
-      </Helmet>
+      <SEOHead
+        title="2026 NY Mets Schedule - Spring Training & Regular Season"
+        description="View the complete 2026 New York Mets schedule including Spring Training and Regular Season games. Game times, opponents, and venues."
+        keywords="Mets schedule 2026, New York Mets games, Mets Spring Training schedule, MLB schedule"
+        canonical="https://www.metsxmfanzone.com/mets-schedule-2026"
+      />
       
       <Navigation />
       

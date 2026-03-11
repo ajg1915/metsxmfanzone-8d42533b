@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -154,13 +154,11 @@ const PlayerStats = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>{playerInfo ? `${playerInfo.fullName} Career Stats` : "Player Stats"} | MetsXMFanZone</title>
-        <meta
-          name="description"
-          content={playerInfo ? `View ${playerInfo.fullName}'s career statistics, including hitting, pitching, and fielding stats.` : "View player career statistics."}
-        />
-      </Helmet>
+      <SEOHead
+        title={playerInfo ? `${playerInfo.fullName} Career Stats` : "Player Stats"}
+        description={playerInfo ? `View ${playerInfo.fullName}'s career statistics, including hitting, pitching, and fielding stats on MetsXMFanZone.` : "View player career statistics."}
+        keywords={playerInfo ? `${playerInfo.fullName} stats, Mets player stats, ${playerInfo.fullName} career, MLB stats` : "Mets player stats, MLB stats"}
+      />
 
       <Navigation />
 

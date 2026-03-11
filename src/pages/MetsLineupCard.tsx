@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -285,10 +285,12 @@ export default function MetsLineupCard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>Mets Lineup Cards - 2025 & 2026 | MetsXMFanZone</title>
-        <meta name="description" content="View New York Mets lineup cards from the end of the 2025 season and upcoming 2026 lineups. Updated automatically with live MLB data." />
-      </Helmet>
+      <SEOHead
+        title="Mets Lineup Cards - 2025 & 2026"
+        description="View New York Mets lineup cards from the end of the 2025 season and upcoming 2026 lineups. Updated automatically with live MLB data."
+        keywords="Mets lineup today, New York Mets lineup card, Mets starting lineup, Mets batting order"
+        canonical="https://www.metsxmfanzone.com/mets-lineup-card"
+      />
 
       <Navigation />
 

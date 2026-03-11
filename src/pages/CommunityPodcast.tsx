@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -130,18 +130,13 @@ const CommunityPodcast = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Community Podcast - Mets Fan Discussions & Stories | MetsXMFanZone</title>
-        <meta
-          name="description"
-          content="Join the MetsXMFanZone community podcast featuring fan discussions, Mets stories, game analysis, and community voices. Your home for Mets fan content."
-        />
-        <meta
-          name="keywords"
-          content="Mets community podcast, Mets fan podcast, baseball community, Mets discussions, fan stories, MLB community"
-        />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/community-podcast" />
-      </Helmet>
+      <SEOHead
+        title="Community Podcast - Mets Fan Discussions & Stories"
+        description="Join the MetsXMFanZone community podcast featuring fan discussions, Mets stories, game analysis, and community voices. Your home for Mets fan content."
+        keywords="Mets community podcast, Mets fan podcast, baseball community, Mets discussions, fan stories, MLB community"
+        canonical="https://www.metsxmfanzone.com/community-podcast"
+        pageType="podcast"
+      />
       <Navigation />
       <main className="pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-7xl">

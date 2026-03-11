@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 
 interface UpdateItem {
   id: string;
@@ -162,6 +163,12 @@ const WhatsNew = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="What's New - Latest Updates & Features"
+        description="Stay up to date with the latest MetsXMFanZone features, improvements, and content updates. See what's new on the platform."
+        keywords="MetsXMFanZone updates, new features, changelog, platform updates"
+        canonical="https://www.metsxmfanzone.com/whats-new"
+      />
       <Navigation />
       
       <main className="container mx-auto px-4 py-8 pt-24">

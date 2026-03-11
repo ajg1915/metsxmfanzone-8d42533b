@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 
 const weeklyShows = [
   {
@@ -210,10 +210,12 @@ export default function Events() {
   if (isStandalone) {
     return (
       <>
-        <Helmet>
-          <title>Events | MetsXMFanZone</title>
-          <meta name="description" content="Join us for exciting Mets fan events and community gatherings. Stay updated on upcoming meetups, watch parties, and special events." />
-        </Helmet>
+        <SEOHead
+          title="Mets Fan Events & Community Gatherings"
+          description="Join us for exciting Mets fan events and community gatherings. Stay updated on upcoming meetups, watch parties, and special events."
+          keywords="Mets events, Mets meetups, Mets watch party, baseball events, Mets fan gatherings"
+          canonical="https://www.metsxmfanzone.com/events"
+        />
         
         <Navigation />
         

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -139,11 +139,12 @@ const Shop = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>MetsXMFanZone Shop - Mets Collectibles & Gear</title>
-        <meta name="description" content="Shop Mets collectibles, jerseys, cards, and memorabilia. Authentic fan gear with secure PayPal checkout." />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/shop" />
-      </Helmet>
+      <SEOHead
+        title="MetsXMFanZone Shop - Collectibles & Gear"
+        description="Shop Mets collectibles, jerseys, cards, and memorabilia. Authentic fan gear with secure PayPal checkout."
+        keywords="Mets collectibles, Mets jerseys, Mets cards, Mets memorabilia, baseball gear"
+        canonical="https://www.metsxmfanzone.com/shop"
+      />
       <Navigation />
 
       <main className="flex-1 pt-12">
