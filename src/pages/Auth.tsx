@@ -776,18 +776,52 @@ const Auth = () => {
     }
   };
 
-  // Handle remembered user login - just go to password login
+  // Handle remembered user login
   const handleRememberedLogin = async () => {
     if (!rememberedUser) return;
-    // Skip remembered flow, just pre-fill email and show password login
-    setIsRememberedLogin(false);
+    if (rememberedUser.pin) {
+      setPinLoginMode(true);
+    } else {
+      setIsRememberedLogin(false);
+    }
   };
 
-  // Clear remembered user and show normal login
+  const handlePinLogin = async () => {
+    if (!rememberedUser || !pinInput || pinInput.length < 4) {
+      toast({ title: "Invalid PIN", description: "Please enter your 4-digit PIN.", variant: "destructive" }); return;
+    }
+    if (pinInput !== rememberedUser.pin) {
+      toast({ title: "Wrong PIN", description: "Incorrect PIN.", variant: "destructive" }); setPinInput(""); return;
+    }
+    setLoading(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) { await completeAuthentication(session.user.id, false); }
+    else { toast({ title: "Session expired", description: "Please sign in with your password.", variant: "destructive" }); setPinLoginMode(false); setIsRememberedLogin(false); }
+    setLoading(false);
+  };
+
+  const handlePinSetup = async () => {
+    if (pinInput.length < 4) { toast({ title: "PIN too short", description: "Enter at least 4 digits.", variant: "destructive" }); return; }
+    if (pinInput !== pinConfirm) { toast({ title: "PINs don't match", variant: "destructive" }); return; }
+    const stored = localStorage.getItem(REMEMBER_ME_KEY);
+    if (stored) { const d: RememberedUser = JSON.parse(stored); d.pin = pinInput; localStorage.setItem(REMEMBER_ME_KEY, JSON.stringify(d)); }
+    toast({ title: "PIN saved!", description: "Use your PIN next time." });
+    setShowPinSetup(false); setPinInput(""); setPinConfirm("");
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) await completeAuthentication(session.user.id, false);
+  };
+
+  const handleSkipPinSetup = async () => {
+    setShowPinSetup(false); setPinInput(""); setPinConfirm("");
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) await completeAuthentication(session.user.id, false);
+  };
+
   const handleForgetDevice = () => {
     localStorage.removeItem(REMEMBER_ME_KEY);
     setRememberedUser(null);
     setIsRememberedLogin(false);
+    setPinLoginMode(false);
     setEmail("");
   };
 
