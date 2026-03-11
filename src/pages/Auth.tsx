@@ -1183,11 +1183,11 @@ const Auth = () => {
               </div>
               <div className="bg-muted/30 border border-muted/30 rounded-xl p-3 text-center">
                 <p className="text-xs text-muted-foreground">
-                  Your device is remembered. Click below to receive a verification code.
+                  Your device is remembered. Click below to continue.
                 </p>
               </div>
               <Button onClick={handleRememberedLogin} className="w-full h-10 rounded-xl text-sm font-semibold" disabled={loading}>
-                {loading ? "Sending code..." : "Send Verification Code"}
+                {loading ? "Loading..." : "Continue to Sign In"}
               </Button>
               <div className="text-center">
                 <button type="button" onClick={handleForgetDevice} className="text-xs text-muted-foreground hover:text-foreground" disabled={loading}>
