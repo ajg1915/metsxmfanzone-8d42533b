@@ -472,37 +472,7 @@ const Auth = () => {
 
 
 
-  const generateOtp = () => {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
-    return { otp, expiry };
-  };
 
-  const sendOtpEmail = async (userEmail: string, otp: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke("send-otp-email", {
-        body: {
-          to: userEmail,
-          otp,
-        },
-      });
-
-      if (error) {
-        console.error("Failed to send OTP email:", error);
-        return false;
-      }
-
-      if (!data?.success) {
-        console.error("OTP email function returned failure:", data);
-        return false;
-      }
-
-      return true;
-    } catch (err) {
-      console.error("Error sending OTP:", err);
-      return false;
-    }
-  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
