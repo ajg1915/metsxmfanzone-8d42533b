@@ -725,7 +725,6 @@ const Auth = () => {
           .eq("id", data.user.id)
           .maybeSingle();
 
-        // If profile lookup fails or profile doesn't exist, that's a different issue
         if (profileError) {
           console.error("Profile lookup error:", profileError);
           toast({
@@ -734,12 +733,11 @@ const Auth = () => {
             variant: "destructive",
           });
           await supabase.auth.signOut();
+          setSendingOtp(false);
           return;
         }
 
-        // Check if email_verified is explicitly true (handles null case)
         if (profile?.email_verified !== true) {
-          // Sign out the user since they haven't confirmed their email
           setSendingOtp(false);
           await supabase.auth.signOut();
           toast({
@@ -751,37 +749,17 @@ const Auth = () => {
           return;
         }
 
-        // CRITICAL: Sign out immediately to prevent session bypass via back navigation
-        // Store credentials so we can re-authenticate after OTP verification
-        const userId = data.user.id;
-        await supabase.auth.signOut();
-        setPendingCredentials({ email: validated.email, password: validated.password });
+        // Email verified - complete authentication directly (no 2FA)
+        setSendingOtp(false);
         
-        // Generate and send OTP for 2FA
-        setLoading(false); // Hide form loading
-        
-        const { otp, expiry } = generateOtp();
-        setGeneratedOtp(otp);
-        setOtpExpiry(expiry);
-        setPendingUserData({ userId, isSignup: false });
-        
-        const emailSent = await sendOtpEmail(validated.email, otp);
-        
-        if (emailSent) {
-          setShow2FA(true); // Must be set BEFORE clearing sendingOtp to prevent redirect race
-          setSendingOtp(false);
-          setResendCooldown(60);
-        } else {
-          // Still show 2FA - user can retry resend. Never bypass 2FA.
-          setShow2FA(true); // Must be set BEFORE clearing sendingOtp to prevent redirect race
-          setSendingOtp(false);
-          setResendCooldown(0);
-          toast({
-            title: "Verification code issue",
-            description: "We had trouble sending your code. Please tap 'Resend Code' to try again.",
-            variant: "destructive",
-          });
+        // Save remember me preference
+        if (rememberMe) {
+          const expiresAt = Date.now() + REMEMBER_ME_EXPIRY_HOURS * 60 * 60 * 1000;
+          const rememberedData: RememberedUser = { email: validated.email, expiresAt };
+          localStorage.setItem(REMEMBER_ME_KEY, JSON.stringify(rememberedData));
         }
+
+        await completeAuthentication(data.user.id, false);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
