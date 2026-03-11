@@ -440,9 +440,32 @@ const Auth = () => {
 
   useEffect(() => {
     // Only redirect if auth has finished loading and user is confirmed logged in
-    // Don't redirect during 2FA, remembered login flow, or password reset
-    if (!authLoading && authUser && !show2FA && !isRememberedLogin && !isResettingPassword && !sendingOtp) {
-      navigate("/", { replace: true });
+    // Don't redirect during remembered login flow or password reset
+    if (!authLoading && authUser && !isRememberedLogin && !isResettingPassword) {
+      // Check if this is a new Google OAuth user who needs to select a plan
+      const checkAndRedirect = async () => {
+        // Check if user has a subscription
+        const { data: subscriptions } = await supabase
+          .rpc("get_user_subscription_safe", { p_user_id: authUser.id });
+        
+        const activeSubscription = subscriptions?.find((s: any) => s.status === "active");
+        
+        if (!activeSubscription) {
+          // New user or no plan - send to pricing
+          // Mark email as verified for Google OAuth users (they verified via Google)
+          const provider = authUser.app_metadata?.provider;
+          if (provider === "google") {
+            await supabase
+              .from("profiles")
+              .update({ email_verified: true })
+              .eq("id", authUser.id);
+          }
+          navigate("/pricing?required=true", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
+      };
+      checkAndRedirect();
     }
   }, [authUser, authLoading, navigate, show2FA, isRememberedLogin, isResettingPassword, sendingOtp]);
 
@@ -845,7 +868,7 @@ const Auth = () => {
       if (subscription && (subscription.plan_type === "premium" || subscription.plan_type === "annual")) {
         navigate("/", { replace: true });
       } else {
-        navigate("/pricing", { replace: true });
+        navigate("/pricing?required=true", { replace: true });
       }
     }
   };
