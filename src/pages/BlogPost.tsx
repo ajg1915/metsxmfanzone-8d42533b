@@ -290,7 +290,6 @@ export default function BlogPost() {
   }
 
   const currentUrl = window.location.href;
-  const siteUrl = window.location.origin;
   
   // Calculate reading time
   const wordCount = post.content.split(/\s+/).length;
