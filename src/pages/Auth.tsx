@@ -1039,19 +1039,76 @@ const Auth = () => {
                   Continue as <span className="font-medium text-foreground">{rememberedUser.email}</span>
                 </p>
               </div>
-              <div className="bg-muted/30 border border-muted/30 rounded-xl p-3 text-center">
-                <p className="text-xs text-muted-foreground">
-                  Your device is remembered. Click below to continue.
-                </p>
-              </div>
-              <Button onClick={handleRememberedLogin} className="w-full h-10 rounded-xl text-sm font-semibold" disabled={loading}>
-                {loading ? "Loading..." : "Continue to Sign In"}
-              </Button>
+              {pinLoginMode ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="pinLogin">Enter your PIN</Label>
+                    <Input id="pinLogin" type="password" maxLength={6} placeholder="••••" value={pinInput} onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))} disabled={loading} autoFocus />
+                  </div>
+                  <Button onClick={handlePinLogin} className="w-full h-10 rounded-xl text-sm font-semibold" disabled={loading || pinInput.length < 4}>
+                    {loading ? "Logging in..." : "Sign In with PIN"}
+                  </Button>
+                  <button type="button" onClick={() => { setPinLoginMode(false); setIsRememberedLogin(false); }} className="text-xs text-primary hover:underline w-full text-center">
+                    Use email & password instead
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="bg-muted/30 border border-muted/30 rounded-xl p-3 text-center">
+                    <p className="text-xs text-muted-foreground">Your device is remembered. Click below to continue.</p>
+                  </div>
+                  <Button onClick={handleRememberedLogin} className="w-full h-10 rounded-xl text-sm font-semibold" disabled={loading}>
+                    {loading ? "Loading..." : rememberedUser.pin ? "Sign In with PIN" : "Continue to Sign In"}
+                  </Button>
+                </>
+              )}
               <div className="text-center">
                 <button type="button" onClick={handleForgetDevice} className="text-xs text-muted-foreground hover:text-foreground" disabled={loading}>
                   Not you? Sign in with a different account
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // PIN setup screen after login with Remember Me
+  if (showPinSetup) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 relative">
+        <AuthBackground />
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[120px]" />
+        </div>
+        <div className="w-full max-w-sm relative z-10">
+          <div className="rounded-2xl border border-muted/40 bg-card/90 backdrop-blur-xl shadow-2xl overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-secondary via-primary to-secondary" />
+            <div className="p-5 sm:p-6 space-y-4">
+              <div className="flex flex-col items-center gap-3">
+                <img src={authLogo} alt="MetsXMFanZone" className="h-16 w-auto object-contain" />
+              </div>
+              <div className="text-center">
+                <h1 className="text-lg font-bold text-foreground">Set a Quick Login PIN</h1>
+                <p className="text-xs text-muted-foreground mt-1">Create a 4-6 digit PIN to log in faster next time (optional)</p>
+              </div>
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label htmlFor="newPin">Create PIN</Label>
+                  <Input id="newPin" type="password" maxLength={6} placeholder="••••" value={pinInput} onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))} autoFocus />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPin">Confirm PIN</Label>
+                  <Input id="confirmPin" type="password" maxLength={6} placeholder="••••" value={pinConfirm} onChange={(e) => setPinConfirm(e.target.value.replace(/\D/g, ""))} />
+                </div>
+              </div>
+              <Button onClick={handlePinSetup} className="w-full" disabled={pinInput.length < 4}>
+                Save PIN
+              </Button>
+              <button type="button" onClick={handleSkipPinSetup} className="text-xs text-muted-foreground hover:text-foreground w-full text-center">
+                Skip for now
+              </button>
             </div>
           </div>
         </div>
