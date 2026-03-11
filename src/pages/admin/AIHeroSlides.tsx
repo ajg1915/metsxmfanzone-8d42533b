@@ -4,7 +4,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Loader2, Trash2, Eye, EyeOff, RefreshCw } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Sparkles, Loader2, Trash2, Eye, EyeOff, RefreshCw, ImagePlus, Search, X } from "lucide-react";
 
 interface HeroSlide {
   id: string;
@@ -21,12 +24,23 @@ interface HeroSlide {
   created_at: string;
 }
 
+interface MediaFile {
+  file_url: string;
+  file_name: string;
+  file_type: string | null;
+}
+
 export default function AIHeroSlides() {
   const { toast } = useToast();
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [slideCount, setSlideCount] = useState(3);
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const [mediaPickerSlideId, setMediaPickerSlideId] = useState<string | null>(null);
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [mediaLoading, setMediaLoading] = useState(false);
+  const [mediaSearch, setMediaSearch] = useState("");
 
   const fetchSlides = async () => {
     const { data } = await supabase
@@ -40,18 +54,45 @@ export default function AIHeroSlides() {
 
   useEffect(() => { fetchSlides(); }, []);
 
+  const fetchMediaFiles = async () => {
+    setMediaLoading(true);
+    const { data } = await supabase
+      .from("media_library")
+      .select("file_url, file_name, file_type")
+      .or("file_type.ilike.%image%,file_name.ilike.%.jpg,file_name.ilike.%.png,file_name.ilike.%.jpeg,file_name.ilike.%.webp")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    setMediaFiles(data || []);
+    setMediaLoading(false);
+  };
+
+  const openMediaPicker = (slideId: string) => {
+    setMediaPickerSlideId(slideId);
+    setMediaPickerOpen(true);
+    setMediaSearch("");
+    if (mediaFiles.length === 0) fetchMediaFiles();
+  };
+
+  const selectMediaImage = async (fileUrl: string) => {
+    if (!mediaPickerSlideId) return;
+    await supabase.from("hero_slides").update({ image_url: fileUrl }).eq("id", mediaPickerSlideId);
+    setSlides(prev => prev.map(s => s.id === mediaPickerSlideId ? { ...s, image_url: fileUrl } : s));
+    setMediaPickerOpen(false);
+    setMediaPickerSlideId(null);
+    toast({ title: "Image Updated", description: "Slide image replaced from media library" });
+  };
+
   const generateSlides = async () => {
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-ai-hero-slides", {
         body: { count: slideCount },
       });
-
       if (error) throw error;
       if (data?.error) {
         toast({ title: "Generation Failed", description: data.error, variant: "destructive" });
       } else {
-        toast({ title: "Slides Generated!", description: `${data.slides_generated} AI hero slides created and published.` });
+        toast({ title: "Slides Generated!", description: `${data.slides_generated} AI hero slides created.` });
         fetchSlides();
       }
     } catch (err: any) {
@@ -77,12 +118,16 @@ export default function AIHeroSlides() {
     toast({ title: "Cleared", description: "All AI slides removed" });
   };
 
+  const filteredMedia = mediaSearch
+    ? mediaFiles.filter(f => f.file_name.toLowerCase().includes(mediaSearch.toLowerCase()))
+    : mediaFiles;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h1 className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> AI Hero Slides</h1>
-          <p className="text-muted-foreground">Auto-generate branded Mets hero slides from your content</p>
+          <p className="text-muted-foreground text-sm">Auto-generate branded Mets hero slides — images from your media library</p>
         </div>
         <div className="flex items-center gap-2">
           <select
@@ -105,7 +150,7 @@ export default function AIHeroSlides() {
             <Loader2 className="w-5 h-5 animate-spin text-primary" />
             <div>
               <p className="font-medium text-sm">Generating AI Hero Slides...</p>
-              <p className="text-xs text-muted-foreground">Analyzing your content, creating copy & generating images. This may take 30-60 seconds.</p>
+              <p className="text-xs text-muted-foreground">Analyzing content & selecting images from your media library. ~15-30 seconds.</p>
             </div>
           </CardContent>
         </Card>
@@ -139,19 +184,33 @@ export default function AIHeroSlides() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {slides.map(slide => (
             <Card key={slide.id} className="overflow-hidden">
-              {slide.image_url && (
-                <div className="aspect-video bg-muted relative overflow-hidden">
+              <div className="aspect-video bg-muted relative overflow-hidden group">
+                {slide.image_url ? (
                   <img src={slide.image_url} alt={slide.title} className="w-full h-full object-cover" />
-                  <div className="absolute top-1 right-1 flex gap-1">
-                    <Badge variant={slide.published ? "default" : "secondary"} className="text-[9px]">
-                      {slide.published ? "Live" : "Draft"}
-                    </Badge>
-                    <Badge variant="outline" className="text-[9px] bg-background/80">
-                      {slide.is_for_members ? "Members" : "Public"}
-                    </Badge>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                    <ImagePlus className="w-8 h-8" />
                   </div>
+                )}
+                <div className="absolute top-1 right-1 flex gap-1">
+                  <Badge variant={slide.published ? "default" : "secondary"} className="text-[9px]">
+                    {slide.published ? "Live" : "Draft"}
+                  </Badge>
+                  <Badge variant="outline" className="text-[9px] bg-background/80">
+                    {slide.is_for_members ? "Members" : "Public"}
+                  </Badge>
                 </div>
-              )}
+                {/* Replace Image button */}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="absolute bottom-1 left-1 h-6 text-[10px] gap-1 opacity-80 hover:opacity-100"
+                  onClick={() => openMediaPicker(slide.id)}
+                >
+                  <ImagePlus className="w-3 h-3" />
+                  {slide.image_url ? "Replace Image" : "Add Image"}
+                </Button>
+              </div>
               <CardHeader className="p-2">
                 <CardTitle className="line-clamp-1">{slide.title}</CardTitle>
                 <CardDescription className="line-clamp-2">{slide.description}</CardDescription>
@@ -173,6 +232,62 @@ export default function AIHeroSlides() {
           ))}
         </div>
       )}
+
+      {/* Media Library Picker Dialog */}
+      <Dialog open={mediaPickerOpen} onOpenChange={setMediaPickerOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ImagePlus className="w-4 h-4" /> Select Image from Media Library
+            </DialogTitle>
+          </DialogHeader>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search media files..."
+              value={mediaSearch}
+              onChange={e => setMediaSearch(e.target.value)}
+              className="pl-8 h-8 text-sm"
+            />
+            {mediaSearch && (
+              <Button variant="ghost" size="sm" className="absolute right-1 top-1 h-6 w-6 p-0" onClick={() => setMediaSearch("")}>
+                <X className="w-3 h-3" />
+              </Button>
+            )}
+          </div>
+          <ScrollArea className="h-[50vh]">
+            {mediaLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : filteredMedia.length === 0 ? (
+              <p className="text-center text-muted-foreground text-sm py-12">
+                {mediaSearch ? "No matching images found" : "No images in media library"}
+              </p>
+            ) : (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 p-1">
+                {filteredMedia.map((file, i) => (
+                  <button
+                    key={i}
+                    onClick={() => selectMediaImage(file.file_url)}
+                    className="aspect-video rounded-md overflow-hidden border border-border hover:border-primary hover:ring-2 hover:ring-primary/30 transition-all cursor-pointer group relative"
+                  >
+                    <img
+                      src={file.file_url}
+                      alt={file.file_name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-1">
+                      <span className="text-[9px] text-foreground truncate w-full">{file.file_name}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
