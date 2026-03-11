@@ -62,12 +62,14 @@ const FAQs = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Frequently Asked Questions - MetsXMFanZone Help & Support</title>
-        <meta name="description" content="Find answers to common questions about MetsXMFanZone subscriptions, live streams, content access, and more. Get help with your account and features." />
-        <meta name="keywords" content="Mets FAQs, MetsXM help, support questions, streaming help, subscription FAQ" />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/faqs" />
-      </Helmet>
+      <SEOHead
+        title="Frequently Asked Questions - Help & Support"
+        description="Find answers to common questions about MetsXMFanZone subscriptions, live streams, content access, and more. Get help with your account and features."
+        keywords="Mets FAQs, MetsXM help, support questions, streaming help, subscription FAQ"
+        canonical="https://www.metsxmfanzone.com/faqs"
+        structuredData={generateFAQSchema(faqs)}
+        pageType="faq"
+      />
       <Navigation />
       <main className="pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-4xl">

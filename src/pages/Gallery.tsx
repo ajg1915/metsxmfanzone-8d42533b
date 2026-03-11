@@ -211,12 +211,12 @@ const Gallery = () => {
   if (loading) {
     return (
       <>
-        <Helmet>
-          <title>Mets Highlights & Game Videos - Watch HD Replays | MetsXMFanZone</title>
-          <meta name="description" content="Watch Mets game highlights, full game replays, and exclusive video content. Browse HD quality Mets videos, best plays, and memorable moments." />
-          <meta name="keywords" content="Mets highlights, Mets videos, Mets replays, baseball highlights, Mets best plays, game replays, Mets gallery" />
-          <link rel="canonical" href="https://www.metsxmfanzone.com/gallery" />
-        </Helmet>
+        <SEOHead
+          title="Mets Highlights & Game Videos - Watch HD Replays"
+          description="Watch Mets game highlights, full game replays, and exclusive video content. Browse HD quality Mets videos, best plays, and memorable moments."
+          keywords="Mets highlights, Mets videos, Mets replays, baseball highlights, Mets best plays, game replays, Mets gallery"
+          canonical="https://www.metsxmfanzone.com/gallery"
+        />
         <div className="min-h-screen bg-background">
           <Navigation />
           <div className="flex items-center justify-center min-h-[60vh]">

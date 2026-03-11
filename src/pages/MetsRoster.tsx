@@ -187,18 +187,12 @@ const MetsRoster = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>2026 New York Mets Roster - Full 40-Man Roster | MetsXMFanZone</title>
-        <meta
-          name="description"
-          content="View the complete 2026 New York Mets 40-man roster with real-time updates from MLB. See all pitchers, catchers, infielders, and outfielders."
-        />
-        <meta
-          name="keywords"
-          content="Mets roster 2026, New York Mets players, Mets 40-man roster, Mets pitchers, Mets lineup"
-        />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/mets-roster" />
-      </Helmet>
+      <SEOHead
+        title="2026 New York Mets Roster - Full 40-Man Roster"
+        description="View the complete 2026 New York Mets 40-man roster with real-time updates from MLB. See all pitchers, catchers, infielders, and outfielders."
+        keywords="Mets roster 2026, New York Mets players, Mets 40-man roster, Mets pitchers, Mets lineup"
+        canonical="https://www.metsxmfanzone.com/mets-roster"
+      />
       
       <Navigation />
 

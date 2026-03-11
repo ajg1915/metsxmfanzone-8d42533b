@@ -52,10 +52,12 @@ const SocialMediaHub = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Social Media | MetsXMFanZone</title>
-        <meta name="description" content="Follow MetsXMFanZone on all social media platforms. Stay connected with the latest Mets news, updates, and community content." />
-      </Helmet>
+      <SEOHead
+        title="Follow MetsXMFanZone on Social Media"
+        description="Follow MetsXMFanZone on all social media platforms. Stay connected with the latest Mets news, updates, and community content."
+        keywords="MetsXMFanZone social media, Mets Twitter, Mets Instagram, Mets Facebook, Mets TikTok"
+        canonical="https://www.metsxmfanzone.com/social-media-hub"
+      />
 
       <Navigation />
 

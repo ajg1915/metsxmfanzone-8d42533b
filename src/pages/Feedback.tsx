@@ -77,12 +77,12 @@ const Feedback = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Share Your Feedback - Help Us Improve MetsXMFanZone</title>
-        <meta name="description" content="Share your feedback and suggestions with MetsXMFanZone. Help us improve your experience and make the platform better for all Mets fans." />
-        <meta name="keywords" content="feedback, suggestions, user feedback, improve service, contact support" />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/feedback" />
-      </Helmet>
+      <SEOHead
+        title="Share Your Feedback - Help Us Improve"
+        description="Share your feedback and suggestions with MetsXMFanZone. Help us improve your experience and make the platform better for all Mets fans."
+        keywords="feedback, suggestions, user feedback, improve service, contact support"
+        canonical="https://www.metsxmfanzone.com/feedback"
+      />
       <Navigation />
       <main className="pt-12 pb-16">
         <div className="container mx-auto px-4 max-w-2xl">

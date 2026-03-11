@@ -208,18 +208,12 @@ const Plans = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Mets Fan Pricing - Premium Access | MetsXMFanZone</title>
-        <meta
-          name="description"
-          content="Choose your MetsXMFanZone membership. Get unlimited access to live Mets streams, game replays, exclusive content, and more. Start your free trial today."
-        />
-        <meta
-          name="keywords"
-          content="Mets subscription, Mets premium, baseball streaming pricing, Mets fan membership, live stream subscription"
-        />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/pricing" />
-      </Helmet>
+      <SEOHead
+        title="Mets Fan Pricing - Premium Access"
+        description="Choose your MetsXMFanZone membership. Get unlimited access to live Mets streams, game replays, exclusive content, and more. Start your free trial today."
+        keywords="Mets subscription, Mets premium, baseball streaming pricing, Mets fan membership, live stream subscription"
+        canonical="https://www.metsxmfanzone.com/plans"
+      />
       {!mustSelectPlan && <Navigation />}
       <main className={mustSelectPlan ? "pt-8" : "pt-12"}>
         <section className="py-8 sm:py-16">

@@ -54,11 +54,12 @@ const Merch = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>MetsXMFanZone Merch - Official Merchandise & Apparel</title>
-        <meta name="description" content="Shop official MetsXMFanZone merchandise. T-shirts, hoodies, hats, and more Mets fan gear." />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/merch" />
-      </Helmet>
+      <SEOHead
+        title="MetsXMFanZone Merch - Official Merchandise"
+        description="Shop official MetsXMFanZone merchandise. T-shirts, hoodies, hats, and more Mets fan gear. Represent your favorite team."
+        keywords="Mets merchandise, Mets t-shirts, Mets hoodies, Mets fan gear, MetsXMFanZone merch"
+        canonical="https://www.metsxmfanzone.com/merch"
+      />
       <Navigation />
       
       <main className="flex-1 pt-12">

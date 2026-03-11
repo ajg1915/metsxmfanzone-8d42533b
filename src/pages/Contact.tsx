@@ -36,12 +36,12 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Contact MetsXMFanZone - Get in Touch with Our Team</title>
-        <meta name="description" content="Contact MetsXMFanZone for support, feedback, or questions. We're here to help Mets fans with subscriptions, content, and more." />
-        <meta name="keywords" content="contact Mets fan zone, MetsXM support, Mets customer service, contact us" />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/contact" />
-      </Helmet>
+      <SEOHead
+        title="Contact MetsXMFanZone - Get in Touch"
+        description="Contact MetsXMFanZone for support, feedback, or questions. We're here to help Mets fans with subscriptions, content, and more."
+        keywords="contact Mets fan zone, MetsXM support, Mets customer service, contact us"
+        canonical="https://www.metsxmfanzone.com/contact"
+      />
       <Navigation />
       <main className="pt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-7xl">

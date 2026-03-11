@@ -232,10 +232,12 @@ const NLScores = () => {
 
   return (
     <>
-      <Helmet>
-        <title>MLB NL Scores - Live National League Games | MetsXMFanZone</title>
-        <meta name="description" content="Live MLB National League scores and game updates. Real-time NL baseball scores, standings, and game information." />
-      </Helmet>
+      <SEOHead
+        title="MLB NL Scores - Live National League Games"
+        description="Live MLB National League scores and game updates. Real-time NL baseball scores, standings, and game information."
+        keywords="NL scores, National League scores, MLB scores today, NL baseball, NL standings"
+        canonical="https://www.metsxmfanzone.com/nl-scores"
+      />
 
       <div className="min-h-screen bg-background">
         <Navigation />

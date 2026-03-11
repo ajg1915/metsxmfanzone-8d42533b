@@ -78,11 +78,12 @@ const Install = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Install MetsXMFanZone App - Mobile, Desktop & TV</title>
-        <meta name="description" content="Install MetsXMFanZone on your phone, computer, or smart TV for the best Mets fan experience with offline access and push notifications." />
-        <link rel="canonical" href="https://www.metsxmfanzone.com/install" />
-      </Helmet>
+      <SEOHead
+        title="Install MetsXMFanZone App - Mobile, Desktop & TV"
+        description="Install MetsXMFanZone on your phone, computer, or smart TV for the best Mets fan experience with offline access and push notifications."
+        keywords="MetsXMFanZone app, install Mets app, Mets mobile app, Mets TV app"
+        canonical="https://www.metsxmfanzone.com/install"
+      />
       <Navigation />
       <main className="pt-20 pb-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">

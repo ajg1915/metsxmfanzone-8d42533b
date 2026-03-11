@@ -103,10 +103,12 @@ export default function VideoGallery() {
   }
 
   return <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>Video Gallery | MetsXMFanZone</title>
-        <meta name="description" content="Watch exclusive Mets videos, highlights, and replays from MetsXMFanZone." />
-      </Helmet>
+      <SEOHead
+        title="Video Gallery - Exclusive Mets Videos & Highlights"
+        description="Watch exclusive Mets videos, highlights, and replays from MetsXMFanZone. HD quality game footage and fan content."
+        keywords="Mets videos, Mets highlights, baseball videos, Mets replays, MetsXMFanZone video gallery"
+        canonical="https://www.metsxmfanzone.com/video-gallery"
+      />
 
       <Navigation />
 
