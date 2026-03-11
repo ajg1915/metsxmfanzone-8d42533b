@@ -759,7 +759,8 @@ const Auth = () => {
         }
 
         if (profile?.email_verified !== true) {
-          setSendingOtp(false);
+
+
           await supabase.auth.signOut();
           toast({
             title: "Email Not Verified",
