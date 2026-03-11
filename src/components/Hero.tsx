@@ -106,7 +106,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="group/hero relative h-[60vw] min-h-[320px] max-h-[540px] sm:max-h-[580px] overflow-hidden bg-black">
+    <section className="group/hero relative h-[clamp(280px,50vw,580px)] overflow-hidden bg-black">
       <div ref={emblaRef} className="overflow-hidden absolute inset-0">
         <div className="flex h-full">
           {slidesToShow.map((slide, index) => (
@@ -143,13 +143,13 @@ const Hero = () => {
                   </span>
                 </div>
 
-                {/* Title */}
-                <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-white mb-1.5 sm:mb-2 max-w-xl leading-[1.1] uppercase tracking-tight drop-shadow-lg">
+                {/* Title — fluid sizing handled by global h1 clamp */}
+                <h1 className="font-black text-foreground mb-1.5 sm:mb-2 max-w-xl leading-[1.1] uppercase tracking-tight drop-shadow-lg" style={{ color: 'white' }}>
                   {slide.title}
                 </h1>
 
                 {/* Description */}
-                <p className="text-[11px] sm:text-xs md:text-sm text-white/75 mb-3 sm:mb-4 max-w-md leading-relaxed line-clamp-2 sm:line-clamp-3">
+                <p className="text-[clamp(0.65rem,1.5vw,0.875rem)] text-foreground/75 mb-3 sm:mb-4 max-w-md leading-relaxed line-clamp-2 sm:line-clamp-3" style={{ color: 'rgba(255,255,255,0.75)' }}>
                   {slide.description}
                 </p>
 
