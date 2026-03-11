@@ -781,41 +781,11 @@ const Auth = () => {
     }
   };
 
-  // Handle remembered user login (skip password, just 2FA)
+  // Handle remembered user login - just go to password login
   const handleRememberedLogin = async () => {
     if (!rememberedUser) return;
-    
-    setSendingOtp(true); // Show loading screen
-    try {
-      // Generate and send OTP for 2FA
-      const { otp, expiry } = generateOtp();
-      setGeneratedOtp(otp);
-      setOtpExpiry(expiry);
-      // We don't have userId yet, will get it after OTP verification
-      setPendingUserData({ userId: "remembered", isSignup: false });
-      
-      const emailSent = await sendOtpEmail(rememberedUser.email, otp);
-      
-      if (emailSent) {
-        setShow2FA(true); // Must be set BEFORE clearing sendingOtp to prevent redirect race
-        setSendingOtp(false);
-        setResendCooldown(60);
-      } else {
-        toast({
-          title: "Failed to send code",
-          description: "Unable to send verification code. Please try with password.",
-          variant: "destructive",
-        });
-        handleForgetDevice();
-      }
-    } catch (error) {
-      setSendingOtp(false);
-      toast({
-        title: "Error",
-        description: "An error occurred. Please try again.",
-        variant: "destructive",
-      });
-    }
+    // Skip remembered flow, just pre-fill email and show password login
+    setIsRememberedLogin(false);
   };
 
   // Clear remembered user and show normal login
