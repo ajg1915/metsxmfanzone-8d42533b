@@ -16,7 +16,7 @@ import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 import { trackFailedLogin } from "@/utils/securityAlerts";
 import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
 import AuthLoadingScreen from "@/components/auth/AuthLoadingScreen";
-import OTPVerificationForm from "@/components/auth/OTPVerificationForm";
+
 import { lovable } from "@/integrations/lovable/index";
 
 const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
