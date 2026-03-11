@@ -753,7 +753,8 @@ const Auth = () => {
             variant: "destructive",
           });
           await supabase.auth.signOut();
-          setSendingOtp(false);
+
+
           return;
         }
 
