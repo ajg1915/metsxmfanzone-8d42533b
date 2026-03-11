@@ -339,41 +339,42 @@ const Auth = () => {
         throw new Error(verifyResponse.data.error);
       }
 
-      // Step 4: Biometric verified - now trigger 2FA with loading screen
+      // Step 4: Biometric verified - establish session directly (no 2FA)
       setBiometricLoading(false);
-      setSendingOtp(true); // Show loading screen
       
-      // Generate and send OTP for 2FA
-      const { otp, expiry } = generateOtp();
-      setGeneratedOtp(otp);
-      setOtpExpiry(expiry);
+      // Establish Supabase session using the auth token
+      const authToken = verifyResponse.data.token;
+      const verificationUrl = verifyResponse.data.verificationUrl;
       
-      // Send OTP email
-      const otpSent = await sendOtpEmail(biometricEmail, otp);
-      
-      if (!otpSent) {
-        setSendingOtp(false);
-        toast({
-          title: "Verification issue",
-          description: "Could not send verification code. Please try password login.",
-          variant: "destructive",
-        });
-        return;
+      if (authToken) {
+        try {
+          const { error: sessionError } = await supabase.auth.verifyOtp({
+            token_hash: authToken,
+            type: 'magiclink',
+          });
+          
+          if (sessionError && verificationUrl) {
+            const url = new URL(verificationUrl);
+            const token = url.searchParams.get('token') || url.hash?.match(/token=([^&]+)/)?.[1];
+            if (token) {
+              await supabase.auth.verifyOtp({
+                token_hash: token,
+                type: 'magiclink',
+              });
+            }
+          }
+        } catch (err) {
+          console.error("Error establishing biometric session:", err);
+        }
       }
-
-      // Store user info and auth token for after 2FA
-      setBiometricPendingUserId(userId);
-      setBiometricAuthToken({
-        token: verifyResponse.data.token,
-        verificationUrl: verifyResponse.data.verificationUrl,
-      });
-      setPendingUserData({ userId, isSignup: false });
       
-      // Show 2FA screen - must set show2FA BEFORE clearing sendingOtp to prevent redirect
-      setShow2FA(true);
-      setSendingOtp(false);
+      toast({
+        title: "Welcome back!",
+        description: "Biometric login successful.",
+      });
+      
+      await completeAuthentication(userId, false);
       setShowBiometricEmailInput(false);
-      setResendCooldown(60);
 
     } catch (error: any) {
       console.error("Biometric login error:", error);
