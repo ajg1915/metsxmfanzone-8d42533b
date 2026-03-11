@@ -716,7 +716,8 @@ const Auth = () => {
       });
 
       if (error) {
-        setSendingOtp(false);
+
+
         // Track failed login attempt for security alerts
         trackFailedLogin(validated.email);
         
