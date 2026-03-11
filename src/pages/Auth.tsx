@@ -469,13 +469,8 @@ const Auth = () => {
     }
   }, [authUser, authLoading, navigate, isRememberedLogin, isResettingPassword]);
 
-  // Resend cooldown timer
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendCooldown]);
+
+
 
   const generateOtp = () => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
