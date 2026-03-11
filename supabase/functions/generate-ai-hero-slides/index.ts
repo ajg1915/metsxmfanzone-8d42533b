@@ -38,7 +38,18 @@ serve(async (req) => {
       news: (newsRes.data || []).map(n => `"${n.title}" about ${n.player} - ${n.details}`).join("\n"),
     };
 
-    // 2. Generate slide content via Lovable AI
+    // 2. Fetch available images from media library
+    const { data: mediaFiles } = await supabase
+      .from("media_library")
+      .select("file_url, file_name, file_type")
+      .or("file_type.ilike.%image%,file_name.ilike.%.jpg,file_name.ilike.%.png,file_name.ilike.%.jpeg,file_name.ilike.%.webp")
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    const availableImages = (mediaFiles || []).map(f => f.file_url).filter(Boolean);
+    console.log(`Found ${availableImages.length} images in media library`);
+
+    // 3. Generate slide content via Lovable AI
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
@@ -51,7 +62,10 @@ serve(async (req) => {
           },
           {
             role: "user",
-            content: `Based on this current MetsXMFanZone content, generate exactly ${count} hero slides as JSON array. Each slide needs: title (max 6 words, bold/uppercase style), description (max 25 words, compelling), link_url (relevant page on the site), link_text (CTA text, max 3 words), show_watch_live (boolean, true if streaming related), is_for_members (boolean, false for conversion slides targeting non-members), image_prompt (detailed prompt to generate a branded Mets-themed hero image for this slide, include "New York Mets" "blue and orange" "MetsXMFanZone" in the prompt, cinematic style, 16:9 aspect ratio).
+            content: `Based on this current MetsXMFanZone content, generate exactly ${count} hero slides as JSON array. Each slide needs: title (max 6 words, bold/uppercase style), description (max 25 words, compelling), link_url (relevant page on the site), link_text (CTA text, max 3 words), show_watch_live (boolean, true if streaming related), is_for_members (boolean, false for conversion slides targeting non-members), image_index (integer, pick the best matching image index from the available media library images listed below).
+
+Available media library images (pick by index):
+${availableImages.map((url, i) => `${i}: ${url}`).join("\n") || "No images available"}
 
 Available content:
 BLOG POSTS:
@@ -90,9 +104,9 @@ Return ONLY a valid JSON array, no markdown.`
                       link_text: { type: "string" },
                       show_watch_live: { type: "boolean" },
                       is_for_members: { type: "boolean" },
-                      image_prompt: { type: "string" },
+                      image_index: { type: "integer" },
                     },
-                    required: ["title", "description", "link_url", "link_text", "show_watch_live", "is_for_members", "image_prompt"],
+                    required: ["title", "description", "link_url", "link_text", "show_watch_live", "is_for_members", "image_index"],
                     additionalProperties: false,
                   },
                 },
@@ -131,55 +145,19 @@ Return ONLY a valid JSON array, no markdown.`
 
     console.log(`Generated ${slides.length} slide concepts`);
 
-    // 3. Generate AI images for each slide
+    // 4. Insert slides using media library images
     const generatedSlides = [];
     for (const slide of slides) {
+      // Pick image from media library by index, fallback to random or null
       let imageUrl: string | null = null;
-
-      try {
-        const imgResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash-image",
-            messages: [{
-              role: "user",
-              content: `${slide.image_prompt}. Ultra high resolution, 16:9 aspect ratio hero banner image. Cinematic lighting, professional sports broadcast quality. No text overlays.`,
-            }],
-            modalities: ["image", "text"],
-          }),
-        });
-
-        if (imgResponse.ok) {
-          const imgData = await imgResponse.json();
-          const base64Image = imgData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-          
-          if (base64Image) {
-            // Upload to storage
-            const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
-            const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
-            const fileName = `ai-hero-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.png`;
-            
-            const { error: uploadError } = await supabase.storage
-              .from("content_uploads")
-              .upload(fileName, imageBytes, { contentType: "image/png", upsert: true });
-            
-            if (!uploadError) {
-              const { data: urlData } = supabase.storage.from("content_uploads").getPublicUrl(fileName);
-              imageUrl = urlData.publicUrl;
-              console.log(`Image uploaded: ${fileName}`);
-            } else {
-              console.error("Upload error:", uploadError);
-            }
-          }
-        } else {
-          console.error("Image gen error:", imgResponse.status);
-        }
-      } catch (imgErr) {
-        console.error("Image generation failed:", imgErr);
+      if (availableImages.length > 0) {
+        const idx = typeof slide.image_index === "number" && slide.image_index >= 0 && slide.image_index < availableImages.length
+          ? slide.image_index
+          : Math.floor(Math.random() * availableImages.length);
+        imageUrl = availableImages[idx];
       }
 
-      // 4. Get max display_order
+      // Get max display_order
       const { data: maxOrder } = await supabase
         .from("hero_slides")
         .select("display_order")
@@ -187,7 +165,6 @@ Return ONLY a valid JSON array, no markdown.`
         .limit(1);
       const nextOrder = ((maxOrder?.[0]?.display_order) || 0) + 1;
 
-      // 5. Insert into hero_slides
       const { data: inserted, error: insertError } = await supabase
         .from("hero_slides")
         .insert({
@@ -201,7 +178,7 @@ Return ONLY a valid JSON array, no markdown.`
           published: true,
           display_order: nextOrder,
           is_ai_generated: true,
-          ai_source_type: "auto",
+          ai_source_type: "media_library",
         })
         .select()
         .single();
@@ -210,7 +187,7 @@ Return ONLY a valid JSON array, no markdown.`
         console.error("Insert error:", insertError);
       } else {
         generatedSlides.push(inserted);
-        console.log(`Slide inserted: "${slide.title}"`);
+        console.log(`Slide inserted: "${slide.title}" with media image`);
       }
     }
 
