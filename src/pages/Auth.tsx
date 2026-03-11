@@ -213,9 +213,7 @@ const Auth = () => {
   const [honeypot, setHoneypot] = useState(""); // Should remain empty - bots fill this
   const [formLoadTime] = useState(() => Date.now()); // Track when form loaded
   
-  // Store credentials for re-authentication after OTP
-  const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string } | null>(null);
-  
+
   // Biometric login states
   const [biometricSupported, setBiometricSupported] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
