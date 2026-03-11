@@ -19,16 +19,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let isMounted = true;
 
+    const clearCorruptedSession = async () => {
+      try {
+        await supabase.auth.signOut({ scope: "local" });
+      } catch {
+        // Ignore cleanup errors; we still reset local state below
+      }
+
+      if (isMounted) {
+        setSession(null);
+        setUser(null);
+      }
+    };
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
         if (!isMounted) return;
 
+        if (event === "SIGNED_OUT") {
+          setSession(null);
+          setUser(null);
+          return;
+        }
+
         // Update state synchronously — never await inside this callback
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
-
-        // Do NOT set loading here — the initial load controls that
       }
     );
 
@@ -40,6 +57,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (error) {
           console.error("Error getting session:", error);
+
+          const message = error.message.toLowerCase();
+          if (message.includes("refresh token") || message.includes("invalid refresh token")) {
+            await clearCorruptedSession();
+          }
           return;
         }
 
@@ -68,7 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(null);
       setUser(null);
 
-      const { error } = await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut({ scope: "local" });
 
       // Ignore "session_not_found" — user is already signed out
       if (error && !error.message.includes("session_not_found")) {

@@ -678,10 +678,19 @@ const Auth = () => {
       setLoading(true);
       
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: validated.email,
-        password: validated.password,
-      });
+      const signInAttempt = () =>
+        supabase.auth.signInWithPassword({
+          email: validated.email,
+          password: validated.password,
+        });
+
+      let { data, error } = await signInAttempt();
+
+      // Recover from stale refresh-token state that can trap users on a blank/blue auth screen
+      if (error?.message?.toLowerCase().includes("refresh token")) {
+        await supabase.auth.signOut({ scope: "local" });
+        ({ data, error } = await signInAttempt());
+      }
 
       if (error) {
 
