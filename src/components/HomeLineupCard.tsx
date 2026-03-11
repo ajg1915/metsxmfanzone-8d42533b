@@ -88,6 +88,25 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
     },
   });
 
+  // Fetch Anthony's Predictions for today
+  const { data: predictions } = useQuery({
+    queryKey: ["todays-predictions"],
+    queryFn: async () => {
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const { data, error } = await supabase
+        .from("daily_player_predictions")
+        .select("*")
+        .eq("prediction_date", todayStr)
+        .order("confidence", { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 3 * 60 * 1000,
+  });
+
+  const hasPredictions = predictions && predictions.length > 0;
 
   const { data: upcomingGames } = useQuery({
     queryKey: ["mlb-mets-upcoming-games"],
