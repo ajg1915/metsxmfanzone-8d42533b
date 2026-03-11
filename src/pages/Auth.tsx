@@ -16,7 +16,7 @@ import authLogo from "@/assets/metsxmfanzone-logo-auth.png";
 import { trackFailedLogin } from "@/utils/securityAlerts";
 import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
 import AuthLoadingScreen from "@/components/auth/AuthLoadingScreen";
-import OTPVerificationForm from "@/components/auth/OTPVerificationForm";
+
 import { lovable } from "@/integrations/lovable/index";
 
 const phoneRegex = /^(\+1)?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
@@ -132,11 +132,13 @@ const newPasswordSchema = z.object({
 });
 
 const REMEMBER_ME_KEY = "metsxm_remember_user";
-const REMEMBER_ME_EXPIRY_HOURS = 48;
-const MIN_FORM_FILL_TIME_MS = 3000; // Minimum 3 seconds to fill form (bots are faster)
+const REMEMBER_PIN_KEY = "metsxm_remember_pin";
+const REMEMBER_ME_EXPIRY_HOURS = 720; // 30 days
+const MIN_FORM_FILL_TIME_MS = 3000;
 
 interface RememberedUser {
   email: string;
+  pin?: string; // Optional PIN for quick login
   expiresAt: number;
 }
 
@@ -196,26 +198,22 @@ const Auth = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  // Remembered user state (skip password, go straight to 2FA)
+  // Remembered user state
   const [rememberedUser, setRememberedUser] = useState<RememberedUser | null>(null);
   const [isRememberedLogin, setIsRememberedLogin] = useState(false);
   
-  // 2FA states
-  const [show2FA, setShow2FA] = useState(false);
-  const [sendingOtp, setSendingOtp] = useState(false); // New: smooth loading during OTP send
-  const [otpCode, setOtpCode] = useState("");
-  const [generatedOtp, setGeneratedOtp] = useState("");
-  const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
-  const [pendingUserData, setPendingUserData] = useState<{ userId: string; isSignup: boolean } | null>(null);
-  const [resendCooldown, setResendCooldown] = useState(0);
-  
+  // PIN login state
+  const [showPinSetup, setShowPinSetup] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [pinConfirm, setPinConfirm] = useState("");
+  const [pinLoginMode, setPinLoginMode] = useState(false);
+  const [pendingPinCredentials, setPendingPinCredentials] = useState<{ email: string; password: string } | null>(null);
+
   // Bot detection states
   const [honeypot, setHoneypot] = useState(""); // Should remain empty - bots fill this
   const [formLoadTime] = useState(() => Date.now()); // Track when form loaded
   
-  // Store credentials for re-authentication after OTP
-  const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string } | null>(null);
-  
+
   // Biometric login states
   const [biometricSupported, setBiometricSupported] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
@@ -467,47 +465,12 @@ const Auth = () => {
       };
       checkAndRedirect();
     }
-  }, [authUser, authLoading, navigate, show2FA, isRememberedLogin, isResettingPassword, sendingOtp]);
+  }, [authUser, authLoading, navigate, isRememberedLogin, isResettingPassword]);
 
-  // Resend cooldown timer
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendCooldown]);
 
-  const generateOtp = () => {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
-    return { otp, expiry };
-  };
 
-  const sendOtpEmail = async (userEmail: string, otp: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke("send-otp-email", {
-        body: {
-          to: userEmail,
-          otp,
-        },
-      });
 
-      if (error) {
-        console.error("Failed to send OTP email:", error);
-        return false;
-      }
 
-      if (!data?.success) {
-        console.error("OTP email function returned failure:", data);
-        return false;
-      }
-
-      return true;
-    } catch (err) {
-      console.error("Error sending OTP:", err);
-      return false;
-    }
-  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -713,7 +676,7 @@ const Auth = () => {
     try {
       const validated = loginSchema.parse({ email, password });
       setLoading(true);
-      setSendingOtp(true); // Prevent redirect race condition before auth completes
+      
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: validated.email,
@@ -721,7 +684,8 @@ const Auth = () => {
       });
 
       if (error) {
-        setSendingOtp(false);
+
+
         // Track failed login attempt for security alerts
         trackFailedLogin(validated.email);
         
@@ -757,12 +721,14 @@ const Auth = () => {
             variant: "destructive",
           });
           await supabase.auth.signOut();
-          setSendingOtp(false);
+
+
           return;
         }
 
         if (profile?.email_verified !== true) {
-          setSendingOtp(false);
+
+
           await supabase.auth.signOut();
           toast({
             title: "Email Not Verified",
@@ -773,17 +739,23 @@ const Auth = () => {
           return;
         }
 
-        // Email verified - complete authentication directly (no 2FA)
-        setSendingOtp(false);
+        // Email verified - complete authentication directly
         
-        // Save remember me preference
+        // Save remember me preference with longer expiry (30 days)
         if (rememberMe) {
           const expiresAt = Date.now() + REMEMBER_ME_EXPIRY_HOURS * 60 * 60 * 1000;
           const rememberedData: RememberedUser = { email: validated.email, expiresAt };
           localStorage.setItem(REMEMBER_ME_KEY, JSON.stringify(rememberedData));
+          
+          // Show PIN setup prompt after login  
+          setPendingPinCredentials({ email: validated.email, password: validated.password });
+          setShowPinSetup(true);
+          setLoading(false);
+          return;
         }
 
         await completeAuthentication(data.user.id, false);
+
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -804,18 +776,52 @@ const Auth = () => {
     }
   };
 
-  // Handle remembered user login - just go to password login
+  // Handle remembered user login
   const handleRememberedLogin = async () => {
     if (!rememberedUser) return;
-    // Skip remembered flow, just pre-fill email and show password login
-    setIsRememberedLogin(false);
+    if (rememberedUser.pin) {
+      setPinLoginMode(true);
+    } else {
+      setIsRememberedLogin(false);
+    }
   };
 
-  // Clear remembered user and show normal login
+  const handlePinLogin = async () => {
+    if (!rememberedUser || !pinInput || pinInput.length < 4) {
+      toast({ title: "Invalid PIN", description: "Please enter your 4-digit PIN.", variant: "destructive" }); return;
+    }
+    if (pinInput !== rememberedUser.pin) {
+      toast({ title: "Wrong PIN", description: "Incorrect PIN.", variant: "destructive" }); setPinInput(""); return;
+    }
+    setLoading(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) { await completeAuthentication(session.user.id, false); }
+    else { toast({ title: "Session expired", description: "Please sign in with your password.", variant: "destructive" }); setPinLoginMode(false); setIsRememberedLogin(false); }
+    setLoading(false);
+  };
+
+  const handlePinSetup = async () => {
+    if (pinInput.length < 4) { toast({ title: "PIN too short", description: "Enter at least 4 digits.", variant: "destructive" }); return; }
+    if (pinInput !== pinConfirm) { toast({ title: "PINs don't match", variant: "destructive" }); return; }
+    const stored = localStorage.getItem(REMEMBER_ME_KEY);
+    if (stored) { const d: RememberedUser = JSON.parse(stored); d.pin = pinInput; localStorage.setItem(REMEMBER_ME_KEY, JSON.stringify(d)); }
+    toast({ title: "PIN saved!", description: "Use your PIN next time." });
+    setShowPinSetup(false); setPinInput(""); setPinConfirm("");
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) await completeAuthentication(session.user.id, false);
+  };
+
+  const handleSkipPinSetup = async () => {
+    setShowPinSetup(false); setPinInput(""); setPinConfirm("");
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) await completeAuthentication(session.user.id, false);
+  };
+
   const handleForgetDevice = () => {
     localStorage.removeItem(REMEMBER_ME_KEY);
     setRememberedUser(null);
     setIsRememberedLogin(false);
+    setPinLoginMode(false);
     setEmail("");
   };
 
@@ -873,177 +879,6 @@ const Auth = () => {
     }
   };
 
-  const handleVerifyOtp = async () => {
-    if (!otpCode || otpCode.length !== 6) {
-      toast({
-        title: "Invalid code",
-        description: "Please enter the 6-digit verification code.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Check if OTP has expired
-    if (otpExpiry && new Date() > otpExpiry) {
-      toast({
-        title: "Code expired",
-        description: "Your verification code has expired. Please request a new one.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (otpCode === generatedOtp && pendingUserData) {
-      setLoading(true);
-      
-      // For remembered users, we need to sign them in with a magic link approach
-      if (pendingUserData.userId === "remembered" && rememberedUser) {
-        toast({
-          title: "Verification successful!",
-          description: "Please enter your password to complete login.",
-        });
-        setShow2FA(false);
-        setIsRememberedLogin(false);
-        setLoading(false);
-        return;
-      }
-      
-      // For password logins, re-authenticate now that OTP is verified
-      if (pendingCredentials) {
-        const { error: reAuthError } = await supabase.auth.signInWithPassword({
-          email: pendingCredentials.email,
-          password: pendingCredentials.password,
-        });
-        setPendingCredentials(null); // Clear stored credentials
-        
-        if (reAuthError) {
-          toast({
-            title: "Authentication Error",
-            description: "Could not complete login. Please try again.",
-            variant: "destructive",
-          });
-          setShow2FA(false);
-          setLoading(false);
-          return;
-        }
-        
-        await completeAuthentication(pendingUserData.userId, pendingUserData.isSignup);
-        setLoading(false);
-        return;
-      }
-      
-      // For biometric logins, establish Supabase session using magic link token
-      if (biometricAuthToken) {
-        try {
-          // Try verifying with the hashed token
-          if (biometricAuthToken.token) {
-            const { error: sessionError } = await supabase.auth.verifyOtp({
-              token_hash: biometricAuthToken.token,
-              type: 'magiclink',
-            });
-            
-            if (sessionError) {
-              console.error("Session establishment failed with token_hash:", sessionError);
-              // Fallback: try using the verification URL directly
-              if (biometricAuthToken.verificationUrl) {
-                try {
-                  const url = new URL(biometricAuthToken.verificationUrl);
-                  const token = url.searchParams.get('token') || url.hash?.match(/token=([^&]+)/)?.[1];
-                  const type = url.searchParams.get('type') || 'magiclink';
-                  if (token) {
-                    const { error: fallbackError } = await supabase.auth.verifyOtp({
-                      token_hash: token,
-                      type: type as 'magiclink',
-                    });
-                    if (fallbackError) {
-                      console.error("Fallback session establishment failed:", fallbackError);
-                      // Last resort: sign in with email link
-                      const { error: signInError } = await supabase.auth.signInWithOtp({
-                        email: biometricEmail,
-                        options: { shouldCreateUser: false },
-                      });
-                      if (signInError) {
-                        toast({
-                          title: "Session Error",
-                          description: "Biometric verified but couldn't establish session. Please try password login.",
-                          variant: "destructive",
-                        });
-                        setLoading(false);
-                        setBiometricAuthToken(null);
-                        setShow2FA(false);
-                        return;
-                      }
-                      // OTP sent - user needs to check email again
-                      toast({
-                        title: "One more step",
-                        description: "Please check your email for a login link to complete sign-in.",
-                      });
-                      setLoading(false);
-                      setBiometricAuthToken(null);
-                      setShow2FA(false);
-                      return;
-                    }
-                  }
-                } catch (urlErr) {
-                  console.error("Error parsing verification URL:", urlErr);
-                }
-              }
-            }
-          }
-        } catch (err) {
-          console.error("Error establishing biometric session:", err);
-        }
-        setBiometricAuthToken(null);
-      }
-      
-      await completeAuthentication(pendingUserData.userId, pendingUserData.isSignup);
-      setLoading(false);
-    } else {
-      toast({
-        title: "Invalid code",
-        description: "The verification code is incorrect. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleResendOtp = async () => {
-    if (resendCooldown > 0) return;
-    
-    setLoading(true);
-    const { otp, expiry } = generateOtp();
-    setGeneratedOtp(otp);
-    setOtpExpiry(expiry);
-    setOtpCode("");
-    
-    const targetEmail = biometricPendingUserId ? biometricEmail : email;
-    const emailSent = await sendOtpEmail(targetEmail, otp);
-    if (emailSent) {
-      setResendCooldown(60);
-      toast({
-        title: "Code resent",
-        description: "A new verification code has been sent to your email.",
-      });
-    } else {
-      toast({
-        title: "Failed to resend",
-        description: "Unable to send verification code. Please try again.",
-        variant: "destructive",
-      });
-    }
-    setLoading(false);
-  };
-
-  const handleBack2FA = async () => {
-    // Sign out and reset 2FA state
-    await supabase.auth.signOut();
-    setShow2FA(false);
-    setOtpCode("");
-    setGeneratedOtp("");
-    setOtpExpiry(null);
-    setPendingUserData(null);
-    setBiometricAuthToken(null);
-  };
 
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -1204,19 +1039,76 @@ const Auth = () => {
                   Continue as <span className="font-medium text-foreground">{rememberedUser.email}</span>
                 </p>
               </div>
-              <div className="bg-muted/30 border border-muted/30 rounded-xl p-3 text-center">
-                <p className="text-xs text-muted-foreground">
-                  Your device is remembered. Click below to continue.
-                </p>
-              </div>
-              <Button onClick={handleRememberedLogin} className="w-full h-10 rounded-xl text-sm font-semibold" disabled={loading}>
-                {loading ? "Loading..." : "Continue to Sign In"}
-              </Button>
+              {pinLoginMode ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="pinLogin">Enter your PIN</Label>
+                    <Input id="pinLogin" type="password" maxLength={6} placeholder="••••" value={pinInput} onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))} disabled={loading} autoFocus />
+                  </div>
+                  <Button onClick={handlePinLogin} className="w-full h-10 rounded-xl text-sm font-semibold" disabled={loading || pinInput.length < 4}>
+                    {loading ? "Logging in..." : "Sign In with PIN"}
+                  </Button>
+                  <button type="button" onClick={() => { setPinLoginMode(false); setIsRememberedLogin(false); }} className="text-xs text-primary hover:underline w-full text-center">
+                    Use email & password instead
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="bg-muted/30 border border-muted/30 rounded-xl p-3 text-center">
+                    <p className="text-xs text-muted-foreground">Your device is remembered. Click below to continue.</p>
+                  </div>
+                  <Button onClick={handleRememberedLogin} className="w-full h-10 rounded-xl text-sm font-semibold" disabled={loading}>
+                    {loading ? "Loading..." : rememberedUser.pin ? "Sign In with PIN" : "Continue to Sign In"}
+                  </Button>
+                </>
+              )}
               <div className="text-center">
                 <button type="button" onClick={handleForgetDevice} className="text-xs text-muted-foreground hover:text-foreground" disabled={loading}>
                   Not you? Sign in with a different account
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // PIN setup screen after login with Remember Me
+  if (showPinSetup) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 relative">
+        <AuthBackground />
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-[120px]" />
+        </div>
+        <div className="w-full max-w-sm relative z-10">
+          <div className="rounded-2xl border border-muted/40 bg-card/90 backdrop-blur-xl shadow-2xl overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-secondary via-primary to-secondary" />
+            <div className="p-5 sm:p-6 space-y-4">
+              <div className="flex flex-col items-center gap-3">
+                <img src={authLogo} alt="MetsXMFanZone" className="h-16 w-auto object-contain" />
+              </div>
+              <div className="text-center">
+                <h1 className="text-lg font-bold text-foreground">Set a Quick Login PIN</h1>
+                <p className="text-xs text-muted-foreground mt-1">Create a 4-6 digit PIN to log in faster next time (optional)</p>
+              </div>
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label htmlFor="newPin">Create PIN</Label>
+                  <Input id="newPin" type="password" maxLength={6} placeholder="••••" value={pinInput} onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ""))} autoFocus />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPin">Confirm PIN</Label>
+                  <Input id="confirmPin" type="password" maxLength={6} placeholder="••••" value={pinConfirm} onChange={(e) => setPinConfirm(e.target.value.replace(/\D/g, ""))} />
+                </div>
+              </div>
+              <Button onClick={handlePinSetup} className="w-full" disabled={pinInput.length < 4}>
+                Save PIN
+              </Button>
+              <button type="button" onClick={handleSkipPinSetup} className="text-xs text-muted-foreground hover:text-foreground w-full text-center">
+                Skip for now
+              </button>
             </div>
           </div>
         </div>

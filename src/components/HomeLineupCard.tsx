@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, RefreshCw, User, Zap, ArrowRight, Activity } from "lucide-react";
+import { Clock, MapPin, Video, TrendingUp, Calendar, Trophy, RefreshCw, User, Zap, ArrowRight, Activity, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -88,6 +88,25 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
     },
   });
 
+  // Fetch Anthony's Predictions for today
+  const { data: predictions } = useQuery({
+    queryKey: ["todays-predictions"],
+    queryFn: async () => {
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const { data, error } = await supabase
+        .from("daily_player_predictions")
+        .select("*")
+        .eq("prediction_date", todayStr)
+        .order("confidence", { ascending: false })
+        .limit(5);
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 3 * 60 * 1000,
+  });
+
+  const hasPredictions = predictions && predictions.length > 0;
 
   const { data: upcomingGames } = useQuery({
     queryKey: ["mlb-mets-upcoming-games"],
@@ -326,7 +345,37 @@ export default function HomeLineupCard({ className, onLineupLoaded }: HomeLineup
                       </div>
                     )}
 
-                    {/* 2026 Season Stats */}
+                    {/* Anthony's Predictions */}
+                    {hasPredictions && (
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-3">
+                          <div className="w-1 h-4 rounded-full bg-secondary" />
+                          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-secondary" />
+                            Anthony's Predictions
+                          </p>
+                        </div>
+                        <div className="space-y-1.5">
+                          {predictions!.slice(0, 3).map((pred: any) => (
+                            <div key={pred.id} className="flex items-center gap-2 p-2 rounded-xl bg-secondary/5 border border-secondary/15 hover:border-secondary/30 transition-all">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-[11px] truncate">{pred.player_name}</p>
+                                <p className="text-[9px] text-muted-foreground truncate">{pred.description}</p>
+                              </div>
+                              {pred.confidence && (
+                                <span className="text-[9px] font-bold text-secondary bg-secondary/10 px-1.5 py-0.5 rounded-md shrink-0">
+                                  {pred.confidence}%
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                          <Link to="/mets-lineup-card" className="flex items-center justify-center gap-1 text-[10px] text-secondary hover:text-secondary/80 font-bold pt-1 transition-colors">
+                            View All Predictions <ArrowRight className="w-3 h-3" />
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+
                     <div>
                       <div className="flex items-center gap-1.5 mb-3">
                         <div className="w-1 h-4 rounded-full bg-primary" />
