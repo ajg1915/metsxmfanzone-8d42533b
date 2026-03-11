@@ -72,10 +72,25 @@ const Plans = () => {
     setCheckoutOpen(true);
   };
 
-  const handleConfirmFreePlan = () => {
+  const handleConfirmFreePlan = async () => {
     setFreeConfirmOpen(false);
     localStorage.removeItem("pending_signup_plan");
     setHasPlanSelected(true);
+    
+    // Send welcome email for new users (especially Google OAuth)
+    if (user) {
+      try {
+        await supabase.functions.invoke('send-welcome-email', {
+          body: {
+            email: user.email,
+            name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Fan',
+          },
+        });
+      } catch (err) {
+        console.error("Welcome email error (non-blocking):", err);
+      }
+    }
+    
     navigate("/");
   };
   
