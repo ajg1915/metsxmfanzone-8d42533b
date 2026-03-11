@@ -132,11 +132,13 @@ const newPasswordSchema = z.object({
 });
 
 const REMEMBER_ME_KEY = "metsxm_remember_user";
-const REMEMBER_ME_EXPIRY_HOURS = 48;
-const MIN_FORM_FILL_TIME_MS = 3000; // Minimum 3 seconds to fill form (bots are faster)
+const REMEMBER_PIN_KEY = "metsxm_remember_pin";
+const REMEMBER_ME_EXPIRY_HOURS = 720; // 30 days
+const MIN_FORM_FILL_TIME_MS = 3000;
 
 interface RememberedUser {
   email: string;
+  pin?: string; // Optional PIN for quick login
   expiresAt: number;
 }
 
