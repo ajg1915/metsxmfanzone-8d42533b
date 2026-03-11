@@ -850,8 +850,8 @@ All colors MUST be HSL.
    ======================================== */
 
 .tv-mode {
-  /* Scale the entire page to fit TV viewport without oversizing */
-  font-size: 16px;
+  /* Override fluid base for TV: fixed comfortable size */
+  font-size: 18px;
 }
 
 /* Fit-to-screen: constrain the body so nothing overflows */
