@@ -292,97 +292,19 @@ export default function BlogPost() {
   const currentUrl = window.location.href;
   const siteUrl = window.location.origin;
   
-  let socialImage = post.featured_image_url || `${siteUrl}/logo-512.png`;
-  
-  if (socialImage.startsWith('data:')) {
-    console.warn('Blog post has base64 image which won\'t work for social sharing:', post.slug);
-    socialImage = `${siteUrl}/logo-512.png`;
-  }
-  
-  if (!socialImage.startsWith('http')) {
-    socialImage = `${siteUrl}${socialImage}`;
-  }
-  
-  const socialTitle = `${post.title} | MetsXMFanZone`;
-  const socialDescription = post.excerpt && post.excerpt.length > 0
-    ? (post.excerpt.length > 160 ? post.excerpt.substring(0, 157) + '...' : post.excerpt)
-    : post.title;
-
   // Calculate reading time
   const wordCount = post.content.split(/\s+/).length;
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-  // Article structured data for SEO
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": post.title,
-    "description": post.excerpt || post.title,
-    "image": socialImage,
-    "datePublished": post.published_at,
-    "dateModified": post.published_at,
-    "author": { "@type": "Organization", "name": "MetsXMFanZone", "url": siteUrl },
-    "publisher": {
-      "@type": "Organization",
-      "name": "MetsXMFanZone",
-      "logo": { "@type": "ImageObject", "url": `${siteUrl}/logo-512.png` }
-    },
-    "mainEntityOfPage": { "@type": "WebPage", "@id": currentUrl },
-    "wordCount": wordCount,
-    "articleSection": post.category,
-    "keywords": post.tags.join(", "),
-  };
+  const articleSchema = generateArticleSchema({
+    title: post.title,
+    description: post.excerpt || post.title,
+    image: post.featured_image_url,
+    datePublished: post.published_at,
+    authorName: "MetsXMFanZone",
+    url: currentUrl,
+  });
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/95">
-      <Helmet>
-        <title>{socialTitle}</title>
-        <meta name="description" content={socialDescription} />
-        
-        <meta property="fb:app_id" content="1151558476948104" />
-        
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={currentUrl} />
-        <meta property="og:site_name" content="MetsXMFanZone" />
-        <meta property="og:title" content={socialTitle} />
-        <meta property="og:description" content={socialDescription} />
-        <meta property="og:image" content={socialImage} />
-        <meta property="og:image:secure_url" content={socialImage} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content={post.title} />
-        <meta property="og:locale" content="en_US" />
-        
-        <meta property="article:published_time" content={post.published_at} />
-        <meta property="article:modified_time" content={post.published_at} />
-        <meta property="article:section" content={post.category} />
-        <meta property="article:author" content="MetsXMFanZone" />
-        {post.tags.map((tag) => (
-          <meta key={tag} property="article:tag" content={tag} />
-        ))}
-        
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@metsxmfanzone" />
-        <meta name="twitter:creator" content="@metsxmfanzone" />
-        <meta name="twitter:url" content={currentUrl} />
-        <meta name="twitter:title" content={socialTitle} />
-        <meta name="twitter:description" content={socialDescription} />
-        <meta name="twitter:image" content={socialImage} />
-        <meta name="twitter:image:alt" content={post.title} />
-        <meta name="twitter:label1" content="Reading time" />
-        <meta name="twitter:data1" content={`${readingTime} min read`} />
-        
-        <meta property="ia:markup_url" content={currentUrl} />
-        <meta property="ia:markup_url_dev" content={currentUrl} />
-        <meta property="ia:rules_url" content={`${siteUrl}/rules.json`} />
-        <meta property="ia:rules_url_dev" content={`${siteUrl}/rules.json`} />
-        
-        <meta name="author" content="MetsXMFanZone" />
-        <link rel="canonical" href={currentUrl} />
-
-        {/* Article structured data */}
-        <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
-      </Helmet>
       
       <Navigation />
       
