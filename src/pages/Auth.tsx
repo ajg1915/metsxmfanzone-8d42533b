@@ -772,7 +772,7 @@ const Auth = () => {
         }
 
         // Email verified - complete authentication directly (no 2FA)
-        setSendingOtp(false);
+        
         
         // Save remember me preference
         if (rememberMe) {
