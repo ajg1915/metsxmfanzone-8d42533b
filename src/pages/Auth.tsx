@@ -439,7 +439,7 @@ const Auth = () => {
   useEffect(() => {
     // Only redirect if auth has finished loading and user is confirmed logged in
     // Don't redirect during remembered login flow or password reset
-    if (!authLoading && authUser && !isRememberedLogin && !isResettingPassword) {
+    if (!authLoading && authUser && !isRememberedLogin && !isResettingPassword && !showPinSetup) {
       // Check if this is a new Google OAuth user who needs to select a plan
       const checkAndRedirect = async () => {
         // Check if user has a subscription
