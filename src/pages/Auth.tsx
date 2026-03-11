@@ -868,7 +868,7 @@ const Auth = () => {
       if (subscription && (subscription.plan_type === "premium" || subscription.plan_type === "annual")) {
         navigate("/", { replace: true });
       } else {
-        navigate("/pricing", { replace: true });
+        navigate("/pricing?required=true", { replace: true });
       }
     }
   };
