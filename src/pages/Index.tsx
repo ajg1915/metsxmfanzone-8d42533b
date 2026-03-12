@@ -303,10 +303,6 @@ const Index = () => {
       </main>
       <Footer />
       
-      {/* Onboarding walkthrough */}
-      <Suspense fallback={null}>
-        <OnboardingWalkthrough onComplete={() => setOnboardingShown(true)} />
-      </Suspense>
       
       {/* Install prompt */}
       <Suspense fallback={null}>
