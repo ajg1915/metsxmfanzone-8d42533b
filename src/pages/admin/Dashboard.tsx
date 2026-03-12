@@ -1,11 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Globe, Sparkles, Settings, Video, Mic } from "lucide-react";
+import { Users, FileText, Activity, Radio, HelpCircle, ArrowRight, UserCog, Eye, HeartPulse, Mail, Search, CreditCard, Globe, Sparkles, Settings, Video, Mic, ClipboardList, Loader2, RefreshCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import CreateBusinessAdForm from "@/components/CreateBusinessAdForm";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +15,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
+function ManualFetchButton({ label, icon, functionName, successMessage }: { label: string; icon: React.ReactNode; functionName: string; successMessage: string }) {
+  const [loading, setLoading] = useState(false);
+  const handleFetch = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(functionName);
+      if (error) throw error;
+      toast.success(successMessage, { description: data?.message || JSON.stringify(data) });
+    } catch (err: any) {
+      toast.error("Fetch failed", { description: err.message || "Unknown error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <Button variant="outline" size="sm" className="gap-2" onClick={handleFetch} disabled={loading}>
+      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : icon}
+      {label}
+    </Button>
+  );
+}
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -228,6 +251,31 @@ export default function AdminDashboard() {
             <div className="text-lg sm:text-xl font-bold text-green-500">Online</div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Manual Fetch Actions */}
+      <div className="mt-4 sm:mt-6">
+        <h3 className="text-sm sm:text-base font-semibold mb-2">Manual Fetch</h3>
+        <div className="flex flex-wrap gap-2">
+          <ManualFetchButton
+            label="Fetch Lineup Card"
+            icon={<ClipboardList className="h-4 w-4" />}
+            functionName="fetch-mets-lineup"
+            successMessage="Lineup card fetched successfully!"
+          />
+          <ManualFetchButton
+            label="Fetch Highlights"
+            icon={<Video className="h-4 w-4" />}
+            functionName="fetch-mets-highlights"
+            successMessage="Highlights fetched successfully!"
+          />
+          <ManualFetchButton
+            label="Fetch Schedule"
+            icon={<RefreshCw className="h-4 w-4" />}
+            functionName="fetch-mets-schedule"
+            successMessage="Schedule fetched successfully!"
+          />
+        </div>
       </div>
 
       <div className="mt-4 sm:mt-6">
