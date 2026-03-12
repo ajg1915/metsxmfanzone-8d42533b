@@ -16,6 +16,28 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+function ManualFetchButton({ label, icon, functionName, successMessage }: { label: string; icon: React.ReactNode; functionName: string; successMessage: string }) {
+  const [loading, setLoading] = useState(false);
+  const handleFetch = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(functionName);
+      if (error) throw error;
+      toast.success(successMessage, { description: data?.message || JSON.stringify(data) });
+    } catch (err: any) {
+      toast.error("Fetch failed", { description: err.message || "Unknown error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <Button variant="outline" size="sm" className="gap-2" onClick={handleFetch} disabled={loading}>
+      {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : icon}
+      {label}
+    </Button>
+  );
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [helpOpen, setHelpOpen] = useState(false);
