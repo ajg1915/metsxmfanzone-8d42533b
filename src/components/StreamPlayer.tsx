@@ -313,7 +313,7 @@ export function StreamPlayer({
                 <p className="text-xs sm:text-sm text-muted-foreground">Stream is muted by default for autoplay</p>
               </div>
             )}
-            <div className="relative aspect-video bg-black rounded-lg overflow-hidden landscape:max-h-[80vh] landscape:mx-auto landscape:w-full">
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden landscape:fixed landscape:inset-0 landscape:z-50 landscape:rounded-none landscape:aspect-auto landscape:max-h-none landscape:w-full landscape:h-full sm:landscape:relative sm:landscape:inset-auto sm:landscape:z-auto sm:landscape:rounded-lg sm:landscape:aspect-video sm:landscape:h-auto">
               <video 
                 ref={videoRef} 
                 className="video-js vjs-big-play-centered vjs-theme-fantasy" 

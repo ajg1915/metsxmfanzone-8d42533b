@@ -247,7 +247,7 @@ export function ClapprPlayer({
           </div>
         )}
 
-        <div className="relative w-full rounded-lg overflow-hidden bg-black aspect-video landscape:max-h-[80vh] landscape:mx-auto">
+        <div className="relative w-full rounded-lg overflow-hidden bg-black aspect-video landscape:fixed landscape:inset-0 landscape:z-50 landscape:rounded-none landscape:aspect-auto landscape:max-h-none landscape:w-full landscape:h-full sm:landscape:relative sm:landscape:inset-auto sm:landscape:z-auto sm:landscape:rounded-lg sm:landscape:aspect-video sm:landscape:h-auto">
           <video
             ref={videoRef}
             className="video-js vjs-big-play-centered vjs-theme-fantasy"
