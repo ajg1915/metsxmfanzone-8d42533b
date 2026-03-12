@@ -231,6 +231,31 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
+      {/* Manual Fetch Actions */}
+      <div className="mt-4 sm:mt-6">
+        <h3 className="text-sm sm:text-base font-semibold mb-2">Manual Fetch</h3>
+        <div className="flex flex-wrap gap-2">
+          <ManualFetchButton
+            label="Fetch Lineup Card"
+            icon={<ClipboardList className="h-4 w-4" />}
+            functionName="fetch-mets-lineup"
+            successMessage="Lineup card fetched successfully!"
+          />
+          <ManualFetchButton
+            label="Fetch Highlights"
+            icon={<Video className="h-4 w-4" />}
+            functionName="fetch-mets-highlights"
+            successMessage="Highlights fetched successfully!"
+          />
+          <ManualFetchButton
+            label="Fetch Schedule"
+            icon={<RefreshCw className="h-4 w-4" />}
+            functionName="fetch-mets-schedule"
+            successMessage="Schedule fetched successfully!"
+          />
+        </div>
+      </div>
+
       <div className="mt-4 sm:mt-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 sm:mb-3">
           <h3 className="text-sm sm:text-base font-semibold">Quick Access</h3>
