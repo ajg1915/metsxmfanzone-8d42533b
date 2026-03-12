@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Play, Music2, Facebook, Headphones, Music, Podcast, Radio, Mic, ArrowRight, Waves } from "lucide-react";
+import { Play, Pause, Music2, Facebook, Headphones, Music, Podcast, Radio, Mic, ArrowRight, Waves, Volume2, Disc3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/metsxmfanzone-logo.png";
 import PremiumBadge from "@/components/PremiumBadge";
 import { useSubscription } from "@/hooks/useSubscription";
+import { motion } from "framer-motion";
 
 interface PodcastEpisode {
   id: string;
@@ -16,13 +17,33 @@ interface PodcastEpisode {
 }
 
 const platforms = [
-{ name: "TikTok", icon: Music2, url: "https://www.tiktok.com/@metsxmfanzone" },
-{ name: "Facebook", icon: Facebook, url: "https://www.facebook.com/metsxmfanzone" },
-{ name: "iHeartRadio", icon: Radio, url: "https://www.iheart.com" },
-{ name: "Amazon Music", icon: Headphones, url: "https://music.amazon.com" },
-{ name: "Spotify", icon: Music, url: "https://open.spotify.com" },
-{ name: "Apple Podcasts", icon: Podcast, url: "https://podcasts.apple.com" }];
+  { name: "TikTok", icon: Music2, url: "https://www.tiktok.com/@metsxmfanzone" },
+  { name: "Facebook", icon: Facebook, url: "https://www.facebook.com/metsxmfanzone" },
+  { name: "iHeartRadio", icon: Radio, url: "https://www.iheart.com" },
+  { name: "Amazon Music", icon: Headphones, url: "https://music.amazon.com" },
+  { name: "Spotify", icon: Music, url: "https://open.spotify.com" },
+  { name: "Apple Podcasts", icon: Podcast, url: "https://podcasts.apple.com" },
+];
 
+const EqualizerBars = ({ animate = true }: { animate?: boolean }) => (
+  <div className="flex items-end gap-[3px] h-5">
+    {[0.6, 1, 0.4, 0.8, 0.5, 0.9, 0.3].map((height, i) => (
+      <motion.div
+        key={i}
+        className="w-[3px] rounded-full bg-[hsl(var(--mets-orange))]"
+        initial={{ height: `${height * 100}%` }}
+        animate={animate ? {
+          height: [`${height * 40}%`, `${height * 100}%`, `${height * 60}%`, `${height * 90}%`, `${height * 40}%`],
+        } : {}}
+        transition={{
+          duration: 1.2 + i * 0.15,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+    ))}
+  </div>
+);
 
 const PodcastSection = () => {
   const { tier, isAdmin } = useSubscription();
@@ -34,150 +55,241 @@ const PodcastSection = () => {
   }, []);
 
   const fetchPodcasts = async () => {
-    const { data } = await supabase.
-    from("podcasts").
-    select("*").
-    eq("published", true).
-    order("published_at", { ascending: false }).
-    limit(3);
+    const { data } = await supabase
+      .from("podcasts")
+      .select("*")
+      .eq("published", true)
+      .order("published_at", { ascending: false })
+      .limit(3);
     if (data) setPodcasts(data);
   };
 
   return (
-    <section className="py-8 sm:py-16 md:py-20 relative overflow-hidden">
-      {/* Decorative background elements */}
+    <section className="py-10 sm:py-20 relative overflow-hidden">
+      {/* Ambient background */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[hsl(var(--mets-blue)/0.08)] blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-[hsl(var(--mets-orange)/0.06)] blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-[hsl(var(--mets-blue)/0.06)] blur-[150px]" />
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-[hsl(var(--mets-orange)/0.04)] blur-[120px]" />
       </div>
 
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-6xl relative z-10">
-        {/* Header */}
-        <div className="flex flex-col items-center text-center mb-6 sm:mb-14">
-          <div className="inline-flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative z-10">
+        {/* Hero Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="text-center mb-10 sm:mb-16"
+        >
+          {/* Logo + Title */}
+          <div className="flex flex-col items-center gap-4 mb-5">
             <div className="relative">
-              <div className="absolute inset-0 rounded-2xl bg-[hsl(var(--mets-orange)/0.3)] blur-lg" />
-              <div className="relative p-2 sm:p-2.5 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/20">
-                <img src={logo} alt="MetsXMFanZone" className="w-7 h-7 sm:w-10 sm:h-10" />
+              <motion.div
+                className="absolute inset-0 rounded-2xl bg-[hsl(var(--mets-orange)/0.4)] blur-xl"
+                animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.6, 0.4] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              />
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-card/90 backdrop-blur-xl border border-border/30 flex items-center justify-center shadow-lg">
+                <img src={logo} alt="MetsXMFanZone" className="w-10 h-10 sm:w-12 sm:h-12" />
               </div>
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2.5 flex-wrap">
-              <h2 className="text-base sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-foreground">
-                MetsXMFanZone Radio
+
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-foreground">
+                MetsXM<span className="text-[hsl(var(--mets-orange))]">FanZone</span> Radio
               </h2>
               {!isPremium && <PremiumBadge size="xs" noGlow />}
             </div>
           </div>
-          <p className="text-xs sm:text-base text-muted-foreground max-w-lg">Exclusive Mets content, game analysis All Season Long join The Live Stream on Social Media Channels    
 
+          <p className="text-sm sm:text-base text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            Exclusive Mets content, game analysis & live coverage all season long
           </p>
-        </div>
+        </motion.div>
 
-        {/* Live Banner */}
-        <div className="mb-10 sm:mb-12">
-          <div className="relative rounded-2xl overflow-hidden border border-[hsl(var(--mets-orange)/0.25)] bg-card/60 backdrop-blur-xl">
+        {/* NOW LIVE Banner */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mb-10 sm:mb-14"
+        >
+          <div className="relative rounded-2xl overflow-hidden border border-[hsl(var(--mets-orange)/0.3)] bg-gradient-to-r from-card/80 via-card/60 to-card/80 backdrop-blur-xl">
+            {/* Top accent line */}
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[hsl(var(--mets-orange))] to-transparent" />
-            <div className="flex items-center gap-3 sm:gap-4 p-4 sm:p-5">
+            
+            {/* Glow behind */}
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-60 h-20 bg-[hsl(var(--mets-orange)/0.15)] blur-3xl rounded-full" />
+            
+            <div className="relative flex items-center gap-4 p-5 sm:p-6">
+              {/* Animated disc */}
               <div className="relative flex-shrink-0">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[hsl(var(--mets-orange)/0.15)] flex items-center justify-center">
-                  <Mic className="w-5 h-5 text-[hsl(var(--mets-orange))]" />
-                </div>
-                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[hsl(var(--mets-orange))] rounded-full animate-pulse border-2 border-card" />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-[hsl(var(--mets-orange))] to-[hsl(var(--mets-orange-light))] flex items-center justify-center shadow-lg shadow-[hsl(var(--mets-orange)/0.3)]"
+                >
+                  <div className="w-4 h-4 rounded-full bg-card" />
+                </motion.div>
+                <motion.span
+                  className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-card"
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
               </div>
+
               <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">On Air</span>
+                  <EqualizerBars />
+                </div>
                 <p className="text-sm sm:text-base font-semibold text-foreground">
                   New episodes drop instantly when we go live!
                 </p>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-                  Follow us on any platform to get notified the moment a new episode is available.
+                  Follow on any platform to get notified the moment a new episode is available.
                 </p>
               </div>
-              <Waves className="w-6 h-6 text-[hsl(var(--mets-orange)/0.4)] hidden sm:block animate-pulse" />
+
+              <Volume2 className="w-6 h-6 text-muted-foreground/40 hidden sm:block" />
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Listen On Platforms */}
-        <div className="mb-10 sm:mb-14">
-          <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground text-center mb-5 sm:mb-6">
-            Listen Live On
-          </h3>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 max-w-3xl mx-auto">
-            {platforms.map((platform) => {
+        {/* Platforms Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mb-12 sm:mb-16"
+        >
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <div className="h-px flex-1 max-w-[60px] bg-gradient-to-r from-transparent to-border/50" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-muted-foreground">
+              Listen On
+            </span>
+            <div className="h-px flex-1 max-w-[60px] bg-gradient-to-l from-transparent to-border/50" />
+          </div>
+
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 sm:gap-3 max-w-3xl mx-auto">
+            {platforms.map((platform, i) => {
               const IconComponent = platform.icon;
               return (
-                <a
+                <motion.a
                   key={platform.name}
                   href={platform.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-col items-center gap-1.5 p-3 sm:p-4 rounded-xl bg-card/40 backdrop-blur-sm border border-border/10 hover:border-[hsl(var(--mets-blue)/0.4)] hover:bg-card/70 transition-all duration-300">
-
-                  <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground group-hover:text-[hsl(var(--mets-blue-light))] transition-colors" />
-                  <span className="text-[10px] sm:text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.05 * i }}
+                  whileHover={{ y: -4, scale: 1.03 }}
+                  className="group flex flex-col items-center gap-2 p-3.5 sm:p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/10 hover:border-[hsl(var(--mets-orange)/0.4)] hover:bg-card/80 transition-colors duration-300 hover:shadow-lg hover:shadow-[hsl(var(--mets-orange)/0.08)]"
+                >
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-muted/30 flex items-center justify-center group-hover:bg-[hsl(var(--mets-orange)/0.15)] transition-colors">
+                    <IconComponent className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-[hsl(var(--mets-orange))] transition-colors" />
+                  </div>
+                  <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground group-hover:text-foreground transition-colors">
                     {platform.name}
                   </span>
-                </a>);
-
+                </motion.a>
+              );
             })}
           </div>
-        </div>
+        </motion.div>
 
         {/* Recent Episodes */}
-        {podcasts.length > 0 &&
-        <div>
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground text-center mb-5 sm:mb-6">
-              Recent Episodes
-            </h3>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-              {podcasts.map((podcast, index) =>
-            <div
-              key={podcast.id}
-              className="group relative rounded-2xl overflow-hidden bg-card/50 backdrop-blur-sm border border-border/10 hover:border-[hsl(var(--mets-blue)/0.3)] transition-all duration-300 hover:-translate-y-0.5">
+        {podcasts.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <div className="h-px flex-1 max-w-[60px] bg-gradient-to-r from-transparent to-border/50" />
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-muted-foreground">
+                Recent Episodes
+              </span>
+              <div className="h-px flex-1 max-w-[60px] bg-gradient-to-l from-transparent to-border/50" />
+            </div>
 
-                  {index === 0 &&
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[hsl(var(--mets-blue))] to-[hsl(var(--mets-orange))]" />
-              }
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {podcasts.map((podcast, index) => (
+                <motion.div
+                  key={podcast.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ y: -3 }}
+                  className="group relative rounded-2xl overflow-hidden bg-card/60 backdrop-blur-sm border border-border/10 hover:border-[hsl(var(--mets-blue)/0.4)] transition-all duration-300 hover:shadow-xl hover:shadow-[hsl(var(--mets-blue)/0.08)]"
+                >
+                  {/* Episode number badge */}
+                  <div className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-[hsl(var(--mets-blue)/0.15)] flex items-center justify-center">
+                    <span className="text-xs font-bold text-[hsl(var(--mets-blue-light))]">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                  </div>
+
+                  {index === 0 && (
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[hsl(var(--mets-blue))] via-[hsl(var(--mets-orange))] to-[hsl(var(--mets-blue))]" />
+                  )}
+
                   <div className="p-5 sm:p-6">
-                    <div className="flex items-start gap-3 mb-4">
-                      <div className="w-11 h-11 rounded-xl bg-[hsl(var(--mets-blue)/0.12)] flex items-center justify-center flex-shrink-0 group-hover:bg-[hsl(var(--mets-blue)/0.2)] transition-colors">
-                        <Play className="w-5 h-5 text-[hsl(var(--mets-blue-light))]" />
+                    <div className="flex items-start gap-3.5 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(var(--mets-blue)/0.2)] to-[hsl(var(--mets-blue)/0.05)] flex items-center justify-center flex-shrink-0 group-hover:from-[hsl(var(--mets-blue)/0.3)] group-hover:to-[hsl(var(--mets-blue)/0.1)] transition-all">
+                        <Mic className="w-5 h-5 text-[hsl(var(--mets-blue-light))]" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-base sm:text-lg leading-snug line-clamp-2 text-foreground">
+                      <div className="flex-1 min-w-0 pr-8">
+                        <h4 className="font-bold text-sm sm:text-base leading-snug line-clamp-2 text-foreground group-hover:text-[hsl(var(--mets-blue-light))] transition-colors">
                           {podcast.title}
                         </h4>
-                        <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2">
+                        <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">
                           {podcast.description}
                         </p>
                       </div>
                     </div>
-                    <audio controls className="w-full h-9 rounded-lg [&::-webkit-media-controls-panel]:bg-[hsl(var(--muted))] accent-[hsl(var(--mets-orange))] [&::-webkit-media-controls-current-time-display]:text-[hsl(var(--mets-orange))] [&::-webkit-media-controls-time-remaining-display]:text-[hsl(var(--mets-orange))]">
+
+                    <audio
+                      controls
+                      className="w-full h-9 rounded-lg [&::-webkit-media-controls-panel]:bg-[hsl(var(--muted))] accent-[hsl(var(--mets-orange))] [&::-webkit-media-controls-current-time-display]:text-[hsl(var(--mets-orange))] [&::-webkit-media-controls-time-remaining-display]:text-[hsl(var(--mets-orange))]"
+                    >
                       <source src={podcast.audio_url} type="audio/mpeg" />
                       Your browser does not support the audio element.
                     </audio>
                   </div>
-                </div>
-            )}
+                </motion.div>
+              ))}
             </div>
-            <div className="text-center mt-8">
-              <Button
-              size="lg"
-              variant="outline"
-              asChild
-              className="rounded-xl border-border/30 hover:border-[hsl(var(--mets-blue)/0.5)] hover:bg-card/60 gap-2 group">
 
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="text-center mt-8"
+            >
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="rounded-xl border-border/30 hover:border-[hsl(var(--mets-orange)/0.5)] hover:bg-[hsl(var(--mets-orange)/0.08)] gap-2 group"
+              >
                 <Link to="/podcast">
                   View All Episodes
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-            </div>
-          </div>
-        }
+            </motion.div>
+          </motion.div>
+        )}
       </div>
-    </section>);
-
+    </section>
+  );
 };
 
 export default PodcastSection;
