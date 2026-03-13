@@ -113,3 +113,5 @@ project_id = "clwghkbtkofacsjeyrtk"
     verify_jwt = true
   [functions.webauthn-register-verify]
     verify_jwt = true
+  [functions.process-email-queue]
+    verify_jwt = true
