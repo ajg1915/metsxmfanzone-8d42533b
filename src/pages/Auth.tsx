@@ -477,7 +477,7 @@ const Auth = () => {
           // New user or no plan - send to pricing
           // Mark email as verified for Google OAuth users (they verified via Google)
           const provider = authUser.app_metadata?.provider;
-          if (provider === "google") {
+          if (provider === "google" || provider === "apple") {
             await supabase
               .from("profiles")
               .update({ email_verified: true })
