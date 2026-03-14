@@ -223,6 +223,7 @@ const Auth = () => {
   const [biometricPendingUserId, setBiometricPendingUserId] = useState<string | null>(null);
   const [biometricAuthToken, setBiometricAuthToken] = useState<{ token: string; verificationUrl: string } | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -248,6 +249,30 @@ const Auth = () => {
       });
     } finally {
       setGoogleLoading(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    setAppleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("apple", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast({
+          title: "Apple Sign-In Failed",
+          description: result.error.message || "Could not sign in with Apple.",
+          variant: "destructive",
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: "Apple Sign-In Error",
+        description: err.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setAppleLoading(false);
     }
   };
 
